@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=test
-#SBATCH --output=%x-%test.out
-#SBATCH --error=%x-%test.err
+#SBATCH --output=%x-%j.out
+#SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
 #SBATCH --cpus-per-task=12
 #SBATCH --mem=10000
@@ -13,7 +13,7 @@
 # Verify working directory
 echo $(pwd)
 
-nvidia-smi
+#nvidia-smi
 
 nvcc --version
 
@@ -21,8 +21,8 @@ nvcc --version
 eval "$(conda shell.bash hook)"
 
 # Activate (local) env
-conda activate faiss
+conda activate llm
 
-python3 hierarchical.py "$@"
+# python3 hierarchical.py "$@"
 
 conda deactivate
