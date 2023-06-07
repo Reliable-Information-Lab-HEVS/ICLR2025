@@ -1,4 +1,4 @@
-name: llm
+name: foo
 channels:
   - conda-forge
   - nvidia
