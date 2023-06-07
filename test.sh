@@ -19,7 +19,7 @@ nvidia-smi
 eval "$(conda shell.bash hook)"
 
 # Activate (local) env
-conda activate foo2
+conda activate llm
 
 python3 test.py
 
