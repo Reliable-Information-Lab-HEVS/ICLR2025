@@ -13,18 +13,14 @@
 # Verify working directory
 echo $(pwd)
 
-#nvidia-smi
-
-nvcc --version
+nvidia-smi
 
 # Initialize the shell to use local conda
 eval "$(conda shell.bash hook)"
 
 # Activate (local) env
-conda activate llm
+conda activate foo2
 
-cat /usr/local/cuda/version.txt
-
-# python3 hierarchical.py "$@"
+python3 test.py
 
 conda deactivate
