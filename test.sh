@@ -23,6 +23,8 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
+cat /usr/local/cuda/version.txt
+
 # python3 hierarchical.py "$@"
 
 conda deactivate
