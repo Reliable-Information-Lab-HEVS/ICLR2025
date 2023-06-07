@@ -1,4 +1,4 @@
-name: foo
+name: foo2
 channels:
   - pytorch
   - nvidia
