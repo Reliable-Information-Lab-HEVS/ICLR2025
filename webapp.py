@@ -7,8 +7,7 @@ import loader
 default = 'bloom-560M'
 
 # Initialize global model and tokenizer
-model = loader.load_model(default)
-tokenizer = loader.load_tokenizer(default)
+model, tokenizer = loader.load_model_and_tokenizer(default)
 
 def update_model(model_name: str):
     """Update the model and tokenizer in the global scope so that we can reuse it and speed up inference.

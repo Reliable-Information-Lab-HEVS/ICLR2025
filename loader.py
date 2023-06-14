@@ -1,7 +1,7 @@
 import torch
-import numpy as np
-import random
 from transformers import AutoTokenizer, AutoModelForCausalLM
+
+import utils
 
 
 # Pretrained bloom models
@@ -75,19 +75,6 @@ all_models_mapping = {
 AUTHORIZED_MODELS = list(all_models_mapping.keys())
 
 
-def set_all_seeds(seed: int):
-    """Set seed for all random number generators (random, numpy and torch).
-
-    Parameters
-    ----------
-    seed : int
-        The seed.
-    """
-
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-
 
 def load_model(model_name: str) -> AutoModelForCausalLM:
     """Load one of the supported pretrained model.
@@ -133,6 +120,23 @@ def load_tokenizer(model_name: str) -> AutoTokenizer:
 
     return tokenizer
 
+
+def load_model_and_tokenizer(model_name: str):
+    """Load both a model and corresponding tokenizer.
+
+    Parameters
+    ----------
+    model_name : str
+        The model name.
+
+    Returns
+    -------
+    Tuple
+        The model and tokenizer.
+    """
+
+    return load_model(model_name), load_tokenizer(model_name)
+
     
 def generate_text(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt: str, max_new_tokens: int = 60,
                   do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
@@ -170,7 +174,7 @@ def generate_text(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt:
     """
     
     if seed is not None:
-        set_all_seeds(seed)
+        utils.set_all_seeds(seed)
 
     inputs = tokenizer(prompt, return_tensors='pt')
     with torch.no_grad():
