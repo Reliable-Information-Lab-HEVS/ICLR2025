@@ -16,6 +16,9 @@ model, tokenizer = loader.load_model_and_tokenizer(model_name)
 print(model.device)
 print(model.hf_device_map)
 
+
+utils.set_all_seeds(0)
+
 prompt = 'Hello, my dog is cute'
 t0 = time.time()
 predictions = loader.generate_text(model, tokenizer, prompt)
