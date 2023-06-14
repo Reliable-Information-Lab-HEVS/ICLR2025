@@ -13,6 +13,7 @@ args = parser.parse_args()
 model_name = args.model_name
 
 model, tokenizer = loader.load_model_and_tokenizer(model_name)
+print(model.device)
 print(model.hf_device_map)
 
 prompt = 'Hello, my dog is cute'

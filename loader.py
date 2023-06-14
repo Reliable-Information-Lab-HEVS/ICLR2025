@@ -177,6 +177,8 @@ def generate_text(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt:
         utils.set_all_seeds(seed)
 
     inputs = tokenizer(prompt, return_tensors='pt')
+    if torch.cuda.is_available():
+        inputs = inputs.to('cuda')
     with torch.no_grad():
         outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k,
                                 top_p=top_p, temperature=temperature, num_return_sequences=num_return_sequences)
