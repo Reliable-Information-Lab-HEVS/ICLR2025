@@ -2,6 +2,7 @@ import gradio as gr
 import gc
 
 import loader
+import utils
 
 # Default model to load at start-up
 default = 'bloom-560M'
@@ -58,8 +59,9 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
         List containing all `num_return_sequences` sequences generated.
     """
         
-    return loader.generate_text(model, tokenizer, prompt, max_new_tokens, do_sample, top_k, top_p,
-                                temperature, num_return_sequences, seed)
+    predictions = loader.generate_text(model, tokenizer, prompt, max_new_tokens, do_sample, top_k, top_p,
+                                       temperature, num_return_sequences, seed)
+    return utils.format_output(predictions)
 
 
 # Define elements of the UI
