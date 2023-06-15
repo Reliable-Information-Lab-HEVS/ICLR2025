@@ -16,6 +16,8 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
+# Note: the -u option is absolutely necesary here to force the flush of the link 
+# to connect to the app!
 python3 -u webapp.py
 
 conda deactivate

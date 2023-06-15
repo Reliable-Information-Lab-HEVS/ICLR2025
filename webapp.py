@@ -114,10 +114,10 @@ temperature = gr.Slider(0, 1, value=0.9, step=0.01, label='Temperature',
                         info='How to cool down the probability distribution.')
 num_return_sequence = gr.Slider(1, 10, value=1, step=1, label='Sequence', info='Number of sequence to generate.')
 seed = gr.Number(0, label='Seed', info='Seed for reproducibility.', precision=0)
-output = gr.Textbox()
-generate_button = gr.Button('Generate text').style()
+output = gr.Textbox(label='Model output')
+generate_button = gr.Button('Generate text', variant='primary')
 clear_button = gr.Button('Clear prompt')
-flag_button = gr.Button('Flag')
+flag_button = gr.Button('Flag', variant='stop')
 
 # Define the inputs for the main inference
 inputs_to_main = [prompt, max_new_tokens, do_sample, top_k, top_p, temperature, num_return_sequence, seed]
@@ -125,14 +125,13 @@ inputs_to_main = [prompt, max_new_tokens, do_sample, top_k, top_p, temperature, 
 callback = gr.CSVLogger()
 
 
-demo = gr.Blocks()
+demo = gr.Blocks(title='Text generation with LLMs')
 
 with demo:
     model_name.render()
     with gr.Row():
         max_new_tokens.render()
         do_sample.render()
-    with gr.Row():
         top_k.render()
         top_p.render()
     with gr.Row():
@@ -141,8 +140,8 @@ with demo:
         seed.render()
     prompt.render()
     with gr.Row():
-        clear_button.render()
         generate_button.render()
+        clear_button.render()
     output.render()
     flag_button.render()
 
@@ -156,6 +155,4 @@ with demo:
 
 
 if __name__ == '__main__':
-    print('test', flush=True)
-    _, local_link, public_link = demo.queue().launch(share=True, auth=authentication, prevent_thread_lock=False)  
-    print(public_link)
+    demo.queue().launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])  
