@@ -19,3 +19,5 @@ eval "$(conda shell.bash hook)"
 conda activate llm
 
 python3 webapp.py
+
+conda deactivate
