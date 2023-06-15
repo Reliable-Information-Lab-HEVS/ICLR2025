@@ -103,7 +103,7 @@ def authentication(username: str, password: str) -> bool:
 model_name = gr.Radio(loader.AUTHORIZED_MODELS, value=DEFAULT, label='Model name',
                       info='Choose the model you want to use.')
 prompt = gr.Textbox(placeholder='Write your prompt here.', label='Prompt')
-max_new_tokens = gr.Slider(10, 100, value=60, step=1, label='Max new tokens',
+max_new_tokens = gr.Slider(10, 1000, value=100, step=5, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
 do_sample = gr.Checkbox(value=True, label='Sampling', info='Whether to incorporate randomness in generation.')
 top_k = gr.Slider(0, 200, value=100, step=5, label='Top-k',
