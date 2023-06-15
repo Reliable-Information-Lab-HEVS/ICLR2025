@@ -1,6 +1,9 @@
 import torch
 import numpy as np
 import random
+import os
+
+ROOT_FOLDER = os.path.dirname(__file__)
 
 
 def set_all_seeds(seed: int):

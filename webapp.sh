@@ -10,9 +10,6 @@
 #SBATCH --gres=gpu:a100:1
 #SBATCH --chdir=/cluster/raid/home/vacy/LLMs
 
-# Verify working directory
-echo $(pwd)
-
 nvidia-smi
 
 # Initialize the shell to use local conda
@@ -22,5 +19,3 @@ eval "$(conda shell.bash hook)"
 conda activate llm
 
 python3 webapp.py
-
-conda deactivate

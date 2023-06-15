@@ -4,11 +4,16 @@ import gc
 import loader
 import utils
 
-# Default model to load at start-up
-default = 'bloom-560M'
 
-# Initialize global model and tokenizer
-model, tokenizer = loader.load_model_and_tokenizer(default)
+# Default model to load at start-up
+DEFAULT = 'bloom-560M'
+
+# File where the valid credentials are stored
+CREDENTIALS_FILE = utils.ROOT_FOLDER + '/.gradio_login.txt'
+
+# Initialize global model and tokenizer (necessary not to reload the model for each new inference)
+model, tokenizer = loader.load_model_and_tokenizer(DEFAULT)
+
 
 def update_model(model_name: str):
     """Update the model and tokenizer in the global scope so that we can reuse it and speed up inference.
@@ -64,8 +69,38 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     return utils.format_output(predictions)
 
 
+def authentication(username: str, password: str) -> bool:
+    """Simple authentication method.
+
+    Parameters
+    ----------
+    username : str
+        The username provided.
+    password : str
+        The password provided.
+
+    Returns
+    -------
+    bool
+        Return True if both the username and password match the credentials stored in `CREDENTIALS_FILE`. 
+        False otherwise.
+    """
+
+    with open(CREDENTIALS_FILE, 'r') as file:
+        # Read lines and remove whitespaces
+        lines = [line.strip() for line in file.readlines()]
+
+    valid_username = lines[0]
+    valid_password = lines[1]
+
+    if (username == valid_username) & (password == valid_password):
+        return True
+    else:
+        return False
+
+
 # Define elements of the UI
-model_name = gr.Radio(loader.AUTHORIZED_MODELS, value=default, label='Model name',
+model_name = gr.Radio(loader.AUTHORIZED_MODELS, value=DEFAULT, label='Model name',
                       info='Choose the model you want to use.')
 prompt = gr.Textbox(placeholder='Write your prompt here.', label='Prompt')
 max_new_tokens = gr.Slider(10, 100, value=60, step=1, label='Max new tokens',
@@ -84,6 +119,7 @@ generate_button = gr.Button('Generate text').style()
 clear_button = gr.Button('Clear prompt')
 flag_button = gr.Button('Flag')
 
+# Define the inputs for the main inference
 inputs_to_main = [prompt, max_new_tokens, do_sample, top_k, top_p, temperature, num_return_sequence, seed]
 # set-up callback for flagging
 callback = gr.CSVLogger()
@@ -120,4 +156,4 @@ with demo:
 
 
 if __name__ == '__main__':
-    demo.queue().launch()  
+    demo.queue().launch(share=True, auth=authentication)  
