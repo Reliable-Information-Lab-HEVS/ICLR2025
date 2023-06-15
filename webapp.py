@@ -156,6 +156,6 @@ with demo:
 
 
 if __name__ == '__main__':
-    print('test')
+    print('test', flush=True)
     _, local_link, public_link = demo.queue().launch(share=True, auth=authentication, prevent_thread_lock=False)  
     print(public_link)
