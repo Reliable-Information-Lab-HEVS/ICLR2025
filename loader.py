@@ -1,11 +1,11 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
 
 import utils
 
 
 # Pretrained bloom models
-bloom_models_mapping = {
+BLOOM_MODELS_MAPPING = {
     'bloom-560M': 'bigscience/bloom-560m',
     'bloom-1.7B': 'bigscience/bloom-1b7',
     'bloom-3B': 'bigscience/bloom-3b',
@@ -14,14 +14,14 @@ bloom_models_mapping = {
 }
 
 # Pretrained Dialo-GPT models
-dialo_gpt_models_mapping = {
-    'DialoGPT-small': 'microsoft/DialoGPT-small',
-    'DialoGPT-medium': 'microsoft/DialoGPT-medium',
-    'DialoGPT-large': 'microsoft/DialoGPT-large',
+DIALO_GPT_MODELS_MAPPING = {
+    'dialo-gpt-small': 'microsoft/DialoGPT-small',
+    'dialo-gpt-medium': 'microsoft/DialoGPT-medium',
+    'dialo-gpt-large': 'microsoft/DialoGPT-large',
 }
 
 # Pretrained GPT-2 models
-gpt2_mapping = {
+GPT2_MODELS_MAPPING = {
     'gpt2-small':'gpt2-small',
     'gpt2-medium': 'gpt2-medium',
     'gpt2-large': 'gpt2-large',
@@ -29,7 +29,7 @@ gpt2_mapping = {
 }
 
 # Pretrained GPT-J and GPT-Neo models
-gpt_j_and_neo_models_mapping = {
+GPT_J_AND_NEO_MODELS_MAPPING = {
     'gpt-j-6B': 'EleutherAI/gpt-j-6B',
     'gpt-neo-125M': 'EleutherAI/gpt-neo-125m',
     'gpt-neo-1.3B': 'EleutherAI/gpt-neo-1.3B',
@@ -38,7 +38,7 @@ gpt_j_and_neo_models_mapping = {
 }
 
 # Pretrained OPT models
-opt_models_mapping = {
+OPT_MODELS_MAPPING = {
     'opt-125M': 'facebook/opt-125m',
     'opt-350M': 'facebook/opt-350m',
     'opt-1.3B': 'facebook/opt-1.3b',
@@ -49,34 +49,79 @@ opt_models_mapping = {
     'opt-66B': 'facebook/opt-66b',
 }
 
-# Pretrained BART models
-bart_models_mapping = {
-    'bart-base': 'facebook/bart-base',
-    'bart-large': 'facebook/bart-large'
+# Pretrained BERT models
+BERT_MODELS_MAPPING = {
+    'bert-base-uncased': 'bert-base-uncased',
+    'bert-large-uncased': 'bert-large-uncased',
+    'bert-base-cased': 'bert-base-cased',
+    'bert-large-cased': 'bert-large-cased',
 }
 
 # Pretrained RoBERTa models
-roberta_models_mapping = {
-    'roberta': 'roberta-base'
+ROBERTA_MODELS_MAPPING = {
+    'roberta-base': 'roberta-base',
+    'roberta-large': 'roberta-large',
 }
 
-# Summarize all pretrained models
-all_models_mapping = {
-    **bloom_models_mapping,
-    **dialo_gpt_models_mapping,
-    **gpt2_mapping,
-    **gpt_j_and_neo_models_mapping,
-    **opt_models_mapping,
-    **bart_models_mapping,
-    **roberta_models_mapping
+# Pretrained BART models
+BART_MODELS_MAPPING = {
+    'bart-base': 'facebook/bart-base',
+    'bart-large': 'facebook/bart-large',
+}
+
+# Pretrained T5 models
+T5_MODELS_MAPPING = {
+    't5-small': 't5-small',
+    't5-base': 't5-base',
+    't5-large': 't5-large',
+    't5-3B': 't5-3b',
+    't5-11B': 't5-11b',
+}
+
+# Pretrained FLAN-T5 models
+FLAN_T5_MODELS_MAPPING = {
+    'flan-t5-small': 'google/flan-t5-small',
+    'flan-t5-base': 'google/flan-t5-base',
+    'flan-t5-large': 'google/flan-t5-large',
+    'flan-t5-xl': 'google/flan-t5-xl',
+    'flan-t5-xxl': 'google/flan-t5-xxl',
+}
+
+# Decoder-based models
+DECODER_MODELS_MAPPING = {
+    **BLOOM_MODELS_MAPPING,
+    **DIALO_GPT_MODELS_MAPPING,
+    **GPT2_MODELS_MAPPING,
+    **GPT_J_AND_NEO_MODELS_MAPPING,
+    **OPT_MODELS_MAPPING,
+}
+
+# Encoder-based models
+ENCODER_MODELS_MAPPING = {
+    **BERT_MODELS_MAPPING,
+    **ROBERTA_MODELS_MAPPING,
+}
+    
+# Full transformer-based (encoder + decoder) models
+TRANSFORMER_MODELS_MAPPING = {
+    **BART_MODELS_MAPPING,
+    **T5_MODELS_MAPPING,
+    **FLAN_T5_MODELS_MAPPING,
+}
+
+# All models mapping
+ALL_MODELS_MAPPING = {
+    **DECODER_MODELS_MAPPING,
+    **ENCODER_MODELS_MAPPING, 
+    **TRANSFORMER_MODELS_MAPPING,
 }
 
 # Summarize all supported model names
-AUTHORIZED_MODELS = list(all_models_mapping.keys())
+AUTHORIZED_MODELS = list(ALL_MODELS_MAPPING.keys())
 
 
 
-def load_model(model_name: str) -> AutoModelForCausalLM:
+def load_model(model_name: str) -> AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM:
     """Load one of the supported pretrained model.
 
     Parameters
@@ -86,14 +131,25 @@ def load_model(model_name: str) -> AutoModelForCausalLM:
 
     Returns
     -------
-    AutoModel
+    AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM
         The model.
     """
 
     if model_name not in AUTHORIZED_MODELS:
         raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
     
-    model = AutoModelForCausalLM.from_pretrained(all_models_mapping[model_name], device_map='auto', torch_dtype='auto')
+    if model_name in DECODER_MODELS_MAPPING.keys():
+        model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map='auto',
+                                                     torch_dtype='auto')
+    elif model_name in ENCODER_MODELS_MAPPING.keys():
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name],
+                                                     torch_dtype='auto')
+        model.to(device)
+    elif model_name in TRANSFORMER_MODELS_MAPPING.keys():
+        model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map='auto',
+                                                      torch_dtype='auto')
+        
     model.eval()
 
     return model
@@ -116,7 +172,7 @@ def load_tokenizer(model_name: str) -> AutoTokenizer:
     if model_name not in AUTHORIZED_MODELS:
         raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
     
-    tokenizer = AutoTokenizer.from_pretrained(all_models_mapping[model_name])
+    tokenizer = AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name])
 
     return tokenizer
 
@@ -138,7 +194,7 @@ def load_model_and_tokenizer(model_name: str):
     return load_model(model_name), load_tokenizer(model_name)
 
     
-def generate_text(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt: str, max_new_tokens: int = 60,
+def generate_text(model: AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM, tokenizer: AutoTokenizer, prompt: str, max_new_tokens: int = 60,
                   do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
                   num_return_sequences: int = 1, seed: int | None = None) -> list[str]:
     """Generate text according to `prompt` using the `model` and `tokenizer` specified.

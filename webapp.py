@@ -35,7 +35,7 @@ def update_model(model_name: str):
 
 def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 100,
                     top_p: float = 0.92, temperature: float = 0.9, num_return_sequences: int = 1,
-                    seed: int | None = None):
+                    use_seed: bool = False, seed: int | None = None):
     """Text generation using the model and tokenizer in the global scope, so that we can reuse them for multiple
     prompts.
 
@@ -56,6 +56,8 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
         no randomness), by default 0.9.
     num_return_sequences : int, optional
         How many sequences to generate according to the `prompt`, by default 1.
+    use_seed : bool, optional
+        Whether to use a fixed seed for reproducibility., by default False.
     seed : Union[None, int], optional
         An optional seed to force the generation to be reproducible.
     Returns
@@ -63,7 +65,9 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     list[str]
         List containing all `num_return_sequences` sequences generated.
     """
-        
+    
+    if not use_seed:
+        seed = None
     predictions = loader.generate_text(model, tokenizer, prompt, max_new_tokens, do_sample, top_k, top_p,
                                        temperature, num_return_sequences, seed)
     return utils.format_output(predictions)
@@ -113,6 +117,7 @@ top_p = gr.Slider(0, 1, value=0.92, step=0.01, label='Top-p',
 temperature = gr.Slider(0, 1, value=0.9, step=0.01, label='Temperature',
                         info='How to cool down the probability distribution.')
 num_return_sequence = gr.Slider(1, 10, value=1, step=1, label='Sequence', info='Number of sequence to generate.')
+use_seed = gr.Checkbox(value=False, label='Use seed', info='Whether to use a fixed seed for reproducibility.')
 seed = gr.Number(0, label='Seed', info='Seed for reproducibility.', precision=0)
 output = gr.Textbox(label='Model output')
 generate_button = gr.Button('Generate text', variant='primary')
@@ -120,7 +125,7 @@ clear_button = gr.Button('Clear prompt')
 flag_button = gr.Button('Flag', variant='stop')
 
 # Define the inputs for the main inference
-inputs_to_main = [prompt, max_new_tokens, do_sample, top_k, top_p, temperature, num_return_sequence, seed]
+inputs_to_main = [prompt, max_new_tokens, do_sample, top_k, top_p, temperature, num_return_sequence, use_seed, seed]
 # set-up callback for flagging
 callback = gr.CSVLogger()
 
@@ -137,6 +142,7 @@ with demo:
     with gr.Row():
         temperature.render()
         num_return_sequence.render()
+        use_seed.render()
         seed.render()
     prompt.render()
     with gr.Row():
@@ -145,11 +151,17 @@ with demo:
     output.render()
     flag_button.render()
 
-    # Define events
-    generate_event = generate_button.click(text_generation, inputs=inputs_to_main, outputs=output)
-    model_name.input(update_model, inputs=model_name, cancels=generate_event)
+    # Perform text generation when clicking the button or pressing enter in the prompt box
+    generate_event1 = generate_button.click(text_generation, inputs=inputs_to_main, outputs=output)
+    generate_event2 = prompt.submit(text_generation, inputs=inputs_to_main, outputs=output)
+
+    # Switch the model loaded in memory when clicking on a new model
+    model_name.input(update_model, inputs=model_name, cancels=[generate_event1, generate_event2])
+
+    # Clear the prompt box when clicking the button
     clear_button.click(lambda: gr.update(value=''), outputs=prompt)
-    # This needs to be called at some point prior to the first call to callback.flag()
+
+    # Perform the flagging
     callback.setup([model_name, *inputs_to_main, output], flagging_dir='flagged')
     flag_button.click(lambda *args: callback.flag(args), inputs=[model_name, *inputs_to_main, output], preprocess=False)
 
