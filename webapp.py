@@ -159,8 +159,9 @@ with demo:
     generate_event1 = generate_button.click(text_generation, inputs=inputs_to_main, outputs=output)
     generate_event2 = prompt.submit(text_generation, inputs=inputs_to_main, outputs=output)
 
-    # Switch the model loaded in memory when clicking on a new model
+    # Switch the model loaded in memory when clicking on a new model or changing quantization
     model_name.input(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
+    quantization.input(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
 
     # Clear the prompt box when clicking the button
     clear_button.click(lambda: gr.update(value=''), outputs=prompt)
