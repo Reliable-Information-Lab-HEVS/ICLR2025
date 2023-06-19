@@ -198,7 +198,7 @@ def load_model_and_tokenizer(model_name: str):
 
     
 def generate_text(model: AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM, tokenizer: AutoTokenizer, prompt: str, max_new_tokens: int = 60,
-                  do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
+                  do_sample: bool = True, top_k: int = 50, top_p: float = 0.92, temperature: float = 0.9,
                   num_return_sequences: int = 1, seed: int | None = None) -> list[str]:
     """Generate text according to `prompt` using the `model` and `tokenizer` specified.
 
@@ -215,7 +215,7 @@ def generate_text(model: AutoModelForCausalLM | AutoModelForMaskedLM | AutoModel
     do_sample : bool, optional
         Whether to introduce randomness in the generation, by default True.
     top_k : int, optional
-        How many tokens with max probability to consider for randomness, by default 100.
+        How many tokens with max probability to consider for randomness, by default 50.
     top_p : float, optional
         The probability density covering the new tokens to consider for randomness, by default 0.92.
     temperature : float, optional
