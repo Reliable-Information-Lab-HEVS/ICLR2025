@@ -139,7 +139,7 @@ demo = gr.Blocks(title='Text generation with LLMs')
 with demo:
     model_name.render()
     quantization.render()
-    load_button.render()
+    # load_button.render()
     with gr.Row():
         max_new_tokens.render()
         do_sample.render()
@@ -162,10 +162,10 @@ with demo:
     generate_event2 = prompt.submit(text_generation, inputs=inputs_to_main, outputs=output)
 
     # Switch the model loaded in memory when clicking on a new model or changing quantization
-    # model_name.input(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
-    # quantization.input(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
-    load_button.click(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
-
+    model_name.input(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
+    quantization.input(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
+    # load_button.click(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
+    
     # Clear the prompt box when clicking the button
     clear_button.click(lambda: gr.update(value=''), outputs=prompt)
 
