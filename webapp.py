@@ -15,13 +15,15 @@ CREDENTIALS_FILE = utils.ROOT_FOLDER + '/.gradio_login.txt'
 model, tokenizer = loader.load_model_and_tokenizer(DEFAULT)
 
 
-def update_model(model_name: str):
+def update_model(model_name: str, quantization:bool = False):
     """Update the model and tokenizer in the global scope so that we can reuse it and speed up inference.
 
     Parameters
     ----------
     model_name : str
         The name of the new model to use.
+    quantization : bool, optional
+        Whether to load the model in 8 bits mode.
     """
     
     global model
@@ -29,7 +31,7 @@ def update_model(model_name: str):
     del model
     del tokenizer
     gc.collect()
-    model = loader.load_model(model_name)
+    model = loader.load_model(model_name, quantization)
     tokenizer = loader.load_tokenizer(model_name)
 
 
@@ -106,6 +108,7 @@ def authentication(username: str, password: str) -> bool:
 # Define elements of the UI
 model_name = gr.Radio(loader.AUTHORIZED_MODELS, value=DEFAULT, label='Model name',
                       info='Choose the model you want to use.')
+quantization = gr.Checkbox(value=False, label='Quantization', info='Whether to load the model in 8 bits mode.')
 prompt = gr.Textbox(placeholder='Write your prompt here.', label='Prompt')
 max_new_tokens = gr.Slider(10, 1000, value=100, step=5, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
@@ -134,6 +137,7 @@ demo = gr.Blocks(title='Text generation with LLMs')
 
 with demo:
     model_name.render()
+    quantization.render()
     with gr.Row():
         max_new_tokens.render()
         do_sample.render()
@@ -156,7 +160,7 @@ with demo:
     generate_event2 = prompt.submit(text_generation, inputs=inputs_to_main, outputs=output)
 
     # Switch the model loaded in memory when clicking on a new model
-    model_name.input(update_model, inputs=model_name, cancels=[generate_event1, generate_event2])
+    model_name.input(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
 
     # Clear the prompt box when clicking the button
     clear_button.click(lambda: gr.update(value=''), outputs=prompt)

@@ -121,7 +121,7 @@ AUTHORIZED_MODELS = list(ALL_MODELS_MAPPING.keys())
 
 
 
-def load_model(model_name: str) -> AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM:
+def load_model(model_name: str, quantization: bool = False) -> AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM:
     """Load one of the supported pretrained model.
 
     Parameters
@@ -138,17 +138,20 @@ def load_model(model_name: str) -> AutoModelForCausalLM | AutoModelForMaskedLM |
     if model_name not in AUTHORIZED_MODELS:
         raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
     
+    # Provide dtype='auto' if we do not quantize the models
+    dtype = torch.float16 if quantization else 'auto'
+    
     if model_name in DECODER_MODELS_MAPPING.keys():
         model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map='auto',
-                                                     torch_dtype='auto')
+                                                    torch_dtype=dtype, load_in_8bit=quantization)
     elif model_name in ENCODER_MODELS_MAPPING.keys():
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name],
-                                                     torch_dtype='auto')
+                                                    torch_dtype=dtype, load_in_8bit=quantization)
         model.to(device)
     elif model_name in TRANSFORMER_MODELS_MAPPING.keys():
         model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map='auto',
-                                                      torch_dtype='auto')
+                                                      torch_dtype=dtype, load_in_8bit=quantization)
         
     model.eval()
 
