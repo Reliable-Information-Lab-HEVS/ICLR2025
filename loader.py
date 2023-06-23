@@ -1,7 +1,9 @@
 import torch
+import torch.nn as nn
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
-
-import utils
+from transformers.modeling_utils import PreTrainedModel
+from transformers.tokenization_utils_base import PreTrainedTokenizerBase
+from tokenizers.processors import TemplateProcessing
 
 
 # Pretrained bloom models
@@ -22,7 +24,6 @@ DIALO_GPT_MODELS_MAPPING = {
 
 # Pretrained GPT-2 models
 GPT2_MODELS_MAPPING = {
-    'gpt2-small':'gpt2-small',
     'gpt2-medium': 'gpt2-medium',
     'gpt2-large': 'gpt2-large',
     'gpt2-xl': 'gpt2-xl',
@@ -121,17 +122,21 @@ AUTHORIZED_MODELS = list(ALL_MODELS_MAPPING.keys())
 
 
 
-def load_model(model_name: str, quantization: bool = False) -> AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM:
+def load_model(model_name: str, quantization: bool = False, device_map: str = 'auto') -> PreTrainedModel:
     """Load one of the supported pretrained model.
 
     Parameters
     ----------
     model_name : str
         The model name.
+    quantization : bool, optional
+        Whether to load the model in 8 bits mode to save memory, by default False.
+    device_map : str, optional
+        The device map to decide how to split the model between available devices, by default 'auto'.
 
     Returns
     -------
-    AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM
+    PreTrainedModel
         The model.
     """
 
@@ -141,16 +146,15 @@ def load_model(model_name: str, quantization: bool = False) -> AutoModelForCausa
     # Provide dtype='auto' if we do not quantize the models
     dtype = torch.float16 if quantization else 'auto'
     
+    # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
-        model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map='auto',
+        model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map=device_map,
                                                     torch_dtype=dtype, load_in_8bit=quantization)
     elif model_name in ENCODER_MODELS_MAPPING.keys():
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name],
+        model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name], device_map=device_map,
                                                     torch_dtype=dtype, load_in_8bit=quantization)
-        model.to(device)
     elif model_name in TRANSFORMER_MODELS_MAPPING.keys():
-        model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map='auto',
+        model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map=device_map,
                                                       torch_dtype=dtype, load_in_8bit=quantization)
         
     model.eval()
@@ -158,7 +162,7 @@ def load_model(model_name: str, quantization: bool = False) -> AutoModelForCausa
     return model
 
 
-def load_tokenizer(model_name: str) -> AutoTokenizer:
+def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     """Load a pretrained tokenizer corresponding to one of the supported models.
 
     Parameters
@@ -168,7 +172,7 @@ def load_tokenizer(model_name: str) -> AutoTokenizer:
 
     Returns
     -------
-    AutoTokenizer
+    PreTrainedTokenizerBase
         The tokenizer.
     """
 
@@ -177,110 +181,32 @@ def load_tokenizer(model_name: str) -> AutoTokenizer:
     
     tokenizer = AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name])
 
+    # For Dialo-GPT models, update the post-processor to automatically add the eos token at the end
+    # We need to sacrifice the ByteLevel processor for that because it is currently not possible to
+    # chain post-processors (should only impact the offsets, that we do not care about)
+    if model_name in DIALO_GPT_MODELS_MAPPING.keys():
+        tokenizer.backend_tokenizer.post_processor = \
+            TemplateProcessing(single="$0 <|endoftext|>", special_tokens=[("<|endoftext|>", tokenizer.eos_token_id)])
+
     return tokenizer
 
 
-def load_model_and_tokenizer(model_name: str):
+def load_model_and_tokenizer(model_name: str, quantization: bool = False, device_map: str = 'auto') -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
     """Load both a model and corresponding tokenizer.
 
     Parameters
     ----------
     model_name : str
         The model name.
+    quantization : bool, optional
+        Whether to load the model in 8 bits mode to save memory, by default False.
+    device_map : str, optional
+        The device map to decide how to split the model between available devices, by default 'auto'.
 
     Returns
     -------
-    Tuple
+    tuple[PreTrainedModel, PreTrainedTokenizerBase]
         The model and tokenizer.
     """
 
-    return load_model(model_name), load_tokenizer(model_name)
-
-    
-def generate_text(model: AutoModelForCausalLM | AutoModelForMaskedLM | AutoModelForSeq2SeqLM, tokenizer: AutoTokenizer, prompt: str, max_new_tokens: int = 60,
-                  do_sample: bool = True, top_k: int = 50, top_p: float = 0.92, temperature: float = 0.9,
-                  num_return_sequences: int = 1, seed: int | None = None) -> list[str]:
-    """Generate text according to `prompt` using the `model` and `tokenizer` specified.
-
-    Parameters
-    ----------
-    model : AutoModelForCausalLM
-        The model used to generate the text.
-    tokenizer : AutoTokenizer
-        The tokenizer to use to process the input and output text.
-    prompt : str
-        The prompt to the model.
-    max_new_tokens : int, optional
-        How many new tokens to generate, by default 60.
-    do_sample : bool, optional
-        Whether to introduce randomness in the generation, by default True.
-    top_k : int, optional
-        How many tokens with max probability to consider for randomness, by default 50.
-    top_p : float, optional
-        The probability density covering the new tokens to consider for randomness, by default 0.92.
-    temperature : float, optional
-        How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
-        no randomness), by default 0.9.
-    num_return_sequences : int, optional
-        How many sequences to generate according to the `prompt`, by default 1.
-    seed : Union[None, int], optional
-        An optional seed to force the generation to be reproducible.
-
-    Returns
-    -------
-    list[str]
-        List containing all `num_return_sequences` sequences generated.
-    """
-    
-    if seed is not None:
-        utils.set_all_seeds(seed)
-
-    inputs = tokenizer(prompt, return_tensors='pt')
-    if torch.cuda.is_available():
-        inputs = inputs.to('cuda')
-    with torch.no_grad():
-        outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k,
-                                top_p=top_p, temperature=temperature, num_return_sequences=num_return_sequences)
-    generated_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)   
-
-    return generated_text
-    
-
-def load_and_generate_text(model_name: str, prompt: str, max_new_tokens: int = 60, do_sample: bool = True,
-                  top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
-                    num_return_sequences: int = 1, seed: int | None = None) -> list[str]:
-    """Load a model and its tokenizer and generate text according to `prompt`.
-
-    Parameters
-    ----------
-    model_name : str
-        The model used to generate the text.
-    prompt : str
-        The prompt to the model.
-    max_new_tokens : int, optional
-        How many new tokens to generate, by default 60.
-    do_sample : bool, optional
-        Whether to introduce randomness in the generation, by default True.
-    top_k : int, optional
-        How many tokens with max probability to consider for randomness, by default 100.
-    top_p : float, optional
-        The probability density covering the new tokens to consider for randomness, by default 0.92.
-    temperature : float, optional
-        How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
-        no randomness), by default 0.9.
-    num_return_sequences : int, optional
-        How many sequences to generate according to the `prompt`, by default 1.
-    seed : Union[None, int], optional
-        An optional seed to force the generation to be reproducible.
-
-    Returns
-    -------
-    list[str]
-        List containing all `num_return_sequences` sequences generated.
-    """
-
-    model = load_model(model_name)
-    tokenizer = load_tokenizer(model_name)
-
-    return generate_text(model, tokenizer, prompt, max_new_tokens, do_sample, top_k,
-                          top_p, temperature, num_return_sequences, seed)
+    return load_model(model_name, quantization=quantization, device_map=device_map), load_tokenizer(model_name)
