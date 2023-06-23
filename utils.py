@@ -3,6 +3,7 @@ import numpy as np
 import random
 import os
 
+# Path to the root of the project
 ROOT_FOLDER = os.path.dirname(__file__)
 
 

@@ -4,24 +4,19 @@ import argparse
 import time
 
 import loader
+import engine
 import utils
 
-parser = argparse.ArgumentParser(description='Clustering of the memes')
-parser.add_argument('--model_name', type=str, default='bloom-560M', choices=loader.AUTHORIZED_MODELS,
-                    help='The model to use.')
-args = parser.parse_args()
-model_name = args.model_name
+model = 'bloom'
 
-model, tokenizer = loader.load_model_and_tokenizer(model_name)
-print(model.device)
-print(model.hf_device_map)
-
-
-utils.set_all_seeds(0)
-
-prompt = 'Hello, my dog is cute'
 t0 = time.time()
-predictions = loader.generate_text(model, tokenizer, prompt)
+model, tokenizer = loader.load_model_and_tokenizer(model, quantization=True)
 dt = time.time() - t0
-print(f'Time for prediction: {dt:.2f} s')
-print(utils.format_output(predictions))
+print(f'Time to load bloom quantized: {dt:.2f} s')
+
+prompt = 'Write Python code to create a model with Pytorch.'
+t1 = time.time()
+out = engine.generate_text(model, tokenizer, prompt, max_new_tokens=150, num_return_sequences=5)
+dt1 = time.time() - t1
+print(f'Time for inference: {dt1:.2f} s')
+print(utils.format_output(out))
