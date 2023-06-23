@@ -167,7 +167,7 @@ def clear_chatbot():
 # Define general elements of the UI (generation parameters)
 model_name = gr.Dropdown(loader.AUTHORIZED_MODELS, value=DEFAULT, label='Model name',
                          info='Choose the model you want to use.', multiselect=False)
-quantization = gr.Checkbox(value=False, label='Quantization', info='Whether to load the model in 8 bits mode.')
+quantization = gr.Checkbox(value=True, label='Quantization', info='Whether to load the model in 8 bits mode.')
 max_new_tokens = gr.Slider(10, 200, value=50, step=5, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
 do_sample = gr.Checkbox(value=True, label='Sampling', info='Whether to incorporate randomness in generation.')
