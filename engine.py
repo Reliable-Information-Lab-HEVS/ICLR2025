@@ -13,24 +13,38 @@ class Conversation(object):
 
         self.user_history_text = []
         self.model_history_text = []
-        self.total_conversation_ids = torch.tensor([[]], dtype=torch.int64)
+
 
     def __len__(self):
         return len(self.user_history_text)
     
+    
+    def __iter__(self):
+        """Create a generator over (user_input, model_answer) tuples for all turns in the conversation.
+        """
+
+        # Generate over copies so that the object in the class cannot change during iteration
+        for user_history, model_history in zip(self.user_history_text.copy(), self.model_history_text.copy()):
+            yield user_history, model_history
+    
+
     def __str__(self):
 
-        if len(self.user_history_text) == 0:
+        N = len(self)
+
+        if N == 0:
             return "The conversation is empty."
         else:
             out = ''
-            for i in range(len(self.user_history_text)):
-                out += f'>> User: {self.user_history_text[i]}\n'
-                out += f'>> Model: {self.model_history_text[i]}\n\n'
+            for i, (user, model) in enumerate(self):
+                out += f'>> User: {user}\n'
+                out += f'>> Model: {model}'
+                if i < N - 1:
+                    out += '\n\n'
             return out
         
 
-    def update_conversation(self, user_input: str, model_output: str, total_output_ids: torch.Tensor):
+    def update_conversation(self, user_input: str, model_output: str):
         """Update the conversation history with a new prompt and answer by a model.
 
         Parameters
@@ -39,30 +53,10 @@ class Conversation(object):
             Prompt to the model.
         model_output : str
             Answer of the model.
-        total_output_ids : torch.Tensor
-            New token ids representation of the full conversation.
         """
 
         self.user_history_text.append(user_input)
         self.model_history_text.append(model_output)
-        self.total_conversation_ids = total_output_ids
-
-
-    def concatenate_history_and_prompt(self, prompt_ids: torch.Tensor) -> torch.Tensor:
-        """Create the new input to feed the model consisting of the conversation history and the new prompt.
-
-        Parameters
-        ----------
-        prompt_ids : torch.Tensor
-            The token ids corresponding to the new prompt.
-
-        Returns
-        -------
-        torch.Tensor
-            The total input to feed to the model.
-        """
-
-        return torch.cat([self.total_conversation_ids, prompt_ids], dim=-1)
     
 
     def erase_conversation(self):
@@ -71,13 +65,13 @@ class Conversation(object):
 
         self.user_history_text = []
         self.model_history_text = []
-        self.total_conversation_ids = torch.tensor([[]], dtype=torch.int64)
-
+        
 
 
 
 def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, prompt: str, max_new_tokens: int = 60, do_sample: bool = True,
-                  top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1, seed: int | None = None) -> list[str]:
+                  top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1, seed: int | None = None,
+                  truncate_prompt_from_output: bool = False) -> str | list[str]:
     """Generate text according to `prompt` using the `model` and `tokenizer` specified.
 
     Parameters
@@ -103,11 +97,13 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
         How many sequences to generate according to the `prompt`, by default 1.
     seed : int | None, optional
         An optional seed to force the generation to be reproducible.
+    truncate_prompt_from_output : bool, optional
+        Whether to remove the prompt from the model answer or not, by default False.
 
     Returns
     -------
-    list[str]
-        List containing all `num_return_sequences` sequences generated.
+    str | list[str]
+        Str containing the generated sequence, or list[str] if `num_return_sequences` > 1.
     """
     
     if seed is not None:
@@ -119,9 +115,69 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     with torch.no_grad():
         outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k,
                                 top_p=top_p, temperature=temperature, num_return_sequences=num_return_sequences)
-    generated_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)   
+        
+    # In this case truncate the prompt from the output
+    if truncate_prompt_from_output:
+        outputs = outputs[:, inputs['input_ids'].shape[-1]:]
+
+    generated_text = tokenizer.batch_decode(outputs, skip_special_tokens=True) 
+
+    # In this case return a str instead of list[str]
+    if num_return_sequences == 1:
+        generated_text = generated_text[0]
 
     return generated_text
+
+
+
+def tokenize_for_conversation(tokenizer: PreTrainedTokenizerBase, conversation: Conversation, prompt: str) -> torch.Tensor:
+    """Tokenize a `conversation` and a new `prompt` according to `tokenizer`.
+
+    Parameters
+    ----------
+    tokenizer : PreTrainedTokenizerBase
+       The tokenizer to use.
+    conversation : Conversation
+        The conversation object keeping past inputs and answers.
+    prompt : str
+        The new prompt to the model.
+
+    Returns
+    -------
+    torch.Tensor
+        The input to pass to the model.
+    """
+
+    # After a close inspection of source code (https://github.com/huggingface/transformers/blob/v4.30.0/src/transformers/pipelines/conversational.py#L18)
+    # for conversational pipeline and all tokenizers, this seems to be the accepted way to treat inputs for conversation with a model.
+    # This is the DialoGPT way of handling conversation, but is in fact reused by all other tokenizers that we use.
+
+    input_ids = []
+
+    for user_history, model_history in conversation:
+        # Tokenize first user input and add eos token
+        input_ids.extend(tokenizer.encode(user_history, add_special_tokens=False))
+        if tokenizer.eos_token_id is not None:
+            input_ids.append(tokenizer.eos_token_id)
+
+        # Tokenize model response and add eos token
+        input_ids.extend(tokenizer.encode(model_history, add_special_tokens=False))
+        if tokenizer.eos_token_id is not None:
+            input_ids.append(tokenizer.eos_token_id)
+
+    # Tokenize prompt and add eos token
+    input_ids.extend(tokenizer.encode(prompt, add_special_tokens=False))
+    if tokenizer.eos_token_id is not None:
+        input_ids.append(tokenizer.eos_token_id)
+
+    # Truncate conversation if it is larger than model capacity
+    if len(input_ids) > tokenizer.model_max_length:
+        input_ids = input_ids[-tokenizer.model_max_length:]
+
+    # Convert to Pytorch
+    input_ids = torch.tensor([input_ids], dtype=torch.int64)
+
+    return input_ids
 
 
 
@@ -167,10 +223,7 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
     if conv_history is None:
         conv_history = Conversation()
 
-    # encode the prompt (we only need the input_ids since we are not running inference on batches)
-    prompt_ids = tokenizer.encode(prompt, return_tensors='pt')
-    # Concatenate the prompt to the history
-    input = conv_history.concatenate_history_and_prompt(prompt_ids)
+    input = tokenize_for_conversation(tokenizer, conv_history, prompt)
 
     # Generate model response
     if torch.cuda.is_available():
@@ -181,7 +234,7 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
         
     model_answer_ids = output[0, input.shape[-1]:]
     model_answer_text = tokenizer.decode(model_answer_ids, skip_special_tokens=True)
-    conv_history.update_conversation(prompt, model_answer_text, output)
+    conv_history.update_conversation(prompt, model_answer_text)
 
     return conv_history
     
@@ -189,7 +242,7 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
 
 def load_and_generate_text(model_name: str, prompt: str, quantization: bool = False, max_new_tokens: int = 60,
                            do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
-                           num_return_sequences: int = 1, seed: int | None = None) -> list[str]:
+                           num_return_sequences: int = 1, seed: int | None = None, truncate_prompt_from_output: bool = False) -> str | list[str]:
     """Load a model and its tokenizer and generate text according to `prompt`.
 
     Parameters
@@ -215,14 +268,17 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
         How many sequences to generate according to the `prompt`, by default 1.
     seed : Union[None, int], optional
         An optional seed to force the generation to be reproducible.
+    truncate_prompt_from_output : bool, optional
+        Whether to remove the prompt from the model answer or not, by default False.
 
     Returns
     -------
-    list[str]
-        List containing all `num_return_sequences` sequences generated.
+    str | list[str]
+        Str containing the generated sequence, or list[str] if `num_return_sequences` > 1.
     """
 
     model, tokenizer = loader.load_model_and_tokenizer(model_name, quantization)
 
     return generate_text(model, tokenizer, prompt, max_new_tokens, do_sample, top_k,
-                          top_p, temperature, num_return_sequences, seed)
+                          top_p, temperature, num_return_sequences, seed, truncate_prompt_from_output)
+

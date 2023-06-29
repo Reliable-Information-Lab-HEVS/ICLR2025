@@ -4,6 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMasked
 from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from tokenizers.processors import TemplateProcessing
+import warnings
 
 
 # Pretrained bloom models
@@ -20,6 +21,27 @@ DIALO_GPT_MODELS_MAPPING = {
     'dialo-gpt-small': 'microsoft/DialoGPT-small',
     'dialo-gpt-medium': 'microsoft/DialoGPT-medium',
     'dialo-gpt-large': 'microsoft/DialoGPT-large',
+}
+
+# Pretrained StableLM models
+STABLE_LM_MODELS_MAPPING = {
+    'stable-lm-3B': 'StabilityAI/stablelm-base-alpha-3b',
+    'stable-lm-7B': 'StabilityAI/stablelm-base-alpha-7b',
+}
+
+# Pretrained StarCoder models
+STAR_CODER_MODELS_MAPPING = {
+    'star-coder-base': 'bigcode/starcoderbase',
+    # Star-coder-base further trained on Python
+    'star-coder': 'bigcode/starcoder',
+    # Star-coder-based further trained on English data
+    'star-coder-plus': 'bigcode/starcoderplus'
+}
+
+# Pretrained Star-chat models
+STAR_CHAT_MODELS_MAPPING = {
+    'star-chat-alpha': 'HuggingFaceH4/starchat-alpha',
+    'star-chat-beta': 'HuggingFaceH4/starchat-beta'
 }
 
 # Pretrained GPT-2 models
@@ -48,6 +70,14 @@ OPT_MODELS_MAPPING = {
     'opt-13B': 'facebook/opt-13b',
     'opt-30B': 'facebook/opt-30b',
     'opt-66B': 'facebook/opt-66b',
+}
+
+# Pretrained CodeGEN models
+CODEGEN_MODELS_MAPPING = {
+    'codegen-350M': 'Salesforce/codegen-350M-mono',
+    'codegen-2B': 'Salesforce/codegen-2B-mono',
+    'codegen-6B': 'Salesforce/codegen-6B-mono',
+    'codegen-16B': 'Salesforce/codegen-16B-mono',
 }
 
 # Pretrained BERT models
@@ -92,9 +122,13 @@ FLAN_T5_MODELS_MAPPING = {
 DECODER_MODELS_MAPPING = {
     **BLOOM_MODELS_MAPPING,
     **DIALO_GPT_MODELS_MAPPING,
+    **STABLE_LM_MODELS_MAPPING,
+    **STAR_CODER_MODELS_MAPPING,
+    **STAR_CHAT_MODELS_MAPPING,
     **GPT2_MODELS_MAPPING,
     **GPT_J_AND_NEO_MODELS_MAPPING,
     **OPT_MODELS_MAPPING,
+    **CODEGEN_MODELS_MAPPING,
 }
 
 # Encoder-based models
@@ -102,7 +136,7 @@ ENCODER_MODELS_MAPPING = {
     **BERT_MODELS_MAPPING,
     **ROBERTA_MODELS_MAPPING,
 }
-    
+
 # Full transformer-based (encoder + decoder) models
 TRANSFORMER_MODELS_MAPPING = {
     **BART_MODELS_MAPPING,
@@ -143,6 +177,11 @@ def load_model(model_name: str, quantization: bool = False, device_map: str = 'a
     if model_name not in AUTHORIZED_MODELS:
         raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
     
+    # Override quantization if we don't have access to GPUs
+    if not torch.cuda.is_available() and quantization:
+        quantization = False
+        warnings.warn('There are no GPUs available. The model will NOT be loaded in 8 bits mode.', RuntimeWarning)
+
     # Provide dtype='auto' if we do not quantize the models
     dtype = torch.float16 if quantization else 'auto'
     
@@ -184,9 +223,9 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     # For Dialo-GPT models, update the post-processor to automatically add the eos token at the end
     # We need to sacrifice the ByteLevel processor for that because it is currently not possible to
     # chain post-processors (should only impact the offsets, that we do not care about)
-    if model_name in DIALO_GPT_MODELS_MAPPING.keys():
-        tokenizer.backend_tokenizer.post_processor = \
-            TemplateProcessing(single="$0 <|endoftext|>", special_tokens=[("<|endoftext|>", tokenizer.eos_token_id)])
+    # if model_name in DIALO_GPT_MODELS_MAPPING.keys():
+    #     tokenizer.backend_tokenizer.post_processor = \
+    #         TemplateProcessing(single="$0 <|endoftext|>", special_tokens=[("<|endoftext|>", tokenizer.eos_token_id)])
 
     return tokenizer
 

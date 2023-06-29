@@ -1,5 +1,6 @@
 import gradio as gr
 import gc
+import os
 
 import loader
 import engine
@@ -10,7 +11,7 @@ import utils
 DEFAULT = 'bloom-560M'
 
 # File where the valid credentials are stored
-CREDENTIALS_FILE = utils.ROOT_FOLDER + '/.gradio_login.txt'
+CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
 
 # Initialize global model and tokenizer (necessary not to reload the model for each new inference)
 model, tokenizer = loader.load_model_and_tokenizer(DEFAULT)
@@ -32,11 +33,22 @@ def update_model(model_name: str, quantization:bool = False):
     
     global model
     global tokenizer
-    del model
-    del tokenizer
+
+    # Delete the variables if they exist (they should except if there was an error when loading a model at some point)
+    try:
+        del model
+        del tokenizer
+    except NameError:
+        pass
     gc.collect()
-    model = loader.load_model(model_name, quantization)
-    tokenizer = loader.load_tokenizer(model_name)
+
+    # Try loading the model and tokenizer
+    try:
+        model = loader.load_model(model_name, quantization)
+        tokenizer = loader.load_tokenizer(model_name)
+    except:
+        gr.Error('There was an error loading this model. Please choose another one.')
+
     # Clear current conversation (if any) when switching the model
     conversation.erase_conversation()
 
@@ -65,7 +77,7 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     num_return_sequences : int, optional
         How many sequences to generate according to the `prompt`, by default 1.
     use_seed : bool, optional
-        Whether to use a fixed seed for reproducibility., by default False.
+        Whether to use a fixed seed for reproducibility, by default False.
     seed : Union[None, int], optional
         An optional seed to force the generation to be reproducible.
     Returns
@@ -182,14 +194,14 @@ use_seed = gr.Checkbox(value=False, label='Use seed', info='Whether to use a fix
 seed = gr.Number(0, label='Seed', info='Seed for reproducibility.', precision=0)
 
 # Define elements of the simple generation Tab
-prompt_text = gr.Textbox(placeholder='Write your prompt here.', label='Prompt')
+prompt_text = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=10)
 output_text = gr.Textbox(label='Model output')
 generate_button_text = gr.Button('Generate text', variant='primary')
 clear_button_text = gr.Button('Clear')
 flag_button_text = gr.Button('Flag', variant='stop')
 
 # Define elements of the chatbot Tab
-prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt')
+prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=10)
 output_chat = gr.Chatbot()
 generate_button_chat = gr.Button('Generate text', variant='primary')
 clear_button_chat = gr.Button('Clear')
@@ -280,4 +292,4 @@ with demo:
 
 
 if __name__ == '__main__':
-    demo.queue().launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])  
+    demo.queue().launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])
