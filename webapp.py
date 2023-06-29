@@ -194,14 +194,14 @@ use_seed = gr.Checkbox(value=False, label='Use seed', info='Whether to use a fix
 seed = gr.Number(0, label='Seed', info='Seed for reproducibility.', precision=0)
 
 # Define elements of the simple generation Tab
-prompt_text = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=10)
+prompt_text = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
 output_text = gr.Textbox(label='Model output')
 generate_button_text = gr.Button('Generate text', variant='primary')
 clear_button_text = gr.Button('Clear')
 flag_button_text = gr.Button('Flag', variant='stop')
 
 # Define elements of the chatbot Tab
-prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=10)
+prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
 output_chat = gr.Chatbot()
 generate_button_chat = gr.Button('Generate text', variant='primary')
 clear_button_chat = gr.Button('Clear')
