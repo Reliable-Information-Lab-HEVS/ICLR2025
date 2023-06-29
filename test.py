@@ -9,4 +9,4 @@ import utils
 
 model = 'star-coder'
 
-model, tokenizer = loader.load_model_and_tokenizer(model, quantization=True)
+model, tokenizer = loader.load_model_and_tokenizer(model, quantization=False)
