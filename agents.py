@@ -100,7 +100,8 @@ class Flake8Tool(BaseTool):
     # the class attribute system (except if the type is explicitly defined as ClassVar[...]).
     # Note also that BaseModel provides a default __init__() based on these arguments.
     name: str = "Flake8"
-    description: str = "useful for when you need to evaluate code quality"
+    description: str = ("Useful for when you need to evaluate code quality and refactore code."
+                        " Input: code snippet. Output: code quality evaluation.")
 
     def _run(self, snippet: str, run_manager: CallbackManagerForToolRun | None = None) -> str:
 
