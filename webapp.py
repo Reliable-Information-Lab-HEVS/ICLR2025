@@ -88,9 +88,12 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     
     if not use_seed:
         seed = None
-    predictions = engine.generate_text(model, tokenizer, prompt, max_new_tokens, do_sample, top_k, top_p,
-                                       temperature, num_return_sequences, seed)
-    return utils.format_output(predictions)
+    predictions = engine.generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
+                                       temperature=temperature, num_return_sequences=num_return_sequences, seed=seed)
+    if num_return_sequences > 1:
+        return utils.format_output(predictions)
+    else:
+        return predictions
 
 
 
@@ -214,6 +217,15 @@ inputs_to_chatbot = [prompt_chat, max_new_tokens, do_sample, top_k, top_p, tempe
 callback = gr.CSVLogger()
 
 
+prompt_examples = [
+    "Please write a function to multiply 2 numbers `a` and `b` in Python.",
+    "Hello, what's your name?",
+    "What's the meaning of life?",
+    "How can I write a Python function to generate the nth Fibonacci number?",
+    "Give the following data {'Name':['Tom', 'Brad', 'Kyle', 'Jerry'], 'Age':[20, 21, 19, 18], 'Height' : [6.1, 5.9, 6.0, 6.1]}. Can you plot a bar graph showing the height of each person.",
+]
+
+
 demo = gr.Blocks(title='Text generation with LLMs')
 
 with demo:
@@ -233,6 +245,9 @@ with demo:
                 output_text.render()
                 flag_button_text.render()
 
+                gr.Markdown("### Prompt Examples")
+                gr.Examples(prompt_examples, inputs=prompt_text)
+
             # Tab 2 for chat mode
             with gr.Tab('Chat mode'):
                 prompt_chat.render()
@@ -240,6 +255,9 @@ with demo:
                     generate_button_chat.render()
                     clear_button_chat.render()
                 output_chat.render()
+
+                gr.Markdown("### Prompt Examples")
+                gr.Examples(prompt_examples, inputs=prompt_chat)
 
         # Second column defines model selection and generation parameters
         with gr.Column(scale=1):

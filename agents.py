@@ -15,6 +15,10 @@ import code_eval
 
 class HuggingFaceLLM(LLM):
 
+    # Even though defined as class variables, these attributes are instance variables because
+    # LLM is a child of BaseModel in pydantic (https://docs.pydantic.dev/latest/) which overrides
+    # the class attribute system (except if the type is explicitly defined as ClassVar[...]).
+    # Note also that BaseModel provides a default __init__() based on these arguments.
     model: PreTrainedModel
     model_id: str
     tokenizer: PreTrainedTokenizerBase
@@ -28,6 +32,8 @@ class HuggingFaceLLM(LLM):
     seed: int | None = None
     truncate: bool = True
 
+
+    # Provides a constructor using the model name
     @classmethod
     def from_name(cls, model: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40, top_p: float = 0.90,
                  temperature: float = 0.9, seed: int | None = None, quantization: bool = False, device_map: str = 'auto'):
@@ -83,12 +89,16 @@ class HuggingFaceLLM(LLM):
 
     @property
     def _llm_type(self) -> str:
-        return "custom"
+        return "custom_huggingface_model"
     
 
-
+ 
 class Flake8Tool(BaseTool):
 
+    # Even though defined as class variables, these attributes are instance variables because
+    # BaseTool is a child of BaseModel in pydantic (https://docs.pydantic.dev/latest/) which overrides
+    # the class attribute system (except if the type is explicitly defined as ClassVar[...]).
+    # Note also that BaseModel provides a default __init__() based on these arguments.
     name: str = "Flake8"
     description: str = "useful for when you need to evaluate code quality"
 
@@ -100,3 +110,4 @@ class Flake8Tool(BaseTool):
     async def _arun(self, snippet: str, run_manager: AsyncCallbackManagerForToolRun | None = None) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("flake8 does not support async")
+    

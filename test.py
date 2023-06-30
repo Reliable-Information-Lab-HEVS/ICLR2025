@@ -6,16 +6,13 @@ import time
 import loader
 import engine
 import utils
-from huggingface_hub import login
-import os
+import agents
 
-model = 'star-coder'
+from langchain.agents import initialize_agent, AgentType
+from langchain.chains import LLMChain
 
-token_file = os.path.join(utils.ROOT_FOLDER, '.hf_token.txt')
-with open(token_file, 'r') as file:
-    # Read lines and remove whitespaces
-    token = file.readline().strip()
+llm = agents.HuggingFaceLLM.from_name('star-coder', max_new_tokens=300)
+tools = [agents.Flake8Tool()]
+agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
 
-login(token)
-
-model, tokenizer = loader.load_model_and_tokenizer(model, quantization=False)
+agent.run("Write code to multiply 2 numbers, then refactore it according to Flake8.")
