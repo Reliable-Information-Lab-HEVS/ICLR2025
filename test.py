@@ -17,7 +17,8 @@ from helpers import utils
 
 prompt = "Write code to multiply 2 numbers"
 t0 = time.time()
-model = engine.HFModel('star-coder')
+# model = engine.HFModel('star-coder')
+model = engine.HFModel('bloom-560M')
 dt = time.time() - t0
 print(f'Time to load the model: {dt:.2f} s')
 

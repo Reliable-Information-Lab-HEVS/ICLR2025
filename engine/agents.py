@@ -35,10 +35,12 @@ class HuggingFaceLLM(LLM):
 
     # Provides a constructor using the model name
     @classmethod
-    def from_name(cls, model: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40, top_p: float = 0.90,
-                 temperature: float = 0.9, seed: int | None = None, quantization: bool = False, device_map: str = 'auto'):
+    def from_name(cls, model: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40,
+                  top_p: float = 0.90, temperature: float = 0.9, seed: int | None = None,
+                  quantization: bool = False, device_map: str = 'auto'):
         
-        model_instance, tokenizer = loader.load_model_and_tokenizer(model, quantization=quantization, device_map=device_map)
+        model_instance, tokenizer = loader.load_model_and_tokenizer(model, quantization=quantization,
+                                                                    device_map=device_map)
         truncate = True if model in loader.DECODER_MODELS_MAPPING.keys() else False
 
         return cls(
@@ -58,9 +60,10 @@ class HuggingFaceLLM(LLM):
 
     def _call(self, prompt: str, stop: list[str] | None = None, run_manager: CallbackManagerForLLMRun | None = None) -> str:
 
-        text = generation.generate_text(self.model, self.tokenizer, prompt, max_new_tokens=self.max_new_tokens, do_sample=self.do_sample,
-                                    top_k=self.top_k, top_p=self.top_p, temperature=self.temperature, num_return_sequences=1,
-                                    seed=self.seed, truncate_prompt_from_output=self.truncate)
+        text = generation.generate_text(self.model, self.tokenizer, prompt, max_new_tokens=self.max_new_tokens,
+                                        do_sample=self.do_sample, top_k=self.top_k, top_p=self.top_p,
+                                        temperature=self.temperature, num_return_sequences=1,
+                                        seed=self.seed, truncate_prompt_from_output=self.truncate)
         
         # Cut off the text as soon as any stop words occur
         if stop is not None:

@@ -177,4 +177,5 @@ class HFModel(object):
         return generate_text(self.model, self.tokenizer, prompt, max_new_tokens=max_new_tokens,
                              do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
                              num_return_sequences=num_return_sequences, seed=seed,
-                             truncate_prompt_from_output=truncate_prompt_from_output, stopping_patterns=stopping_patterns)
+                             truncate_prompt_from_output=truncate_prompt_from_output,
+                             stopping_patterns=stopping_patterns)

@@ -89,8 +89,9 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     
     if not use_seed:
         seed = None
-    predictions = generation.generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
-                                       temperature=temperature, num_return_sequences=num_return_sequences, seed=seed)
+    predictions = generation.generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens,
+                                           do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                           num_return_sequences=num_return_sequences, seed=seed)
     if num_return_sequences > 1:
         return utils.format_output(predictions)
     else:
@@ -98,10 +99,11 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
 
 
 
-def chat_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40, top_p: float = 0.90,
-                    temperature: float = 0.9, use_seed: bool = False, seed: int | None = None) -> tuple[str, list[tuple[str, str]]]:
-    """Chat generation using the model, tokenizer and conversation in the global scope, so that we can reuse them for multiple
-    prompts.
+def chat_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40,
+                    top_p: float = 0.90, temperature: float = 0.9, use_seed: bool = False,
+                    seed: int | None = None) -> tuple[str, list[tuple[str, str]]]:
+    """Chat generation using the model, tokenizer and conversation in the global scope, so that we can reuse
+    them for multiple prompts.
 
     Parameters
     ----------
@@ -135,7 +137,8 @@ def chat_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     # This will update the global conversation in-place
     _ = generate_conversation(model, tokenizer, prompt, conv_history=conversation, max_new_tokens=max_new_tokens,
                               do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature, seed=seed)
-    # The first output is an empty string to clear the input box, the second cast the 2 list of chat history into a single list of tuples (user, model)
+    # The first output is an empty string to clear the input box, the second cast the 2 list of chat history 
+    # into a single list of tuples (user, model)
     return '', list(zip(conversation.user_history_text, conversation.model_history_text))
 
 
@@ -212,7 +215,8 @@ clear_button_chat = gr.Button('Clear')
 flag_button_chat = gr.Button('Flag', variant='stop')
 
 # Define the inputs for the main inference
-inputs_to_simple_generation = [prompt_text, max_new_tokens, do_sample, top_k, top_p, temperature, num_return_sequence, use_seed, seed]
+inputs_to_simple_generation = [prompt_text, max_new_tokens, do_sample, top_k, top_p, temperature,
+                               num_return_sequence, use_seed, seed]
 inputs_to_chatbot = [prompt_chat, max_new_tokens, do_sample, top_k, top_p, temperature, use_seed, seed]
 # set-up callback for flagging
 callback = gr.CSVLogger()
@@ -223,7 +227,8 @@ prompt_examples = [
     "Hello, what's your name?",
     "What's the meaning of life?",
     "How can I write a Python function to generate the nth Fibonacci number?",
-    "Give the following data {'Name':['Tom', 'Brad', 'Kyle', 'Jerry'], 'Age':[20, 21, 19, 18], 'Height' : [6.1, 5.9, 6.0, 6.1]}. Can you plot a bar graph showing the height of each person.",
+    ("Give the following data {'Name':['Tom', 'Brad', 'Kyle', 'Jerry'], 'Age':[20, 21, 19, 18], 'Height' :"
+     " [6.1, 5.9, 6.0, 6.1]}. Can you plot a bar graph showing the height of each person."),
 ]
 
 
@@ -287,17 +292,23 @@ with demo:
                         seed.render()
 
     # Perform simple text generation when clicking the button or pressing enter in the prompt box
-    generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation, outputs=output_text)
-    generate_event2 = prompt_text.submit(text_generation, inputs=inputs_to_simple_generation, outputs=output_text)
+    generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation,
+                                                 outputs=output_text)
+    generate_event2 = prompt_text.submit(text_generation, inputs=inputs_to_simple_generation,
+                                         outputs=output_text)
 
     # Perform chat generation when clicking the button or pressing enter in the prompt box
-    generate_event3 = generate_button_chat.click(chat_generation, inputs=inputs_to_chatbot, outputs=[prompt_chat, output_chat])
-    generate_event4 = prompt_chat.submit(chat_generation, inputs=inputs_to_chatbot, outputs=[prompt_chat, output_chat])
+    generate_event3 = generate_button_chat.click(chat_generation, inputs=inputs_to_chatbot,
+                                                 outputs=[prompt_chat, output_chat])
+    generate_event4 = prompt_chat.submit(chat_generation, inputs=inputs_to_chatbot,
+                                         outputs=[prompt_chat, output_chat])
 
     # Switch the model loaded in memory when clicking on a new model or changing quantization and clear outputs if any
     events_to_cancel = [generate_event1, generate_event2, generate_event3, generate_event4]
-    model_name.input(update_model, inputs=[model_name, quantization], cancels=events_to_cancel).then(lambda: '', outputs=output_text).then(clear_chatbot, outputs=[prompt_chat, output_chat])
-    quantization.input(update_model, inputs=[model_name, quantization], cancels=events_to_cancel).then(lambda: '', outputs=output_text).then(clear_chatbot, outputs=[prompt_chat, output_chat])
+    model_name.input(update_model, inputs=[model_name, quantization], cancels=events_to_cancel).then(
+        lambda: '', outputs=output_text).then(clear_chatbot, outputs=[prompt_chat, output_chat])
+    quantization.input(update_model, inputs=[model_name, quantization], cancels=events_to_cancel).then(
+        lambda: '', outputs=output_text).then(clear_chatbot, outputs=[prompt_chat, output_chat])
     # load_button.click(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
     
     # Clear the prompt and output boxes when clicking the button
@@ -306,7 +317,8 @@ with demo:
 
     # Perform the flagging
     callback.setup([model_name, *inputs_to_simple_generation, output_text], flagging_dir='flagged')
-    flag_button_text.click(lambda *args: callback.flag(args), inputs=[model_name, *inputs_to_simple_generation, output_text], preprocess=False)
+    flag_button_text.click(lambda *args: callback.flag(args),
+                           inputs=[model_name, *inputs_to_simple_generation, output_text], preprocess=False)
 
 
 
