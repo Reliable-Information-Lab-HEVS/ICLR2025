@@ -2,7 +2,7 @@ import os
 import subprocess
 from datetime import datetime
 
-import utils
+from helpers import utils
 
 BIN_FOLDER = os.path.join(utils.ROOT_FOLDER, '.snippet_bin')
 

@@ -3,8 +3,8 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from transformers import StoppingCriteriaList
 
-from models import loader
-from models import stopping
+from engine import loader
+from engine import stopping
 from helpers import utils
 
 
@@ -143,3 +143,38 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
                          top_p, temperature, num_return_sequences, seed, truncate_prompt_from_output,
                          stopping_patterns)
 
+
+
+
+class HFModel(object):
+    """Class encapsulating a HuggingFace model and its tokenizer to generate text. 
+    """
+
+    def __init__(self, model_name: str, quantization: bool = False, device_map: str = 'auto'):
+
+        self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
+                                                                     device_map=device_map)
+        self.model_name = model_name
+        self.quantization = quantization
+        self.device_map = device_map
+
+    
+    def __repr__(self) -> str:
+        return f'HFModel({self.model_name}, {self.quantization}, {self.device_map})'
+    
+    def __str__(self) -> str:
+        if self.quantization:
+            return f'{self.model_name} model, quantized 8 bits version'
+        else:
+            return f'{self.model_name} model, original (not quantized) version'
+        
+
+    def __call__(self, prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40,
+                 top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
+                 seed: int | None = None, truncate_prompt_from_output: bool = False,
+                 stopping_patterns: list[str] | bool | None = None) -> str | list[str]:
+        
+        return generate_text(self.model, self.tokenizer, prompt, max_new_tokens=max_new_tokens,
+                             do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                             num_return_sequences=num_return_sequences, seed=seed,
+                             truncate_prompt_from_output=truncate_prompt_from_output, stopping_patterns=stopping_patterns)

@@ -8,9 +8,9 @@ from langchain.llms.base import LLM
 from langchain.callbacks.manager import CallbackManagerForLLMRun, CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
 from langchain.tools import BaseTool
 
-import loader
-import engine
-import code_eval
+from engine import loader
+from engine import generation
+from engine import code_eval
 
 
 class HuggingFaceLLM(LLM):
@@ -58,7 +58,7 @@ class HuggingFaceLLM(LLM):
 
     def _call(self, prompt: str, stop: list[str] | None = None, run_manager: CallbackManagerForLLMRun | None = None) -> str:
 
-        text = engine.generate_text(self.model, self.tokenizer, prompt, max_new_tokens=self.max_new_tokens, do_sample=self.do_sample,
+        text = generation.generate_text(self.model, self.tokenizer, prompt, max_new_tokens=self.max_new_tokens, do_sample=self.do_sample,
                                     top_k=self.top_k, top_p=self.top_p, temperature=self.temperature, num_return_sequences=1,
                                     seed=self.seed, truncate_prompt_from_output=self.truncate)
         

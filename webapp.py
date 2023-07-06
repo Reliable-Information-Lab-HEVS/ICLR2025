@@ -2,9 +2,10 @@ import gradio as gr
 import gc
 import os
 
-import loader
-import engine
-import utils
+from engine import loader
+from engine.conversation import Conversation, generate_conversation
+from engine import generation
+from helpers import utils
 
 
 # Default model to load at start-up
@@ -17,7 +18,7 @@ CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
 model, tokenizer = loader.load_model_and_tokenizer(DEFAULT)
 
 # Initialize a global conversation object for chatting with the models
-conversation = engine.Conversation()
+conversation = Conversation()
 
 
 def update_model(model_name: str, quantization:bool = False):
@@ -88,7 +89,7 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     
     if not use_seed:
         seed = None
-    predictions = engine.generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
+    predictions = generation.generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
                                        temperature=temperature, num_return_sequences=num_return_sequences, seed=seed)
     if num_return_sequences > 1:
         return utils.format_output(predictions)
@@ -132,8 +133,8 @@ def chat_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
         seed = None
     
     # This will update the global conversation in-place
-    _ = engine.generate_conversation(model, tokenizer, prompt, conversation, max_new_tokens, do_sample, top_k,
-                                     top_p, temperature, seed)
+    _ = generate_conversation(model, tokenizer, prompt, conv_history=conversation, max_new_tokens=max_new_tokens,
+                              do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature, seed=seed)
     # The first output is an empty string to clear the input box, the second cast the 2 list of chat history into a single list of tuples (user, model)
     return '', list(zip(conversation.user_history_text, conversation.model_history_text))
 
