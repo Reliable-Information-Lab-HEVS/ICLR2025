@@ -4,7 +4,7 @@ import random
 import os
 
 # Path to the root of the project
-ROOT_FOLDER = os.path.dirname(__file__)
+ROOT_FOLDER = os.path.dirname(os.path.dirname(__file__))
 
 
 def set_all_seeds(seed: int):

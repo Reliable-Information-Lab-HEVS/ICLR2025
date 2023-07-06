@@ -230,7 +230,8 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
-def load_model_and_tokenizer(model_name: str, quantization: bool = False, device_map: str = 'auto') -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
+def load_model_and_tokenizer(model_name: str, quantization: bool = False,
+                             device_map: str = 'auto') -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
     """Load both a model and corresponding tokenizer.
 
     Parameters
