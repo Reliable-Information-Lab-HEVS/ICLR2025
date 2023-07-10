@@ -9,10 +9,10 @@ from helpers import utils
 
 
 def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, prompt: str, max_new_tokens: int = 60,
-                  do_sample: bool = True, top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9,
-                  num_return_sequences: int = 1, batch_size: int | None = None, seed: int | None = None,
-                  truncate_prompt_from_output: bool = False, stopping_patterns: list[str] | bool | None = None,
-                  **kwargs) -> str | list[str]:
+                  min_new_tokens: int = 5, do_sample: bool = True, top_k: int = 40, top_p: float = 0.90,
+                  temperature: float = 0.9, num_return_sequences: int = 1, batch_size: int | None = None,
+                  seed: int | None = None, truncate_prompt_from_output: bool = False,
+                  stopping_patterns: list[str] | bool | None = None, **kwargs) -> str | list[str]:
     """Generate text according to `prompt` using the `model` and `tokenizer` specified.
 
     Parameters
@@ -25,6 +25,9 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
         The prompt to the model.
     max_new_tokens : int, optional
         How many new tokens to generate, by default 60.
+    min_new_tokens : int, optional
+        The minimum number of tokens to generate, by setting the probability of EOS token to 0. It is useful to
+        force the model to generate an output, instead of immediately generating EOS, by default 5.
     do_sample : bool, optional
         Whether to introduce randomness in the generation, by default True.
     top_k : int, optional
@@ -89,9 +92,9 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     for size in batch_sizes:
 
         with torch.no_grad():
-            outputs = model.generate(input, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k,
-                                     top_p=top_p, temperature=temperature, num_return_sequences=size,
-                                     stopping_criteria=stopping_criteria, **kwargs)
+            outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                     do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                     num_return_sequences=size, stopping_criteria=stopping_criteria, **kwargs)
             
         # In this case truncate the prompt from the output
         if truncate_prompt_from_output:
@@ -112,9 +115,9 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
 
 
 def load_and_generate_text(model_name: str, prompt: str, quantization: bool = False, max_new_tokens: int = 60,
-                           do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
-                           batch_size: int | None = None, num_return_sequences: int = 1, seed: int | None = None,
-                           truncate_prompt_from_output: bool = False,
+                           min_new_tokens: int = 5, do_sample: bool = True, top_k: int = 100, top_p: float = 0.92,
+                           temperature: float = 0.9, batch_size: int | None = None, num_return_sequences: int = 1,
+                           seed: int | None = None, truncate_prompt_from_output: bool = False,
                            stopping_patterns: list[str] | bool | None = None, **kwargs) -> str | list[str]:
     """Load a model and its tokenizer and generate text according to `prompt`.
 
@@ -128,6 +131,9 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
         Whether to load the model in 8 bits mode to save memory, by default False.
     max_new_tokens : int, optional
         How many new tokens to generate, by default 60.
+    min_new_tokens : int, optional
+        The minimum number of tokens to generate, by setting the probability of EOS token to 0. It is useful to
+        force the model to generate an output, instead of immediately generating EOS, by default 5.
     do_sample : bool, optional
         Whether to introduce randomness in the generation, by default True.
     top_k : int, optional
@@ -158,9 +164,10 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
 
     model, tokenizer = loader.load_model_and_tokenizer(model_name, quantization)
 
-    return generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k,
-                         top_p=top_p, temperature=temperature, num_return_sequences=num_return_sequences,
-                         batch_size=batch_size, seed=seed, truncate_prompt_from_output=truncate_prompt_from_output,
+    return generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                         do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                         num_return_sequences=num_return_sequences, batch_size=batch_size, seed=seed,
+                         truncate_prompt_from_output=truncate_prompt_from_output,
                          stopping_patterns=stopping_patterns, **kwargs)
 
 
@@ -189,8 +196,8 @@ class HFModel(object):
             return f'{self.model_name} model, original (not quantized) version'
         
 
-    def __call__(self, prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40,
-                 top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
+    def __call__(self, prompt: str, max_new_tokens: int = 60, min_new_tokens: int = 5, do_sample: bool = True,
+                 top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
                  batch_size: int | None = None, seed: int | None = None, truncate_prompt_from_output: bool = False,
                  stopping_patterns: list[str] | bool | None = None, **kwargs) -> str | list[str]:
         """Generate text according to `prompt`.
@@ -201,6 +208,9 @@ class HFModel(object):
         The prompt to the model.
     max_new_tokens : int, optional
         How many new tokens to generate, by default 60.
+    min_new_tokens : int, optional
+        The minimum number of tokens to generate, by setting the probability of EOS token to 0. It is useful to
+        force the model to generate an output, instead of immediately generating EOS, by default 5.
     do_sample : bool, optional
         Whether to introduce randomness in the generation, by default True.
     top_k : int, optional
@@ -229,7 +239,7 @@ class HFModel(object):
     """
         
         return generate_text(self.model, self.tokenizer, prompt, max_new_tokens=max_new_tokens,
-                             do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                             num_return_sequences=num_return_sequences, batch_size=batch_size, seed=seed,
-                             truncate_prompt_from_output=truncate_prompt_from_output,
+                             min_new_tokens=min_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
+                             temperature=temperature, num_return_sequences=num_return_sequences,
+                             batch_size=batch_size, seed=seed, truncate_prompt_from_output=truncate_prompt_from_output,
                              stopping_patterns=stopping_patterns, **kwargs)
