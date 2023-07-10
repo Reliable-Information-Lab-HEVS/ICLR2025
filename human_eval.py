@@ -1,5 +1,6 @@
 import os
 import gc
+from tqdm import tqdm
 
 import engine
 from engine import stopping
@@ -13,7 +14,7 @@ models = [
     'bloom-1.7B',
     'bloom-3B',
     'bloom-7.1B',
-    # 'bloom',
+    'bloom',
     'stable-lm-3B',
     'stable-lm-7B',
     'star-coder-base',
@@ -59,6 +60,7 @@ human_eval_generation_kwargs = {
     'top_k': 0,
     'top_p': 0.95,
     'num_return_sequences': 200,
+    'batch_size': 32,
     'seed': None,
     'truncate_prompt_from_output': True,
     'stopping_patterns': stopping.CODE_STOP_PATTERNS
@@ -79,7 +81,9 @@ temperatures = [0., 0.2, 0.4, 0.6, 0.8, 1.]
 
 def main():
 
-    for model_name in models:
+    utils.set_all_seeds(1234)
+
+    for model_name in tqdm(models, desc='Models'):
 
         # Load in 8 bits for bloom due to model size
         quantization = True if model_name == 'bloom' else False
@@ -87,11 +91,11 @@ def main():
         model = engine.HFModel(model_name, quantization=quantization)
         folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
 
-        for temperature in temperatures:
+        for temperature in tqdm(temperatures, desc='Temperatures', leave=False):
 
             filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
 
-            for sample in dataset:
+            for sample in tqdm(dataset, desc='Dataset samples', leave=False):
 
                 task_id = sample['task_id']
                 prompt = sample['prompt']
