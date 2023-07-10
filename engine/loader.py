@@ -80,6 +80,16 @@ CODEGEN_MODELS_MAPPING = {
     'codegen-16B': 'Salesforce/codegen-16B-mono',
 }
 
+# Pretrained CodeGEN2 models
+CODEGEN2_MODELS_MAPPING = {
+    'codegen2-1B': 'Salesforce/codegen2-1B',
+    'codegen2-3.7B': 'Salesforce/codegen2-3_7B',
+    'codegen2-7B': 'Salesforce/codegen2-7B',
+    'codegen2-16B': 'Salesforce/codegen2-16B',
+    'codegen25-7B': 'Salesforce/codegen25-7B-mono',
+    'codegen25-7B-instruct': 'Salesforce/codegen25-7b-instruct',
+}
+
 # Pretrained BERT models
 BERT_MODELS_MAPPING = {
     'bert-base-uncased': 'bert-base-uncased',
@@ -129,6 +139,7 @@ DECODER_MODELS_MAPPING = {
     **GPT_J_AND_NEO_MODELS_MAPPING,
     **OPT_MODELS_MAPPING,
     **CODEGEN_MODELS_MAPPING,
+    **CODEGEN2_MODELS_MAPPING,
 }
 
 # Encoder-based models
