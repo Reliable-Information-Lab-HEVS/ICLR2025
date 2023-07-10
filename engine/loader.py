@@ -90,6 +90,12 @@ CODEGEN2_MODELS_MAPPING = {
     'codegen25-7B-instruct': 'Salesforce/codegen25-7b-instruct',
 }
 
+# Pretrained Vicuna models
+VICUNA_MODELS_MAPPING = {
+    'vicuna-7B': 'lmsys/vicuna-7b-v1.3',
+    'vicuna-13B': 'lmsys/vicuna-13b-v1.3',
+}
+
 # Pretrained BERT models
 BERT_MODELS_MAPPING = {
     'bert-base-uncased': 'bert-base-uncased',
@@ -140,6 +146,7 @@ DECODER_MODELS_MAPPING = {
     **OPT_MODELS_MAPPING,
     **CODEGEN_MODELS_MAPPING,
     **CODEGEN2_MODELS_MAPPING,
+    **VICUNA_MODELS_MAPPING,
 }
 
 # Encoder-based models

@@ -47,6 +47,8 @@ models = [
     # 'codegen2-16B',
     # 'codegen25-7B',
     # 'codegen25-7B-instruct',
+    # 'vicuna-7B',
+    # 'vicuna-13B',
 ]
 
 
