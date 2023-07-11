@@ -7,7 +7,7 @@ from tokenizers.processors import TemplateProcessing
 import warnings
 import re
 
-
+from transformers import PreTrainedModel
 # Pretrained bloom models
 BLOOM_MODELS_MAPPING = {
     'bloom-560M': 'bigscience/bloom-560m',
@@ -15,6 +15,13 @@ BLOOM_MODELS_MAPPING = {
     'bloom-3B': 'bigscience/bloom-3b',
     'bloom-7.1B':'bigscience/bloom-7b1',
     'bloom-176B': 'bigscience/bloom',
+}
+BLOOM_MODELS_DTYPES = {
+    'bloom-560M': torch.float16,
+    'bloom-1.7B': torch.float16,
+    'bloom-3B': torch.float16,
+    'bloom-7.1B':torch.float16,
+    'bloom-176B': torch.bfloat16,
 }
 
 # Pretrained Dialo-GPT models
@@ -26,8 +33,12 @@ DIALO_GPT_MODELS_MAPPING = {
 
 # Pretrained StableLM models
 STABLE_LM_MODELS_MAPPING = {
-    'stable-lm-3B': 'StabilityAI/stablelm-base-alpha-3b',
-    'stable-lm-7B': 'StabilityAI/stablelm-base-alpha-7b',
+    'stable-lm-3B': 'stabilityai/stablelm-base-alpha-3b',
+    'stable-lm-7B': 'stabilityai/stablelm-base-alpha-7b',
+}
+STABLE_LM_MODELS_DTYPES = {
+    'stable-lm-3B': torch.float16,
+    'stable-lm-7B': torch.float16,
 }
 
 # Pretrained StarCoder models

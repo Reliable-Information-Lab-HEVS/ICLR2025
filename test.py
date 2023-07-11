@@ -70,29 +70,29 @@ from helpers import utils
 # print(f'Time needed using cuda: {dt2:.2f} s')
 
 
-model_name = 'bloom-7.1B'
-model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
-                                                    torch_dtype=torch.float16, load_in_8bit=False).to('cuda')
-tokenizer = loader.load_tokenizer(model_name)
+# model_name = 'bloom-7.1B'
+# model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
+#                                                     torch_dtype=torch.float16, load_in_8bit=False).to('cuda')
+# tokenizer = loader.load_tokenizer(model_name)
 
-prompt = "Write code to multiply 2 numbers"
+# prompt = "Write code to multiply 2 numbers"
 
-foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=1, batch_size=100, max_new_tokens=500,
-                               seed=1)
-print(f'float16: {foo}')
+# foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=1, batch_size=100, max_new_tokens=500,
+#                                seed=1)
+# print(f'float16: {foo}')
 
-del model, tokenizer
+# del model, tokenizer
 
 
-model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
-                                                    torch_dtype='auto', load_in_8bit=False).to('cuda')
-tokenizer = loader.load_tokenizer(model_name)
+# model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
+#                                                     torch_dtype='auto', load_in_8bit=False).to('cuda')
+# tokenizer = loader.load_tokenizer(model_name)
 
-prompt = "Write code to multiply 2 numbers"
+# prompt = "Write code to multiply 2 numbers"
 
-foo2 = generation.generate_text(model, tokenizer, prompt, num_return_sequences=1, batch_size=100, max_new_tokens=500,
-                               seed=1)
-print(f'original: {foo2}')
+# foo2 = generation.generate_text(model, tokenizer, prompt, num_return_sequences=1, batch_size=100, max_new_tokens=500,
+#                                seed=1)
+# print(f'original: {foo2}')
 
 # param_size = 0
 # for param in model.parameters():
@@ -103,3 +103,17 @@ print(f'original: {foo2}')
 
 # size_all_mb = (param_size + buffer_size) / 1024**2
 # print('model size: {:.3f}MB'.format(size_all_mb))
+
+
+tokenizer = AutoTokenizer.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
+model = AutoModelForCausalLM.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
+model.half().cuda()
+
+inputs = tokenizer("What's your mood today?", return_tensors="pt").cuda()
+tokens = model.generate(
+  **inputs,
+  max_new_tokens=64,
+  temperature=0.7,
+  do_sample=True,
+)
+print(tokenizer.decode(tokens[0], skip_special_tokens=True))
