@@ -10,11 +10,6 @@
 #SBATCH --gres=gpu:v100:3
 #SBATCH --chdir=/cluster/raid/home/vacy/LLMs
 
-# Verify working directory
-echo $(pwd)
-
-nvidia-smi
-
 # Initialize the shell to use local conda
 eval "$(conda shell.bash hook)"
 

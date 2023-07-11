@@ -34,6 +34,7 @@ model_name = 'bloom-560M'
 prompt = "Write code to multiply 2 numbers"
 
 model, tokenizer = loader.load_model_and_tokenizer(model_name, device_map='auto')
+print(model.hf_device_map)
 
 t0 = time.time()
 foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=16)
@@ -43,7 +44,8 @@ print(f'Time needed with auto: {dt:.2f} s')
 del model, tokenizer
 gc.collect()
 
-model, tokenizer = loader.load_model_and_tokenizer(model_name, device_map='cuda:0')
+model, tokenizer = loader.load_model_and_tokenizer(model_name, device_map='sequential')
+print(model.hf_device_map)
 
 t1 = time.time()
 foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=16)
