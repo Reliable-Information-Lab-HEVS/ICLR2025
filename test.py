@@ -109,7 +109,7 @@ tokenizer = AutoTokenizer.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
 model = AutoModelForCausalLM.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
 model.half().cuda()
 
-inputs = tokenizer("What's your mood today?", return_tensors="pt").cuda()
+inputs = tokenizer("What's your mood today?", return_tensors="pt").to("cuda")
 tokens = model.generate(
   **inputs,
   max_new_tokens=64,
