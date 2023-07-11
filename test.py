@@ -39,7 +39,7 @@ model, tokenizer = loader.load_model_and_tokenizer(model_name, device_map='auto'
 print(model.hf_device_map)
 
 t0 = time.time()
-foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=16)
+foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=100)
 dt = time.time() - t0
 print(f'Time needed with auto: {dt:.2f} s')
 
@@ -50,7 +50,7 @@ model, tokenizer = loader.load_model_and_tokenizer(model_name, device_map='seque
 print(model.hf_device_map)
 
 t1 = time.time()
-foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=16)
+foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=100)
 dt1 = time.time() - t1
 print(f'Time needed without auto: {dt1:.2f} s')
 
@@ -65,6 +65,6 @@ tokenizer = loader.load_tokenizer(model_name)
 # print(model.hf_device_map)
 
 t2 = time.time()
-foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=16)
+foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=100)
 dt2 = time.time() - t2
 print(f'Time needed using cuda: {dt2:.2f} s')

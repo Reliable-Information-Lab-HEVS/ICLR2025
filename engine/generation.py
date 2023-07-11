@@ -61,7 +61,7 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     input = tokenizer.encode(prompt, return_tensors='pt')
     input_length = input.shape[-1]
     if torch.cuda.is_available():
-        input = input.to('cuda:0')
+        input = input.to('cuda')
 
     # Possible early stopping
     if type(stopping_patterns) is list:
