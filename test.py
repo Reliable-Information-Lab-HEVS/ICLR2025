@@ -73,13 +73,33 @@ from helpers import utils
 model_name = 'bloom-7.1B'
 model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
                                                     torch_dtype=torch.float16, load_in_8bit=False)
+tokenizer = loader.load_tokenizer(model_name)
 
-param_size = 0
-for param in model.parameters():
-    param_size += param.nelement() * param.element_size()
-buffer_size = 0
-for buffer in model.buffers():
-    buffer_size += buffer.nelement() * buffer.element_size()
+prompt = "Write code to multiply 2 numbers"
 
-size_all_mb = (param_size + buffer_size) / 1024**2
-print('model size: {:.3f}MB'.format(size_all_mb))
+foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=1, batch_size=100, max_new_tokens=500,
+                               seed=1)
+print(f'float16: {foo}')
+
+del model, tokenizer
+
+
+model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
+                                                    torch_dtype='auto', load_in_8bit=False)
+tokenizer = loader.load_tokenizer(model_name)
+
+prompt = "Write code to multiply 2 numbers"
+
+foo2 = generation.generate_text(model, tokenizer, prompt, num_return_sequences=1, batch_size=100, max_new_tokens=500,
+                               seed=1)
+print(f'original: {foo2}')
+
+# param_size = 0
+# for param in model.parameters():
+#     param_size += param.nelement() * param.element_size()
+# buffer_size = 0
+# for buffer in model.buffers():
+#     buffer_size += buffer.nelement() * buffer.element_size()
+
+# size_all_mb = (param_size + buffer_size) / 1024**2
+# print('model size: {:.3f}MB'.format(size_all_mb))

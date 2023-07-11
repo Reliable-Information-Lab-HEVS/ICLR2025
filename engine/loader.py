@@ -14,7 +14,7 @@ BLOOM_MODELS_MAPPING = {
     'bloom-1.7B': 'bigscience/bloom-1b7',
     'bloom-3B': 'bigscience/bloom-3b',
     'bloom-7.1B':'bigscience/bloom-7b1',
-    'bloom': 'bigscience/bloom',
+    'bloom-176B': 'bigscience/bloom',
 }
 
 # Pretrained Dialo-GPT models
@@ -228,13 +228,13 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
         model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                    torch_dtype=dtype, load_in_8bit=quantization)
+                                                    torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True)
     elif model_name in ENCODER_MODELS_MAPPING.keys():
         model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                    torch_dtype=dtype, load_in_8bit=quantization)
+                                                    torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True)
     elif model_name in TRANSFORMER_MODELS_MAPPING.keys():
         model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                      torch_dtype=dtype, load_in_8bit=quantization)
+                                                      torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True)
         
     model.eval()
 
