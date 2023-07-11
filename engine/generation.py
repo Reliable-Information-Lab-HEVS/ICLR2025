@@ -82,7 +82,10 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     # If we require more sequences than the allowed batch size, we need to split the generation into
     # multiple passes
     if (batch_size is not None) and (num_return_sequences > batch_size):
-        batch_sizes = [batch_size]*(num_return_sequences // batch_size) + [num_return_sequences % batch_size]
+        batch_sizes = [batch_size]*(num_return_sequences // batch_size)
+        remainder = num_return_sequences % batch_size
+        if remainder != 0:
+              batch_sizes += [remainder]
         assert sum(batch_sizes) == num_return_sequences
     else:
         batch_sizes = [num_return_sequences]
