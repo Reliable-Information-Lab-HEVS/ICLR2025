@@ -62,7 +62,7 @@ model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model
                                                     torch_dtype='auto', load_in_8bit=False)
 model = model.to('cuda:0')
 tokenizer = loader.load_tokenizer(model_name)
-print(model.hf_device_map)
+# print(model.hf_device_map)
 
 t2 = time.time()
 foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=16)
