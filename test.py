@@ -72,7 +72,7 @@ from helpers import utils
 
 model_name = 'bloom-7.1B'
 model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
-                                                    torch_dtype=torch.float16, load_in_8bit=False)
+                                                    torch_dtype=torch.float16, load_in_8bit=False).to('cuda')
 tokenizer = loader.load_tokenizer(model_name)
 
 prompt = "Write code to multiply 2 numbers"
@@ -85,7 +85,7 @@ del model, tokenizer
 
 
 model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
-                                                    torch_dtype='auto', load_in_8bit=False)
+                                                    torch_dtype='auto', load_in_8bit=False).to('cuda')
 tokenizer = loader.load_tokenizer(model_name)
 
 prompt = "Write code to multiply 2 numbers"
