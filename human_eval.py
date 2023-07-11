@@ -56,6 +56,7 @@ models = [
 # We need to set top_k to 0 to deactivate top-k sampling
 human_eval_generation_kwargs = {
     'max_new_tokens': 512,
+    'min_new_tokens': 5,
     'do_sample': True,
     'top_k': 0,
     'top_p': 0.95,
@@ -68,6 +69,7 @@ human_eval_generation_kwargs = {
 
 human_eval_greedy_generation_kwargs = {
     'max_new_tokens': 512,
+    'min_new_tokens': 5,
     'do_sample': False,
     'top_k': 0,
     'top_p': 1.,
