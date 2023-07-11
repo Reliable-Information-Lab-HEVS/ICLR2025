@@ -4,6 +4,8 @@ import argparse
 import time
 import gc
 
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
+
 from langchain.agents import initialize_agent, AgentType
 from langchain.chains import LLMChain
 
@@ -51,3 +53,18 @@ t1 = time.time()
 foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=16)
 dt1 = time.time() - t1
 print(f'Time needed without auto: {dt1:.2f} s')
+
+
+del model, tokenizer
+gc.collect()
+
+model = AutoModelForCausalLM.from_pretrained(loader.DECODER_MODELS_MAPPING[model_name], device_map=None,
+                                                    torch_dtype='auto', load_in_8bit=False)
+model = model.to('cuda:0')
+tokenizer = loader.load_tokenizer(model_name)
+print(model.hf_device_map)
+
+t2 = time.time()
+foo = generation.generate_text(model, tokenizer, prompt, num_return_sequences=200, batch_size=16)
+dt2 = time.time() - t2
+print(f'Time needed using cuda: {dt2:.2f} s')

@@ -211,11 +211,11 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
             matched_letter = match.group(2)
             # Model size in billion (B) of parameters
             model_size = float(matched_number) if matched_letter == 'B' else float(matched_number)/1e3
-            device_map = 'auto' if model_size > 7 else 'sequential'
+            device_map = 'balanced_low_0' if model_size > 7 else 'sequential'
         elif 'gpt2' in model_name or 'dialo-gpt' in model_name:
             device_map = 'sequential'
         else:
-            device_map = 'auto'
+            device_map = 'balanced_low_0'
         
     # Override quantization if we don't have access to GPUs
     if not torch.cuda.is_available() and quantization:
