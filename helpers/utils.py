@@ -15,12 +15,12 @@ RESULTS_FOLDER = os.path.join(ROOT_FOLDER, 'results')
 
 
 # Most frequent text/data file extensions
-FREQUENT_EXTENSIONS = [
+FREQUENT_EXTENSIONS = (
     'json',
     'jsonl',
     'txt',
     'csv'
-]
+)
 
 
 def set_all_seeds(seed: int):

@@ -5,6 +5,7 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from tokenizers.processors import TemplateProcessing
 import warnings
+import re
 
 
 # Pretrained bloom models
@@ -174,7 +175,7 @@ AUTHORIZED_MODELS = list(ALL_MODELS_MAPPING.keys())
 
 
 
-def load_model(model_name: str, quantization: bool = False, device_map: str = 'auto') -> PreTrainedModel:
+def load_model(model_name: str, quantization: bool = False, device_map: str | None = None) -> PreTrainedModel:
     """Load one of the supported pretrained model.
 
     Parameters
@@ -183,8 +184,9 @@ def load_model(model_name: str, quantization: bool = False, device_map: str = 'a
         The model name.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
-    device_map : str, optional
-        The device map to decide how to split the model between available devices, by default 'auto'.
+    device_map : str | None, optional
+        The device map to decide how to split the model between available devices, by default None. If not
+        provided, the model will be put on a single GPU if relatively small, else split using 'auto'.
 
     Returns
     -------
@@ -195,6 +197,26 @@ def load_model(model_name: str, quantization: bool = False, device_map: str = 'a
     if model_name not in AUTHORIZED_MODELS:
         raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
     
+    # Automatically find the best device_map depending on the model size
+    if device_map is None:
+    
+        # The following regex match any digits possibly separated with a dot ('.') which is immeditely
+        # followed by a 'B' or 'M' to capture the model size following our model name convention. Parenthesis 
+        # allow to capture given groups of the regex thanks to the match object .group() method.
+        pattern = r'([0-9]+(?:\.[0-9]+)?)([BM])'
+
+        match = re.search(pattern, model_name)
+        if match:
+            matched_number = match.group(1)
+            matched_letter = match.group(2)
+            # Model size in billion (B) of parameters
+            model_size = float(matched_number) if matched_letter == 'B' else float(matched_number)/1e3
+            device_map = 'auto' if model_size > 7 else 'sequential'
+        elif 'gpt2' in model_name or 'dialo-gpt' in model_name:
+            device_map = 'sequential'
+        else:
+            device_map = 'auto'
+        
     # Override quantization if we don't have access to GPUs
     if not torch.cuda.is_available() and quantization:
         quantization = False

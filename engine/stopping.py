@@ -5,20 +5,20 @@ from transformers import StoppingCriteria
 # If we reach one of these patterns, it means that the model has finished generating the solution as a 
 # function and continues useless generation (basically stop words used in the Codex/HumanEval 
 # paper: https://arxiv.org/pdf/2107.03374.pdf). Should only be used when the prompt is a function definition.
-CODE_STOP_PATTERNS = [
+CODE_STOP_PATTERNS = (
     '\nclass',
     '\ndef',
     '\n#',
     '\nif',
     '\nprint',
     '\n@'
-]
+)
 
 
 class TextPatternStopping(StoppingCriteria):
 
     def __init__(self, prompt_ids_length: int, tokenizer: PreTrainedTokenizerBase,
-                 stop_patterns: list[str] = CODE_STOP_PATTERNS):
+                 stop_patterns: tuple[str] = CODE_STOP_PATTERNS):
 
         super().__init__()
         self.prompt_ids_length = prompt_ids_length
@@ -44,7 +44,7 @@ class TextPatternStopping(StoppingCriteria):
 
 
 def post_process_sequences(generated_sequences: list[str], prompt:str,
-                           stop_patterns: list[str] = CODE_STOP_PATTERNS) -> list[str]:
+                           stop_patterns: tuple[str] = CODE_STOP_PATTERNS) -> list[str]:
     """Post-process the outputs of a model to truncate according to a list of patterns upon which we stop
     generation (this is needed because the StoppingCriteria cannot immediately stop the generation of each
     sequence upon meeting a pattern in the case of more than 1 `num_return_sequences`).
