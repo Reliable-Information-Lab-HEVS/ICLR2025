@@ -447,15 +447,34 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
 
     # Estimate of the memory size of the model
     rough_model_size_estimate = ALL_MODELS_PARAMS_MAPPING[model_name] * size_multiplier
+
+    # Flag that will be set to True if we don't even need a device_map and can just put the model and first gpu
+    only_move_to_first_gpu = False
     
-    # Automatically find the best device_map depending on the model size
-    if device_map is None:
+    # Automatically find the best device_map depending on the model size and gpu size.
+    # Try to minimize the number of gpus to use because using more will slow inference (but allow larger
+    # batch size). Indeed, the parallelism of device_map is naive and gpus are only used sequentially
+    if (device_map is None) and torch.cuda.is_available():
     
-        device_map = 'balanced_low_0' if model_size > 7 else 'sequential'
-        elif 'gpt2' in model_name or 'dialo-gpt' in model_name:
-            device_map = 'sequential'
-        else:
-            device_map = 'balanced_low_0'
+        # We assume that we always have identical gpus when using multiple gpus
+        gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
+        # Say we only have access to a portion of that memory for our model
+        gpu_memory = 0.7 * gpu_memory
+        gpu_number = torch.cuda.device_count()
+
+
+        if rough_model_size_estimate > gpu_memory * gpu_number:
+            raise(RuntimeError('The model seems too big for the gpu resources you have.'))
+        
+        # In this case we don't need a device_map, we just move the model to the 1st gpu
+        if rough_model_size_estimate < gpu_memory:
+            only_move_to_first_gpu = True
+        
+        # device_map = 'balanced_low_0' if model_size > 7 else 'sequential'
+        # elif 'gpt2' in model_name or 'dialo-gpt' in model_name:
+        #     device_map = 'sequential'
+        # else:
+        #     device_map = 'balanced_low_0'
         
     if model_name in ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING.keys():
         additional_kwargs = ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING[model_name]
@@ -465,13 +484,21 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
         model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                    torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True)
+                                                    torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
+                                                    **additional_kwargs)
     elif model_name in ENCODER_MODELS_MAPPING.keys():
         model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                    torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True)
+                                                    torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
+                                                    **additional_kwargs)
     elif model_name in TRANSFORMER_MODELS_MAPPING.keys():
         model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                      torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True)
+                                                      torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
+                                                      **additional_kwargs)
+    
+    # If the flag is active we directly put our model on first gpu without using any device_map (this is 
+    # more efficient)
+    if only_move_to_first_gpu:
+        model = model.to('cuda:0')
         
     model.eval()
 
@@ -495,7 +522,12 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     if model_name not in AUTHORIZED_MODELS:
         raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
     
-    tokenizer = AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name])
+    if model_name in ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING.keys():
+        additional_kwargs = ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING[model_name]
+    else:
+        additional_kwargs = {}
+    
+    tokenizer = AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name], **additional_kwargs)
 
     # For Dialo-GPT models, update the post-processor to automatically add the eos token at the end
     # We need to sacrifice the ByteLevel processor for that because it is currently not possible to
@@ -507,8 +539,8 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
-def load_model_and_tokenizer(model_name: str, quantization: bool = False,
-                             device_map: str = 'auto') -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
+def load_model_and_tokenizer(model_name: str, quantization: bool = False, device_map: str | None = None,
+               dtype: torch.dtype | None = None) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
     """Load both a model and corresponding tokenizer.
 
     Parameters
@@ -517,8 +549,12 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False,
         The model name.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
-    device_map : str, optional
-        The device map to decide how to split the model between available devices, by default 'auto'.
+    device_map : str | None, optional
+        The device map to decide how to split the model between available devices, by default None. If not
+        provided, the model will be put on a single GPU if relatively small, else split using 'auto'.
+    dtype : torch.dtype | None, optional
+        The dtype to use for the model. If not provided, we use the dtype with which the model was trained
+        if it is known, else we use float32, by default None.
 
     Returns
     -------
@@ -526,4 +562,5 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False,
         The model and tokenizer.
     """
 
-    return load_model(model_name, quantization=quantization, device_map=device_map), load_tokenizer(model_name)
+    return load_model(model_name, quantization=quantization, device_map=device_map,
+                      dtype=dtype), load_tokenizer(model_name)
