@@ -438,6 +438,13 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     # Override dtype if we quantize the model as only float16 is acceptable for quantization
     dtype = torch.float16 if quantization else dtype
 
+    # Add possible additional kwargs
+    if model_name in ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING.keys():
+        additional_kwargs = ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING[model_name]
+    else:
+        additional_kwargs = {}
+
+
     if quantization:
         size_multiplier = 1
     elif (dtype == torch.float16) or (dtype == torch.bfloat16):
@@ -462,24 +469,29 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         gpu_memory = 0.7 * gpu_memory
         gpu_number = torch.cuda.device_count()
 
+        min_gpu_needed = rough_model_size_estimate // gpu_memory + 1
 
-        if rough_model_size_estimate > gpu_memory * gpu_number:
+
+        if min_gpu_needed > gpu_number:
             raise(RuntimeError('The model seems too big for the gpu resources you have.'))
         
-        # In this case we don't need a device_map, we just move the model to the 1st gpu
-        if rough_model_size_estimate < gpu_memory:
+        # In this case we don't need a device_map, we just move the model to the 1st gpu. Most models are 
+        # relatively small and should fall on this category.
+        if min_gpu_needed == 1:
             only_move_to_first_gpu = True
-        
-        # device_map = 'balanced_low_0' if model_size > 7 else 'sequential'
-        # elif 'gpt2' in model_name or 'dialo-gpt' in model_name:
-        #     device_map = 'sequential'
-        # else:
-        #     device_map = 'balanced_low_0'
-        
-    if model_name in ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING.keys():
-        additional_kwargs = ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING[model_name]
-    else:
-        additional_kwargs = {}
+        # Heuristic: if we need 4 or less, we create a custom device_map to only use the minimum number of gpu
+        # possible. Only 20-60 G parameters models should fall on this category.
+        elif min_gpu_needed <= 4:
+            max_memory = {i: f'{gpu_memory:.2f}GiB' for i in range(min_gpu_needed)}
+            max_memory['cpu'] = '0GiB'
+            additional_kwargs['max_memory'] = max_memory
+            device_map = 'balanced_low_0'
+        # Otherwise, we need a lot of gpus anyway, so better use built-in 'balanced_low_0'. Only very large
+        # models should fall on this category since we are mostly using A100 gpus.
+        else:
+            device_map = 'balanced_low_0'
+
+    
     
     # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
