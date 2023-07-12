@@ -7,7 +7,55 @@ from tokenizers.processors import TemplateProcessing
 import warnings
 import re
 
-from transformers import PreTrainedModel
+def _infer_model_size(model_name: str) -> float:
+    """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
+    ValueError otherwise.
+
+    Parameters
+    ----------
+    model_name : str
+        The model name.
+
+    Returns
+    -------
+    float
+        The number of parameters of the model, in billions.
+    """
+
+    # The following regex matches any digits possibly separated with a dot ('.') which is immeditely
+    # followed by a 'B' or 'M' to capture the model size following our model name convention. Parenthesis 
+    # allow to capture given groups of the regex thanks to the match object .group() method.
+    pattern = r'([0-9]+(?:\.[0-9]+)?)([BM])'
+
+    match = re.search(pattern, model_name)
+    if match:
+        matched_number = match.group(1)
+        matched_letter = match.group(2)
+        # Model size in billion (B) of parameters
+        model_size = float(matched_number) if matched_letter == 'B' else float(matched_number)/1e3
+        return model_size
+    else:
+        raise(ValueError('The model number of parameters cannot be inferred from its name.'))
+    
+
+def _infer_model_sizes(name_mapping: dict[str, str]) -> dict[str, float]:
+    """Infer the number of parameters of all model names (dict keys) and return them as {key: #params}.
+
+    Parameters
+    ----------
+    name_mapping : dict[str, str]
+        A dictionary whose keys are the model names.
+
+    Returns
+    -------
+    dict[str, float]
+        A mapping from names to number of parameters.
+    """
+
+    return {key: _infer_model_size(key) for key in name_mapping.keys()}
+
+    
+
 # Pretrained bloom models
 BLOOM_MODELS_MAPPING = {
     'bloom-560M': 'bigscience/bloom-560m',
@@ -23,12 +71,24 @@ BLOOM_MODELS_DTYPES = {
     'bloom-7.1B':torch.float16,
     'bloom-176B': torch.bfloat16,
 }
+BLOOM_MODELS_PARAMS = _infer_model_sizes(BLOOM_MODELS_MAPPING)
+
 
 # Pretrained Dialo-GPT models
 DIALO_GPT_MODELS_MAPPING = {
     'dialo-gpt-small': 'microsoft/DialoGPT-small',
     'dialo-gpt-medium': 'microsoft/DialoGPT-medium',
     'dialo-gpt-large': 'microsoft/DialoGPT-large',
+}
+DIALO_GPT_MODELS_DTYPES = {
+    'dialo-gpt-small': torch.float32,
+    'dialo-gpt-medium': torch.float32,
+    'dialo-gpt-large': torch.float32,
+}
+DIALO_GPT_MODELS_PARAMS = {
+    'dialo-gpt-small': 125/1e3,
+    'dialo-gpt-medium': 355/1e3,
+    'dialo-gpt-large': 775/1e3,
 }
 
 # Pretrained StableLM models
@@ -40,6 +100,7 @@ STABLE_LM_MODELS_DTYPES = {
     'stable-lm-3B': torch.float16,
     'stable-lm-7B': torch.float16,
 }
+STABLE_LM_MODELS_PARAMS = _infer_model_sizes(STABLE_LM_MODELS_MAPPING)
 
 # Pretrained StarCoder models
 STAR_CODER_MODELS_MAPPING = {
@@ -47,14 +108,37 @@ STAR_CODER_MODELS_MAPPING = {
     # Star-coder-base further trained on Python
     'star-coder': 'bigcode/starcoder',
     # Star-coder-based further trained on English data
-    'star-coder-plus': 'bigcode/starcoderplus'
+    'star-coder-plus': 'bigcode/starcoderplus',
 }
+STAR_CODER_MODELS_DTYPES = {
+    'star-coder-base': torch.bfloat16,
+    'star-coder': torch.bfloat16,
+    'star-coder-plus': torch.bfloat16,
+}
+STAR_CODER_MODELS_PARAMS = {
+    'star-coder-base': 15.5,
+    'star-coder': 15.5,
+    'star-coder-plus': 15.5,
+}
+STAR_CODER_ADDITIONAL_MODEL_KWARGS = {
+    'star-coder-base': {'trust_remote_code': True},
+}
+
 
 # Pretrained Star-chat models
 STAR_CHAT_MODELS_MAPPING = {
     'star-chat-alpha': 'HuggingFaceH4/starchat-alpha',
-    'star-chat-beta': 'HuggingFaceH4/starchat-beta'
+    'star-chat-beta': 'HuggingFaceH4/starchat-beta',
 }
+STAR_CHAT_MODELS_DTYPES = {
+    'star-chat-alpha': torch.float16,
+    'star-chat-beta': torch.bfloat16,
+}
+STAR_CHAT_MODELS_PARAMS = {
+    'star-chat-alpha': 16,
+    'star-chat-beta': 16,
+}
+
 
 # Pretrained GPT-2 models
 GPT2_MODELS_MAPPING = {
@@ -62,6 +146,17 @@ GPT2_MODELS_MAPPING = {
     'gpt2-large': 'gpt2-large',
     'gpt2-xl': 'gpt2-xl',
 }
+GPT2_MODELS_DTYPES = {
+    'gpt2-medium': torch.float32,
+    'gpt2-large': torch.float32,
+    'gpt2-xl': torch.float32,
+}
+GPT2_MODELS_PARAMS = {
+    'gpt2-medium': 355/1e3,
+    'gpt2-large': 774/1e3,
+    'gpt2-xl': 1.5,
+}
+
 
 # Pretrained GPT-J and GPT-Neo models
 GPT_J_AND_NEO_MODELS_MAPPING = {
@@ -71,6 +166,15 @@ GPT_J_AND_NEO_MODELS_MAPPING = {
     'gpt-neo-2.7B': 'EleutherAI/gpt-neo-2.7B',
     'gpt-neoX-20B': 'EleutherAI/gpt-neox-20b',
 }
+GPT_J_AND_NEO_MODELS_DTYPES = {
+    'gpt-j-6B': torch.float32,
+    'gpt-neo-125M': torch.float32,
+    'gpt-neo-1.3B': torch.float32,
+    'gpt-neo-2.7B': torch.float32,
+    'gpt-neoX-20B': torch.float16,
+}
+GPT_J_AND_NEO_MODELS_PARAMS = _infer_model_sizes(GPT_J_AND_NEO_MODELS_MAPPING)
+
 
 # Pretrained OPT models
 OPT_MODELS_MAPPING = {
@@ -83,6 +187,18 @@ OPT_MODELS_MAPPING = {
     'opt-30B': 'facebook/opt-30b',
     'opt-66B': 'facebook/opt-66b',
 }
+OPT_MODELS_DTYPES = {
+    'opt-125M': torch.float16,
+    'opt-350M': torch.float16,
+    'opt-1.3B': torch.float16,
+    'opt-2.7B': torch.float16,
+    'opt-6.7B': torch.float16,
+    'opt-13B': torch.float16,
+    'opt-30B': torch.float16,
+    'opt-66B': torch.float16,
+}
+OPT_MODELS_PARAMS = _infer_model_sizes(OPT_MODELS_MAPPING)
+
 
 # Pretrained CodeGEN models
 CODEGEN_MODELS_MAPPING = {
@@ -91,6 +207,14 @@ CODEGEN_MODELS_MAPPING = {
     'codegen-6B': 'Salesforce/codegen-6B-mono',
     'codegen-16B': 'Salesforce/codegen-16B-mono',
 }
+CODEGEN_MODELS_DTYPES = {
+    'codegen-350M': torch.float16,
+    'codegen-2B': torch.float16,
+    'codegen-6B': torch.float16,
+    'codegen-16B': torch.float16,
+}
+CODEGEN_MODELS_PARAMS = _infer_model_sizes(CODEGEN_MODELS_MAPPING)
+
 
 # Pretrained CodeGEN2 models
 CODEGEN2_MODELS_MAPPING = {
@@ -101,50 +225,38 @@ CODEGEN2_MODELS_MAPPING = {
     'codegen25-7B': 'Salesforce/codegen25-7B-mono',
     'codegen25-7B-instruct': 'Salesforce/codegen25-7b-instruct',
 }
+CODEGEN2_MODELS_DTYPES = {
+    'codegen2-1B': torch.float32,
+    'codegen2-3.7B': torch.float32,
+    'codegen2-7B': torch.float32,
+    'codegen2-16B': torch.float32,
+    'codegen25-7B': torch.float32,
+    'codegen25-7B-instruct': torch.float32,
+}
+CODEGEN2_MODELS_PARAMS = _infer_model_sizes(CODEGEN2_MODELS_MAPPING)
+CODEGEN2_ADDITIONAL_MODEL_KWARGS = {
+    'codegen2-1B': {'trust_remote_code': True, 'revision': 'main'},
+    'codegen2-3.7B': {'trust_remote_code': True, 'revision': 'main'},
+    'codegen2-7B': {'trust_remote_code': True, 'revision': 'main'},
+    'codegen2-16B': {'trust_remote_code': True, 'revision': 'main'},
+}
+CODEGEN2_ADDITIONAL_TOKENIZER_KWARGS = {
+    'codegen25-7B': {'trust_remote_code': True},
+    'codegen25-7B-instruct': {'trust_remote_code': True},
+}
+
 
 # Pretrained Vicuna models
 VICUNA_MODELS_MAPPING = {
     'vicuna-7B': 'lmsys/vicuna-7b-v1.3',
     'vicuna-13B': 'lmsys/vicuna-13b-v1.3',
 }
-
-# Pretrained BERT models
-BERT_MODELS_MAPPING = {
-    'bert-base-uncased': 'bert-base-uncased',
-    'bert-large-uncased': 'bert-large-uncased',
-    'bert-base-cased': 'bert-base-cased',
-    'bert-large-cased': 'bert-large-cased',
+VICUNA_MODELS_DTYPES = {
+    'vicuna-7B': torch.float16,
+    'vicuna-13B': torch.float16,
 }
+VICUNA_MODELS_PARAMS = _infer_model_sizes(VICUNA_MODELS_MAPPING)
 
-# Pretrained RoBERTa models
-ROBERTA_MODELS_MAPPING = {
-    'roberta-base': 'roberta-base',
-    'roberta-large': 'roberta-large',
-}
-
-# Pretrained BART models
-BART_MODELS_MAPPING = {
-    'bart-base': 'facebook/bart-base',
-    'bart-large': 'facebook/bart-large',
-}
-
-# Pretrained T5 models
-T5_MODELS_MAPPING = {
-    't5-small': 't5-small',
-    't5-base': 't5-base',
-    't5-large': 't5-large',
-    't5-3B': 't5-3b',
-    't5-11B': 't5-11b',
-}
-
-# Pretrained FLAN-T5 models
-FLAN_T5_MODELS_MAPPING = {
-    'flan-t5-small': 'google/flan-t5-small',
-    'flan-t5-base': 'google/flan-t5-base',
-    'flan-t5-large': 'google/flan-t5-large',
-    'flan-t5-xl': 'google/flan-t5-xl',
-    'flan-t5-xxl': 'google/flan-t5-xxl',
-}
 
 # Decoder-based models
 DECODER_MODELS_MAPPING = {
@@ -160,12 +272,92 @@ DECODER_MODELS_MAPPING = {
     **CODEGEN2_MODELS_MAPPING,
     **VICUNA_MODELS_MAPPING,
 }
+DECODER_MODELS_DTYPES_MAPPING = {
+    **BLOOM_MODELS_DTYPES,
+    **DIALO_GPT_MODELS_DTYPES,
+    **STABLE_LM_MODELS_DTYPES,
+    **STAR_CODER_MODELS_DTYPES,
+    **STAR_CHAT_MODELS_DTYPES,
+    **GPT2_MODELS_DTYPES,
+    **GPT_J_AND_NEO_MODELS_DTYPES,
+    **OPT_MODELS_DTYPES,
+    **CODEGEN_MODELS_DTYPES,
+    **CODEGEN2_MODELS_DTYPES,
+    **VICUNA_MODELS_DTYPES,
+}
+DECODER_MODELS_PARAMS_MAPPING = {
+    **BLOOM_MODELS_PARAMS,
+    **DIALO_GPT_MODELS_PARAMS,
+    **STABLE_LM_MODELS_PARAMS,
+    **STAR_CODER_MODELS_PARAMS,
+    **STAR_CHAT_MODELS_PARAMS,
+    **GPT2_MODELS_PARAMS,
+    **GPT_J_AND_NEO_MODELS_PARAMS,
+    **OPT_MODELS_PARAMS,
+    **CODEGEN_MODELS_PARAMS,
+    **CODEGEN2_MODELS_PARAMS,
+    **VICUNA_MODELS_PARAMS,
+}
+DECODER_ADDITIONAL_MODEL_KWARGS_MAPPING = {
+    **STAR_CODER_ADDITIONAL_MODEL_KWARGS,
+    **CODEGEN2_ADDITIONAL_MODEL_KWARGS,
+}
+DECODER_ADDITIONAL_TOKENIZER_KWARGS_MAPPING = {
+    **CODEGEN2_ADDITIONAL_TOKENIZER_KWARGS,
+}
+
+
+
+# Pretrained BERT models
+BERT_MODELS_MAPPING = {
+    'bert-base-uncased': 'bert-base-uncased',
+    'bert-large-uncased': 'bert-large-uncased',
+    'bert-base-cased': 'bert-base-cased',
+    'bert-large-cased': 'bert-large-cased',
+}
+
+
+# Pretrained RoBERTa models
+ROBERTA_MODELS_MAPPING = {
+    'roberta-base': 'roberta-base',
+    'roberta-large': 'roberta-large',
+}
+
 
 # Encoder-based models
 ENCODER_MODELS_MAPPING = {
     **BERT_MODELS_MAPPING,
     **ROBERTA_MODELS_MAPPING,
 }
+
+
+
+# Pretrained BART models
+BART_MODELS_MAPPING = {
+    'bart-base': 'facebook/bart-base',
+    'bart-large': 'facebook/bart-large',
+}
+
+
+# Pretrained T5 models
+T5_MODELS_MAPPING = {
+    't5-small': 't5-small',
+    't5-base': 't5-base',
+    't5-large': 't5-large',
+    't5-3B': 't5-3b',
+    't5-11B': 't5-11b',
+}
+
+
+# Pretrained FLAN-T5 models
+FLAN_T5_MODELS_MAPPING = {
+    'flan-t5-small': 'google/flan-t5-small',
+    'flan-t5-base': 'google/flan-t5-base',
+    'flan-t5-large': 'google/flan-t5-large',
+    'flan-t5-xl': 'google/flan-t5-xl',
+    'flan-t5-xxl': 'google/flan-t5-xxl',
+}
+
 
 # Full transformer-based (encoder + decoder) models
 TRANSFORMER_MODELS_MAPPING = {
@@ -174,19 +366,39 @@ TRANSFORMER_MODELS_MAPPING = {
     **FLAN_T5_MODELS_MAPPING,
 }
 
+
+
+
+
 # All models mapping
 ALL_MODELS_MAPPING = {
     **DECODER_MODELS_MAPPING,
     **ENCODER_MODELS_MAPPING, 
     **TRANSFORMER_MODELS_MAPPING,
 }
+ALL_MODELS_DTYPES_MAPPING = {
+    **DECODER_MODELS_DTYPES_MAPPING,
+}
+ALL_MODELS_PARAMS_MAPPING = {
+    **DECODER_MODELS_PARAMS_MAPPING,
+}
+ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING = {
+    **DECODER_ADDITIONAL_MODEL_KWARGS_MAPPING,
+}
+ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING = {
+    **DECODER_ADDITIONAL_TOKENIZER_KWARGS_MAPPING,
+}
 
 # Summarize all supported model names
-AUTHORIZED_MODELS = list(ALL_MODELS_MAPPING.keys())
+AUTHORIZED_MODELS = tuple(ALL_MODELS_MAPPING.keys())
+
+ALLOWED_DTYPES = (torch.float16, torch.bfloat16, torch.float32)
 
 
 
-def load_model(model_name: str, quantization: bool = False, device_map: str | None = None) -> PreTrainedModel:
+
+def load_model(model_name: str, quantization: bool = False, device_map: str | None = None,
+               dtype: torch.dtype | None = None) -> PreTrainedModel:
     """Load one of the supported pretrained model.
 
     Parameters
@@ -198,6 +410,9 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     device_map : str | None, optional
         The device map to decide how to split the model between available devices, by default None. If not
         provided, the model will be put on a single GPU if relatively small, else split using 'auto'.
+    dtype : torch.dtype | None, optional
+        The dtype to use for the model. If not provided, we use the dtype with which the model was trained
+        if it is known, else we use float32, by default None.
 
     Returns
     -------
@@ -208,33 +423,44 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     if model_name not in AUTHORIZED_MODELS:
         raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
     
-    # Automatically find the best device_map depending on the model size
-    if device_map is None:
-    
-        # The following regex match any digits possibly separated with a dot ('.') which is immeditely
-        # followed by a 'B' or 'M' to capture the model size following our model name convention. Parenthesis 
-        # allow to capture given groups of the regex thanks to the match object .group() method.
-        pattern = r'([0-9]+(?:\.[0-9]+)?)([BM])'
+    # Set the dtype if not provided
+    if dtype is None:
+        dtype = ALL_MODELS_DTYPES_MAPPING[model_name]
 
-        match = re.search(pattern, model_name)
-        if match:
-            matched_number = match.group(1)
-            matched_letter = match.group(2)
-            # Model size in billion (B) of parameters
-            model_size = float(matched_number) if matched_letter == 'B' else float(matched_number)/1e3
-            device_map = 'balanced_low_0' if model_size > 7 else 'sequential'
-        elif 'gpt2' in model_name or 'dialo-gpt' in model_name:
-            device_map = 'sequential'
-        else:
-            device_map = 'balanced_low_0'
-        
+    if dtype not in ALLOWED_DTYPES:
+        raise(ValueError(f'The dtype must be one of {*ALLOWED_DTYPES,}.'))
+    
     # Override quantization if we don't have access to GPUs
     if not torch.cuda.is_available() and quantization:
         quantization = False
         warnings.warn('There are no GPUs available. The model will NOT be loaded in 8 bits mode.', RuntimeWarning)
 
-    # Provide dtype='auto' if we do not quantize the models
-    dtype = torch.float16 if quantization else 'auto'
+    # Override dtype if we quantize the model as only float16 is acceptable for quantization
+    dtype = torch.float16 if quantization else dtype
+
+    if quantization:
+        size_multiplier = 1
+    elif (dtype == torch.float16) or (dtype == torch.bfloat16):
+        size_multiplier = 2
+    else:
+        size_multiplier = 4
+
+    # Estimate of the memory size of the model
+    rough_model_size_estimate = ALL_MODELS_PARAMS_MAPPING[model_name] * size_multiplier
+    
+    # Automatically find the best device_map depending on the model size
+    if device_map is None:
+    
+        device_map = 'balanced_low_0' if model_size > 7 else 'sequential'
+        elif 'gpt2' in model_name or 'dialo-gpt' in model_name:
+            device_map = 'sequential'
+        else:
+            device_map = 'balanced_low_0'
+        
+    if model_name in ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING.keys():
+        additional_kwargs = ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING[model_name]
+    else:
+        additional_kwargs = {}
     
     # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
