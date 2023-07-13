@@ -172,7 +172,7 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
 
     # Generate model response
     if torch.cuda.is_available():
-        input = input.to('cuda')
+        input = input.to('cuda:0')
     with torch.no_grad():
         output = model.generate(input, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k,
                                 top_p=top_p, temperature=temperature)

@@ -466,9 +466,10 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         # We assume that we always have identical gpus when using multiple gpus
         gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
         # Say we only have access to a portion of that memory for our model
-        gpu_memory = 0.7 * gpu_memory
+        gpu_memory = 0.8 * gpu_memory
         gpu_number = torch.cuda.device_count()
 
+        if rough_model_size_estimate % gpu_memory == 0:
         min_gpu_needed = rough_model_size_estimate // gpu_memory + 1
 
 
@@ -479,19 +480,16 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         # relatively small and should fall on this category.
         if min_gpu_needed == 1:
             only_move_to_first_gpu = True
-        # Heuristic: if we need 4 or less, we create a custom device_map to only use the minimum number of gpu
-        # possible. Only 20-60 G parameters models should fall on this category.
-        elif min_gpu_needed <= 4:
+        # In this case, we need more than 1 gpu so we create a device_map between different gpus. However, 
+        # we minimize the number of gpus used with the max_memory arg instead of naively using device_map='balanced'
+        # between all gpus, because the parallelism is not optimized and thus using a lot of gpus is not efficient
+        # if not needed
+        else:
             max_memory = {i: f'{gpu_memory:.2f}GiB' for i in range(min_gpu_needed)}
             max_memory['cpu'] = '0GiB'
             additional_kwargs['max_memory'] = max_memory
-            device_map = 'balanced_low_0'
-        # Otherwise, we need a lot of gpus anyway, so better use built-in 'balanced_low_0'. Only very large
-        # models should fall on this category since we are mostly using A100 gpus.
-        else:
-            device_map = 'balanced_low_0'
+            device_map = 'balanced'
 
-    
     
     # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
