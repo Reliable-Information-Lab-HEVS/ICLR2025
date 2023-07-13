@@ -207,6 +207,7 @@ class HFModel(object):
         self.quantization = quantization
         try:
             self.device_map = self.model.hf_device_map
+            self.input_device = min(self.device_map.values())
         except AttributeError:
             device = next(self.model.parameters()).get_device()
             self.device_map = 'cpu' if device == -1 else f'cuda:{device}'
