@@ -2,19 +2,16 @@ import torch
 import gc
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
 
+import engine
 from engine import generation
+from engine import stopping
 
-model1 = AutoModelForCausalLM.from_pretrained('facebook/opt-6.7b', torch_dtype=torch.float16, device_map='balanced_low_0')
-print(model1.hf_device_map)
-# tokenizer = AutoTokenizer.from_pretrained('facebook/opt-6.7b')
+model = engine.HFModel('bigcode/starcoder')
+print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
+print(model.device_map)
 
-del model1
-gc.collect()
+prompt = "# Write a python function to multiply 2 numbers"
 
-# ValueError: The current `device_map` had weights offloaded to the disk. Please provide an `offload_folder`
-#  for them. Alternatively, make sure you have `safetensors` installed if the model you are using offers
-#  the weights in this format.
-max_memory = {0: '6GiB', 1:'6GiB', 2:'6GiB', 'cpu':'0GiB'}
-model2 = AutoModelForCausalLM.from_pretrained('facebook/opt-6.7b', torch_dtype=torch.float16, device_map='balanced',
-                                              max_memory=max_memory)
-print(model2.hf_device_map)
+for i in range(50):
+    out = model(prompt, max_new_tokens=512, batch_size=64, stopping_patterns=stopping.CODE_STOP_PATTERNS)
+print(f'After generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
