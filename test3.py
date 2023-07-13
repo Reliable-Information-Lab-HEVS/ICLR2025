@@ -27,4 +27,4 @@ model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', device_map
 tokenizer = AutoTokenizer.from_pretrained('bigscience/bloom-560m')
 print(model.hf_device_map)
 
-foo = generation.generate_text(model, tokenizer, 'Hello dear', gpu_rank=0)
+foo = generation.generate_text(model, tokenizer, 'Hello dear', gpu_rank=1)
