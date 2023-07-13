@@ -9,5 +9,9 @@ print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} 
 
 prompt = "# Write a python function to multiply 2 numbers"
 
-out = generation.generate_text(model, tokenizer, prompt, max_new_tokens=512, batch_size=64)
+for i in range(50):
+    out = generation.generate_text(model, tokenizer, prompt, max_new_tokens=512, batch_size=64)
 print(f'After generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
+
+
+#TODO: make a loop and see if memory consumption increases !!!!
