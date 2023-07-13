@@ -198,10 +198,11 @@ class HFModel(object):
     """
 
     def __init__(self, model_name: str, quantization: bool = False, device_map: str | None = None,
-                 dtype: torch.dtype | None = None):
+                 gpu_rank: int = 0, dtype: torch.dtype | None = None):
 
         self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
-                                                                     device_map=device_map, dtype=dtype)
+                                                                     device_map=device_map, gpu_rank=gpu_rank,
+                                                                     dtype=dtype)
         self.model_name = model_name
         self.quantization = quantization
         try:

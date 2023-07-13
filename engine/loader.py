@@ -557,7 +557,7 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
 
 
 def load_model_and_tokenizer(model_name: str, quantization: bool = False, device_map: str | None = None,
-               dtype: torch.dtype | None = None) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
+               gpu_rank: int = 0, dtype: torch.dtype | None = None) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
     """Load both a model and corresponding tokenizer.
 
     Parameters
@@ -569,6 +569,9 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, device
     device_map : str | None, optional
         The device map to decide how to split the model between available devices, by default None. If not
         provided, the model will be put on a single GPU if relatively small, else split using 'auto'.
+    gpu_rank : int, optional
+        The gpu rank on which to put the model if it can fit on a single gpu. This is ignored if `device_map`
+        is provided. By default 0.
     dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
@@ -580,4 +583,4 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, device
     """
 
     return load_model(model_name, quantization=quantization, device_map=device_map,
-                      dtype=dtype), load_tokenizer(model_name)
+                      gpu_rank=gpu_rank, dtype=dtype), load_tokenizer(model_name)

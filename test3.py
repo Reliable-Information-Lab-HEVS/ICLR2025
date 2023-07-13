@@ -7,7 +7,7 @@ from engine import generation
 from engine import stopping
 import time
 
-model = engine.HFModel('star-coder')
+model = engine.HFModel('star-coder', gpu_rank=)
 print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 print(model.device_map)
 

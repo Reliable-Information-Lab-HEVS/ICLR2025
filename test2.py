@@ -13,7 +13,7 @@ prompt = "# Write a python function to multiply 2 numbers"
 
 t0 = time.time()
 for i in range(50):
-    out = generation.generate_text(model, tokenizer, prompt, max_new_tokens=512, num_return_sequences=200, batch_size=64,
+    out = generation.generate_text(model, tokenizer, prompt, max_new_tokens=512, num_return_sequences=200, batch_size=200,
                                    stopping_patterns=stopping.CODE_STOP_PATTERNS)
 dt = time.time() - t0
 print(f'After generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
