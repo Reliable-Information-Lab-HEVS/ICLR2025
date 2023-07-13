@@ -90,6 +90,9 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     else:
         batch_sizes = [num_return_sequences]
 
+    # Suppress pad_token_id warning
+    pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
+
     generated_text = []
 
     for size in batch_sizes:
@@ -97,7 +100,8 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
         with torch.no_grad():
             outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
                                      do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                     num_return_sequences=size, stopping_criteria=stopping_criteria, **kwargs)
+                                     num_return_sequences=size, stopping_criteria=stopping_criteria,
+                                     pad_token_id=pad_token_id, **kwargs)
             
         # In this case truncate the prompt from the output
         if truncate_prompt_from_output:

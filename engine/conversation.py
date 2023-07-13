@@ -169,13 +169,16 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
         conv_history = Conversation()
 
     input = tokenize_for_conversation(tokenizer, conv_history, prompt)
-
-    # Generate model response
     if torch.cuda.is_available():
         input = input.to('cuda:0')
+
+    # Suppress pad_token_id warning
+    pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
+
+    # Generate model response
     with torch.no_grad():
         output = model.generate(input, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k,
-                                top_p=top_p, temperature=temperature)
+                                top_p=top_p, temperature=temperature, pad_token_id=pad_token_id)
         
     model_answer_ids = output[0, input.shape[-1]:]
     model_answer_text = tokenizer.decode(model_answer_ids, skip_special_tokens=True)
