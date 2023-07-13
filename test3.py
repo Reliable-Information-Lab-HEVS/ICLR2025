@@ -24,4 +24,7 @@ import time
 
 max_memory = {0: '10GiB', 1:'10GiB'}
 model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', device_map='auto', max_memory=max_memory)
+tokenizer = AutoTokenizer.from_pretrained('bigscience/bloom-560m')
 print(model.hf_device_map)
+
+foo = generation.generate_text(model, tokenizer, 'Hello dear', gpu_rank=0)

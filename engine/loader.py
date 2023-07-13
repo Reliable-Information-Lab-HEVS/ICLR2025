@@ -493,7 +493,6 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         # if not needed
         else:
             max_memory = {i: f'{gpu_memory:.2f}GiB' for i in range(min_gpu_needed)}
-            # max_memory['cpu'] = '0GiB'
             additional_kwargs['max_memory'] = max_memory
             device_map = 'balanced'
 
