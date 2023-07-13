@@ -189,13 +189,19 @@ class HFChatModel(object):
     """Class encapsulating a HuggingFace model and its tokenizer to generate text in a conversational fashion. 
     """
 
-    def __init__(self, model_name: str, quantization: bool = False, device_map: str = 'auto'):
+    def __init__(self, model_name: str, quantization: bool = False, device_map: str | None = None,
+                 dtype: torch.dtype | None = None):
 
         self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
-                                                                     device_map=device_map)
+                                                                     device_map=device_map, dtype=dtype)
         self.model_name = model_name
         self.quantization = quantization
-        self.device_map = device_map
+        try:
+            self.device_map = self.model.hf_device_map
+        except AttributeError:
+            device = next(self.model.parameters()).get_device()
+            self.device_map = 'cpu' if device == -1 else f'cuda:{device}'
+        self.dtype = self.model.dtype
 
 
     def __repr__(self) -> str:

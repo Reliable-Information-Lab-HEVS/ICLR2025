@@ -117,10 +117,11 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
 
 
 
-def load_and_generate_text(model_name: str, prompt: str, quantization: bool = False, max_new_tokens: int = 60,
-                           min_new_tokens: int = 5, do_sample: bool = True, top_k: int = 100, top_p: float = 0.92,
-                           temperature: float = 0.9, batch_size: int | None = None, num_return_sequences: int = 1,
-                           seed: int | None = None, truncate_prompt_from_output: bool = False,
+def load_and_generate_text(model_name: str, prompt: str, quantization: bool = False, device_map: str | None = None,
+                           dtype: torch.dtype | None = None, max_new_tokens: int = 60, min_new_tokens: int = 5,
+                           do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
+                           batch_size: int | None = None, num_return_sequences: int = 1, seed: int | None = None,
+                           truncate_prompt_from_output: bool = False,
                            stopping_patterns: list[str] | bool | None = None, **kwargs) -> str | list[str]:
     """Load a model and its tokenizer and generate text according to `prompt`.
 
@@ -132,6 +133,12 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
         The prompt to the model.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
+    device_map : str | None, optional
+        The device map to decide how to split the model between available devices, by default None. If not
+        provided, the model will be put on a single GPU if relatively small, else split using 'auto'.
+    dtype : torch.dtype | None, optional
+        The dtype to use for the model. If not provided, we use the dtype with which the model was trained
+        if it is known, else we use float32, by default None.
     max_new_tokens : int, optional
         How many new tokens to generate, by default 60.
     min_new_tokens : int, optional
@@ -165,7 +172,8 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
         Str containing the generated sequence, or list[str] if `num_return_sequences` > 1.
     """
 
-    model, tokenizer = loader.load_model_and_tokenizer(model_name, quantization)
+    model, tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
+                                                       device_map=device_map, dtype=dtype)
 
     return generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
                          do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
@@ -180,13 +188,19 @@ class HFModel(object):
     """Class encapsulating a HuggingFace model and its tokenizer to generate text. 
     """
 
-    def __init__(self, model_name: str, quantization: bool = False, device_map: str = 'auto'):
+    def __init__(self, model_name: str, quantization: bool = False, device_map: str | None = None,
+                 dtype: torch.dtype | None = None):
 
         self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
-                                                                     device_map=device_map)
+                                                                     device_map=device_map, dtype=dtype)
         self.model_name = model_name
         self.quantization = quantization
-        self.device_map = device_map
+        try:
+            self.device_map = self.model.hf_device_map
+        except AttributeError:
+            device = next(self.model.parameters()).get_device()
+            self.device_map = 'cpu' if device == -1 else f'cuda:{device}'
+        self.dtype = self.model.dtype
 
     
     def __repr__(self) -> str:
