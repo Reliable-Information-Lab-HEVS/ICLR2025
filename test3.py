@@ -12,6 +12,7 @@ print(model.device_map)
 
 prompt = "# Write a python function to multiply 2 numbers"
 
-for i in range(50):
-    out = model(prompt, max_new_tokens=512, batch_size=64, stopping_patterns=stopping.CODE_STOP_PATTERNS)
+# for i in range(50):
+out = model(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=64,
+            stopping_patterns=stopping.CODE_STOP_PATTERNS)
 print(f'After generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')

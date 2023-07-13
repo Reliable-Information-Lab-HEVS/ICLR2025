@@ -11,7 +11,7 @@ print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} 
 prompt = "# Write a python function to multiply 2 numbers"
 
 for i in range(50):
-    out = generation.generate_text(model, tokenizer, prompt, max_new_tokens=512, batch_size=64,
+    out = generation.generate_text(model, tokenizer, prompt, max_new_tokens=512, num_return_sequences=200, batch_size=64,
                                    stopping_patterns=stopping.CODE_STOP_PATTERNS)
 print(f'After generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 
