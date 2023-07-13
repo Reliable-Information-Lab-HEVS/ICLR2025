@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMasked
 
 from engine import generation
 
-model = AutoModelForCausalLM.from_pretrained('bigcode/starcoder', torch_dtype=torch.bfloat16).to('cuda:0')
+# model = AutoModelForCausalLM.from_pretrained('bigcode/starcoder', torch_dtype=torch.bfloat16).to('cuda:0')
 # tokenizer = AutoTokenizer.from_pretrained('bigcode/starcoder')
 # print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 

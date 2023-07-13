@@ -469,8 +469,15 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         gpu_memory = 0.8 * gpu_memory
         gpu_number = torch.cuda.device_count()
 
-        # if rough_model_size_estimate % gpu_memory == 0:
-        min_gpu_needed = rough_model_size_estimate // gpu_memory + 1
+        # Compute the minimum number of gpus needed. Note that we allow some flexibility: if the remainder
+        # is very small (less than 3% of gpu_memory), we don't use an additional gpu for that remainder
+        if rough_model_size_estimate % gpu_memory < 0.03 * gpu_memory:
+            min_gpu_needed = rough_model_size_estimate // gpu_memory
+        else:
+            min_gpu_needed = rough_model_size_estimate // gpu_memory + 1
+
+        # Can be 0 for very small models for which the expected size is only 0.03*gpu_memory or less
+        min_gpu_needed = min_gpu_needed if min_gpu_needed > 0 else 1
 
 
         if min_gpu_needed > gpu_number:
