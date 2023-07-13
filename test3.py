@@ -22,7 +22,7 @@ import time
 # print(f'Time for generation: {dt:.2f} s')
 
 
-max_memory = {0: '10GiB', 1:'10GiB'}
+max_memory = {'cpu':'20GiB'}
 model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', device_map='auto', max_memory=max_memory)
 tokenizer = AutoTokenizer.from_pretrained('bigscience/bloom-560m')
 print(model.hf_device_map)
