@@ -14,7 +14,7 @@ gc.collect()
 # ValueError: The current `device_map` had weights offloaded to the disk. Please provide an `offload_folder`
 #  for them. Alternatively, make sure you have `safetensors` installed if the model you are using offers
 #  the weights in this format.
-max_memory = {0: '6GiB', 1:'6GiB', 2:'6GiB', 3:'6GiB', 'cpu':'0GiB'}
-model2 = AutoModelForCausalLM.from_pretrained('facebook/opt-6.7b', torch_dtype=torch.float16, device_map='balanced_low_0',
+max_memory = {0: '6GiB', 1:'6GiB', 2:'6GiB', 'cpu':'0GiB'}
+model2 = AutoModelForCausalLM.from_pretrained('facebook/opt-6.7b', torch_dtype=torch.float16, device_map='balanced',
                                               max_memory=max_memory)
 print(model2.hf_device_map)
