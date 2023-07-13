@@ -398,7 +398,7 @@ ALLOWED_DTYPES = (torch.float16, torch.bfloat16, torch.float32)
 
 
 def load_model(model_name: str, quantization: bool = False, device_map: str | None = None,
-               dtype: torch.dtype | None = None) -> PreTrainedModel:
+               gpu_rank: int = 0, dtype: torch.dtype | None = None) -> PreTrainedModel:
     """Load one of the supported pretrained model.
 
     Parameters
@@ -409,7 +409,10 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         Whether to load the model in 8 bits mode to save memory, by default False.
     device_map : str | None, optional
         The device map to decide how to split the model between available devices, by default None. If not
-        provided, the model will be put on a single GPU if relatively small, else split using 'auto'.
+        provided, the model will be put on a single GPU if relatively small, else split using 'balanced'.
+    gpu_rank : int, optional
+        The gpu rank on which to put the model if it can fit on a single gpu. This is ignored if `device_map`
+        is provided. By default 0.
     dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
@@ -455,8 +458,8 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     # Estimate of the memory size of the model
     rough_model_size_estimate = ALL_MODELS_PARAMS_MAPPING[model_name] * size_multiplier
 
-    # Flag that will be set to True if we don't even need a device_map and can just put the model and first gpu
-    only_move_to_first_gpu = False
+    # Flag that will be set to True if we don't even need a device_map and can just put the model on one gpu
+    only_move_to_one_gpu = False
     
     # Automatically find the best device_map depending on the model size and gpu size.
     # Try to minimize the number of gpus to use because using more will slow inference (but allow larger
@@ -483,7 +486,7 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         # In this case we don't need a device_map, we just move the model to the 1st gpu. Most models are 
         # relatively small and should fall on this category.
         if min_gpu_needed == 1:
-            only_move_to_first_gpu = True
+            only_move_to_one_gpu = True
         # In this case, we need more than 1 gpu so we create a device_map between different gpus. However, 
         # we minimize the number of gpus used with the max_memory arg instead of naively using device_map='balanced'
         # between all gpus, because the parallelism is not optimized and thus using a lot of gpus is not efficient
@@ -509,10 +512,10 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
                                                       torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
                                                       **additional_kwargs)
     
-    # If the flag is active we directly put our model on first gpu without using any device_map (this is 
+    # If the flag is active we directly put our model on one gpu without using any device_map (this is 
     # more efficient)
-    if only_move_to_first_gpu:
-        model = model.to('cuda:0')
+    if only_move_to_one_gpu:
+        model = model.cuda(gpu_rank)
         
     model.eval()
 

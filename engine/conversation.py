@@ -126,7 +126,7 @@ def tokenize_for_conversation(tokenizer: PreTrainedTokenizerBase, conversation: 
 def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, prompt: str,
                           conv_history: Conversation | None, max_new_tokens: int = 60, do_sample: bool = True,
                           top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9,
-                          seed: int | None = None) -> Conversation:
+                          seed: int | None = None, gpu_rank: int = 0) -> Conversation:
     """Generate a turn in a conversation with a `model`. To mimic a conversation, we simply append all past
     prompts and model responses to the current prompt.
 
@@ -153,6 +153,8 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
         no randomness), by default 0.9.
     seed : int | None, optional
         An optional seed to force the generation to be reproducible.
+    gpu_rank : int, optional
+        The gpu rank on which to put the inputs, by default 0.
 
 
     Returns
@@ -170,7 +172,7 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
 
     input = tokenize_for_conversation(tokenizer, conv_history, prompt)
     if torch.cuda.is_available():
-        input = input.to('cuda:0')
+        input = input.cuda(gpu_rank)
 
     # Suppress pad_token_id warning
     pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
@@ -219,8 +221,8 @@ class HFChatModel(object):
 
     def __call__(self, prompt: str, conv_history: Conversation | None, max_new_tokens: int = 60,
                  do_sample: bool = True, top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9,
-                 seed: int | None = None) -> Conversation:
+                 seed: int | None = None, gpu_rank: int = 0) -> Conversation:
         
         return generate_conversation(self.model, self.tokenizer, prompt, conv_history,
                                      max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k,
-                                     top_p=top_p, temperature=temperature, seed=seed)
+                                     top_p=top_p, temperature=temperature, seed=seed, gpu_rank=gpu_rank)
