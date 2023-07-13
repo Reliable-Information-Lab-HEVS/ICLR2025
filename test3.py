@@ -6,7 +6,7 @@ import engine
 from engine import generation
 from engine import stopping
 
-model = engine.HFModel('bigcode/starcoder')
+model = engine.HFModel('star-coder')
 print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 print(model.device_map)
 
