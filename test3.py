@@ -7,7 +7,7 @@ from engine import generation
 from engine import stopping
 import time
 
-model = engine.HFModel('bloom-560M', gpu_rank=0, device_map='auto')
+model = engine.HFModel('codegen-16B', gpu_rank=0, device_map='auto')
 print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 print(model.device_map)
 
