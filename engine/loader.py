@@ -514,7 +514,8 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     # If the flag is active we directly put our model on one gpu without using any device_map (this is 
     # more efficient)
     if only_move_to_one_gpu:
-        model = model.cuda(gpu_rank)
+        # This operation is in-place for nn.Module
+        model.cuda(gpu_rank)
         
     model.eval()
 

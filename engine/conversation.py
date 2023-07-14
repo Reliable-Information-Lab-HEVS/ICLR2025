@@ -126,7 +126,7 @@ def tokenize_for_conversation(tokenizer: PreTrainedTokenizerBase, conversation: 
 def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, prompt: str,
                           conv_history: Conversation | None, max_new_tokens: int = 60, do_sample: bool = True,
                           top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9,
-                          seed: int | None = None, gpu_rank: int = 0) -> Conversation:
+                          seed: int | None = None, input_device: int | str = 0) -> Conversation:
     """Generate a turn in a conversation with a `model`. To mimic a conversation, we simply append all past
     prompts and model responses to the current prompt.
 
@@ -153,8 +153,8 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
         no randomness), by default 0.9.
     seed : int | None, optional
         An optional seed to force the generation to be reproducible.
-    gpu_rank : int, optional
-        The gpu rank on which to put the inputs, by default 0.
+    input_device : int | str, optional
+        The device on which to put the inputs, by default 0.
 
 
     Returns
@@ -172,7 +172,7 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
 
     input = tokenize_for_conversation(tokenizer, conv_history, prompt)
     if torch.cuda.is_available():
-        input = input.cuda(gpu_rank)
+        input = input.to(device=input_device)
 
     # Suppress pad_token_id warning
     pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
@@ -195,17 +195,25 @@ class HFChatModel(object):
     """
 
     def __init__(self, model_name: str, quantization: bool = False, device_map: str | None = None,
-                 dtype: torch.dtype | None = None):
+                 gpu_rank: int = 0, dtype: torch.dtype | None = None):
 
         self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
-                                                                     device_map=device_map, dtype=dtype)
+                                                                     device_map=device_map, gpu_rank=gpu_rank,
+                                                                     dtype=dtype)
         self.model_name = model_name
         self.quantization = quantization
+        # The model is on multiple devices
         try:
             self.device_map = self.model.hf_device_map
+            devices = set(self.device_map.values())
+            # remove possible non-gpu devices from the device_map
+            devices = {val for val in devices if not isinstance(val, str)}
+            self.input_device = min(devices) if len(devices) > 0 else 'cpu'
+        # The model is on a single device
         except AttributeError:
             device = next(self.model.parameters()).get_device()
             self.device_map = 'cpu' if device == -1 else f'cuda:{device}'
+            self.input_device = 'cpu' if device == -1 else device
         self.dtype = self.model.dtype
 
 

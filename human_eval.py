@@ -9,12 +9,11 @@ from helpers import utils
 
 dataset = datasets.HumanEval()
 
-models = [
+small_models = (
     'bloom-560M',
     'bloom-1.7B',
     'bloom-3B',
     'bloom-7.1B',
-    'bloom',
     'stable-lm-3B',
     'stable-lm-7B',
     'star-coder-base',
@@ -29,15 +28,12 @@ models = [
     'gpt-neo-125M',
     'gpt-neo-1.3B',
     'gpt-neo-2.7B',
-    'gpt-neoX-20B',
     'opt-125M',
     'opt-350M',
     'opt-1.3B',
     'opt-2.7B',
     'opt-6.7B',
     'opt-13B',
-    'opt-30B',
-    'opt-66B',
     'codegen-350M',
     'codegen-2B',
     'codegen-6B',
@@ -50,7 +46,15 @@ models = [
     'codegen25-7B-instruct',
     'vicuna-7B',
     'vicuna-13B',
-]
+)
+
+
+large_models = (
+    'gpt-neoX-20B',
+    'opt-30B',
+    'opt-66B',
+    'bloom-176B',
+)
 
 
 # We need to set top_k to 0 to deactivate top-k sampling
@@ -83,16 +87,16 @@ temperatures = [0., 0.2, 0.4, 0.6, 0.8, 1.]
 
 
 
-def main():
+def main(gpu_rank: int):
 
     utils.set_all_seeds(1234)
 
     for model_name in tqdm(models, desc='Models'):
 
         # Load in 8 bits for bloom due to model size
-        quantization = True if model_name == 'bloom' else False
+        quantization = True if model_name == 'bloom-176B' else False
 
-        model = engine.HFModel(model_name, quantization=quantization)
+        model = engine.HFModel(model_name, quantization=quantization, gpu_rank=gpu_rank)
         folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
 
         for temperature in tqdm(temperatures, desc='Temperatures', leave=False):

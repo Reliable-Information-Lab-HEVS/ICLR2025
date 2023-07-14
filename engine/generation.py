@@ -12,7 +12,8 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
                   min_new_tokens: int = 5, do_sample: bool = True, top_k: int = 40, top_p: float = 0.90,
                   temperature: float = 0.9, num_return_sequences: int = 1, batch_size: int | None = None,
                   seed: int | None = None, truncate_prompt_from_output: bool = False,
-                  stopping_patterns: list[str] | bool | None = None, gpu_rank: int = 0, **kwargs) -> str | list[str]:
+                  stopping_patterns: list[str] | bool | None = None, input_device: int | str = 0,
+                  **kwargs) -> str | list[str]:
     """Generate text according to `prompt` using the `model` and `tokenizer` specified.
 
     Parameters
@@ -48,8 +49,8 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     stopping_patterns: list[str] | bool | None
         List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
         If `None`, no early stopping is performed, by default None.
-    gpu_rank : int, optional
-        The gpu rank on which to put the inputs, by default 0.
+    input_device : int | str, optional
+        The device on which to put the inputs, by default 0.
 
     Returns
     -------
@@ -63,7 +64,7 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     input = tokenizer.encode(prompt, return_tensors='pt')
     input_length = input.shape[-1]
     if torch.cuda.is_available():
-        input = input.cuda(gpu_rank)
+        input = input.to(device=input_device)
 
     # Possible early stopping
     if type(stopping_patterns) is list:
@@ -128,7 +129,7 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
                            do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
                            batch_size: int | None = None, num_return_sequences: int = 1, seed: int | None = None,
                            truncate_prompt_from_output: bool = False,
-                           stopping_patterns: list[str] | bool | None = None, gpu_rank: int = 0,
+                           stopping_patterns: list[str] | bool | None = None, input_device: int | str = 0,
                            **kwargs) -> str | list[str]:
     """Load a model and its tokenizer and generate text according to `prompt`.
 
@@ -171,8 +172,8 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
     stopping_patterns: list[str] | bool | None
         List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
         If `None`, no early stopping is performed, by default None.
-    gpu_rank : int, optional
-        The gpu rank on which to put the inputs, by default 0.
+    input_device : int | str, optional
+        The device on which to put the inputs, by default 0.
 
 
     Returns
@@ -188,7 +189,7 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
                          do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
                          num_return_sequences=num_return_sequences, batch_size=batch_size, seed=seed,
                          truncate_prompt_from_output=truncate_prompt_from_output,
-                         stopping_patterns=stopping_patterns, gpu_rank=gpu_rank, **kwargs)
+                         stopping_patterns=stopping_patterns, input_device=input_device, **kwargs)
 
 
 
@@ -205,12 +206,18 @@ class HFModel(object):
                                                                      dtype=dtype)
         self.model_name = model_name
         self.quantization = quantization
+        # The model is on multiple devices
         try:
             self.device_map = self.model.hf_device_map
-            self.input_device = min(self.device_map.values())
+            devices = set(self.device_map.values())
+            # remove possible non-gpu devices from the device_map
+            devices = {val for val in devices if not isinstance(val, str)}
+            self.input_device = min(devices) if len(devices) > 0 else 'cpu'
+        # The model is on a single device
         except AttributeError:
             device = next(self.model.parameters()).get_device()
             self.device_map = 'cpu' if device == -1 else f'cuda:{device}'
+            self.input_device = 'cpu' if device == -1 else device
         self.dtype = self.model.dtype
 
     
@@ -227,7 +234,7 @@ class HFModel(object):
     def __call__(self, prompt: str, max_new_tokens: int = 60, min_new_tokens: int = 5, do_sample: bool = True,
                  top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
                  batch_size: int | None = None, seed: int | None = None, truncate_prompt_from_output: bool = False,
-                 stopping_patterns: list[str] | bool | None = None, gpu_rank: int = 0, **kwargs) -> str | list[str]:
+                 stopping_patterns: list[str] | bool | None = None, **kwargs) -> str | list[str]:
         """Generate text according to `prompt`.
 
     Parameters
@@ -259,8 +266,6 @@ class HFModel(object):
     stopping_patterns: list[str] | bool | None
         List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
         If `None`, no early stopping is performed, by default None.
-    gpu_rank : int, optional
-        The gpu rank on which to put the inputs, by default 0.
 
     Returns
     -------
@@ -272,4 +277,4 @@ class HFModel(object):
                              min_new_tokens=min_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
                              temperature=temperature, num_return_sequences=num_return_sequences,
                              batch_size=batch_size, seed=seed, truncate_prompt_from_output=truncate_prompt_from_output,
-                             stopping_patterns=stopping_patterns, gpu_rank=gpu_rank, **kwargs)
+                             stopping_patterns=stopping_patterns, input_device=self.input_device, **kwargs)
