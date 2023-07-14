@@ -226,12 +226,12 @@ CODEGEN2_MODELS_MAPPING = {
     'codegen25-7B-instruct': 'Salesforce/codegen25-7b-instruct',
 }
 CODEGEN2_MODELS_DTYPES = {
-    'codegen2-1B': torch.float32,
-    'codegen2-3.7B': torch.float32,
-    'codegen2-7B': torch.float32,
-    'codegen2-16B': torch.float32,
-    'codegen25-7B': torch.float32,
-    'codegen25-7B-instruct': torch.float32,
+    'codegen2-1B': torch.float16,
+    'codegen2-3.7B': torch.float16,
+    'codegen2-7B': torch.float16,
+    'codegen2-16B': torch.float16,
+    'codegen25-7B': torch.float16,
+    'codegen25-7B-instruct': torch.float16,
 }
 CODEGEN2_MODELS_PARAMS = _infer_model_sizes(CODEGEN2_MODELS_MAPPING)
 CODEGEN2_ADDITIONAL_MODEL_KWARGS = {
