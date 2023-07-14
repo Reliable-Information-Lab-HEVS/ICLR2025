@@ -7,7 +7,7 @@ from engine import generation
 from engine import stopping
 import time
 
-model = engine.HFModel('star-chat-beta', gpu_rank=0)
+model = engine.HFModel('codegen-16B', gpu_rank=0)
 print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 print(model.device_map)
 
