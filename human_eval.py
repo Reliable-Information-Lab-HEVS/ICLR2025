@@ -39,7 +39,7 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
 
 TEMPERATURES = (0., 0.2, 0.4, 0.6, 0.8, 1.)
 
-small_models = (
+SMALL_MODELS = (
     'bloom-560M',
     'bloom-1.7B',
     'bloom-3B',
@@ -78,7 +78,7 @@ small_models = (
     'vicuna-13B',
 )
 
-large_models = (
+LARGE_MODELS = (
     'gpt-neoX-20B',
     'opt-30B',
     'opt-66B',
@@ -172,6 +172,19 @@ def human_eval(model_name: str, dataset: datasets.HumanEval = DATASET, temperatu
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser(description='HumanEval benchmark')
+    parser.add_argument('--gpus', type=int, default=8, help='The number of GPUs to use.')
+    parser.add_argument('--big_models', type=str, default='True', choices=['False', 'True'],
+                        help='Whether to run the benchmark on large models that do not fit on a single gpu.')
+    
+    args = parser.parse_args()
+    num_gpus = args.gpus
+    big_models = args.big_models == 'True'
+
     # Run all models that fit on a single gpu in parallel using all gpus
     with mp.Pool(processes=num_gpus, initializer=utils.set_all_seeds, initargs=(1234,)) as pool:
-        pool.map(human_eval, small_models, chunksize=1)
+        pool.map(human_eval, SMALL_MODELS, chunksize=1)
+
+    if big_models:
+        for model in LARGE_MODELS:
+            human_eval(model)
