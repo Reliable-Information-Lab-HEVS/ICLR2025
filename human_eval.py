@@ -1,13 +1,43 @@
 import os
 import gc
-from tqdm import tqdm
+import multiprocessing as mp
+import argparse
+import time
 
 import engine
 from engine import stopping
 from helpers import datasets
 from helpers import utils
 
-dataset = datasets.HumanEval()
+DATASET = datasets.HumanEval()
+
+# We need to set top_k to 0 to deactivate top-k sampling
+HUMAN_EVAL_GENERATION_KWARGS = {
+    'max_new_tokens': 512,
+    'min_new_tokens': 5,
+    'do_sample': True,
+    'top_k': 0,
+    'top_p': 0.95,
+    'num_return_sequences': 200,
+    'batch_size': 32,
+    'seed': None,
+    'truncate_prompt_from_output': True,
+    'stopping_patterns': stopping.CODE_STOP_PATTERNS
+}
+
+HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
+    'max_new_tokens': 512,
+    'min_new_tokens': 5,
+    'do_sample': False,
+    'top_k': 0,
+    'top_p': 1.,
+    'num_return_sequences': 1,
+    'seed': None,
+    'truncate_prompt_from_output': True,
+    'stopping_patterns': stopping.CODE_STOP_PATTERNS
+}
+
+TEMPERATURES = (0., 0.2, 0.4, 0.6, 0.8, 1.)
 
 small_models = (
     'bloom-560M',
@@ -48,7 +78,6 @@ small_models = (
     'vicuna-13B',
 )
 
-
 large_models = (
     'gpt-neoX-20B',
     'opt-30B',
@@ -57,73 +86,92 @@ large_models = (
 )
 
 
-# We need to set top_k to 0 to deactivate top-k sampling
-human_eval_generation_kwargs = {
-    'max_new_tokens': 512,
-    'min_new_tokens': 5,
-    'do_sample': True,
-    'top_k': 0,
-    'top_p': 0.95,
-    'num_return_sequences': 200,
-    'batch_size': 32,
-    'seed': None,
-    'truncate_prompt_from_output': True,
-    'stopping_patterns': stopping.CODE_STOP_PATTERNS
-}
+def find_rank_of_subprocess_inside_the_pool():
+    """Find the rank of the current subprocess inside the pool that was launched either by 
+    multiprocessing.Pool() or concurrent.futures.ProcessPoolExecutor().
+    If called from the main process, return 0.
+    Note that this is a bit hacky but work correctly because both methods provide the rank of the subprocesses
+    inside the subprocesses name as 'SpawnPoolWorker-RANK' or 'SpawnProcess-RANK' respectively.
+    """
 
-human_eval_greedy_generation_kwargs = {
-    'max_new_tokens': 512,
-    'min_new_tokens': 5,
-    'do_sample': False,
-    'top_k': 0,
-    'top_p': 1.,
-    'num_return_sequences': 1,
-    'seed': None,
-    'truncate_prompt_from_output': True,
-    'stopping_patterns': stopping.CODE_STOP_PATTERNS
-}
+    process = mp.current_process()
 
-temperatures = [0., 0.2, 0.4, 0.6, 0.8, 1.]
+    if process.name == 'MainProcess':
+        rank = 0
+    elif isinstance(process, mp.context.SpawnProcess):
+        # Provide rank starting at 0 instead of 1
+        try:
+            rank = int(process.name[-1]) - 1
+        except ValueError:
+            raise RuntimeError('Cannot retrieve the rank of the current subprocess.')
+    else:
+        raise RuntimeError('The type of the running process is unknown.')
+        
+    return rank
 
 
 
-def main(gpu_rank: int):
+def human_eval(model_name: str, dataset: datasets.HumanEval = DATASET, temperatures: tuple[int] = TEMPERATURES,
+               generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
+               greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
+    """Generate the HumanEval completions for different temperatures with the model `model_name` and
+    save the results.
 
-    utils.set_all_seeds(1234)
+    Parameters
+    ----------
+    model_name : str
+        The model name.
+    dataset : datasets.HumanEval, optional
+        The HumanEval dataset, by default DATASET
+    temperatures : tuple[int], optional
+        The different temperaturs to use to generate the completions, by default TEMPERATURES
+    generation_kwargs : dict, optional
+        The argument for generation used in the HumanEval benchmark, by default HUMAN_EVAL_GENERATION_KWARGS
+    greedy_generation_kwargs : dict, optional
+        The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
+    """
 
-    for model_name in tqdm(models, desc='Models'):
+    # Load in 8 bits for bloom due to model size
+    quantization = True if model_name == 'bloom-176B' else False
 
-        # Load in 8 bits for bloom due to model size
-        quantization = True if model_name == 'bloom-176B' else False
+    gpu_rank = find_rank_of_subprocess_inside_the_pool()
 
-        model = engine.HFModel(model_name, quantization=quantization, gpu_rank=gpu_rank)
-        folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
+    model = engine.HFModel(model_name, quantization=quantization, gpu_rank=gpu_rank)
+    folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
 
-        for temperature in tqdm(temperatures, desc='Temperatures', leave=False):
+    t0 = time.time()
 
-            filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
+    for temperature in temperatures:
 
-            for sample in tqdm(dataset, desc='Dataset samples', leave=False):
+        filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
 
-                task_id = sample['task_id']
-                prompt = sample['prompt']
+        for sample in dataset:
 
-                # In this case we use greedy decoding (the temperature parameters does not matter anymore
-                # so we set it to the default which is 1)
-                if temperature == 0:
-                    completions = [model(prompt, temperature=1., **human_eval_greedy_generation_kwargs)]
-                # In this case we use top-p sampling
-                else:
-                    completions = model(prompt, temperature=temperature, **human_eval_generation_kwargs)
+            task_id = sample['task_id']
+            prompt = sample['prompt']
 
-                # Save the model completions
-                results = [{'task_id': task_id, 'completion': completion} for completion in completions]
-                utils.save_jsonl(results, filename, append=True)
+            # In this case we use greedy decoding (the temperature parameters does not matter anymore
+            # so we set it to the default which is 1)
+            if temperature == 0:
+                completions = [model(prompt, temperature=1., **greedy_generation_kwargs)]
+            # In this case we use top-p sampling
+            else:
+                completions = model(prompt, temperature=temperature, **generation_kwargs)
 
-        del model
-        gc.collect()
+            # Save the model completions
+            results = [{'task_id': task_id, 'completion': completion} for completion in completions]
+            utils.save_jsonl(results, filename, append=True)
+
+    dt = time.time() - t0
+
+    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    del model
+    gc.collect()
+
 
 
 if __name__ == '__main__':
 
-    main()
+    # Run all models that fit on a single gpu in parallel using all gpus
+    with mp.Pool(processes=num_gpus, initializer=utils.set_all_seeds, initargs=(1234,)) as pool:
+        pool.map(human_eval, small_models, chunksize=1)
