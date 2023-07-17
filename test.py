@@ -114,7 +114,7 @@ for i in range(torch.cuda.device_count()):
     print(f'Before generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.2f} GB')
 t0 = time.time()
 out = model1(prompt, max_new_tokens=max_tokens, num_return_sequences=200, batch_size=batch_size,
-             stopping_patterns=stopping.CODE_STOP_PATTERNS)
+             stopping_patterns=None)
 dt = time.time() - t0
 for i in range(torch.cuda.device_count()):
     print(f'After generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.2f} GB')
@@ -128,7 +128,7 @@ for i in range(torch.cuda.device_count()):
     print(f'Before generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.2f} GB')
 t0 = time.time()
 out = model1(prompt, max_new_tokens=max_tokens, num_return_sequences=200, batch_size=batch_size,
-             stopping_patterns=stopping.CODE_STOP_PATTERNS)
+             stopping_patterns=None)
 dt = time.time() - t0
 for i in range(torch.cuda.device_count()):
     print(f'After generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.2f} GB')
