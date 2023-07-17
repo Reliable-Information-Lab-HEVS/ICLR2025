@@ -106,11 +106,12 @@ from helpers import utils
 # print('model size: {:.3f}MB'.format(size_all_mb))
 
 prompt = "# Write a python function to multiply 2 numbers"
+batch_size = 32
 
 model1 = engine.HFModel('bloom-560M', gpu_rank=0)
 print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 t0 = time.time()
-out = model1(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=200,
+out = model1(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=batch_size,
              stopping_patterns=stopping.CODE_STOP_PATTERNS)
 dt = time.time() - t0
 print(f'After generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
@@ -123,7 +124,7 @@ model2 = engine.HFModel('bloom-560M', device_map='auto')
 print(f'Before generation gpu 0: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 print(f'Before generation gpu 1: {(torch.cuda.max_memory_allocated(1) / 1024**3):.2f} GB')
 t0 = time.time()
-out = model1(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=200,
+out = model1(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=batch_size,
              stopping_patterns=stopping.CODE_STOP_PATTERNS)
 dt = time.time() - t0
 print(f'After generation gpu 0: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')

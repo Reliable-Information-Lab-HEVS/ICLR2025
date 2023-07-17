@@ -390,9 +390,51 @@ ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING = {
 }
 
 # Summarize all supported model names
-AUTHORIZED_MODELS = tuple(ALL_MODELS_MAPPING.keys())
+ALLOWED_MODELS = tuple(ALL_MODELS_MAPPING.keys())
 
 ALLOWED_DTYPES = (torch.float16, torch.bfloat16, torch.float32)
+
+
+
+def get_model_params(model_name: str) -> float:
+    """Return the approximate number of params of the model, in billions.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model.
+
+    Returns
+    -------
+    float
+        The number of parameters.
+    """
+
+    if model_name not in ALLOWED_MODELS:
+        raise(ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.'))
+    
+    return ALL_MODELS_PARAMS_MAPPING[model_name]
+
+
+def get_model_dtype(model_name: str) -> torch.dtype:
+    """Return the default dtype used by the model.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model.
+
+    Returns
+    -------
+    torch.dtype
+        The default dtype.
+    """
+
+    if model_name not in ALLOWED_MODELS:
+        raise(ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.'))
+    
+    return ALL_MODELS_DTYPES_MAPPING[model_name]
+
 
 
 
@@ -423,8 +465,8 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         The model.
     """
 
-    if model_name not in AUTHORIZED_MODELS:
-        raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
+    if model_name not in ALLOWED_MODELS:
+        raise(ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.'))
     
     # Set the dtype if not provided
     if dtype is None:
@@ -536,8 +578,8 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
         The tokenizer.
     """
 
-    if model_name not in AUTHORIZED_MODELS:
-        raise(ValueError(f'The model name must be one of {*AUTHORIZED_MODELS,}.'))
+    if model_name not in ALLOWED_MODELS:
+        raise(ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.'))
     
     if model_name in ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING.keys():
         additional_kwargs = ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING[model_name]
