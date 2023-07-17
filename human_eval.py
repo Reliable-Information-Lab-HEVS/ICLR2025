@@ -1,6 +1,7 @@
 import os
 import gc
 import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor
 import argparse
 import time
 
@@ -182,7 +183,9 @@ if __name__ == '__main__':
     big_models = args.big_models == 'True'
 
     # Run all models that fit on a single gpu in parallel using all gpus
-    with mp.Pool(processes=num_gpus, initializer=utils.set_all_seeds, initargs=(1234,)) as pool:
+    # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
+    # with mp.Pool(processes=num_gpus, initializer=utils.set_all_seeds, initargs=(1234,)) as pool:
+    with ProcessPoolExecutor(max_workers=num_gpus, initializer=utils.set_all_seeds, initargs=(1234,)) as pool:
         pool.map(human_eval, SMALL_MODELS, chunksize=1)
 
     if big_models:
