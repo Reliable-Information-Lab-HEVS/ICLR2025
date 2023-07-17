@@ -24,7 +24,7 @@ prompt = "# Write a python function to multiply 2 numbers"
 # model = engine.HFModel('codegen-16B', gpu_rank=0)
 # print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
 # print(model.device_map)
-model = AutoModelForCausalLM.from_pretrained('Salesforce/codegen-16B-mono', torch_dtype=torch.float16, device_map='balanced_low_0')
+model = AutoModelForCausalLM.from_pretrained('Salesforce/codegen-16B-mono', torch_dtype=torch.float16, device_map='balanced')
 print(model.hf_device_map)
 tokenizer = AutoTokenizer.from_pretrained('Salesforce/codegen-16B-mono')
 for i in range(torch.cuda.device_count()):
