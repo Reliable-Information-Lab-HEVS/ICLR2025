@@ -10,6 +10,7 @@ from langchain.agents import initialize_agent, AgentType
 from langchain.chains import LLMChain
 
 import engine
+from engine import stopping
 from engine import loader, generation
 from helpers import utils
 
@@ -104,16 +105,27 @@ from helpers import utils
 # size_all_mb = (param_size + buffer_size) / 1024**2
 # print('model size: {:.3f}MB'.format(size_all_mb))
 
+prompt = "# Write a python function to multiply 2 numbers"
 
-tokenizer = AutoTokenizer.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
-model = AutoModelForCausalLM.from_pretrained("StabilityAI/stablelm-base-alpha-3b")
-model.half().cuda()
+model1 = engine.HFModel('bloom-560M', gpu_rank=0)
+print(f'Before generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
+t0 = time.time()
+out = model1(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=200,
+             stopping_patterns=stopping.CODE_STOP_PATTERNS)
+dt = time.time() - t0
+print(f'After generation: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
+print(f'Time for generation: {dt:.2f} s')
 
-inputs = tokenizer("What's your mood today?", return_tensors="pt").to("cuda")
-tokens = model.generate(
-  **inputs,
-  max_new_tokens=64,
-  temperature=0.7,
-  do_sample=True,
-)
-print(tokenizer.decode(tokens[0], skip_special_tokens=True))
+torch.cuda.reset_peak_memory_stats(device=0)
+torch.cuda.reset_peak_memory_stats(device=1)
+
+model2 = engine.HFModel('bloom-560M', device_map='auto')
+print(f'Before generation gpu 0: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
+print(f'Before generation gpu 1: {(torch.cuda.max_memory_allocated(1) / 1024**3):.2f} GB')
+t0 = time.time()
+out = model1(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=200,
+             stopping_patterns=stopping.CODE_STOP_PATTERNS)
+dt = time.time() - t0
+print(f'After generation gpu 0: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GB')
+print(f'After generation gpu 1: {(torch.cuda.max_memory_allocated(1) / 1024**3):.2f} GB')
+print(f'Time for generation: {dt:.2f} s')
