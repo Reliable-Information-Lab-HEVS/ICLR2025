@@ -9,7 +9,7 @@ import resource
 
 prompt = "# Write a python function to multiply 2 numbers"
 
-model = engine.HFModel('bloom-7.1B')
+model = engine.HFModel('bloom-3B', dtype=torch.float32)
 
 if torch.cuda.is_available():
     for i in range(torch.cuda.device_count()):

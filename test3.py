@@ -33,7 +33,7 @@ for i in range(torch.cuda.device_count()):
 t0 = time.time()
 # out = model(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=100,
             # stopping_patterns=stopping.CODE_STOP_PATTERNS)
-out = generation.generate_text(model, tokenizer, prompt, max_new_tokens=512, num_return_sequences=200, batch_size=100,
+out = generation.generate_text(model, tokenizer, prompt, max_new_tokens=512, num_return_sequences=200, batch_size=16,
                                stopping_patterns=None)
 dt = time.time() - t0
 for i in range(torch.cuda.device_count()):
