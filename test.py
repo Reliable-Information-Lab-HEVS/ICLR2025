@@ -107,12 +107,13 @@ from helpers import utils
 
 prompt = "# Write a python function to multiply 2 numbers"
 batch_size = 200
+max_tokens = 200
 
 model1 = engine.HFModel('bloom-560M', gpu_rank=0)
 for i in range(torch.cuda.device_count()):
     print(f'Before generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.2f} GB')
 t0 = time.time()
-out = model1(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=batch_size,
+out = model1(prompt, max_new_tokens=max_tokens, num_return_sequences=200, batch_size=batch_size,
              stopping_patterns=stopping.CODE_STOP_PATTERNS)
 dt = time.time() - t0
 for i in range(torch.cuda.device_count()):
@@ -126,7 +127,7 @@ model2 = engine.HFModel('bloom-560M', device_map='auto')
 for i in range(torch.cuda.device_count()):
     print(f'Before generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.2f} GB')
 t0 = time.time()
-out = model1(prompt, max_new_tokens=512, num_return_sequences=200, batch_size=batch_size,
+out = model1(prompt, max_new_tokens=max_tokens, num_return_sequences=200, batch_size=batch_size,
              stopping_patterns=stopping.CODE_STOP_PATTERNS)
 dt = time.time() - t0
 for i in range(torch.cuda.device_count()):
