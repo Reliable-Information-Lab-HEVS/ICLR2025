@@ -26,7 +26,7 @@ out = model(prompt, max_new_tokens=max_tokens, num_return_sequences=200, batch_s
             stopping_patterns=None)
 dt = time.time() - t0
 
-size_out = model.tokenizer(out, return_tensors='pt').input_ids.shape[1]
+size_out = model.tokenizer(out, return_tensors='pt', padding=True).input_ids.shape[1]
 if size_out != (input_size + max_tokens):
     print(f'Early stopping of generation after {size_out} tokens total.')
     inferred_mem_size = batch_size * size_out * model.tokenizer.vocab_size * multiplier / 1024**3
