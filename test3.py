@@ -7,7 +7,18 @@ from engine import generation
 from engine import stopping
 import time
 
-prompt = "# Write a python function to multiply 2 numbers"
+# prompt = "# Write a python function to multiply 2 numbers"
+# Prompt of about 500 tokens. Courtesy of ChatGPT for making-up random stuff of the appropriate length.
+prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations. Belonging to the primate order, monkeys are found in various parts of the world, inhabiting diverse habitats ranging from tropical rainforests to savannas. With their intelligence, agility, and unique characteristics, monkeys have left an indelible mark on our collective imagination. In this article, we will explore some of the fascinating aspects of monkeys and shed light on their captivating lives.
+
+One of the defining features of monkeys is their incredible diversity. There are over 260 known species of monkeys, each with its own distinct traits and adaptations. They come in a wide range of sizes, from the tiny pygmy marmoset, which can fit in the palm of your hand, to the large and powerful mandrill, known for its strikingly colorful face. This diversity allows monkeys to occupy various ecological niches and adapt to different habitats and diets.
+
+Monkeys are highly social animals, living in complex social structures. They form troops or bands that can range in size from a few individuals to several hundred members, depending on the species. Within these groups, monkeys establish hierarchies through social interactions, with dominant individuals enjoying certain privileges and responsibilities. Social bonds are crucial for their survival, as they provide protection from predators and facilitate cooperative behaviors, such as foraging and caring for young ones.
+
+Another remarkable aspect of monkeys is their exceptional cognitive abilities. They exhibit problem-solving skills, tool usage, and the ability to learn from each other. For instance, certain species of monkeys have been observed using rocks to crack open nuts or sticks to fish for termites. They demonstrate an understanding of cause-and-effect relationships and exhibit a sense of self-awareness. Researchers have conducted numerous studies to explore the cognitive abilities of monkeys, revealing their impressive intellectual capacities.
+
+Monkeys are primarily herbivorous but have a diverse diet that includes fruits, leaves, seeds, and insects. Some species, like the howler monkey, are specialized folivores, consuming mainly leaves to meet their nutritional needs. Others, such as the capuchin monkey, are known for their omnivorous diet, which includes fruits, nuts, insects, and even small vertebrates. Their varied diet contributes to the dispersal of seeds, making monkeys important agents in forest regeneration and maintaining biodiversity.
+"""
 max_tokens = 512
 batch_size = 200
 
