@@ -12,8 +12,6 @@ import time
 prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations. Belonging to the primate order, monkeys are found in various parts of the world, inhabiting diverse habitats ranging from tropical rainforests to savannas. With their intelligence, agility, and unique characteristics, monkeys have left an indelible mark on our collective imagination. In this article, we will explore some of the fascinating aspects of monkeys and shed light on their captivating lives.
 
 One of the defining features of monkeys is their incredible diversity. There are over 260 known species of monkeys, each with its own distinct traits and adaptations. They come in a wide range of sizes, from the tiny pygmy marmoset, which can fit in the palm of your hand, to the large and powerful mandrill, known for its strikingly colorful face. This diversity allows monkeys to occupy various ecological niches and adapt to different habitats and diets.
-
-Monkeys are highly social animals, living in complex social structures. They form troops or bands that can range in size from a few individuals to several hundred members, depending on the species. Within these groups, monkeys establish hierarchies through social interactions, with dominant individuals enjoying certain privileges and responsibilities. Social bonds are crucial for their survival, as they provide protection from predators and facilitate cooperative behaviors, such as foraging and caring for young ones.
 """
 max_tokens = 512
 batch_size = 200
