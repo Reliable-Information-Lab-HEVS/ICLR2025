@@ -12,6 +12,7 @@ max_tokens = 512
 batch_size = 200
 
 model = engine.HFModel('bloom-560M', gpu_rank=0, device_map='balanced_low_0')
+model.input_device = 0
 for i in range(torch.cuda.device_count()):
     print(f'Before generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
 print(model.device_map)
