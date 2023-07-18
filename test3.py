@@ -9,7 +9,7 @@ import time
 
 # prompt = "# Write a python function to multiply 2 numbers"
 # Prompt of about 500 tokens. Courtesy of ChatGPT for making-up random stuff of the appropriate length.
-prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations. Belonging to the primate order, monkeys are found in various parts of the world, inhabiting diverse habitats ranging from tropical rainforests to savannas. With their intelligence, agility, and unique characteristics, monkeys have left an indelible mark on our collective imagination.
+prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations. 
 """
 max_tokens = 512
 batch_size = 200
