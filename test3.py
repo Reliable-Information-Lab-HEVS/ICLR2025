@@ -60,6 +60,13 @@ out = model.model(large_input).logits
 for i in range(torch.cuda.device_count()):
     print(f'After model forward gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
 
+print(f'dtype: {out.dtype}')
+print(f'shape: {out.shape}')
+print(f'memory: {out.element_size() * out.nelement() / 1024**3}')
+
+del out
+gc.collect()
+
 for i in range(torch.cuda.device_count()):
     torch.cuda.reset_peak_memory_stats(device=i)
 
@@ -67,8 +74,4 @@ out2 = model(prompt, num_return_sequences=200, max_new_tokens=1)
 
 for i in range(torch.cuda.device_count()):
     print(f'After generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
-
-print(f'dtype: {out.dtype}')
-print(f'shape: {out.shape}')
-print(f'memory: {out.element_size() * out.nelement() / 1024**3}')
 
