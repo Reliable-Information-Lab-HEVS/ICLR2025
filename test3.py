@@ -13,13 +13,14 @@ batch_size = 200
 
 model = engine.HFModel('bloom-560M', gpu_rank=0, device_map='balanced_low_0')
 # model.input_device = 0
-for i in range(torch.cuda.device_count()):
-    print(f'Before generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
 print(model.device_map)
 print(model.input_device)
-
 input_size = model.tokenizer.encode(prompt, return_tensors='pt').shape[1]
 print(f'Input sequence size: {input_size}')
+
+for i in range(torch.cuda.device_count()):
+    print(f'Before generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
+
 # multiplier = 2 if (model.dtype == torch.bfloat16 or model.dtype == torch.float16) else 4
 # inferred_mem_size = batch_size * (input_size + max_tokens) * model.tokenizer.vocab_size * multiplier / 1024**3
 
@@ -49,6 +50,14 @@ out = model.model(large_input).logits
 
 for i in range(torch.cuda.device_count()):
     print(f'After model forward gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
+
+for i in range(torch.cuda.device_count()):
+    torch.cuda.reset_peak_memory_stats(device=i)
+
+out2 = model(prompt, num_return_sequences=200, max_new_tokens=1)
+
+for i in range(torch.cuda.device_count()):
+    print(f'After generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
 
 print(f'dtype: {out.dtype}')
 print(f'shape: {out.shape}')
