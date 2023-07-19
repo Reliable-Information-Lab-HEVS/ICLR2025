@@ -54,6 +54,7 @@ def new_forward(
 
         # Only compute LOGITS FOR LAST TOKEN!!!!!!!!!!!!!
         # Greatly help to save memory!!!!!!!!!!!!!!
+        print('We made it this far!')
         lm_logits = self.lm_head(hidden_states[:, -1:, :])
 
         loss = None
@@ -83,7 +84,9 @@ def new_forward(
         )
 
 
-prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations. 
+prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
+
+One of the defining features of monkeys is their incredible diversity. There are over 260 known species of monkeys, each with its own distinct traits and adaptations. They come in a wide range of sizes, from the tiny pygmy marmoset, which can fit in the palm of your hand, to the large and powerful mandrill, known for its strikingly colorful face. This diversity allows monkeys to occupy various ecological niches and adapt to different habitats and diets.
 """
 max_tokens = 50
 batch_size = 200
