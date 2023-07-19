@@ -12,7 +12,7 @@ model = engine.HFModel(model_name)
 
 max_new_tokens = 200
 num_return_sequences = 208
-batch_size = 8
+batch_size = 1
 
 prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 
