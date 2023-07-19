@@ -93,7 +93,10 @@ for i in range(torch.cuda.device_count()):
 for i in range(torch.cuda.device_count()):
     torch.cuda.reset_peak_memory_stats(device=i)
 
-out1 = model(prompt, num_return_sequences=200, max_new_tokens=max_tokens, seed=1)
+# out1 = model(prompt, num_return_sequences=200, max_new_tokens=max_tokens, seed=1)
+input_ids = model.tokenizer.encode(prompt, return_tensors='pt')
+large_input, _ = model.model._expand_inputs_for_generation(expand_size=200, input_ids=input_ids)
+out1 = model.model(large_input)
 
 for i in range(torch.cuda.device_count()):
     print(f'After generation with trick gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
@@ -104,7 +107,10 @@ model = engine.HFModel('bloom-560M', gpu_rank=0, device_map='balanced_low_0')
 for i in range(torch.cuda.device_count()):
     torch.cuda.reset_peak_memory_stats(device=i)
 
-out2 = model(prompt, num_return_sequences=200, max_new_tokens=max_tokens, seed=1)
+# out2 = model(prompt, num_return_sequences=200, max_new_tokens=max_tokens, seed=1)
+input_ids = model.tokenizer.encode(prompt, return_tensors='pt')
+large_input, _ = model.model._expand_inputs_for_generation(expand_size=200, input_ids=input_ids)
+out2 = model.model(large_input)
 
 for i in range(torch.cuda.device_count()):
     print(f'After generation without trick gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
