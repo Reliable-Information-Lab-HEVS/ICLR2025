@@ -11,6 +11,7 @@ import engine
 model = engine.HFModel('bloom-560M')
 print(model.device_map)
 print(next(model.model.parameters()).get_device())
+print(model.input_device)
 
 max_new_tokens = 200
 num_return_sequences = 200
