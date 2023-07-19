@@ -7,8 +7,8 @@ import time
 
 import engine
 
-
-model = engine.HFModel('bloom-7.1B')
+model_name = 'bloom-7.1B'
+model = engine.HFModel(model_name)
 
 max_new_tokens = 200
 num_return_sequences = 208
@@ -37,7 +37,7 @@ print(f'Memory peak with precomputed states: {(torch.cuda.max_memory_allocated(0
 
 del model
 torch.cuda.reset_peak_memory_stats(device=0)
-model = engine.HFModel('bloom-560M')
+model = engine.HFModel(model_name)
 
 
 t1 = time.time()
