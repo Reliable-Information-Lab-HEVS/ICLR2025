@@ -9,6 +9,8 @@ import engine
 
 
 model = engine.HFModel('bloom-560M')
+print(model.device)
+print(next(model.model.parameters()).get_device())
 
 max_new_tokens = 200
 num_return_sequences = 200
@@ -46,3 +48,5 @@ out2 = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=m
 dt1 = time.time() - t1
 print(f'Time withOUT precomputed hidden states: {dt:.2f} s')
 print(f'Memory peak withOUT precomputed states: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
+
+print(f'Same results: {out1 == out2}')
