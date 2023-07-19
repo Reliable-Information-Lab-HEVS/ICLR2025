@@ -85,7 +85,7 @@ def new_forward(
 
 prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations. 
 """
-max_tokens = 512
+max_tokens = 50
 batch_size = 200
 
 model = engine.HFModel('bloom-560M', gpu_rank=0, device_map='balanced_low_0')
