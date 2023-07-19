@@ -7,7 +7,7 @@ import time
 
 import engine
 
-model_name = 'bloom-7.1B'
+model_name = 'stable-lm-7B'
 model = engine.HFModel(model_name)
 
 max_new_tokens = 200
