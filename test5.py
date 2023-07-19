@@ -8,11 +8,11 @@ import time
 import engine
 
 
-model = engine.HFModel('bloom-560M')
+model = engine.HFModel('bloom-7.1B')
 
 max_new_tokens = 200
 num_return_sequences = 208
-batch_size = 16
+batch_size = 8
 
 prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 
