@@ -115,4 +115,5 @@ out2 = model.model(large_input)
 for i in range(torch.cuda.device_count()):
     print(f'After generation without trick gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
 
-print(f'The outputs are similar: {out1 == out2}')
+# print(f'The outputs are similar: {out1 == out2}')
+print(f'The outputs are similar: {torch.all(out1 == out2)}')
