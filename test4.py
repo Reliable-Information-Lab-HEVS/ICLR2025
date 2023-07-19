@@ -116,9 +116,8 @@ for i in range(torch.cuda.device_count()):
 del model
 
 # Put back original method
-model.model.__class__.forward = original_forward
-
 model = engine.HFModel('bloom-560M', gpu_rank=0, device_map='balanced_low_0')
+model.model.__class__.forward = original_forward
 
 for i in range(torch.cuda.device_count()):
     torch.cuda.reset_peak_memory_stats(device=i)
