@@ -28,6 +28,19 @@ input_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda(0)
 input_ids, _ = model.model._expand_inputs_for_generation(expand_size=batch_size, input_ids=input_ids)
 past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
 
+mem = 0
+for i in range(len(past_key_values)):
+    for j in range(len(past_key_values[i])):
+        mem += past_key_values[i][j].nelement() * past_key_values[i][j].element_size()
+
+print(f'Memory peak: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
+print(f'Memory of keys: {(mem / 1024**3):.2f} GiB')
+
+torch.cuda.reset_peak_memory_stats(device=0)
+
+out2 = model(prompt, num_return_sequences=1, max_new_tokens=2, seed=1,
+             batch_size=batch_size, past_key_values=past_key_values)
+
 print(f'Memory peak: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
 
 # out1 = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=max_new_tokens,
