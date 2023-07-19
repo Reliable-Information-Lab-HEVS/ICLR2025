@@ -11,7 +11,7 @@ import engine
 model = engine.HFModel('bloom-560M')
 
 max_new_tokens = 200
-num_return_sequences = 200
+num_return_sequences = 208
 batch_size = 16
 
 prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
@@ -23,11 +23,11 @@ Monkeys are highly social animals, living in complex social structures. They for
 Another remarkable aspect of monkeys is their exceptional cognitive abilities. They exhibit problem-solving skills, tool usage, and the ability to learn from each other. For instance, certain species of monkeys have been observed using rocks to crack open nuts or sticks to fish for termites. They demonstrate an understanding of cause-and-effect relationships and exhibit a sense of self-awareness. Researchers have conducted numerous studies to explore the cognitive abilities of monkeys, revealing their impressive intellectual capacities.
 """
 
+t0 = time.time()
 input_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda(0)
 input_ids, _ = model.model._expand_inputs_for_generation(expand_size=batch_size, input_ids=input_ids)
 past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
 
-t0 = time.time()
 out1 = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=max_new_tokens,
              seed=1, batch_size=batch_size, past_key_values=past_key_values)
 dt = time.time() - t0
