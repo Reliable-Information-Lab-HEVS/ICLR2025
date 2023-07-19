@@ -28,23 +28,25 @@ input_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda(0)
 input_ids, _ = model.model._expand_inputs_for_generation(expand_size=batch_size, input_ids=input_ids)
 past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
 
-out1 = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=max_new_tokens,
-             seed=1, batch_size=batch_size, past_key_values=past_key_values)
-dt = time.time() - t0
-print(f'Time with precomputed hidden states: {dt:.2f} s')
-print(f'Memory peak with precomputed states: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
+print(f'Memory peak: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
+
+# out1 = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=max_new_tokens,
+#              seed=1, batch_size=batch_size, past_key_values=past_key_values)
+# dt = time.time() - t0
+# print(f'Time with precomputed hidden states: {dt:.2f} s')
+# print(f'Memory peak with precomputed states: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
 
 
-del model
-torch.cuda.reset_peak_memory_stats(device=0)
-model = engine.HFModel(model_name)
+# del model
+# torch.cuda.reset_peak_memory_stats(device=0)
+# model = engine.HFModel(model_name)
 
 
-t1 = time.time()
-out2 = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=max_new_tokens, seed=1,
-             batch_size=batch_size)
-dt1 = time.time() - t1
-print(f'Time withOUT precomputed hidden states: {dt:.2f} s')
-print(f'Memory peak withOUT precomputed states: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
+# t1 = time.time()
+# out2 = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=max_new_tokens, seed=1,
+#              batch_size=batch_size)
+# dt1 = time.time() - t1
+# print(f'Time withOUT precomputed hidden states: {dt:.2f} s')
+# print(f'Memory peak withOUT precomputed states: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
 
-print(f'Same results: {out1 == out2}')
+# print(f'Same results: {out1 == out2}')
