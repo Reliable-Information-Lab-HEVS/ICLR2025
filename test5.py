@@ -12,7 +12,7 @@ model = engine.HFModel(model_name)
 
 max_new_tokens = 200
 num_return_sequences = 208
-batch_size = 1
+batch_size = 4
 
 prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 
@@ -38,7 +38,7 @@ print(f'Memory of keys: {(mem / 1024**3):.2f} GiB')
 
 torch.cuda.reset_peak_memory_stats(device=0)
 
-out2 = model(prompt, num_return_sequences=1, max_new_tokens=2, seed=1,
+out2 = model(prompt, num_return_sequences=batch_size, max_new_tokens=2, seed=1,
              batch_size=batch_size, past_key_values=past_key_values)
 
 print(f'Memory peak: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
