@@ -9,9 +9,9 @@ import engine
 
 model_name = 'bloom-7.1B'
 max_tokens = 512
-batch_size = 2
-# num_sequences = 10 * batch_size
-num_sequences = 20
+batch_size = 5
+num_sequences = 5 * batch_size
+# num_sequences = 20
 
 
 def expand_past_keys(past_key_values, batch_size):
