@@ -8,10 +8,10 @@ import time
 import engine
 
 model_name = 'bloom-7.1B'
-max_tokens = 50
-batch_size = 40
+max_tokens = 500
+batch_size = 2
 # num_sequences = 10 * batch_size
-num_sequences = 120
+num_sequences = 2
 
 
 def expand_past_keys(past_key_values, batch_size):
