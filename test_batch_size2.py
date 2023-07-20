@@ -6,6 +6,7 @@ import warnings
 import time
 import numpy as np
 import os
+from tqdm import tqdm
 
 import engine
 from helpers import utils
@@ -56,13 +57,13 @@ torch.cuda.reset_peak_memory_stats(device=0)
 memory = np.zeros((len(input_sizes), len(batch_sizes), len(max_tokens)))
 time_ = np.zeros((len(input_sizes), len(batch_sizes), len(max_tokens)))
 
-for i, input_size in enumerate(input_sizes):
+for i, input_size in tqdm(enumerate(input_sizes), leave=True, desc='Input size'):
 
     prompt = large_text[:input_size]
 
-    for j, batch_size in enumerate(batch_sizes):
+    for j, batch_size in tqdm(enumerate(batch_sizes), leave=False, desc='batch size'):
 
-        for k, max_token in enumerate(max_tokens):
+        for k, max_token in tqdm(enumerate(max_tokens), leave=False, desc='max tokens'):
 
             t0 = time.time()
             foo = model(prompt, num_return_sequences=num_sequences, max_new_tokens=max_token, seed=1,
