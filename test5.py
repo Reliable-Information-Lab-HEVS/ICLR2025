@@ -15,6 +15,9 @@ model_name = 'bloom-7.1B'
 # model_name = 'vicuna-7B'
 model = engine.HFModel(model_name)
 
+print(f'Memory of the model: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GiB')
+torch.cuda.reset_peak_memory_stats(device=0)
+
 max_new_tokens = 200
 num_return_sequences = 208
 batch_size = 1
