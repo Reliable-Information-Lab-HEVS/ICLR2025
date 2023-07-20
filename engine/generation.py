@@ -126,16 +126,16 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     for size in batch_sizes:
 
         if past:
-            if size == unique_batch_sizes[1]:
-                outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                     do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                     num_return_sequences=size, stopping_criteria=stopping_criteria,
-                                     pad_token_id=pad_token_id, past_key_values=past_keys[1], **kwargs)
-            elif size == unique_batch_sizes[0]:
+            if size == unique_batch_sizes[0]:
                 outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
                                      do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
                                      num_return_sequences=size, stopping_criteria=stopping_criteria,
                                      pad_token_id=pad_token_id, past_key_values=past_keys[0], **kwargs)
+            elif size == unique_batch_sizes[1]:
+                outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                     do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                     num_return_sequences=size, stopping_criteria=stopping_criteria,
+                                     pad_token_id=pad_token_id, past_key_values=past_keys[1], **kwargs)
         else:
             outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
                                      do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
