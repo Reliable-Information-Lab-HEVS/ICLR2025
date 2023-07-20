@@ -8,8 +8,8 @@ import time
 import engine
 
 # model_name = 'bloom-7.1B'
-model_name = 'stable-lm-7B'
-# model_name = 'gpt-j-6B'
+# model_name = 'stable-lm-7B'
+model_name = 'gpt-j-6B'
 # model_name = 'opt-6.7B'
 # model_name = 'codegen-6B'
 # model_name = 'vicuna-7B'
