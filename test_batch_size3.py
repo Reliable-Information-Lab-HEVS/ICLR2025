@@ -34,22 +34,6 @@ Despite their significance, monkeys face numerous challenges and threats. Habita
 In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
 """
 
-
-def expand_past_keys(past_key_values, batch_size):
-
-    if batch_size <=1:
-        return past_key_values
-    
-    new = []
-    with torch.no_grad():
-        for i in range(len(past_key_values)):
-            new_ = []
-            for j in range(len(past_key_values[i])):
-                new_.append(past_key_values[i][j].repeat(batch_size, 1, 1))
-            new.append(tuple(new_))
-
-    return tuple(new)
-
 model = engine.HFModel(model_name)
 model_memory = torch.cuda.max_memory_allocated(0) / 1024**3
 torch.cuda.reset_peak_memory_stats(device=0)
@@ -69,7 +53,6 @@ for i, input_size in tqdm(enumerate(input_sizes), leave=True, desc='Input size')
             with torch.no_grad():
                 input_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda(0)
                 past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
-                past_key_values = expand_past_keys(past_key_values, batch_size)
             foo = model(prompt, num_return_sequences=num_sequences, max_new_tokens=max_token, seed=1,
                         batch_size=batch_size, past_key_values=past_key_values)
             dt = time.time() - t0

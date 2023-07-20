@@ -2,10 +2,26 @@ import torch
 from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from transformers import StoppingCriteriaList
+import numpy as np
 
 from engine import loader
 from engine import stopping
 from helpers import utils
+
+def expand_past_keys(past_key_values, batch_size):
+
+    if batch_size <=1:
+        return past_key_values
+    
+    new = []
+    with torch.no_grad():
+        for i in range(len(past_key_values)):
+            new_ = []
+            for j in range(len(past_key_values[i])):
+                new_.append(past_key_values[i][j].repeat(batch_size, 1, 1))
+            new.append(tuple(new_))
+
+    return tuple(new)
 
 
 def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, prompt: str, max_new_tokens: int = 60,
@@ -93,6 +109,15 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     else:
         batch_sizes = [num_return_sequences]
 
+    past = False
+    # Past key values generation
+    if 'past_key_values' in kwargs.keys():
+        unique_batch_sizes = np.unique(batch_sizes) # already sorted
+        past_key_values = kwargs.pop('past_key_values')
+        # Maximum 2 elements in the following list
+        past_keys = [expand_past_keys(past_key_values, size) for size in unique_batch_sizes]
+        past = True
+
     # Suppress pad_token_id warning
     pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
 
@@ -100,7 +125,18 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
 
     for size in batch_sizes:
 
-        with torch.no_grad():
+        if past:
+            if size == unique_batch_sizes[1]:
+                outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                     do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                     num_return_sequences=size, stopping_criteria=stopping_criteria,
+                                     pad_token_id=pad_token_id, past_key_values=past_keys[1], **kwargs)
+            elif size == unique_batch_sizes[0]:
+                outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                     do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                     num_return_sequences=size, stopping_criteria=stopping_criteria,
+                                     pad_token_id=pad_token_id, past_key_values=past_keys[0], **kwargs)
+        else:
             outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
                                      do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
                                      num_return_sequences=size, stopping_criteria=stopping_criteria,
