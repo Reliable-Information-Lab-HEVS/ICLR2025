@@ -41,7 +41,7 @@ import torch
 
 prompt = "Hello my dear"
 
-torch.cuda.reset_peak_memory_stats(device=0)
+# torch.cuda.reset_peak_memory_stats(device=0)
 
 model = engine.HFModel('bloom-7.1B')
 
