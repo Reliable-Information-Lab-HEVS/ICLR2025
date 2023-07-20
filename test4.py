@@ -3,6 +3,7 @@ from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
 from torch.nn import CrossEntropyLoss
 import torch
 import warnings
+import time
 
 import engine
 
@@ -41,6 +42,7 @@ for i in range(torch.cuda.device_count()):
     print(f'Memory of the model gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GiB')
     torch.cuda.reset_peak_memory_stats(device=i)
 
+t0 = time.time()
 with torch.no_grad():
     input_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda(0)
     past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
@@ -52,6 +54,7 @@ for i in range(torch.cuda.device_count()):
 
 out1 = model(prompt, num_return_sequences=num_sequences, max_new_tokens=max_tokens, seed=1,
              batch_size=batch_size, past_key_values=past_key_values)
+dt = time.time() - t0
 
 for i in range(torch.cuda.device_count()):
     print(f'Generation with past keys gpu {i}: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GB')
@@ -64,11 +67,15 @@ model = engine.HFModel(model_name)
 for i in range(torch.cuda.device_count()):
     torch.cuda.reset_peak_memory_stats(device=i)
 
+t1 = time.time()
 out2 = model(prompt, num_return_sequences=num_sequences, max_new_tokens=max_tokens, seed=1,
              batch_size=batch_size)
+dt1 = time.time() - t1
 
 for i in range(torch.cuda.device_count()):
     print(f'Generation withOUT past keys gpu {i}: {(torch.cuda.max_memory_allocated(0) / 1024**3):.5f} GB')
     torch.cuda.reset_peak_memory_stats(device=i)
 
 print(f'Outputs are the same: {out1 == out2}')
+print(f'Time with past keys: {dt:.2f} s')
+print(f'Time without past keys: {dt1:.2f} s')
