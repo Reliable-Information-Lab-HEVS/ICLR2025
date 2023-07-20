@@ -30,7 +30,19 @@ Another remarkable aspect of monkeys is their exceptional cognitive abilities. T
 t0 = time.time()
 input_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda(0)
 input_ids, _ = model.model._expand_inputs_for_generation(expand_size=batch_size, input_ids=input_ids)
-past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
+if 'bloom' in model_name:
+    past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
+elif 'stable-lm' in model_name:
+    past_key_values = model.model.gpt_neox(input_ids[:, :-1], return_dict=True).past_key_values
+elif 'gpt-j' in model_name:
+    past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
+elif 'opt' in model_name:
+    past_key_values = model.model.model.decoder(input_ids[:, :-1], return_dict=True).past_key_values
+elif 'codegen' in model_name:
+    past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
+elif 'vicuna' in model_name:
+    past_key_values = model.model.model(input_ids[:, :-1], return_dict=True).past_key_values
+
 
 mem = 0
 for i in range(len(past_key_values)):
