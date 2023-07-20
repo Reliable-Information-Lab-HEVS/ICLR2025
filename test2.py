@@ -55,7 +55,7 @@ model = engine.HFModel('bloom-7.1B')
 model_memory = torch.cuda.max_memory_allocated(0) / 1024**3
 
 input_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda(0)
-input_ids, _ = model.model._expand_inputs_for_generation(expand_size=20, input_ids=input_ids)
+input_ids, _ = model.model._expand_inputs_for_generation(expand_size=5, input_ids=input_ids)
 
 torch.cuda.reset_peak_memory_stats(device=0)
 
