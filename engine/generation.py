@@ -114,8 +114,8 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     if 'past_key_values' in kwargs.keys():
         unique_batch_sizes = np.unique(batch_sizes) # already sorted
         past_key_values = kwargs.pop('past_key_values')
-        # Maximum 2 elements in the following list
-        past_keys = [expand_past_keys(past_key_values, size) for size in unique_batch_sizes]
+        # Maximum 2 elements in the following dict: one for common batch size and one for remainder
+        past_keys = {size: expand_past_keys(past_key_values, size) for size in unique_batch_sizes}
         past = True
 
     # Suppress pad_token_id warning
@@ -126,16 +126,11 @@ def generate_text(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, pr
     for size in batch_sizes:
 
         if past:
-            if size == unique_batch_sizes[0]:
-                outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                     do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                     num_return_sequences=size, stopping_criteria=stopping_criteria,
-                                     pad_token_id=pad_token_id, past_key_values=past_keys[0], **kwargs)
-            elif size == unique_batch_sizes[1]:
-                outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                     do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                     num_return_sequences=size, stopping_criteria=stopping_criteria,
-                                     pad_token_id=pad_token_id, past_key_values=past_keys[1], **kwargs)
+            outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                    do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                    num_return_sequences=size, stopping_criteria=stopping_criteria,
+                                    pad_token_id=pad_token_id, past_key_values=past_keys[size], **kwargs)
+            
         else:
             outputs = model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
                                      do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
