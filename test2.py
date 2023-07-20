@@ -52,17 +52,24 @@ input_ids, _ = model.model._expand_inputs_for_generation(expand_size=20, input_i
 
 torch.cuda.reset_peak_memory_stats(device=0)
 
+t0 = time.time()
 past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
+dt = time.time() - t0
 
 memory_with_grad = torch.cuda.max_memory_allocated(0) / 1024**3 - model_memory
 
 del past_key_values
 torch.cuda.reset_peak_memory_stats(device=0)
 
+t1 = time.time()
 with torch.no_grad():
     past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
+dt1 = time.time() - t1
 
 memory_without_grad = torch.cuda.max_memory_allocated(0) / 1024**3 - model_memory
 
 print(f'Memory with grad: {memory_with_grad:.5f} GiB')
 print(f'Memory without grad: {memory_without_grad:.5f} GiB')
+
+print(f'Time with grad: {dt:.2f} s')
+print(f'Time without grad: {dt1:.2f} s')
