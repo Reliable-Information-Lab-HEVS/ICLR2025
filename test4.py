@@ -9,15 +9,17 @@ import engine
 
 model_name = 'bloom-7.1B'
 max_tokens = 50
-batch_size = 1
+batch_size = 40
 # num_sequences = 10 * batch_size
-num_sequences = 100
+num_sequences = 120
 
 
 def expand_past_keys(past_key_values, batch_size):
 
+    if batch_size <=1:
+        return past_key_values
+    
     new = []
-
     with torch.no_grad():
         for i in range(len(past_key_values)):
             new_ = []
