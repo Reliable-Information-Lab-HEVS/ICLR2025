@@ -9,8 +9,14 @@ from engine import loader
 from engine import stopping
 from helpers import utils
 
+def get_memory_footprint(model: PreTrainedModel):
+    if hasattr(model, 'hf_device_map'):
+        pass
+    else:
+        return model.get_memory_footprint()
 
-def infer_best_batch_size(model, input_size: int, max_new_tokens: int, )
+def infer_best_batch_size(model, input_size: int, max_new_tokens: int):
+    pass
 
 def expand_past_keys(past_key_values, batch_size):
 
