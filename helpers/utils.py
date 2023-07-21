@@ -3,6 +3,7 @@ import numpy as np
 import random
 import os
 import json
+import multiprocessing as mp
 
 # Path to the root of the project
 ROOT_FOLDER = os.path.dirname(os.path.dirname(__file__))
@@ -204,3 +205,51 @@ def load_jsonl(filename: str) -> list[dict]:
                 dictionaries.append(json.loads(line))
 
     return dictionaries
+
+
+def find_rank_of_subprocess_inside_the_pool():
+    """Find the rank of the current subprocess inside the pool that was launched either by 
+    multiprocessing.Pool() or concurrent.futures.ProcessPoolExecutor().
+    If called from the main process, return 0.
+    Note that this is a bit hacky but work correctly because both methods provide the rank of the subprocesses
+    inside the subprocesses name as 'SpawnPoolWorker-RANK' or 'SpawnProcess-RANK' respectively.
+    """
+
+    process = mp.current_process()
+
+    if process.name == 'MainProcess':
+        rank = 0
+    elif isinstance(process, mp.context.SpawnProcess):
+        # Provide rank starting at 0 instead of 1
+        try:
+            rank = int(process.name[-1]) - 1
+        except ValueError:
+            raise RuntimeError('Cannot retrieve the rank of the current subprocess.')
+    else:
+        raise RuntimeError('The type of the running process is unknown.')
+        
+    return rank
+
+
+def set_cuda_visible_device(gpu_rank: int | list[int]):
+    """Set cuda visible devices to `gpu_rank` only.
+
+    Parameters
+    ----------
+    gpu_rank : int | list[int]
+        The GPUs we want to be visible.
+    """
+
+    if type(gpu_rank) == int:
+        gpu_rank = [gpu_rank]
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in gpu_rank)
+
+
+def set_cuda_visible_device_of_subprocess():
+    """Set the cuda visible device of a subprocess inside a pool to only the gpu with same
+    rank as the subprocess.
+    """
+
+    gpu_rank = find_rank_of_subprocess_inside_the_pool()
+    set_cuda_visible_device(gpu_rank)
