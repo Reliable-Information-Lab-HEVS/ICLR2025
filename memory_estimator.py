@@ -25,11 +25,11 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 """
 
 SMALL_MODELS = (
-    'bloom-560M',
-    'bloom-1.7B',
-    'bloom-3B',
-    'bloom-7.1B',
-    'stable-lm-3B',
+    # 'bloom-560M',
+    # 'bloom-1.7B',
+    # 'bloom-3B',
+    # 'bloom-7.1B',
+    # 'stable-lm-3B',
     'stable-lm-7B',
     'star-coder-base',
     'star-coder',
@@ -73,6 +73,8 @@ def memory_estimation(model_name: str):
     model_memory = torch.cuda.max_memory_allocated() / 1024**3
     large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
     model_memory_consumption = {}
+
+    torch.cuda.reset_peak_memory_stats()
 
     for i, input_size in enumerate(input_sizes):
 
