@@ -55,21 +55,21 @@ def main(useless, sleep_time = 2):
 
 def test(useless):
 
-    process = mp.current_process()
-    print(type(process))
-    print(process.name)
+    # process = mp.current_process()
+    # print(type(process))
+    # print(process.name)
 
-    # time.sleep(5)
-    # rank = utils.find_rank_of_subprocess_inside_the_pool()
-    # print(f"Process {rank}: visible device: {os.environ['CUDA_VISIBLE_DEVICES']}")
+    time.sleep(5)
+    rank = utils.find_rank_of_subprocess_inside_the_pool()
+    print(f"Process {rank}: visible device: {os.environ['CUDA_VISIBLE_DEVICES']}")
 
 
 if __name__ == '__main__':
 
-    # with ProcessPoolExecutor(max_workers=3, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-    #     pool.map(test, [1,1,1], chunksize=1)
-
-    with ProcessPoolExecutor(max_workers=3) as pool:
+    with ProcessPoolExecutor(max_workers=3, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
         pool.map(test, [1,1,1], chunksize=1)
+
+    # with ProcessPoolExecutor(max_workers=3) as pool:
+    #     pool.map(test, [1,1,1], chunksize=1)
 
     print(f"Main process: {os.environ['CUDA_VISIBLE_DEVICES']}")

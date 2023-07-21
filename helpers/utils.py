@@ -219,7 +219,7 @@ def find_rank_of_subprocess_inside_the_pool():
 
     if process.name == 'MainProcess':
         rank = 0
-    elif isinstance(process, mp.context.SpawnProcess):
+    elif isinstance(process, mp.context.SpawnProcess) or isinstance(process, mp.context.ForkProcess):
         # Provide rank starting at 0 instead of 1
         try:
             rank = int(process.name[-1]) - 1
