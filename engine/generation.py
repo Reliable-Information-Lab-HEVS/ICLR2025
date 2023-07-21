@@ -3,10 +3,14 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from transformers import StoppingCriteriaList
 import numpy as np
+from transformers import BloomForCausalLM
 
 from engine import loader
 from engine import stopping
 from helpers import utils
+
+
+def infer_best_batch_size(model, input_size: int, max_new_tokens: int, )
 
 def expand_past_keys(past_key_values, batch_size):
 
@@ -268,41 +272,41 @@ class HFModel(object):
                  stopping_patterns: list[str] | bool | None = None, **kwargs) -> str | list[str]:
         """Generate text according to `prompt`.
 
-    Parameters
-    ----------
-    prompt : str
-        The prompt to the model.
-    max_new_tokens : int, optional
-        How many new tokens to generate, by default 60.
-    min_new_tokens : int, optional
-        The minimum number of tokens to generate, by setting the probability of EOS token to 0. It is useful to
-        force the model to generate an output, instead of immediately generating EOS, by default 5.
-    do_sample : bool, optional
-        Whether to introduce randomness in the generation, by default True.
-    top_k : int, optional
-        How many tokens with max probability to consider for randomness, by default 50.
-    top_p : float, optional
-        The probability density covering the new tokens to consider for randomness, by default 0.92.
-    temperature : float, optional
-        How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
-        no randomness), by default 0.9.
-    num_return_sequences : int, optional
-        How many sequences to generate according to the `prompt`, by default 1.
-    batch_size : int | None, optional
-        Max batch size for the model forward pass, in case `num_return_sequences` is large, by default None.
-    seed : int | None, optional
-        An optional seed to force the generation to be reproducible.
-    truncate_prompt_from_output : bool, optional
-        Whether to remove the prompt from the model answer or not, by default False.
-    stopping_patterns: list[str] | bool | None
-        List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
-        If `None`, no early stopping is performed, by default None.
+        Parameters
+        ----------
+        prompt : str
+            The prompt to the model.
+        max_new_tokens : int, optional
+            How many new tokens to generate, by default 60.
+        min_new_tokens : int, optional
+            The minimum number of tokens to generate, by setting the probability of EOS token to 0. It is useful to
+            force the model to generate an output, instead of immediately generating EOS, by default 5.
+        do_sample : bool, optional
+            Whether to introduce randomness in the generation, by default True.
+        top_k : int, optional
+            How many tokens with max probability to consider for randomness, by default 50.
+        top_p : float, optional
+            The probability density covering the new tokens to consider for randomness, by default 0.92.
+        temperature : float, optional
+            How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
+            no randomness), by default 0.9.
+        num_return_sequences : int, optional
+            How many sequences to generate according to the `prompt`, by default 1.
+        batch_size : int | None, optional
+            Max batch size for the model forward pass, in case `num_return_sequences` is large, by default None.
+        seed : int | None, optional
+            An optional seed to force the generation to be reproducible.
+        truncate_prompt_from_output : bool, optional
+            Whether to remove the prompt from the model answer or not, by default False.
+        stopping_patterns: list[str] | bool | None
+            List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
+            If `None`, no early stopping is performed, by default None.
 
-    Returns
-    -------
-    str | list[str]
-        Str containing the generated sequence, or list[str] if `num_return_sequences` > 1.
-    """
+        Returns
+        -------
+        str | list[str]
+            Str containing the generated sequence, or list[str] if `num_return_sequences` > 1.
+        """
         
         return generate_text(self.model, self.tokenizer, prompt, max_new_tokens=max_new_tokens,
                              min_new_tokens=min_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
