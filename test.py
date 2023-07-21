@@ -32,10 +32,10 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 """
 
 model_name = 'bloom-7.1B'
-batch_size = 30
+batch_size = 10
 max_tokens = 512
 input_size = 500
-num_sequences = 90
+num_sequences = 40
 
 model = engine.HFModel(model_name)
 print(model.device_map)
@@ -53,7 +53,7 @@ gc.collect()
 model = engine.HFModel(model_name, device_map='balanced')
 print(model.device_map)
 t1 = time.time()
-foo = model(prompt, max_new_tokens=max_tokens, num_return_sequences=num_sequences, batch_size=40)
+foo = model(prompt, max_new_tokens=max_tokens, num_return_sequences=num_sequences, batch_size=15)
 dt1 = time.time() - t1
 
 print(f'Single gpu {dt:.2f} s')
