@@ -16,6 +16,7 @@ from helpers import utils
 
 model = engine.HFModel('bloom-7.1B', device_map='balanced')
 model_memory = torch.cuda.max_memory_allocated(0) / 1024**3
+print(model.device_map)
 print(f'From peak: {model_memory} GiB')
 mem = model.model.get_memory_footprint() / 1024**3
 print(f'From func estimation: {mem} GiB')

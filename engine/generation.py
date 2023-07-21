@@ -3,7 +3,6 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from transformers import StoppingCriteriaList
 import numpy as np
-from transformers import BloomForCausalLM
 
 from engine import loader
 from engine import stopping
@@ -11,7 +10,13 @@ from helpers import utils
 
 def get_memory_footprint(model: PreTrainedModel):
     if hasattr(model, 'hf_device_map'):
-        pass
+        devices = set(model.hf_device_map.values())
+        if len(devices) == 1:
+            return model.get_memory_footprint()
+        else:
+            memory = {}
+            for device in devices:
+                modules = [key for (key, val) in model.hf_device_map.items() if val == device]
     else:
         return model.get_memory_footprint()
 
