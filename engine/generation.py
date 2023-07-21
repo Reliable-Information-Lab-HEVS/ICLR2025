@@ -3,10 +3,20 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from transformers import StoppingCriteriaList
 import numpy as np
+import operator
 
 from engine import loader
 from engine import stopping
 from helpers import utils
+
+def _get_module_memory_footprint(module: torch.nn.Module, return_buffers: bool = True):
+
+    mem = sum([param.nelement() * param.element_size() for param in module.parameters()])
+    if return_buffers:
+        mem_bufs = sum([buf.nelement() * buf.element_size() for buf in module.buffers()])
+        mem = mem + mem_bufs
+    return mem
+
 
 def get_memory_footprint(model: PreTrainedModel):
     if hasattr(model, 'hf_device_map'):
@@ -17,6 +27,10 @@ def get_memory_footprint(model: PreTrainedModel):
             memory = {}
             for device in devices:
                 modules = [key for (key, val) in model.hf_device_map.items() if val == device]
+                # operator.attrgetter(x)(y) is a recursive version of getattr(y, x)
+                mem = sum([_get_module_memory_footprint(operator.attrgetter(module)(model)) for module in modules])
+                memory[device] = mem
+            return memory
     else:
         return model.get_memory_footprint()
 

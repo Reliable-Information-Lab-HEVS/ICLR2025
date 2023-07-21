@@ -20,6 +20,9 @@ print(model.device_map)
 print(f'From peak: {model_memory} GiB')
 mem = model.model.get_memory_footprint() / 1024**3
 print(f'From func estimation: {mem} GiB')
+mem_per_device = generation.get_memory_footprint(model.model)
+print(f'Memory per device: {mem_per_device}')
+print(f'The sum is equal: {(sum(mem_per_device.values()) / 1024**3) == mem}')
 
 # large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 
