@@ -57,4 +57,4 @@ foo = model(prompt, max_new_tokens=max_tokens, num_return_sequences=num_sequence
 dt1 = time.time() - t1
 
 print(f'Single gpu {dt:.2f} s')
-print(f'3 gpus with larger batch {dt:.2f} s')
+print(f'3 gpus with larger batch {dt1:.2f} s')
