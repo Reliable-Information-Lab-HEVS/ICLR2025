@@ -38,12 +38,14 @@ model = engine.HFModel(model_name)
 model_memory = torch.cuda.max_memory_allocated(0) / 1024**3
 torch.cuda.reset_peak_memory_stats(device=0)
 
+large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
+
 memory = np.zeros((len(input_sizes), len(batch_sizes), len(max_tokens)))
 time_ = np.zeros((len(input_sizes), len(batch_sizes), len(max_tokens)))
 
 for i, input_size in tqdm(enumerate(input_sizes), leave=True, desc='Input size'):
 
-    prompt = large_text[:input_size]
+    prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
     for j, batch_size in tqdm(enumerate(batch_sizes), leave=False, desc='batch size'):
 

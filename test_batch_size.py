@@ -51,6 +51,8 @@ model = engine.HFModel(model_name)
 model_memory = torch.cuda.max_memory_allocated(0) / 1024**3
 torch.cuda.reset_peak_memory_stats(device=0)
 
+large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
+
 memory_without_past = []
 memory_with_past = []
 time_without_past = []
@@ -58,7 +60,7 @@ time_with_past = []
 
 for input_size in input_sizes:
 
-    prompt = large_text[:input_size]
+    prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
     t0 = time.time()
     foo = model(prompt, num_return_sequences=num_sequences, max_new_tokens=max_tokens, seed=1,
