@@ -267,21 +267,40 @@ class HFModel(object):
 
     def __init__(self, model_name: str, quantization: bool = False, device_map: str | None = None,
                  gpu_rank: int = 0, dtype: torch.dtype | None = None):
+        
+        # Save the current allocated memory on each gpu to estimate model size after loading
+        if torch.cuda.is_available():
+            reference_memory = {}
+            for i in range(torch.cuda.device_count()):
+                reference_memory[i] = torch.cuda.memory_allocated(i)
 
         self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
                                                                      device_map=device_map, gpu_rank=gpu_rank,
                                                                      dtype=dtype)
+        
+        # Compute the memory footprint of the model on each gpu
+        self.memory_map = {}
+        if hasattr(self.model, 'hf_device_map'):
+            devices = set(self.model.hf_device_map.values())
+            devices.discard('cpu')
+            for device in devices:
+                self.memory_map[device] = (torch.cuda.memory_allocated(device) - reference_memory[device]) / 1024**3
+        else:
+            self.memory_map[gpu_rank] = (torch.cuda.memory_allocated(gpu_rank) - reference_memory[gpu_rank]) / 1024**3
+
+        self.memory_footprint = self.model.get_memory_footprint() / 1024**3
+
         self.model_name = model_name
         self.quantization = quantization
         # The model is on multiple devices
-        try:
+        if hasattr(self.model, 'hf_device_map'):
             self.device_map = self.model.hf_device_map
-            devices = set(self.device_map.values())
-            # remove possible non-gpu devices from the device_map
-            devices = {val for val in devices if not isinstance(val, str)}
+            # Devices may not be already computed if gpu is not available
+            devices = set(self.model.hf_device_map.values())
+            devices.discard('cpu')
             self.input_device = min(devices) if len(devices) > 0 else 'cpu'
         # The model is on a single device
-        except AttributeError:
+        else:
             device = next(self.model.parameters()).get_device()
             self.device_map = 'cpu' if device == -1 else f'cuda:{device}'
             self.input_device = 'cpu' if device == -1 else device
