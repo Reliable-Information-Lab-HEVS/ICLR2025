@@ -2,6 +2,7 @@ import torch
 import os
 from concurrent.futures import ProcessPoolExecutor
 import argparse
+import gc
 
 import engine
 from helpers import utils
@@ -93,6 +94,9 @@ def memory_estimation(model_name: str):
 
     filename = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{model_name}.json')
     utils.save_json(model_memory_consumption, filename)
+
+    del model
+    gc.collect()
 
 
 if __name__ == '__main__':
