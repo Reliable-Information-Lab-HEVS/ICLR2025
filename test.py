@@ -33,7 +33,7 @@ mem_a = get_mem(a)
 print(f'Memory of tensor allocated outside func: {mem_a:.2f} GiB')
 
 def test_alloc():
-    ref = torch.cuda.memory_allocated()
+    ref = torch.cuda.memory_allocated() / 1024**3
     b = torch.rand(10000, 10000, 3, device=0)
     mem_b = get_mem(b)
     print(f'Memory of tensor allocated in func: {mem_b:.2f} GiB')
