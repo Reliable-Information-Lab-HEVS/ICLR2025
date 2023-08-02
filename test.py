@@ -48,6 +48,7 @@ from helpers import utils
 
 model = engine.HFModel('bloom-1.7B')
 print(f'Max memory: {(torch.cuda.max_memory_allocated() / 1024**3):.2f} GiB')
+print(f'Memory: {(torch.cuda.memory_allocated() / 1024**3):.2f} GiB')
 print(f'Memory footprint: {model.memory_footprint:.2f} GiB')
 print(f'Memory map: {model.memory_map}')
 
