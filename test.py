@@ -24,27 +24,32 @@ from helpers import utils
 # print(f'Memory per device: {mem_per_device}')
 # print(f'The sum is equal: {(sum(mem_per_device.values()) / 1024**3) == mem}')
 
-a = torch.rand(10000, 10000, 5, device=0)
+# a = torch.rand(10000, 10000, 5, device=0)
 
-def get_mem(a):
-    return a.nelement() * a.element_size() / 1024**3
+# def get_mem(a):
+#     return a.nelement() * a.element_size() / 1024**3
 
-mem_a = get_mem(a)
-print(f'Memory of tensor allocated outside func: {mem_a:.2f} GiB')
+# mem_a = get_mem(a)
+# print(f'Memory of tensor allocated outside func: {mem_a:.2f} GiB')
 
-def test_alloc():
-    ref = torch.cuda.memory_allocated() / 1024**3
-    b = torch.rand(10000, 10000, 3, device=0)
-    mem_b = get_mem(b)
-    print(f'Memory of tensor allocated in func: {mem_b:.2f} GiB')
-    max_mem = torch.cuda.max_memory_allocated() / 1024**3
-    print(f'Max memory: {max_mem-ref:.2f} GiB')
-    print(f'Sum of both: {(mem_a + mem_b):.2f} GiB')
+# def test_alloc():
+#     ref = torch.cuda.memory_allocated() / 1024**3
+#     b = torch.rand(10000, 10000, 3, device=0)
+#     mem_b = get_mem(b)
+#     print(f'Memory of tensor allocated in func: {mem_b:.2f} GiB')
+#     max_mem = torch.cuda.max_memory_allocated() / 1024**3
+#     print(f'Max memory: {max_mem-ref:.2f} GiB')
+#     print(f'Sum of both: {(mem_a + mem_b):.2f} GiB')
 
-test_alloc()
-print('After func:')
-max_mem = torch.cuda.max_memory_allocated() / 1024**3
-print(f'Max memory: {max_mem:.2f} GiB')
+# test_alloc()
+# print('After func:')
+# max_mem = torch.cuda.max_memory_allocated() / 1024**3
+# print(f'Max memory: {max_mem:.2f} GiB')
+
+model = engine.HFModel('bloom-1.7B')
+print(f'Max memory: {(torch.cuda.max_memory_allocated() / 1024**3):.2f} GiB')
+print(f'Memory footprint: {model.memory_footprint:.2f} GiB')
+print(f'Memory map: {model.memory_map}')
 
 
 
