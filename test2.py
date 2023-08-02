@@ -50,5 +50,7 @@ foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, see
             batch_size=None)
 
 memory = torch.cuda.max_memory_allocated() / 1024**3
+gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
 print(f'Max memory usage: {memory:.2f} GiB')
+print(f'Total gpu memory: {gpu_mem:.2f} GiB')
 print(f'Batch size: {model.infer_best_batch_size(input_size, max_new_tokens, 200)}')
