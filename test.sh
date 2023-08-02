@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=30G
 #SBATCH --partition=nodes
-#SBATCH --gres=gpu:a100:1
+#SBATCH --gres=gpu:1
 #SBATCH --chdir=/cluster/raid/home/vacy/LLMs
 
 # Initialize the shell to use local conda
