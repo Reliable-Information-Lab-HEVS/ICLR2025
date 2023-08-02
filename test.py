@@ -30,13 +30,15 @@ def get_mem(a):
     return a.nelement() * a.element_size() / 1024**3
 
 mem_a = get_mem(a)
+print(f'Memory of tensor allocated outside func: {mem_a:.2f} GiB')
 
 def test_alloc():
-    torch.cuda.reset_peak_memory_stats()
+    torch.cuda.reset_peak_memory_stats(0)
     b = torch.rand(10000, 10000, 3)
     mem_b = get_mem(b)
     print(f'Memory of tensor allocated in func: {mem_b:.2f} GiB')
-    print(f'Max memory: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GiB')
+    max_mem = torch.cuda.max_memory_allocated() / 1024**3
+    print(f'Max memory: {max_mem:.2f} GiB')
     print(f'Sum of both: {(mem_a + mem_b):.2f} GiB')
 
 test_alloc()
