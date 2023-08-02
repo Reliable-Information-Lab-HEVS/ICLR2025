@@ -475,6 +475,11 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     if dtype not in ALLOWED_DTYPES:
         raise(ValueError(f'The dtype must be one of {*ALLOWED_DTYPES,}.'))
     
+    # Reset peak gpu memory usage for each gpu, to estimate model size after loading
+    if torch.cuda.is_available():
+        for i in range(torch.cuda.device_count()):
+            torch.cuda.reset_peak_memory_stats(device=0)
+    
     # Override quantization if we don't have access to GPUs
     if not torch.cuda.is_available() and quantization:
         quantization = False

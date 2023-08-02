@@ -14,15 +14,38 @@ from engine import stopping
 from engine import loader, generation
 from helpers import utils
 
-model = engine.HFModel('bloom-7.1B', device_map='balanced')
-model_memory = torch.cuda.max_memory_allocated(0) / 1024**3
-print(model.device_map)
-print(f'From peak: {model_memory} GiB')
-mem = model.model.get_memory_footprint() / 1024**3
-print(f'From func estimation: {mem} GiB')
-mem_per_device = generation.get_memory_footprint(model.model)
-print(f'Memory per device: {mem_per_device}')
-print(f'The sum is equal: {(sum(mem_per_device.values()) / 1024**3) == mem}')
+# model = engine.HFModel('bloom-7.1B', device_map='balanced')
+# model_memory = torch.cuda.max_memory_allocated(0) / 1024**3
+# print(model.device_map)
+# print(f'From peak: {model_memory} GiB')
+# mem = model.model.get_memory_footprint() / 1024**3
+# print(f'From func estimation: {mem} GiB')
+# mem_per_device = generation.get_memory_footprint(model.model)
+# print(f'Memory per device: {mem_per_device}')
+# print(f'The sum is equal: {(sum(mem_per_device.values()) / 1024**3) == mem}')
+
+a = torch.rand(10000, 10000, 5)
+
+def get_mem(a):
+    return a.nelement() * a.element_size() / 1024**3
+
+mem_a = get_mem(a)
+
+def test_alloc():
+    torch.cuda.reset_peak_memory_stats()
+    b = torch.rand(10000, 10000, 3)
+    mem_b = get_mem(b)
+    print(f'Memory of tensor allocated in func: {mem_b:.2f} GiB')
+    print(f'Max memory: {(torch.cuda.max_memory_allocated(0) / 1024**3):.2f} GiB')
+    print(f'Sum of both: {(mem_a + mem_b):.2f} GiB')
+
+test_alloc()
+
+
+
+
+
+
 
 # large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 
