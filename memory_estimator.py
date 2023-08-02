@@ -84,9 +84,11 @@ def memory_estimation(model_name: str):
         for j, max_token in enumerate(max_tokens):
 
             torch.cuda.reset_peak_memory_stats()
+            actual_peak = torch.cuda.max_memory_allocated() / 1024**3
 
             foo = model(prompt, num_return_sequences=1, max_new_tokens=max_token, batch_size=1)
-            mem = torch.cuda.max_memory_allocated() / 1024**3 - model_memory
+            # mem = torch.cuda.max_memory_allocated() / 1024**3 - model_memory
+            mem = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
             input_size_memory_consumption[max_token] = mem
 
         model_memory_consumption[input_size] = input_size_memory_consumption
