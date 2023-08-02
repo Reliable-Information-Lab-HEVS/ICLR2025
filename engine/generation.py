@@ -192,7 +192,7 @@ class HFModel(object):
             post_process = False
 
         if batch_size is None:
-            batch_size = self.infer_best_batch_size(input_length, max_new_tokens)
+            batch_size = self.infer_best_batch_size(input_length, max_new_tokens, num_return_sequences)
 
         # If we require more sequences than the allowed batch size, we need to split the generation into
         # multiple passes
@@ -251,20 +251,20 @@ class HFModel(object):
     
     
 
-    def infer_best_batch_size(self, input_size: int, max_new_tokens: int):
+    def infer_best_batch_size(self, input_size: int, max_new_tokens: int, num_return_sequences: int):
     
         if not torch.cuda.is_available():
             memory = psutil.virtual_memory().total / 1024**3
         else:
             memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
 
-        available_memory = memory*0.95 - self.max_memory_footprint
+        available_memory = memory - self.max_memory_footprint
 
         try:
             batch_footprint = utils.load_json(os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{self.model_name}.json'))
             # Convert keys to int
             batch_footprint = {int(k): {int(k1):v1 for k1,v1 in batch_footprint[k].items()} for k in batch_footprint.keys()}
-        except:
+        except FileNotFoundError:
             pass
 
         # Find the reference input size immediately larger than the current input size
@@ -284,6 +284,9 @@ class HFModel(object):
             ref_max_tokens = max_tokens[indices[0][0]]
 
         ref_batch_footprint = batch_footprint[ref_input_size][ref_max_tokens]
+
+        if ref_batch_footprint < 0:
+            return num_return_sequences
 
         return int(available_memory // ref_batch_footprint)
 
