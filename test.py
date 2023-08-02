@@ -46,9 +46,10 @@ from helpers import utils
 # max_mem = torch.cuda.max_memory_allocated() / 1024**3
 # print(f'Max memory: {max_mem:.2f} GiB')
 
-model = engine.HFModel('bloom-1.7B')
-print(f'Max memory: {(torch.cuda.max_memory_allocated() / 1024**3):.2f} GiB')
-print(f'Memory: {(torch.cuda.memory_allocated() / 1024**3):.2f} GiB')
+model = engine.HFModel('bloom-1.7B', device_map='balanced')
+for i in range(torch.cuda.device_count()):
+    print(f'Max memory gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.2f} GiB')
+    print(f'Memory gpu {i}: {(torch.cuda.memory_allocated(i) / 1024**3):.2f} GiB')
 print(f'Memory footprint: {model.memory_footprint:.2f} GiB')
 print(f'Memory map: {model.memory_map}')
 
