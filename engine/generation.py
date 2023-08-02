@@ -258,7 +258,7 @@ class HFModel(object):
         else:
             memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
 
-        available_memory = memory*0.9 - self.max_memory_footprint
+        available_memory = memory*0.95 - self.max_memory_footprint
 
         try:
             batch_footprint = utils.load_json(os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{self.model_name}.json'))
