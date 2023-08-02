@@ -26,42 +26,42 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 """
 
 SMALL_MODELS = (
-    # 'bloom-560M',
-    # 'bloom-1.7B',
-    # 'bloom-3B',
-    # 'bloom-7.1B',
-    # 'stable-lm-3B',
-    # 'stable-lm-7B',
-    # 'star-coder-base',
-    # 'star-coder',
-    # 'star-coder-plus',
-    # 'star-chat-alpha',
-    # 'star-chat-beta',
-    # 'gpt2-medium',
-    # 'gpt2-large',
-    # 'gpt2-xl',
-    # 'gpt-j-6B',
-    # 'gpt-neo-125M',
-    # 'gpt-neo-1.3B',
-    # 'gpt-neo-2.7B',
-    # 'opt-125M',
-    # 'opt-350M',
-    # 'opt-1.3B',
-    # 'opt-2.7B',
-    # 'opt-6.7B',
-    # 'opt-13B',
-    # 'codegen-350M',
-    # 'codegen-2B',
-    # 'codegen-6B',
-    # 'codegen-16B',
+    'bloom-560M',
+    'bloom-1.7B',
+    'bloom-3B',
+    'bloom-7.1B',
+    'stable-lm-3B',
+    'stable-lm-7B',
+    'star-coder-base',
+    'star-coder',
+    'star-coder-plus',
+    'star-chat-alpha',
+    'star-chat-beta',
+    'gpt2-medium',
+    'gpt2-large',
+    'gpt2-xl',
+    'gpt-j-6B',
+    'gpt-neo-125M',
+    'gpt-neo-1.3B',
+    'gpt-neo-2.7B',
+    'opt-125M',
+    'opt-350M',
+    'opt-1.3B',
+    'opt-2.7B',
+    'opt-6.7B',
+    'opt-13B',
+    'codegen-350M',
+    'codegen-2B',
+    'codegen-6B',
+    'codegen-16B',
     'codegen2-1B',
     'codegen2-3.7B',
     'codegen2-7B',
     'codegen2-16B',
-    # 'codegen25-7B',
-    # 'codegen25-7B-instruct',
-    # 'vicuna-7B',
-    # 'vicuna-13B',
+    'codegen25-7B',
+    'codegen25-7B-instruct',
+    'vicuna-7B',
+    'vicuna-13B',
 )
 
 input_sizes = [50*i for i in range(1, 11)]
@@ -71,11 +71,10 @@ max_tokens += [512]
 def memory_estimation(model_name: str):
 
     model = engine.HFModel(model_name)
-    model_memory = torch.cuda.max_memory_allocated() / 1024**3
+    # model_memory = torch.cuda.max_memory_allocated() / 1024**3
+    model_memory = model.max_memory_footprint
     large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
     model_memory_consumption = {}
-
-    torch.cuda.reset_peak_memory_stats()
 
     for i, input_size in enumerate(input_sizes):
 
@@ -84,15 +83,15 @@ def memory_estimation(model_name: str):
 
         for j, max_token in enumerate(max_tokens):
 
+            torch.cuda.reset_peak_memory_stats()
+
             foo = model(prompt, num_return_sequences=1, max_new_tokens=max_token, batch_size=1)
             mem = torch.cuda.max_memory_allocated() / 1024**3 - model_memory
             input_size_memory_consumption[max_token] = mem
 
-            torch.cuda.reset_peak_memory_stats()
-
         model_memory_consumption[input_size] = input_size_memory_consumption
 
-    filename = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{model_name}.json')
+    filename = os.path.join(utils.ROOT_FOLDER, 'memory_estimator2', f'{model_name}.json')
     utils.save_json(model_memory_consumption, filename)
 
     del model
