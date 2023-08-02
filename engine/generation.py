@@ -4,6 +4,7 @@ from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from transformers import StoppingCriteriaList
 import numpy as np
 import operator
+import psutil
 
 from engine import loader
 from engine import stopping
@@ -18,24 +19,30 @@ def _get_module_memory_footprint(module: torch.nn.Module, return_buffers: bool =
     return mem
 
 
-def get_memory_footprint(model: PreTrainedModel):
+def get_memory_footprint(model: PreTrainedModel, return_buffers: bool = True):
     if hasattr(model, 'hf_device_map'):
         devices = set(model.hf_device_map.values())
         if len(devices) == 1:
-            return model.get_memory_footprint()
+            return model.get_memory_footprint(return_buffers=return_buffers)
         else:
             memory = {}
             for device in devices:
                 modules = [key for (key, val) in model.hf_device_map.items() if val == device]
                 # operator.attrgetter(x)(y) is a recursive version of getattr(y, x)
-                mem = sum([_get_module_memory_footprint(operator.attrgetter(module)(model)) for module in modules])
+                mem = sum([_get_module_memory_footprint(operator.attrgetter(module)(model), return_buffers=return_buffers) \
+                           for module in modules])
                 memory[device] = mem
             return memory
     else:
-        return model.get_memory_footprint()
+        return model.get_memory_footprint(return_buffers=return_buffers)
+    
 
-def infer_best_batch_size(model, input_size: int, max_new_tokens: int):
-    pass
+def infer_best_batch_size(model, model_name, input_size: int, max_new_tokens: int):
+    
+    if not torch.cuda.is_available():
+        memory = psutil.virtual_memory().total / 1024**3
+    else:
+        memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
 
 def expand_past_keys(past_key_values, batch_size):
 
