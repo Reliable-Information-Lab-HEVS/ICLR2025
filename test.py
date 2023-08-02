@@ -24,7 +24,7 @@ from helpers import utils
 # print(f'Memory per device: {mem_per_device}')
 # print(f'The sum is equal: {(sum(mem_per_device.values()) / 1024**3) == mem}')
 
-a = torch.rand(10000, 10000, 5)
+a = torch.rand(10000, 10000, 5, device=0)
 
 def get_mem(a):
     return a.nelement() * a.element_size() / 1024**3
@@ -34,7 +34,7 @@ print(f'Memory of tensor allocated outside func: {mem_a:.2f} GiB')
 
 def test_alloc():
     torch.cuda.reset_peak_memory_stats()
-    b = torch.rand(10000, 10000, 3)
+    b = torch.rand(10000, 10000, 3, device=0)
     mem_b = get_mem(b)
     print(f'Memory of tensor allocated in func: {mem_b:.2f} GiB')
     max_mem = torch.cuda.max_memory_allocated() / 1024**3
