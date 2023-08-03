@@ -194,6 +194,8 @@ class HFModel(object):
         if batch_size is None:
             batch_size = self.infer_best_batch_size(input_length, max_new_tokens, num_return_sequences)
 
+        print(f'Inside the function, the batch size is: {batch_size}')
+
         # If we require more sequences than the allowed batch size, we need to split the generation into
         # multiple passes
         if num_return_sequences > batch_size:
