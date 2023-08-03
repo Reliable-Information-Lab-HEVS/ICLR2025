@@ -202,6 +202,9 @@ class HFModel(object):
         # Anything larger than `num_return_sequences` is useless
         batch_size = min(batch_size, num_return_sequences)
 
+        # Possible past key values
+        past_key_values = kwargs.pop('past_key_values', None)
+
         # This will lower the batch size if needed, in case of possible OOM. This allows to continue without crashing,
         # by reducing the batch size automatically
         first_output, batch_size = self.oom_safe_batch_generation(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
@@ -222,9 +225,8 @@ class HFModel(object):
 
         past = False
         # Past key values generation
-        if 'past_key_values' in kwargs.keys():
+        if past_key_values is not None:
             unique_batch_sizes = np.unique(batch_sizes) # already sorted
-            past_key_values = kwargs.pop('past_key_values')
             # Maximum 2 elements in the following dict: one for common batch size and one for remainder
             past_keys = {size: expand_past_keys(past_key_values, size) for size in unique_batch_sizes}
             past = True
