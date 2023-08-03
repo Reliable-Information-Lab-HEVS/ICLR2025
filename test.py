@@ -56,7 +56,7 @@ except torch.cuda.OutOfMemoryError:
     gc.collect()
     torch.cuda.empty_cache()
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
-                batch_size=40)
+                batch_size=30)
 
 gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
 for i in range(torch.cuda.device_count()):
