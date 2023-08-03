@@ -52,6 +52,7 @@ try:
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
                 batch_size=50)
 except torch.cuda.OutOfMemoryError:
+    torch.cuda.empty_cache()
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
                 batch_size=40)
 
