@@ -20,10 +20,6 @@ from tqdm import tqdm
 import engine
 from helpers import utils
 
-model_name = 'codegen-16B'
-input_size = 432
-max_new_tokens = 512
-
 large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 
 One of the defining features of monkeys is their incredible diversity. There are over 260 known species of monkeys, each with its own distinct traits and adaptations. They come in a wide range of sizes, from the tiny pygmy marmoset, which can fit in the palm of your hand, to the large and powerful mandrill, known for its strikingly colorful face. This diversity allows monkeys to occupy various ecological niches and adapt to different habitats and diets.
@@ -40,6 +36,11 @@ Despite their significance, monkeys face numerous challenges and threats. Habita
 
 In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
 """
+
+model_name = 'gpt2-large'
+input_size = 432
+max_new_tokens = 512
+
 
 model = engine.HFModel(model_name)
 
