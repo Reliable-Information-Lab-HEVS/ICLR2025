@@ -48,20 +48,17 @@ model = engine.HFModel(model_name)
 large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
+retry = False
 print(f'Batch size: {model.infer_best_batch_size(input_size, max_new_tokens, 200)}')
 try:
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
                 batch_size=50)
 except RuntimeError:
-    t0 = time.time()
-    # if isinstance(e, torch.cuda.OutOfMemoryError):
-    gc.collect()
-    torch.cuda.empty_cache()
+    retry = True
+    
+if retry:
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
                 batch_size=30)
-finally:
-    dt = time.time() - t0
-    print(f'Time after exception: {dt:.2f} s')
 
 gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
 for i in range(torch.cuda.device_count()):
