@@ -49,7 +49,7 @@ prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special
 
 print(f'Batch size: {model.infer_best_batch_size(input_size, max_new_tokens, 200)}')
 foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
-            batch_size=40)
+            batch_size=45)
 
 gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
 for i in range(torch.cuda.device_count()):
