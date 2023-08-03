@@ -28,7 +28,7 @@ Despite their significance, monkeys face numerous challenges and threats. Habita
 In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
 """
 
-model_name = 'bloom-7.1B'
+model_name = 'stable-lm-3B'
 input_size = 300
 max_new_tokens = 512
 num_sequences = 100
