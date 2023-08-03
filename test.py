@@ -53,6 +53,7 @@ try:
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
                 batch_size=50)
 except RuntimeError as e:
+    t0 = time.time()
     if isinstance(e, torch.cuda.OutOfMemoryError):
         gc.collect()
         torch.cuda.empty_cache()
@@ -60,6 +61,9 @@ except RuntimeError as e:
                     batch_size=30)
     else:
         raise e
+finally:
+    dt = time.time() - t0
+    print(f'Time after exception: {dt:.2f} s')
 
 gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
 for i in range(torch.cuda.device_count()):
