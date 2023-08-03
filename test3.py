@@ -1,71 +1,62 @@
+from typing import Optional, Tuple, Union
+from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
+from torch.nn import CrossEntropyLoss
 import torch
-import gc
-from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
+import warnings
+import time
+import numpy as np
+import os
+from tqdm import tqdm
 
 import engine
-from engine import generation
-from engine import stopping
-import time
+from helpers import utils
 
-# prompt = "# Write a python function to multiply 2 numbers"
-# Prompt of about 500 tokens. Courtesy of ChatGPT for making-up random stuff of the appropriate length.
-prompt = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations. 
+large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
+
+One of the defining features of monkeys is their incredible diversity. There are over 260 known species of monkeys, each with its own distinct traits and adaptations. They come in a wide range of sizes, from the tiny pygmy marmoset, which can fit in the palm of your hand, to the large and powerful mandrill, known for its strikingly colorful face. This diversity allows monkeys to occupy various ecological niches and adapt to different habitats and diets.
+
+Monkeys are highly social animals, living in complex social structures. They form troops or bands that can range in size from a few individuals to several hundred members, depending on the species. Within these groups, monkeys establish hierarchies through social interactions, with dominant individuals enjoying certain privileges and responsibilities. Social bonds are crucial for their survival, as they provide protection from predators and facilitate cooperative behaviors, such as foraging and caring for young ones.
+
+Another remarkable aspect of monkeys is their exceptional cognitive abilities. They exhibit problem-solving skills, tool usage, and the ability to learn from each other. For instance, certain species of monkeys have been observed using rocks to crack open nuts or sticks to fish for termites. They demonstrate an understanding of cause-and-effect relationships and exhibit a sense of self-awareness. Researchers have conducted numerous studies to explore the cognitive abilities of monkeys, revealing their impressive intellectual capacities.
+
+Monkeys are primarily herbivorous but have a diverse diet that includes fruits, leaves, seeds, and insects. Some species, like the howler monkey, are specialized folivores, consuming mainly leaves to meet their nutritional needs. Others, such as the capuchin monkey, are known for their omnivorous diet, which includes fruits, nuts, insects, and even small vertebrates. Their varied diet contributes to the dispersal of seeds, making monkeys important agents in forest regeneration and maintaining biodiversity.
+
+Monkeys play a crucial role in their ecosystems. As both predators and prey, they contribute to the balance of their habitats. They aid in seed dispersal, pollination, and nutrient cycling, thereby influencing the structure and dynamics of plant communities. Additionally, monkeys are indicators of ecosystem health, as their presence or absence can reflect the overall well-being of an ecosystem.
+
+Despite their significance, monkeys face numerous challenges and threats. Habitat loss due to deforestation, fragmentation, and human encroachment is one of the primary concerns. Additionally, illegal wildlife trade and hunting pose significant risks to monkey populations. Conservation efforts, including protected areas and education campaigns, are vital to ensure the survival of these remarkable creatures.
+
+In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
 """
-max_tokens = 512
-batch_size = 200
 
-model = engine.HFModel('bloom-560M', gpu_rank=0, device_map='balanced_low_0')
-# model.input_device = 0
-print(model.device_map)
-print(model.input_device)
-input_size = model.tokenizer.encode(prompt, return_tensors='pt').shape[1]
-print(f'Input sequence size: {input_size}')
+model_name = 'bloom-7.1B'
+input_size = 300
+max_new_tokens = 512
+num_sequences = 100
+batch_size = 1
 
-for i in range(torch.cuda.device_count()):
-    print(f'Before generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
+model = engine.HFModel(model_name)
 
-# multiplier = 2 if (model.dtype == torch.bfloat16 or model.dtype == torch.float16) else 4
-# inferred_mem_size = batch_size * (input_size + max_tokens) * model.tokenizer.vocab_size * multiplier / 1024**3
+large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
+prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
-# t0 = time.time()
-# out = model(prompt, max_new_tokens=max_tokens, num_return_sequences=200, batch_size=batch_size,
-#             stopping_patterns=None)
-# dt = time.time() - t0
+t0 = time.time()
 
-# size_out = model.tokenizer(out, return_tensors='pt', padding=True).input_ids.shape[1]
-# if size_out != (input_size + max_tokens):
-#     print(f'Early stopping of generation after {size_out} tokens total.')
-#     inferred_mem_size = batch_size * size_out * model.tokenizer.vocab_size * multiplier / 1024**3
+with torch.no_grad():
+    input_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda(0)
+    past_key_values = model.model.transformer(input_ids[:, :-1], return_dict=True).past_key_values
 
-# for i in range(torch.cuda.device_count()):
-#     print(f'After generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
+foo = model(prompt, num_return_sequences=num_sequences, max_new_tokens=max_new_tokens, seed=1,
+            batch_size=batch_size, past_key_values=past_key_values)
 
-# print(f'According to calculation, memory should be {inferred_mem_size:.5f} GB')
-# print(f'Time for generation: {dt:.2f} s')
+dt = time.time() - t0
 
-for i in range(torch.cuda.device_count()):
-    torch.cuda.reset_peak_memory_stats(device=i)
+print(f'Time with past: {dt:.2f} s')
 
-input_ids = model.tokenizer.encode(prompt, return_tensors='pt')
-large_input, _ = model.model._expand_inputs_for_generation(expand_size=200, input_ids=input_ids)
+t1 = time.time()
+foo2 = model(prompt, num_return_sequences=num_sequences, max_new_tokens=max_new_tokens, seed=1,
+             batch_size=batch_size)
+dt1 = time.time() - t1
 
-out = model.model(large_input).logits
-
-for i in range(torch.cuda.device_count()):
-    print(f'After model forward gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
-
-print(f'dtype: {out.dtype}')
-print(f'shape: {out.shape}')
-print(f'memory: {out.element_size() * out.nelement() / 1024**3}')
-
-del out
-gc.collect()
-
-for i in range(torch.cuda.device_count()):
-    torch.cuda.reset_peak_memory_stats(device=i)
-
-out2 = model(prompt, num_return_sequences=200, max_new_tokens=1)
-
-for i in range(torch.cuda.device_count()):
-    print(f'After generation gpu {i}: {(torch.cuda.max_memory_allocated(i) / 1024**3):.5f} GB')
+print(f'Time without past: {dt1:.2f} s')
+print(f'Results are the same: {foo == foo2}')
 

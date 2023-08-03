@@ -293,7 +293,39 @@ class HFModel(object):
         return int(available_memory // ref_batch_footprint)
 
 
+    def generate_batch_oom_safe(self, input: torch.Tensor, max_new_tokens: int, min_new_tokens: int, do_sample: bool,
+                                top_k: int, top_p: float, temperature: float, num_return_sequences: int,
+                                stopping_criteria: StoppingCriteriaList | None, pad_token_id: int,
+                                past_key_values: tuple | None, **kwargs):
+        """Generate text by recursively recovering from possible memory errors (OOMs) by lowering the batch size.
+        Note that it is not possible to retry immediately in the except block because the exception retains the
+        tensors already allocated in the try block which causes an immediate new OOM
+        (see https://github.com/pytorch/pytorch/issues/18853)
+        """
+        retry = False
 
+        try:
+            out = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=max_new_tokens, seed=seed,
+                        batch_size=batch_size)
+            out = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                      do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                      num_return_sequences=num_return_sequences, stopping_criteria=stopping_criteria,
+                                      pad_token_id=pad_token_id, past_key_values=past_keys[size], **kwargs)
+        except RuntimeError as e:
+            if isinstance(e, torch.cuda.OutOfMemoryError):
+                retry = True
+            else:
+                raise e
+
+        if retry:
+            if batch_size == 1:
+                raise RuntimeError('Even a batch size of 1 causes an OOM.')
+            batch_size = max(1, math.floor(batch_size*0.8))
+            gc.collect()
+            torch.cuda.empty_cache()
+            try_recursively(model, num_return_sequences, max_new_tokens, seed, batch_size)
+        else:
+            return foo
    
 
 def expand_past_keys(past_key_values, batch_size):
