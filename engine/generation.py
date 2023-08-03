@@ -258,7 +258,7 @@ class HFModel(object):
         else:
             memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
 
-        available_memory = memory*0.95 - self.max_memory_footprint
+        available_memory = memory*0.9 - self.max_memory_footprint
 
         try:
             batch_footprint = utils.load_json(os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{self.model_name}.json'))
@@ -369,15 +369,14 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
     str | list[str]
         Str containing the generated sequence, or list[str] if `num_return_sequences` > 1.
     """
+    
+    model = HFModel(model_name, quantization=quantization, device_map=device_map, dtype=dtype)
 
-    model, tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
-                                                       device_map=device_map, dtype=dtype)
-
-    return generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                         do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                         num_return_sequences=num_return_sequences, batch_size=batch_size, seed=seed,
-                         truncate_prompt_from_output=truncate_prompt_from_output,
-                         stopping_patterns=stopping_patterns, input_device=input_device, **kwargs)
+    return model(prompt, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                num_return_sequences=num_return_sequences, batch_size=batch_size, seed=seed,
+                truncate_prompt_from_output=truncate_prompt_from_output,
+                stopping_patterns=stopping_patterns, input_device=input_device, **kwargs)
 
 
 
