@@ -89,7 +89,7 @@ def validate_filename(filename: str, extension: str = 'json') -> str:
 
     # Check that the extension and basename are correct
     if basename == '':
-        raise(ValueError('The basename cannot be empty'))
+        raise ValueError('The basename cannot be empty')
     
     split_on_dots = basename.split('.')
 
@@ -111,7 +111,7 @@ def validate_filename(filename: str, extension: str = 'json') -> str:
     # Check that the given path goes through the project repository
     dirname = os.path.abspath(dirname)
     if not (dirname.startswith(ROOT_FOLDER + os.sep) or dirname == ROOT_FOLDER):
-        raise(ValueError('The path you provided is outside the project repository.'))
+        raise ValueError('The path you provided is outside the project repository.')
 
     # Make sure the path exists, and creates it if this is not the case
     if not os.path.exists(dirname):

@@ -35,7 +35,7 @@ def _infer_model_size(model_name: str) -> float:
         model_size = float(matched_number) if matched_letter == 'B' else float(matched_number)/1e3
         return model_size
     else:
-        raise(ValueError('The model number of parameters cannot be inferred from its name.'))
+        raise ValueError('The model number of parameters cannot be inferred from its name.')
     
 
 def _infer_model_sizes(name_mapping: dict[str, str]) -> dict[str, float]:
@@ -411,7 +411,7 @@ def get_model_params(model_name: str) -> float:
     """
 
     if model_name not in ALLOWED_MODELS:
-        raise(ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.'))
+        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.')
     
     return ALL_MODELS_PARAMS_MAPPING[model_name]
 
@@ -431,7 +431,7 @@ def get_model_dtype(model_name: str) -> torch.dtype:
     """
 
     if model_name not in ALLOWED_MODELS:
-        raise(ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.'))
+        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.')
     
     return ALL_MODELS_DTYPES_MAPPING[model_name]
 
@@ -466,14 +466,14 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     """
 
     if model_name not in ALLOWED_MODELS:
-        raise(ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.'))
+        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.') 
     
     # Set the dtype if not provided
     if dtype is None:
         dtype = ALL_MODELS_DTYPES_MAPPING[model_name]
 
     if dtype not in ALLOWED_DTYPES:
-        raise(ValueError(f'The dtype must be one of {*ALLOWED_DTYPES,}.'))
+        raise ValueError(f'The dtype must be one of {*ALLOWED_DTYPES,}.')
     
     # Override quantization if we don't have access to GPUs
     if not torch.cuda.is_available() and quantization:
@@ -523,7 +523,8 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
 
 
         if min_gpu_needed > gpu_number:
-            raise(RuntimeError('The model seems too big for the gpu resources you have.'))
+            raise RuntimeError(("The model seems too big for the gpu resources you have. To offload to the cpu as well, "
+                               "explicitly pass a `device_map`, e.g device_map='balanced'."))
         
         # In this case we don't need a device_map, we just move the model to the 1st gpu. Most models are 
         # relatively small and should fall on this category.
@@ -585,7 +586,7 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     """
 
     if model_name not in ALLOWED_MODELS:
-        raise(ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.'))
+        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.') 
     
     if model_name in ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING.keys():
         additional_kwargs = ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING[model_name]

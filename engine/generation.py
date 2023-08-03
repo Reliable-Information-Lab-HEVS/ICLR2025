@@ -269,7 +269,24 @@ class HFModel(object):
     
     
 
-    def infer_best_batch_size(self, input_size: int, max_new_tokens: int, num_return_sequences: int):
+    def infer_best_batch_size(self, input_size: int, max_new_tokens: int, num_return_sequences: int) -> int:
+        """Try to infer the best (largest) possible batch size for the model given the current `input_size`,
+        and `max_new_tokens`. By default, this function checks if a batch memory footprint estimation exists
+        in the folder `memory_estimator`, and falls back to simple heuristics if this is not the case.
+
+        Parameters
+        ----------
+        input_size : int
+            The input length.
+        max_new_tokens : int
+            The number of tokens to generate.
+        num_return_sequences : int
+            The number of sequences to generate.
+        Returns
+        -------
+        int
+            Estimation of the largest possible batch size.
+        """
     
         if not torch.cuda.is_available():
             memory = psutil.virtual_memory().total / 1024**3
@@ -282,26 +299,44 @@ class HFModel(object):
             batch_footprint = utils.load_json(os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{self.model_name}.json'))
             # Convert keys to int
             batch_footprint = {int(k): {int(k1):v1 for k1,v1 in batch_footprint[k].items()} for k in batch_footprint.keys()}
+        # If no precise estimate exist, fall back to simple heuristics
         except FileNotFoundError:
-            pass
+            parameters = self.parameters_count()
+            if parameters < 5:
+                batch = int(available_memory // 0.5)
+            elif parameters < 10:
+                batch = int(available_memory // 1)
+            elif parameters < 20:
+                batch = int(available_memory // 2)
+            else:
+                batch = int(available_memory // 3)
+            
+            return max(batch, 1)
 
-        # Find the reference input size immediately larger than the current input size
+        # Find the reference input size immediately larger than the current input size. If none exist, take 
+        # the largest and adapt with a coeff
         input_sizes = np.sort(list(batch_footprint.keys()))
         indices = np.nonzero(input_sizes >= input_size)
         if len(indices) == 0:
-            pass
+            ref_input_size = input_sizes[-1]
+            input_size_coeff = input_size / ref_input_size
         else:
             ref_input_size = input_sizes[indices[0][0]]
+            input_size_coeff = 1
 
-        # Find the reference max new tokens immediately larger than the current max new tokens
+        # Find the reference max new tokens immediately larger than the current max new tokens. If none exist, 
+        # take the largest and adapt with a coeff
         max_tokens = np.sort(list(batch_footprint[ref_input_size].keys()))
         indices = np.nonzero(max_tokens >= max_new_tokens)
         if len(indices) == 0:
-            pass
+            ref_max_tokens = max_tokens[-1]
+            max_tokens_coeff = max_new_tokens / ref_max_tokens
         else:
             ref_max_tokens = max_tokens[indices[0][0]]
+            max_tokens_coeff = 1
 
-        ref_batch_footprint = batch_footprint[ref_input_size][ref_max_tokens]
+        # Adapt the estimation with the coeffs if needed (they should usually be 1)
+        ref_batch_footprint = batch_footprint[ref_input_size][ref_max_tokens] * input_size_coeff * max_tokens_coeff
 
         if ref_batch_footprint < 0:
             return num_return_sequences
@@ -311,7 +346,8 @@ class HFModel(object):
 
     def oom_safe_batch_generation(self, input: torch.Tensor, max_new_tokens: int, min_new_tokens: int, do_sample: bool,
                                   top_k: int, top_p: float, temperature: float, batch_size: int,
-                                  stopping_criteria: StoppingCriteriaList | None, pad_token_id: int, **kwargs):
+                                  stopping_criteria: StoppingCriteriaList | None, pad_token_id: int,
+                                  **kwargs) -> tuple[torch.Tensor, int]:
         """Generate text by recursively recovering from possible memory errors (OOMs) by lowering the batch size.
         Note that it is not possible to retry immediately in the except block because the exception retains the
         tensors already allocated in the try block which causes an immediate new OOM
@@ -336,7 +372,7 @@ class HFModel(object):
             if batch_size == 1:
                 raise RuntimeError('Even a batch size of 1 causes an OOM. Cannot generate with current config.')
             new_batch_size = max(1, math.floor(batch_size*0.8))
-            warnings.warn(f'Reduce batch size from {batch_size} to {new_batch_size} due to memory overflow (OOM).', RuntimeWarning)
+            warnings.warn(f'Reducing batch size from {batch_size} to {new_batch_size} due to memory overflow (OOM).', RuntimeWarning)
             gc.collect()
             torch.cuda.empty_cache()
             return self.oom_safe_batch_generation(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
@@ -345,6 +381,19 @@ class HFModel(object):
                                                   pad_token_id=pad_token_id, **kwargs)
         else:
             return out, batch_size
+        
+
+    def parameters_count(self) -> float:
+        """Return the (approximate) number of parameters of the current model, in billions.
+        Note that shared parameters will be counted twice by this current function, thus it is only approximate.
+
+        Returns
+        -------
+        float
+            The number of parameters, in billions.
+        """
+
+        return sum(map(torch.numel, self.model.parameters())) / 1e9
         
 
 
