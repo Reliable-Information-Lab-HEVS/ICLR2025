@@ -26,42 +26,42 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 """
 
 SMALL_MODELS = (
-    'bloom-560M',
-    'bloom-1.7B',
-    'bloom-3B',
-    'bloom-7.1B',
-    'stable-lm-3B',
-    'stable-lm-7B',
-    'star-coder-base',
-    'star-coder',
-    'star-coder-plus',
-    'star-chat-alpha',
-    'star-chat-beta',
-    'gpt2-medium',
-    'gpt2-large',
-    'gpt2-xl',
-    'gpt-j-6B',
-    'gpt-neo-125M',
-    'gpt-neo-1.3B',
-    'gpt-neo-2.7B',
-    'opt-125M',
-    'opt-350M',
-    'opt-1.3B',
-    'opt-2.7B',
-    'opt-6.7B',
-    'opt-13B',
-    'codegen-350M',
-    'codegen-2B',
-    'codegen-6B',
-    'codegen-16B',
+    # 'bloom-560M',
+    # 'bloom-1.7B',
+    # 'bloom-3B',
+    # 'bloom-7.1B',
+    # 'stable-lm-3B',
+    # 'stable-lm-7B',
+    # 'star-coder-base',
+    # 'star-coder',
+    # 'star-coder-plus',
+    # 'star-chat-alpha',
+    # 'star-chat-beta',
+    # 'gpt2-medium',
+    # 'gpt2-large',
+    # 'gpt2-xl',
+    # 'gpt-j-6B',
+    # 'gpt-neo-125M',
+    # 'gpt-neo-1.3B',
+    # 'gpt-neo-2.7B',
+    # 'opt-125M',
+    # 'opt-350M',
+    # 'opt-1.3B',
+    # 'opt-2.7B',
+    # 'opt-6.7B',
+    # 'opt-13B',
+    # 'codegen-350M',
+    # 'codegen-2B',
+    # 'codegen-6B',
+    # 'codegen-16B',
     'codegen2-1B',
     'codegen2-3.7B',
     'codegen2-7B',
     'codegen2-16B',
-    'codegen25-7B',
-    'codegen25-7B-instruct',
-    'vicuna-7B',
-    'vicuna-13B',
+    # 'codegen25-7B',
+    # 'codegen25-7B-instruct',
+    # 'vicuna-7B',
+    # 'vicuna-13B',
 )
 
 input_sizes = [50*i for i in range(1, 11)]
@@ -108,5 +108,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     num_gpus = args.gpus
 
-    with ProcessPoolExecutor(max_workers=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-        pool.map(memory_estimation, SMALL_MODELS, chunksize=1)
+    if num_gpus > 1:
+        with ProcessPoolExecutor(max_workers=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+            pool.map(memory_estimation, SMALL_MODELS, chunksize=1)
+    else:
+        for model in SMALL_MODELS:
+            memory_estimation(model)
