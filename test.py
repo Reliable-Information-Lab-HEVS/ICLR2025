@@ -52,15 +52,13 @@ print(f'Batch size: {model.infer_best_batch_size(input_size, max_new_tokens, 200
 try:
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
                 batch_size=50)
-except RuntimeError as e:
+except RuntimeError:
     t0 = time.time()
-    if isinstance(e, torch.cuda.OutOfMemoryError):
-        gc.collect()
-        torch.cuda.empty_cache()
-        foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
-                    batch_size=30)
-    else:
-        raise e
+    # if isinstance(e, torch.cuda.OutOfMemoryError):
+    gc.collect()
+    torch.cuda.empty_cache()
+    foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
+                batch_size=30)
 finally:
     dt = time.time() - t0
     print(f'Time after exception: {dt:.2f} s')
