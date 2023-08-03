@@ -40,7 +40,7 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 """
 
 
-model_name = 'gpt2-large'
+model_name = 'codegen2-1B'
 input_size = 432
 max_new_tokens = 512
 
@@ -50,9 +50,8 @@ model = engine.HFModel(model_name)
 large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
-batch_size = model.infer_best_batch_size(input_size, max_new_tokens, 200)
-print(f'Initial batch size: {batch_size}')
-foo = model(prompt, max_new_tokens=max_new_tokens, num_return_sequences=200)
+foo = model(prompt, max_new_tokens=max_new_tokens, num_return_sequences=5)
+print(foo)
 
 
 gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
