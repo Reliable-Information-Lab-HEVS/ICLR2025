@@ -55,10 +55,10 @@ try:
                 batch_size=50)
 except RuntimeError:
     retry = True
-    
+
 if retry:
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
-                batch_size=30)
+                batch_size=40)
 
 gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
 for i in range(torch.cuda.device_count()):
