@@ -7,6 +7,7 @@ import math
 import gc
 import psutil
 import os
+import warnings
 
 from engine import loader
 from engine import stopping
@@ -192,10 +193,21 @@ class HFModel(object):
             stopping_criteria = None
             post_process = False
 
+        # Suppress pad_token_id warning
+        pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else self.tokenizer.eos_token_id
+
         if batch_size is None:
             batch_size = self.infer_best_batch_size(input_length, max_new_tokens, num_return_sequences)
 
-        print(f'Inside the function, the batch size is: {batch_size}')
+        # Anything larger than `num_return_sequences` is useless
+        batch_size = min(batch_size, num_return_sequences)
+
+        # This will lower the batch size if needed, in case of possible OOM. This allows to continue without crashing,
+        # by reducing the batch size automatically
+        first_output, batch_size = self.oom_safe_batch_generation(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                                                  do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                                                  batch_size=batch_size, stopping_criteria=stopping_criteria,
+                                                                  pad_token_id=pad_token_id, **kwargs)
 
         # If we require more sequences than the allowed batch size, we need to split the generation into
         # multiple passes
@@ -217,24 +229,25 @@ class HFModel(object):
             past_keys = {size: expand_past_keys(past_key_values, size) for size in unique_batch_sizes}
             past = True
 
-        # Suppress pad_token_id warning
-        pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else self.tokenizer.eos_token_id
-
         generated_text = []
 
-        for size in batch_sizes:
+        for i, size in enumerate(batch_sizes):
 
-            if past:
-                outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                              do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                              num_return_sequences=size, stopping_criteria=stopping_criteria,
-                                              pad_token_id=pad_token_id, past_key_values=past_keys[size], **kwargs)
-                
+            # Do not recompute the first batch of outputs
+            if i == 0:
+                outputs = first_output
             else:
-                outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                              do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                              num_return_sequences=size, stopping_criteria=stopping_criteria,
-                                              pad_token_id=pad_token_id, **kwargs)
+                if past:
+                    outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                                do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                                num_return_sequences=size, stopping_criteria=stopping_criteria,
+                                                pad_token_id=pad_token_id, past_key_values=past_keys[size], **kwargs)
+                    
+                else:
+                    outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                                do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                                num_return_sequences=size, stopping_criteria=stopping_criteria,
+                                                pad_token_id=pad_token_id, **kwargs)
                 
             # In this case truncate the prompt from the output
             if truncate_prompt_from_output:
@@ -294,10 +307,9 @@ class HFModel(object):
         return int(available_memory // ref_batch_footprint)
 
 
-    def generate_batch_recursive_oom_safe(self, input: torch.Tensor, max_new_tokens: int, min_new_tokens: int, do_sample: bool,
-                                top_k: int, top_p: float, temperature: float, batch_size: int,
-                                stopping_criteria: StoppingCriteriaList | None, pad_token_id: int,
-                                past_key_values: tuple | None, **kwargs):
+    def oom_safe_batch_generation(self, input: torch.Tensor, max_new_tokens: int, min_new_tokens: int, do_sample: bool,
+                                  top_k: int, top_p: float, temperature: float, batch_size: int,
+                                  stopping_criteria: StoppingCriteriaList | None, pad_token_id: int, **kwargs):
         """Generate text by recursively recovering from possible memory errors (OOMs) by lowering the batch size.
         Note that it is not possible to retry immediately in the except block because the exception retains the
         tensors already allocated in the try block which causes an immediate new OOM
@@ -307,16 +319,10 @@ class HFModel(object):
 
         # Try generating result
         try:
-            if past_key_values is not None:
-                out = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                          do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                          num_return_sequences=batch_size, stopping_criteria=stopping_criteria,
-                                          pad_token_id=pad_token_id, past_key_values=past_key_values, **kwargs)
-            else:
-                out = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                          do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                          num_return_sequences=batch_size, stopping_criteria=stopping_criteria,
-                                          pad_token_id=pad_token_id, **kwargs)
+            out = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                      do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                      num_return_sequences=batch_size, stopping_criteria=stopping_criteria,
+                                      pad_token_id=pad_token_id, **kwargs)
         
         except RuntimeError as e:
             if isinstance(e, torch.cuda.OutOfMemoryError):
@@ -327,16 +333,19 @@ class HFModel(object):
         if retry:
             if batch_size == 1:
                 raise RuntimeError('Even a batch size of 1 causes an OOM. Cannot generate with current config.')
-            batch_size = max(1, math.floor(batch_size*0.8))
+            new_batch_size = max(1, math.floor(batch_size*0.8))
+            warnings.warn(f'Reduce batch size from {batch_size} to {new_batch_size} due to memory overflow (OOM).', RuntimeWarning)
             gc.collect()
             torch.cuda.empty_cache()
-            return self.generate_batch_recursive_oom_safe(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                                          do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                                          batch_size=batch_size, stopping_criteria=stopping_criteria,
-                                                          pad_token_id=pad_token_id, past_key_values=past_key_values,
-                                                          **kwargs)
+            return self.oom_safe_batch_generation(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                                  do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                                  batch_size=new_batch_size, stopping_criteria=stopping_criteria,
+                                                  pad_token_id=pad_token_id, **kwargs)
         else:
             return out, batch_size
+        
+
+
    
 
 def expand_past_keys(past_key_values, batch_size):
