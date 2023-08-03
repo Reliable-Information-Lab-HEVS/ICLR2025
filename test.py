@@ -7,6 +7,7 @@ from engine import stopping
 import time
 import resource
 import gc
+import math
 
 from typing import Optional, Tuple, Union
 from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
@@ -38,6 +39,32 @@ Despite their significance, monkeys face numerous challenges and threats. Habita
 In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
 """
 
+def try_recursively(model, num_return_sequences, max_new_tokens, seed, batch_size):
+    """Recursively recover from memory error (OOM) by lowering the batch size. Note that it is not possible
+    to retry immediately in the except block because the exception retains the tensors already allocated
+    in the try block which causes an immediate new OOM (see https://github.com/pytorch/pytorch/issues/18853)
+    """
+    retry = False
+
+    try:
+        foo = model(prompt, num_return_sequences=num_return_sequences, max_new_tokens=max_new_tokens, seed=seed,
+                    batch_size=batch_size)
+    except RuntimeError as e:
+        if isinstance(e, torch.cuda.OutOfMemoryError):
+            retry = True
+        else:
+            raise e
+
+    if retry:
+        if batch_size == 1:
+            raise RuntimeError('Even a batch size of 1 causes an OOM.')
+        batch_size = max(1, math.floor(batch_size*0.8))
+        gc.collect()
+        torch.cuda.empty_cache()
+        try_recursively(model, num_return_sequences, max_new_tokens, seed, batch_size)
+    else:
+        return foo
+
 model_name = 'gpt2-large'
 input_size = 432
 max_new_tokens = 512
@@ -48,17 +75,10 @@ model = engine.HFModel(model_name)
 large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
-retry = False
-print(f'Batch size: {model.infer_best_batch_size(input_size, max_new_tokens, 200)}')
-try:
-    foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
-                batch_size=50)
-except RuntimeError:
-    retry = True
-
-if retry:
-    foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
-                batch_size=40)
+batch_size = model.infer_best_batch_size(input_size, max_new_tokens, 200)
+foo = try_recursively(model, 200, max_new_tokens, 1, batch_size)
+        
+        
 
 gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
 for i in range(torch.cuda.device_count()):
