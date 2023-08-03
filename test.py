@@ -51,7 +51,7 @@ print(f'Batch size: {model.infer_best_batch_size(input_size, max_new_tokens, 200
 try:
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
                 batch_size=50)
-except torch.cuda.OutOfMemoryError():
+except torch.cuda.OutOfMemoryError:
     foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
                 batch_size=40)
 
