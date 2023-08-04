@@ -41,17 +41,35 @@ Despite their significance, monkeys face numerous challenges and threats. Habita
 In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
 """
 
-model = engine.HFModel(model_name, device_map='balanced')
+# model = engine.HFModel(model_name, device_map='balanced')
 
-large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
-prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
+# large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
+# prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
-foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
-            batch_size=None)
+# foo = model(prompt, num_return_sequences=200, max_new_tokens=max_new_tokens, seed=1,
+#             batch_size=None)
 
-gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
-for i in range(torch.cuda.device_count()):
-    memory = torch.cuda.max_memory_allocated(i) / 1024**3
-    print(f'Max memory usage gpu {i}: {memory:.2f} GiB')
-print(f'Total gpu memory: {gpu_mem:.2f} GiB')
-print(f'Batch size: {model.infer_best_batch_size(input_size, max_new_tokens, 200)}')
+# gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
+# for i in range(torch.cuda.device_count()):
+#     memory = torch.cuda.max_memory_allocated(i) / 1024**3
+#     print(f'Max memory usage gpu {i}: {memory:.2f} GiB')
+# print(f'Total gpu memory: {gpu_mem:.2f} GiB')
+# print(f'Batch size: {model.infer_best_batch_size(input_size, max_new_tokens, 200)}')
+
+
+
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from huggingface_hub import login
+from helpers import utils
+
+# login(token=utils.get_hf_token())
+
+model_names = ['meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-13b-hf', 'meta-llama/Llama-2-70b-hf', 
+               'meta-llama/Llama-2-7b-chat-hf', 'meta-llama/Llama-2-13b-chat-hf', 'meta-llama/Llama-2-70b-chat-hf']
+
+for model_name in model_names:
+    try:
+        model = AutoModelForCausalLM.from_pretrained(model_name)
+    except:
+        pass
+    tokenizer = AutoTokenizer.from_pretrained(model_name)

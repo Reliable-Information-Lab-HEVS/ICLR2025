@@ -61,6 +61,34 @@ def format_output(predictions: list[str]) -> str:
             if i != len(predictions)-1:
                 out += '\n\n'
         return out
+    
+
+def get_hf_token(token_file: str = '.hf_token.txt') -> str:
+    """Return the huggingface identification token stored in `token_file`.
+
+    Parameters
+    ----------
+    token_file : str, optional
+        File where the token is stored, by default '.hf_token.txt'
+
+    Returns
+    -------
+    str
+        The huggingface identification token.
+    """
+
+    if ROOT_FOLDER not in token_file:
+        token_file = os.path.join(ROOT_FOLDER, token_file)
+
+    try:
+        with open(token_file, 'r') as file:
+            # Read lines and remove whitespaces
+            token = file.readline().strip()
+    
+    except FileNotFoundError:
+        raise ValueError('The file you provided for your token does not exist.')
+
+    return token
 
 
 def validate_filename(filename: str, extension: str = 'json') -> str:
