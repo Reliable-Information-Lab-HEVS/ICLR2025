@@ -64,12 +64,9 @@ from helpers import utils
 
 login(token=utils.get_hf_token())
 
-model_names = ['meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-13b-hf', 'meta-llama/Llama-2-70b-hf', 
-               'meta-llama/Llama-2-7b-chat-hf', 'meta-llama/Llama-2-13b-chat-hf', 'meta-llama/Llama-2-70b-chat-hf']
+model_names = ['meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-7b-chat-hf', 'meta-llama/Llama-2-13b-hf',
+               'meta-llama/Llama-2-13b-chat-hf', 'meta-llama/Llama-2-70b-hf', 'meta-llama/Llama-2-70b-chat-hf']
 
 for model_name in model_names:
-    try:
-        model = AutoModelForCausalLM.from_pretrained(model_name)
-    except:
-        pass
+    model = AutoModelForCausalLM.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
