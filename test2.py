@@ -62,7 +62,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from huggingface_hub import login
 from helpers import utils
 
-# login(token=utils.get_hf_token())
+login(token=utils.get_hf_token())
 
 model_names = ['meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-13b-hf', 'meta-llama/Llama-2-70b-hf', 
                'meta-llama/Llama-2-7b-chat-hf', 'meta-llama/Llama-2-13b-chat-hf', 'meta-llama/Llama-2-70b-chat-hf']
