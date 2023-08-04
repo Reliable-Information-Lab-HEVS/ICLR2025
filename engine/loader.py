@@ -257,6 +257,25 @@ VICUNA_MODELS_DTYPES = {
 }
 VICUNA_MODELS_PARAMS = _infer_model_sizes(VICUNA_MODELS_MAPPING)
 
+# Pretrained llama-2 models
+LLAMA2_MODELS_MAPPING = {
+    'llama2-7B': 'meta-llama/Llama-2-7b-hf',
+    'llama2-13B': 'meta-llama/Llama-2-13b-hf',
+    'llama2-70B': 'meta-llama/Llama-2-70b-hf',
+    'llama2-7B-chat': 'meta-llama/Llama-2-7b-chat-hf',
+    'llama2-13B-chat': 'meta-llama/Llama-2-13b-chat-hf',
+    'llama2-70B-chat': 'meta-llama/Llama-2-70b-chat-hf',
+}
+LLAMA2_MODELS_DTYPES = {
+    'llama2-7B': torch.float16,
+    'llama2-13B': torch.float16,
+    'llama2-70B': torch.float16,
+    'llama2-7B-chat': torch.float16,
+    'llama2-13B-chat': torch.float16,
+    'llama2-70B-chat': torch.float16,
+}
+LLAMA2_MODELS_PARAMS = _infer_model_sizes(LLAMA2_MODELS_MAPPING)
+
 
 # Decoder-based models
 DECODER_MODELS_MAPPING = {
@@ -271,6 +290,7 @@ DECODER_MODELS_MAPPING = {
     **CODEGEN_MODELS_MAPPING,
     **CODEGEN2_MODELS_MAPPING,
     **VICUNA_MODELS_MAPPING,
+    **LLAMA2_MODELS_MAPPING,
 }
 DECODER_MODELS_DTYPES_MAPPING = {
     **BLOOM_MODELS_DTYPES,
@@ -284,6 +304,7 @@ DECODER_MODELS_DTYPES_MAPPING = {
     **CODEGEN_MODELS_DTYPES,
     **CODEGEN2_MODELS_DTYPES,
     **VICUNA_MODELS_DTYPES,
+    **LLAMA2_MODELS_DTYPES,
 }
 DECODER_MODELS_PARAMS_MAPPING = {
     **BLOOM_MODELS_PARAMS,
@@ -297,6 +318,7 @@ DECODER_MODELS_PARAMS_MAPPING = {
     **CODEGEN_MODELS_PARAMS,
     **CODEGEN2_MODELS_PARAMS,
     **VICUNA_MODELS_PARAMS,
+    **LLAMA2_MODELS_PARAMS,
 }
 DECODER_ADDITIONAL_MODEL_KWARGS_MAPPING = {
     **STAR_CODER_ADDITIONAL_MODEL_KWARGS,
