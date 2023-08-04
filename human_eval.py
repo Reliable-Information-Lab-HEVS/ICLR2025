@@ -14,26 +14,26 @@ DATASET = datasets.HumanEval()
 
 # We need to set top_k to 0 to deactivate top-k sampling
 HUMAN_EVAL_GENERATION_KWARGS = {
-    'max_new_tokens': 512,
+    'max_new_tokens': 300,
     'min_new_tokens': 5,
     'do_sample': True,
     'top_k': 0,
     'top_p': 0.95,
     'num_return_sequences': 200,
     'batch_size': 32,
-    'seed': None,
+    'seed': 1234,
     'truncate_prompt_from_output': True,
     'stopping_patterns': stopping.CODE_STOP_PATTERNS
 }
 
 HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
-    'max_new_tokens': 512,
+    'max_new_tokens': 300,
     'min_new_tokens': 5,
     'do_sample': False,
     'top_k': 0,
     'top_p': 1.,
     'num_return_sequences': 1,
-    'seed': None,
+    'seed': 1234,
     'truncate_prompt_from_output': True,
     'stopping_patterns': stopping.CODE_STOP_PATTERNS
 }
@@ -77,42 +77,23 @@ SMALL_MODELS = (
     'codegen25-7B-instruct',
     'vicuna-7B',
     'vicuna-13B',
+    'llama-2-7B',
+    'llama-2-7B-chat',
+    'llama-2-13B',
+    'llama-2-13B-chat',
 )
 
 LARGE_MODELS = (
     'gpt-neoX-20B',
     'opt-30B',
     'opt-66B',
+    'llama-2-70B',
+    'llama-2-70B-chat',
     'bloom-176B',
 )
 
 
-def find_rank_of_subprocess_inside_the_pool():
-    """Find the rank of the current subprocess inside the pool that was launched either by 
-    multiprocessing.Pool() or concurrent.futures.ProcessPoolExecutor().
-    If called from the main process, return 0.
-    Note that this is a bit hacky but work correctly because both methods provide the rank of the subprocesses
-    inside the subprocesses name as 'SpawnPoolWorker-RANK' or 'SpawnProcess-RANK' respectively.
-    """
-
-    process = mp.current_process()
-
-    if process.name == 'MainProcess':
-        rank = 0
-    elif isinstance(process, mp.context.SpawnProcess):
-        # Provide rank starting at 0 instead of 1
-        try:
-            rank = int(process.name[-1]) - 1
-        except ValueError:
-            raise RuntimeError('Cannot retrieve the rank of the current subprocess.')
-    else:
-        raise RuntimeError('The type of the running process is unknown.')
-        
-    return rank
-
-
-
-def human_eval(model_name: str, dataset: datasets.HumanEval = DATASET, temperatures: tuple[int] = TEMPERATURES,
+def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
                generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
                greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
     """Generate the HumanEval completions for different temperatures with the model `model_name` and
@@ -122,8 +103,6 @@ def human_eval(model_name: str, dataset: datasets.HumanEval = DATASET, temperatu
     ----------
     model_name : str
         The model name.
-    dataset : datasets.HumanEval, optional
-        The HumanEval dataset, by default DATASET
     temperatures : tuple[int], optional
         The different temperaturs to use to generate the completions, by default TEMPERATURES
     generation_kwargs : dict, optional
@@ -135,10 +114,10 @@ def human_eval(model_name: str, dataset: datasets.HumanEval = DATASET, temperatu
     # Load in 8 bits for bloom due to model size
     quantization = True if model_name == 'bloom-176B' else False
 
-    gpu_rank = find_rank_of_subprocess_inside_the_pool()
-
-    model = engine.HFModel(model_name, quantization=quantization, gpu_rank=gpu_rank)
+    model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
     folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
+
+    dataset = datasets.HumanEval()
 
     t0 = time.time()
 
@@ -175,7 +154,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='HumanEval benchmark')
     parser.add_argument('--gpus', type=int, default=8, help='The number of GPUs to use.')
-    parser.add_argument('--big_models', type=str, default='True', choices=['False', 'True'],
+    parser.add_argument('--big_models', type=str, default='False', choices=['False', 'True'],
                         help='Whether to run the benchmark on large models that do not fit on a single gpu.')
     
     args = parser.parse_args()
@@ -184,8 +163,8 @@ if __name__ == '__main__':
 
     # Run all models that fit on a single gpu in parallel using all gpus
     # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
-    # with mp.Pool(processes=num_gpus, initializer=utils.set_all_seeds, initargs=(1234,)) as pool:
-    with ProcessPoolExecutor(max_workers=num_gpus, initializer=utils.set_all_seeds, initargs=(1234,)) as pool:
+    # with mp.Pool(processes=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+    with ProcessPoolExecutor(max_workers=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
         pool.map(human_eval, SMALL_MODELS, chunksize=1)
 
     if big_models:
