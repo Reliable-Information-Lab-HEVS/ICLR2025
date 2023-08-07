@@ -15,7 +15,7 @@ TEMPERATURES = (0.,)
 
 # We need to set top_k to 0 to deactivate top-k sampling
 HUMAN_EVAL_GENERATION_KWARGS = {
-    'max_new_tokens': 300,
+    'max_new_tokens': 512,
     'min_new_tokens': 5,
     'do_sample': True,
     'top_k': 0,
@@ -27,7 +27,7 @@ HUMAN_EVAL_GENERATION_KWARGS = {
 }
 
 HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
-    'max_new_tokens': 300,
+    'max_new_tokens': 512,
     'min_new_tokens': 5,
     'do_sample': False,
     'top_k': 0,
