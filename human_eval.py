@@ -10,7 +10,8 @@ from engine import stopping
 from helpers import datasets
 from helpers import utils
 
-DATASET = datasets.HumanEval()
+# TEMPERATURES = (0., 0.2, 0.4, 0.6, 0.8, 1.)
+TEMPERATURES = (0.,)
 
 # We need to set top_k to 0 to deactivate top-k sampling
 HUMAN_EVAL_GENERATION_KWARGS = {
@@ -37,8 +38,6 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
     'truncate_prompt_from_output': True,
     'stopping_patterns': stopping.CODE_STOP_PATTERNS
 }
-
-TEMPERATURES = (0., 0.2, 0.4, 0.6, 0.8, 1.)
 
 SMALL_MODELS = (
     'bloom-560M',
