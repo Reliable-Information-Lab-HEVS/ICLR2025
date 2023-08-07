@@ -21,7 +21,6 @@ HUMAN_EVAL_GENERATION_KWARGS = {
     'top_k': 0,
     'top_p': 0.95,
     'num_return_sequences': 200,
-    'batch_size': 32,
     'seed': 1234,
     'truncate_prompt_from_output': True,
     'stopping_patterns': stopping.CODE_STOP_PATTERNS
@@ -132,7 +131,7 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
             # In this case we use greedy decoding (the temperature parameters does not matter anymore
             # so we set it to the default which is 1)
             if temperature == 0:
-                completions = [model(prompt, temperature=1., **greedy_generation_kwargs)]
+                completions = [model(prompt, temperature=1., batch_size=1, **greedy_generation_kwargs)]
             # In this case we use top-p sampling
             else:
                 completions = model(prompt, temperature=temperature, **generation_kwargs)
