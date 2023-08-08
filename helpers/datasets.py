@@ -17,7 +17,7 @@ class HumanEval(object):
 
         return len(self.samples)
     
-    def __getitem__(self, key: int | slice) -> dict[str, str]:
+    def __getitem__(self, key: int | slice) -> dict[str, str] | list[dict[str, str]]:
 
         return self.samples[key]
     
@@ -27,3 +27,9 @@ class HumanEval(object):
 
         for i in range(len(self)):
             yield self[i]
+
+    def samples_by_id(self) -> dict[str, dict]:
+        """Maps the task_ids to the tasks themselves.
+        """
+
+        return {task["task_id"]: task for task in self}

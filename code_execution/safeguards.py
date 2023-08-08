@@ -57,57 +57,6 @@ def unsafe_execute(program_str: str, result: mp.Queue, timeout: float):
         os.chdir = chdir
 
 
-def check_correctness(problem: dict, completion: str, timeout: float,
-                      completion_id: int | None = None) -> dict:
-    """Evaluates the functional correctness of a completion by running the test
-    suite provided in the problem. 
-
-    Parameters
-    ----------
-    problem : dict
-        A sample of the HumanEval dataset corresponding to a problem.
-    completion : str
-        The completion of the program as given by a model.
-    timeout : float
-        The time after which to stop the program execution.
-    completion_id : int | None, optional
-        _description_, by default None
-
-    Returns
-    -------
-    dict
-        A dict with the result of the test suite.
-    """
-
-    # Construct the check program 
-    program = (
-        problem["prompt"] + completion + "\n" +
-        problem["test"] + "\n" +
-        f"check({problem['entry_point']})"
-    )
-
-    # We need a Queue to communicate with the other process, because as we may kill it, we cannot just 
-    # return a value and use a "finally" clause for cleanup (kill() prevents the finally clauses from being executed)
-    result = mp.Queue()
-    p = mp.Process(target=unsafe_execute, args=(program, result, timeout))
-    p.start()
-    p.join(timeout=timeout + 1)
-    if p.is_alive():
-        p.kill()
-
-    if result.empty():
-        out = "passed out"
-    else:
-        out = result.get_nowait()
-
-    output = {'task_id': problem['task_id'], 'passed': out == 'passed', 'result': out,
-              'completion_id': completion_id}
-    
-    return output
-
-
-
-
 class TimeoutException(Exception):
     pass
 
