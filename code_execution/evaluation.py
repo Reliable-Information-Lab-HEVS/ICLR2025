@@ -158,6 +158,12 @@ def evaluate_pass_at_k(result_file: str, k: list[int] = [1, 10, 100]):
     for sample in utils.load_jsonl(result_file):
         results[sample["task_id"]].append(sample)
 
+    if len(results) != len(datasets.HumanEval()):
+        raise RuntimeError('Some problems are not attempted.')
+    first_value_length = len(next(iter(results.values())))
+    if not all(first_value_length == l for l in map(len, results.values())):
+        raise RuntimeError('Not all problems have been solved the same number of times.')
+
     # Calculate pass@k.
     total, correct = [], []
     for result in results.values():
