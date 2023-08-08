@@ -6,10 +6,10 @@ USER random_user
 
 WORKDIR /LLMs
 
-# COPY requirements.txt ./
-# RUN pip install --no-cache-dir -r requirements.txt
-
 COPY results/HumanEval_completions results/HumanEval_completions
 COPY code_execution code_execution
+COPY code_eval.py code_eval.py
 
-CMD [ "python", "code_execution/test.py" ]
+RUN pip install --no-cache-dir -r code_execution/requirements.txt
+
+CMD [ "python3", "code_eval.py" ]

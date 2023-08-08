@@ -8,6 +8,7 @@
 
 # All python, shell, notebook and markdown files in root
 *.py
+!code_eval.py
 *.sh
 *.ipynb
 *.md
