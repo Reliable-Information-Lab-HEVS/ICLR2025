@@ -1,92 +1,110 @@
-# NOTE: the following code is mostly taken from https://github.com/openai/human-eval/blob/master/human_eval/execution.py
+# acknowledgment: the following code is adapted from https://github.com/openai/human-eval/blob/master/human_eval/execution.py
 
-from typing import Optional, Callable, Dict
-import ast
 import contextlib
 import faulthandler
 import io
 import os
-import multiprocessing
+import multiprocessing as mp
 import platform
 import signal
 import tempfile
 
+def unsafe_execute(program_str: str, result: mp.Queue, timeout: float):
+    """WARNING
+    This program exists to execute untrusted model-generated code. Although
+    it is highly unlikely that model-generated code will do something overtly
+    malicious in response to this test suite, model-generated code may act
+    destructively due to a lack of model capability or alignment.
+    Users are strongly encouraged to sandbox this evaluation suite so that it 
+    does not perform destructive actions on their host or network. 
 
-def check_correctness(problem: Dict, completion: str, timeout: float,
-                      completion_id: Optional[int] = None) -> Dict:
+    Parameters
+    ----------
+    program_str : str
+        A string representation of a Python program and its test suite.
+    result : mp.Queue
+        A Queue where we will save the result of the test.
+    timeout : float
+        The time after which to stop the program execution.
     """
-    Evaluates the functional correctness of a completion by running the test
+
+    with create_tempdir():
+
+        # These system calls are needed when cleaning up tempdir.
+        import os
+        import shutil
+        rmtree = shutil.rmtree
+        rmdir = os.rmdir
+        chdir = os.chdir
+
+        # Disable functionalities that can make destructive changes to the test.
+        reliability_guard()
+
+        try:
+            exec_globals = {}
+            with swallow_io():
+                with time_limit(timeout):
+                    exec(program_str, exec_globals)
+            result.put_nowait("passed")
+        except TimeoutException:
+            result.put_nowait("passed out")
+        except BaseException as e:
+            result.put_nowait(f"failed: {e}")
+    
+        # Needed for cleaning up.
+        shutil.rmtree = rmtree
+        os.rmdir = rmdir
+        os.chdir = chdir
+
+
+def check_correctness(problem: dict, completion: str, timeout: float,
+                      completion_id: int | None = None) -> dict:
+    """Evaluates the functional correctness of a completion by running the test
     suite provided in the problem. 
 
-    :param completion_id: an optional completion ID so we can match
-        the results later even if execution finishes asynchronously.
+    Parameters
+    ----------
+    problem : dict
+        A sample of the HumanEval dataset corresponding to a problem.
+    completion : str
+        The completion of the program as given by a model.
+    timeout : float
+        The time after which to stop the program execution.
+    completion_id : int | None, optional
+        _description_, by default None
+
+    Returns
+    -------
+    dict
+        A dict with the result of the test suite.
     """
 
-    def unsafe_execute():
+    # Construct the check program 
+    program = (
+        problem["prompt"] + completion + "\n" +
+        problem["test"] + "\n" +
+        f"check({problem['entry_point']})"
+    )
 
-        with create_tempdir():
-
-            # These system calls are needed when cleaning up tempdir.
-            import os
-            import shutil
-            rmtree = shutil.rmtree
-            rmdir = os.rmdir
-            chdir = os.chdir
-
-            # Disable functionalities that can make destructive changes to the test.
-            reliability_guard()
-
-            # Construct the check program and run it.
-            check_program = (
-                problem["prompt"] + completion + "\n" +
-                problem["test"] + "\n" +
-                f"check({problem['entry_point']})"
-            )
-
-            try:
-                exec_globals = {}
-                with swallow_io():
-                    with time_limit(timeout):
-# WARNING
-# This program exists to execute untrusted model-generated code. Although
-# it is highly unlikely that model-generated code will do something overtly
-# malicious in response to this test suite, model-generated code may act
-# destructively due to a lack of model capability or alignment.
-# Users are strongly encouraged to sandbox this evaluation suite so that it 
-# does not perform destructive actions on their host or network. For more 
-# information on how OpenAI sandboxes its code, see the accompanying paper.
-# Once you have read this disclaimer and taken appropriate precautions, 
-# uncomment the following line and proceed at your own risk:
-                        exec(check_program, exec_globals)
-                result.append("passed")
-            except TimeoutException:
-                result.append("timed out")
-            except BaseException as e:
-                result.append(f"failed: {e}")
-
-            # Needed for cleaning up.
-            shutil.rmtree = rmtree
-            os.rmdir = rmdir
-            os.chdir = chdir
-
-    manager = multiprocessing.Manager()
-    result = manager.list()
-
-    p = multiprocessing.Process(target=unsafe_execute)
+    # We need a Queue to communicate with the other process, because as we may kill it, we cannot just 
+    # return a value and use a "finally" clause for cleanup (kill() prevents the finally clauses from being executed)
+    result = mp.Queue()
+    p = mp.Process(target=unsafe_execute, args=(program, result, timeout))
     p.start()
     p.join(timeout=timeout + 1)
     if p.is_alive():
         p.kill()
 
-    if not result:
-        result.append("timed out")
+    if result.empty():
+        out = "passed out"
+    else:
+        out = result.get_nowait()
 
-    return dict(
-        task_id=problem["task_id"],
-        passed=result[0] == "passed",
-        result=result[0],
-        completion_id=completion_id,
-    )
+    output = {'task_id': problem['task_id'], 'passed': out == 'passed', 'result': out,
+              'completion_id': completion_id}
+    
+    return output
+
 
 
 
@@ -169,7 +187,7 @@ def create_tempdir():
 
 
 
-def reliability_guard(maximum_memory_bytes: Optional[int] = None):
+def reliability_guard(maximum_memory_bytes: int | None = None):
     """
     This disables various destructive functions and prevents the generated code
     from interfering with the test (e.g. fork bomb, killing other processes,

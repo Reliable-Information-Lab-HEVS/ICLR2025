@@ -4,6 +4,7 @@ import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 import argparse
 import time
+import copy
 
 import engine
 from engine import stopping
@@ -39,21 +40,21 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
 }
 
 SMALL_MODELS = (
-    'bloom-560M',
-    'bloom-1.7B',
-    'bloom-3B',
-    'bloom-7.1B',
-    'stable-lm-3B',
-    'stable-lm-7B',
-    'star-coder-base',
-    'star-coder',
-    'star-coder-plus',
-    'star-chat-alpha',
-    'star-chat-beta',
+    # 'bloom-560M',
+    # 'bloom-1.7B',
+    # 'bloom-3B',
+    # 'bloom-7.1B',
+    # 'stable-lm-3B',
+    # 'stable-lm-7B',
+    # 'star-coder-base',
+    # 'star-coder',
+    # 'star-coder-plus',
+    # 'star-chat-alpha',
+    # 'star-chat-beta',
     'gpt2-medium',
     'gpt2-large',
     'gpt2-xl',
-    'gpt-j-6B',
+    # 'gpt-j-6B',
     'gpt-neo-125M',
     'gpt-neo-1.3B',
     'gpt-neo-2.7B',
@@ -65,7 +66,7 @@ SMALL_MODELS = (
     'opt-13B',
     'codegen-350M',
     'codegen-2B',
-    'codegen-6B',
+    # 'codegen-6B',
     'codegen-16B',
     'codegen2-1B',
     'codegen2-3.7B',
@@ -122,11 +123,26 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
     for temperature in temperatures:
 
         filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
+        # Delete the file if it already exist for some reason (e.g. a previous run that dit not end correctly)
+        # because in this case we do not want to append to the file
+        if os.path.exists(filename):
+            os.remove(filename)
 
         for sample in dataset:
 
             task_id = sample['task_id']
             prompt = sample['prompt']
+
+            # GPT2 has only a context size of 1024, which can sometimes overflow with large `max_new_tokens`.
+            if 'gpt2' in model_name:
+                prompt_length = model.tokenizer.encode(prompt, return_tensors='pt').shape[-1]
+                # Note that we need deepcopies to avoid changing the default values of the function inplace
+                if prompt_length + generation_kwargs['max_new_tokens'] > 1024:
+                    generation_kwargs = copy.deepcopy(generation_kwargs)
+                    generation_kwargs['max_new_tokens'] = 1024 - prompt_length
+                if prompt_length + greedy_generation_kwargs['max_new_tokens'] > 1024:
+                    greedy_generation_kwargs = copy.deepcopy(greedy_generation_kwargs)
+                    greedy_generation_kwargs['max_new_tokens'] = 1024 - prompt_length
 
             # In this case we use greedy decoding (the temperature parameters does not matter anymore
             # so we set it to the default which is 1)

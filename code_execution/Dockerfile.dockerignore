@@ -1,0 +1,21 @@
+
+# All hidden files in root
+.git
+.gitignore
+.hf_token.txt
+.gradio_login.txt
+.snippet_bin
+
+# All python, shell, notebook and markdown files in root
+*.py
+*.sh
+*.ipynb
+*.md
+
+# All directories in root EXCEPT code_execution, data and results
+engine
+helpers
+__pycache__
+flagged
+memory_estimator
+
