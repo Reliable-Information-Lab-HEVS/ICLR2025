@@ -41,7 +41,7 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 
 # model_name = 'star-coder'
-model_name = 'opt-2.7B'
+model_name = 'codegen-16B'
 input_size = 432
 max_new_tokens = 512
 
@@ -56,28 +56,28 @@ foo = model(prompt, max_new_tokens=max_new_tokens, num_return_sequences=100)
 dt0 = time.time() - t0
 print(f'Time with a single gpu: {dt0:.2f} s')
 
-for i in range(torch.cuda.device_count()):
-    memory = torch.cuda.max_memory_allocated(i) / 1024**3
-    print(f'Max memory usage gpu {i}: {memory:.2f} GiB')
+# for i in range(torch.cuda.device_count()):
+#     memory = torch.cuda.max_memory_allocated(i) / 1024**3
+#     print(f'Max memory usage gpu {i}: {memory:.2f} GiB')
 
-del model
-gc.collect()
+# del model
+# gc.collect()
 
-for i in range(torch.cuda.device_count()):
-    torch.cuda.reset_peak_memory_stats(i) 
+# for i in range(torch.cuda.device_count()):
+#     torch.cuda.reset_peak_memory_stats(i) 
 
-model = engine.HFModel(model_name, device_map='balanced')
+# model = engine.HFModel(model_name, device_map='balanced')
 
-t1 = time.time()
-foo = model(prompt, max_new_tokens=max_new_tokens, num_return_sequences=100)
-dt1 = time.time() - t0
-print(f'Time with 2 gpus: {dt1:.2f} s')
+# t1 = time.time()
+# foo = model(prompt, max_new_tokens=max_new_tokens, num_return_sequences=100)
+# dt1 = time.time() - t0
+# print(f'Time with 2 gpus: {dt1:.2f} s')
 
-for i in range(torch.cuda.device_count()):
-    memory = torch.cuda.max_memory_allocated(i) / 1024**3
-    print(f'Max memory usage gpu {i}: {memory:.2f} GiB')
+# for i in range(torch.cuda.device_count()):
+#     memory = torch.cuda.max_memory_allocated(i) / 1024**3
+#     print(f'Max memory usage gpu {i}: {memory:.2f} GiB')
 
 
 
-gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
-print(f'Total gpu memory: {gpu_mem:.2f} GiB')
+# gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
+# print(f'Total gpu memory: {gpu_mem:.2f} GiB')

@@ -1,4 +1,7 @@
-from collections import defaultdict, Counter
+
+# Acknowledgment: code adapted from https://github.com/openai/human-eval/blob/master/human_eval/evaluation.py
+
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import itertools
 import multiprocessing as mp
@@ -109,6 +112,8 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
 
     # Save to file
     utils.save_jsonl(outs, out_file)
+
+    return out_file
 
 
 
