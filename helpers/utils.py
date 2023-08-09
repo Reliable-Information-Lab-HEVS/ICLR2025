@@ -1,4 +1,3 @@
-import torch
 import numpy as np
 import random
 import os
@@ -32,6 +31,10 @@ def set_all_seeds(seed: int):
     seed : int
         The seed.
     """
+
+    # We import here to avoid having to use torch as a dependency of this utils module if this function is
+    # not needed 
+    import torch
 
     random.seed(seed)
     np.random.seed(seed)
