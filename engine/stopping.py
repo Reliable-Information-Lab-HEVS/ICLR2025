@@ -4,7 +4,7 @@ from transformers import StoppingCriteria
 
 # If we reach one of these patterns, it means that the model has finished generating the solution as a 
 # function and continues useless generation (basically stop words used in the Codex/HumanEval 
-# paper: https://arxiv.org/pdf/2107.03374.pdf). Should only be used when the prompt is a function definition.
+# paper: https://arxiv.org/pdf/2107.03374.pdf). Should only be used when the prompt is a python function definition.
 CODE_STOP_PATTERNS = (
     '\nclass',
     '\ndef',
@@ -48,7 +48,7 @@ class TextPatternStopping(StoppingCriteria):
 
 
 
-def post_process_sequences(generated_sequences: list[str], prompt:str,
+def post_process_sequences(generated_sequences: list[str], prompt: str | None = None,
                            stop_patterns: tuple[str] = CODE_STOP_PATTERNS) -> list[str]:
     """Post-process the outputs of a model to truncate according to a list of patterns upon which we stop
     generation (this is needed because the StoppingCriteria cannot immediately stop the generation of each
@@ -58,8 +58,10 @@ def post_process_sequences(generated_sequences: list[str], prompt:str,
     ----------
     generated_sequences : list[str]
         Decoded outputs of a model.
-    prompt : str
-        The prompt used for generation.
+    prompt : str, optional
+        The prompt used for generation, by default None. If provided, only the completion part of the outputs
+        will be truncated according to `stop_patterns`, i.e. the prompt will be left unchanged at the beginning
+        of each generated sequence.
     stop_patterns : list[str], optional
         The list of patterns to use to stop generation, by default CODE_STOP_PATTERNS
 
@@ -69,12 +71,13 @@ def post_process_sequences(generated_sequences: list[str], prompt:str,
         The truncated outputs to meet the criteria of the stopping patterns.
     """
 
-    prompt_length = len(prompt)
+    if prompt is not None:
+        prompt_length = len(prompt)
     generated_sequences_curated = []
     
     for sequence in generated_sequences:
 
-        if sequence.startswith(prompt):
+        if prompt is not None and sequence.startswith(prompt):
             sequence = sequence[prompt_length:]
             reattach_prompt = True
         else:
