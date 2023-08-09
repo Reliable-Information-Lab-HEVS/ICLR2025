@@ -58,7 +58,7 @@ def unsafe_execute(result, timeout=2):
                         # Once you have read this disclaimer and taken appropriate precautions, 
                         # uncomment the following line and proceed at your own risk:
 
-                        time.sleep(0.1)
+                        time.sleep(0.01)
                         # time.sleep(3)
                         # raise AttributeError('foo')
                 # clean_up()
@@ -284,5 +284,6 @@ def reliability_guard(maximum_memory_bytes: int | None = None):
 if __name__ == '__main__':
 
     t0 = time.time()
-    print(check_correctness())
+    for i in range(164):
+        print(check_correctness())
     print(f'{time.time() - t0:.2f} s')

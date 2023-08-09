@@ -3,7 +3,7 @@ import os
 from code_execution import evaluation
 from helpers import utils
 
-model = 'codegen-16B'
+model = 'bloom-3B'
 temperature = 0.
 
 file = os.path.join(utils.ROOT_FOLDER, 'results', 'HumanEval_completions',
