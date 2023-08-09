@@ -15,7 +15,6 @@
 
 # All directories in root EXCEPT code_execution, data and results
 engine
-helpers
 __pycache__
 flagged
 memory_estimator
