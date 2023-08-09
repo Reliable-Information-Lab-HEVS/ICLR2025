@@ -47,7 +47,7 @@ input_size = 432
 max_new_tokens = 512
 
 
-model = engine.HFModel(model_name, device_map='balanced')
+model = engine.HFModel(model_name)
 
 large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
