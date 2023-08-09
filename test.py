@@ -41,7 +41,7 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 
 # model_name = 'star-coder'
-model_name = 'codegen-16B'
+model_name = 'llama2-7B'
 input_size = 432
 max_new_tokens = 512
 
