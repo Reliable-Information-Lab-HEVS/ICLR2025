@@ -1,15 +1,14 @@
 import os
+from tqdm import tqdm
 
 from code_execution import evaluation
 from helpers import utils
 
-model = 'codegen-16B'
-temperature = 0.
+path = os.path.join(utils.RESULTS_FOLDER, 'HumanEval_completions')
+model_directories = [os.path.join(path, dir) for dir in os.listdir(path) if not dir.startswith('.')]
+files = [os.path.join(dir, f'temperature_0.0_modified.jsonl') for dir in model_directories]
+# temperatures = (0.,)
 
-file = os.path.join(utils.ROOT_FOLDER, 'results', 'HumanEval_completions',
-                    model, f'temperature_{temperature}.jsonl')
 
-result_file = evaluation.evaluate_functional_correctness(file, n_workers=6, timeout=3)
-pass_at_k = evaluation.evaluate_pass_at_k(result_file)
-
-print(pass_at_k)
+for file in tqdm(files):
+    _ = evaluation.evaluate_functional_correctness(file, n_workers=6, timeout=3)

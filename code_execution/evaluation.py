@@ -80,9 +80,11 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
         Timeout after which to stop the test , by default 3.0
     """
 
+    # sample_file should be of the form utils.RESULTS_FOLDER/HumanEval_completions/model/temperature_X.jsonl
+    _, model, filename = sample_file.rsplit('/', 2)
+
     # Format the output filename
-    out_file, ext = os.path.splitext(sample_file)
-    out_file = out_file + '_results' + ext
+    out_file = os.path.join(utils.RESULTS_FOLDER, 'HumanEval_results', model, filename)
 
     problems = datasets.HumanEval().samples_by_id()
 
@@ -102,7 +104,7 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
 
         results = []
 
-        for future in tqdm(as_completed(futures), total=len(futures)):
+        for future in tqdm(as_completed(futures), total=len(futures), leave=False):
             result, completion_id = future.result()
             results.append((completion_id, result))
 

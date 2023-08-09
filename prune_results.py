@@ -17,7 +17,7 @@ for file_in, file_out in zip(files_in, files_out):
     new_completions = []
     for completion in completions:
         new_completion = copy.deepcopy(completion)
-        new_completion['completion'] = stopping.post_process_sequences([completion['completion']])
+        new_completion['completion'] = stopping.post_process_sequences([completion['completion']])[0]
         new_completions.append(new_completion)
 
     utils.save_jsonl(new_completions, file_out)

@@ -1,3 +1,3 @@
 docker build -t code_sandbox -f code_execution/Dockerfile .
-docker run -it code_sandbox
-# docker run -it --entrypoint bash code_sandbox
+docker run -it --name my_container code_sandbox
+docker cp my_container:/LLMs/results/HumanEval_results results/HumanEval_results
