@@ -29,7 +29,7 @@ class TextPatternStopping(StoppingCriteria):
         # self.memoization = {}
 
     def __repr__(self):
-        return f'TextPatternStopping({*self.stop_patterns,})'
+        return f'TextPatternStopping{*self.stop_patterns,}'
     
     def __str__(self):
         return f'{*self.stop_patterns,}'

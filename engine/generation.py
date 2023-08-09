@@ -76,7 +76,7 @@ class HFModel(object):
     def __call__(self, prompt: str, max_new_tokens: int = 60, min_new_tokens: int = 5, do_sample: bool = True,
                  top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
                  batch_size: int | None = None, seed: int | None = None, truncate_prompt_from_output: bool = False,
-                 stopping_patterns: list[str] | bool | None = None, **kwargs) -> str | list[str]:
+                 stopping_patterns: tuple[str] | bool | None = None, **kwargs) -> str | list[str]:
         """Generate text according to `prompt` using the parameters specified.
 
         Parameters
@@ -106,7 +106,7 @@ class HFModel(object):
             An optional seed to force the generation to be reproducible.
         truncate_prompt_from_output : bool, optional
             Whether to remove the prompt from the model answer or not, by default False.
-        stopping_patterns: list[str] | bool | None
+        stopping_patterns: tuple[str] | bool | None
             List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
             If `None`, no early stopping is performed, by default None.
         input_device : int | str, optional
@@ -127,7 +127,7 @@ class HFModel(object):
     def generate_text(self, prompt: str, max_new_tokens: int = 60, min_new_tokens: int = 5, do_sample: bool = True,
                       top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
                       batch_size: int | None = None, seed: int | None = None, truncate_prompt_from_output: bool = False,
-                      stopping_patterns: list[str] | bool | None = None, input_device: int | str = 0,
+                      stopping_patterns: tuple[str] | bool | None = None, input_device: int | str = 0,
                       **kwargs) -> str | list[str]:
         """Generate text according to `prompt` using the parameters specified.
 
@@ -158,7 +158,7 @@ class HFModel(object):
             An optional seed to force the generation to be reproducible.
         truncate_prompt_from_output : bool, optional
             Whether to remove the prompt from the model answer or not, by default False.
-        stopping_patterns: list[str] | bool | None
+        stopping_patterns: tuple[str] | bool | None
             List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
             If `None`, no early stopping is performed, by default None.
         input_device : int | str, optional
@@ -179,12 +179,12 @@ class HFModel(object):
             input = input.to(device=input_device)
 
         # Possible early stopping
-        if type(stopping_patterns) is list:
+        if isinstance(stopping_patterns, list) or isinstance(stopping_patterns, tuple):
             stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns)
             stopping_criteria = StoppingCriteriaList([stopping_criteria])
             post_process = True
             post_process_list = stopping_patterns
-        elif type(stopping_patterns) is bool and stopping_patterns:
+        elif isinstance(stopping_patterns, bool) and stopping_patterns:
             stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer)
             stopping_criteria = StoppingCriteriaList([stopping_criteria])
             post_process = True
