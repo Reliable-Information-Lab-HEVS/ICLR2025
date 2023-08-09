@@ -54,7 +54,7 @@ prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special
 
 t0 = time.time()
 # print(model.infer_best_batch_size(input_size, max_new_tokens, 100))
-foo = model(prompt, max_new_tokens=max_new_tokens, min_new_tokens=max_new_tokens, num_return_sequences=100, batch_size=15)
+foo = model(prompt, max_new_tokens=max_new_tokens, min_new_tokens=max_new_tokens, num_return_sequences=100, batch_size=3)
 dt0 = time.time() - t0
 print(f'Time with a single gpu: {dt0:.2f} s')
 
