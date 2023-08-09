@@ -28,6 +28,11 @@ class TextPatternStopping(StoppingCriteria):
         # to be generated in a single pass
         # self.memoization = {}
 
+    def __repr__(self):
+        return f'TextPatternStopping({*self.stop_patterns,})'
+    
+    def __str__(self):
+        return f'{*self.stop_patterns,}'
 
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
 
