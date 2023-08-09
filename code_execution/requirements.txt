@@ -1,15 +1,2 @@
-# For some reasons the standard libraries are not included in the default python image...
-collections
-concurrent.futures
-itertools
-multiprocessing 
-tqdm
-os
-contextlib
-faulthandler
-io
-platform
-signal
-tempfile
-
 numpy==1.24.3
+tqdm==4.65.0

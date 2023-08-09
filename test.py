@@ -41,7 +41,8 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 
 # model_name = 'star-coder'
-model_name = 'llama2-7B'
+# model_name = 'llama2-7B'
+model_name = 'codegen-16B'
 input_size = 432
 max_new_tokens = 512
 
@@ -52,8 +53,8 @@ large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
 t0 = time.time()
-print(model.infer_best_batch_size(input_size, max_new_tokens, 100))
-foo = model(prompt, max_new_tokens=max_new_tokens, num_return_sequences=100, batch_size=10)
+# print(model.infer_best_batch_size(input_size, max_new_tokens, 100))
+foo = model(prompt, max_new_tokens=max_new_tokens, num_return_sequences=100, batch_size=3)
 dt0 = time.time() - t0
 print(f'Time with a single gpu: {dt0:.2f} s')
 
