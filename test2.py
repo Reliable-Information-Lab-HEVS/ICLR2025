@@ -9,9 +9,9 @@ model_name = 'star-coder'
 model = engine.HFModel(model_name)
 
 data = datasets.HumanEval()
-# prompt = data[0]['prompt']
+prompt = data[4]['prompt']
 
-prompt = 'def hello_world()\n    """Python function to display hello\n    """\n'
+# prompt = 'def hello_world()\n    """Python function to display hello\n    """\n'
     
 
 
