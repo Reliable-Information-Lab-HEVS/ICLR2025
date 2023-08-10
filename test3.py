@@ -6,26 +6,26 @@ from transformers import AutoModelForCausalLM
 
 model_name = 'bigcode/starcoder'
 
-t0 = time.time()
-model = AutoModelForCausalLM.from_pretrained(model_name)
-dt0 = time.time() - t0
-print(f'Default time: {dt0:.2f}s')
+# t0 = time.time()
+# model = AutoModelForCausalLM.from_pretrained(model_name)
+# dt0 = time.time() - t0
+# print(f'Default time: {dt0:.2f}s')
 
-del model
+# del model
 
-t1 = time.time()
-model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True)
-dt1 = time.time() - t1
-print(f'Low cpu option: {dt1:.2f}s')
+# t1 = time.time()
+# model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True)
+# dt1 = time.time() - t1
+# print(f'Low cpu option: {dt1:.2f}s')
 
-del model
+# del model
 
-t2 = time.time()
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16)
-dt2 = time.time() - t2
-print(f'dtype16 option: {dt2:.2f}s')
+# t2 = time.time()
+# model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16)
+# dt2 = time.time() - t2
+# print(f'dtype16 option: {dt2:.2f}s')
 
-del model
+# del model
 
 t3 = time.time()
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16, low_cpu_mem_usage=True)
