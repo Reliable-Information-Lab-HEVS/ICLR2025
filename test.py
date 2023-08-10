@@ -42,20 +42,21 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 # model_name = 'star-coder'
 # model_name = 'llama2-7B'
-model_name = 'codegen-16B'
+# model_name = 'codegen-16B'
 # model_name = 'bloom-1.7B'
+model_name = 'star_coder'
 input_size = 432
 max_new_tokens = 512
 
 
-model = engine.HFModel(model_name, device_map='balanced')
+model = engine.HFModel(model_name)
 
 large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
 t0 = time.time()
 # print(model.infer_best_batch_size(input_size, max_new_tokens, 100))
-foo = model(prompt, max_new_tokens=max_new_tokens, min_new_tokens=max_new_tokens - 1, num_return_sequences=100, batch_size=10)
+foo = model(prompt, max_new_tokens=max_new_tokens, min_new_tokens=max_new_tokens - 1, num_return_sequences=100)
 dt0 = time.time() - t0
 print(f'Time with a single gpu: {dt0:.2f} s')
 
