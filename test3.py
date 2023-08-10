@@ -23,7 +23,7 @@ del model
 t2 = time.time()
 model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16)
 dt2 = time.time() - t2
-print(f'dtype16 option: {dt2:.2f}s')$
+print(f'dtype16 option: {dt2:.2f}s')
 
 del model
 
