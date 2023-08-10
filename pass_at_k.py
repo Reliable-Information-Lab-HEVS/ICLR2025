@@ -4,12 +4,16 @@ from tqdm import tqdm
 from code_execution import evaluation
 from helpers import utils
 
-path = os.path.join(utils.RESULTS_FOLDER, 'HumanEval_completions')
+path = os.path.join(utils.RESULTS_FOLDER, 'HumanEval_results')
 model_directories = [os.path.join(path, dir) for dir in os.listdir(path) if not dir.startswith('.')]
 files = [os.path.join(dir, f'temperature_0.0_modified.jsonl') for dir in model_directories]
 # temperatures = (0.,)
 
 
-if __name__ == '__main__':
-    for file in tqdm(files):
-        _ = evaluation.evaluate_functional_correctness(file, n_workers=6, timeout=3)
+passes = {}
+for file in tqdm(files):
+    _, model, _ = file.rsplit('/', 2)
+    pass_at_k = evaluation.evaluate_pass_at_k(file)
+    passes[model] = pass_at_k
+
+print(passes)
