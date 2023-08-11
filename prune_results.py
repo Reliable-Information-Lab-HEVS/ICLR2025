@@ -7,8 +7,11 @@ from engine import stopping
 
 path = os.path.join(utils.RESULTS_FOLDER, 'HumanEval_completions')
 models = [os.path.join(path, dir) for dir in os.listdir(path) if not dir.startswith('.')]
-files_in = [os.path.join(model, f'temperature_0.0.jsonl') for model in models]
-files_out = [os.path.join(model, f'temperature_0.0_modified.jsonl') for model in models]
+files_in = []
+files_out = []
+for model_dir in models:
+    files_in.extend([os.path.join(model_dir, file) for file in os.listdir(model_dir)])
+    files_out.extend([os.path.join(model_dir, file.rsplit('.', 1)[0] + '_modified.jsonl') for file in os.listdir(model_dir)])
 
 problems = datasets.HumanEval().samples_by_id()
 

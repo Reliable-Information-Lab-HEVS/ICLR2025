@@ -4,7 +4,8 @@ import torch
 import engine
 from transformers import AutoModelForCausalLM
 
-model_name = 'bigcode/starcoder'
+# model_name = 'bigcode/starcoder'
+model_name = 'bloom-7.1B'
 
 # t0 = time.time()
 # model = AutoModelForCausalLM.from_pretrained(model_name)
