@@ -124,7 +124,7 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
 
     for temperature in temperatures:
 
-        filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
+        filename = os.path.join(folder, f'temperature_{temperature}_infill.jsonl')
         # Delete the file if it already exist for some reason (e.g. a previous run that dit not end correctly)
         # because in this case we do not want to append to the file
         if os.path.exists(filename):
