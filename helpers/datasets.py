@@ -32,4 +32,15 @@ class HumanEval(object):
         """Maps the task_ids to the tasks themselves.
         """
 
-        return {task["task_id"]: task for task in self}
+        return {task['task_id']: task for task in self}
+    
+
+
+class HumanEvalInstruct(HumanEval):
+    """Class representing the HumanEval_Instruct dataset.
+    """
+
+    def __init__(self):
+        # Simply overwrite attributes
+        self.path = os.path.join(utils.DATA_FOLDER, 'HumanEval_Instruct.jsonl')
+        self.samples = utils.load_jsonl(self.path)
