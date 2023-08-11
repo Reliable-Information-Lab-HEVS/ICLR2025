@@ -46,9 +46,9 @@ SMALL_MODELS = (
     # 'bloom-7.1B',
     # 'stable-lm-3B',
     # 'stable-lm-7B',
-    # 'star-coder-base',
-    # 'star-coder',
-    # 'star-coder-plus',
+    'star-coder-base',
+    'star-coder',
+    'star-coder-plus',
     # 'star-chat-alpha',
     # 'star-chat-beta',
     # 'gpt2-medium',
@@ -76,10 +76,12 @@ SMALL_MODELS = (
     # 'codegen25-7B-instruct',
     # 'vicuna-7B',
     # 'vicuna-13B',
-    'llama-2-7B',
-    'llama-2-7B-chat',
-    'llama-2-13B',
-    'llama-2-13B-chat',
+
+    # TODO:
+    # 'llama2-7B',
+    # 'llama2-7B-chat',
+    # 'llama2-13B',
+    # 'llama2-13B-chat',
 )
 
 LARGE_MODELS = (

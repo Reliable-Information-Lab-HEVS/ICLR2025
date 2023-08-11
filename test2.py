@@ -5,7 +5,7 @@ from helpers import utils
 from helpers import datasets
 
 # model_name = 'star-coder'
-model_name = 'llama-2-7B'
+model_name = 'llama2-7B'
 
 model = engine.HFModel(model_name)
 
