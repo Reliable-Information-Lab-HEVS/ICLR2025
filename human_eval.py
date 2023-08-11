@@ -133,6 +133,10 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
             task_id = sample['task_id']
             prompt = sample['prompt']
 
+            # Try infill mode for starcoder
+            if 'star-coder' in model_name:
+                prompt = "<fim_prefix>" + prompt + "<fim_suffix><fim_middle>"
+
             # GPT2 has only a context size of 1024, which can sometimes overflow with large `max_new_tokens`.
             if 'gpt2' in model_name:
                 prompt_length = model.tokenizer.encode(prompt, return_tensors='pt').shape[-1]
