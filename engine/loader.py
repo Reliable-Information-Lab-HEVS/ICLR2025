@@ -256,6 +256,10 @@ VICUNA_MODELS_DTYPES = {
     'vicuna-13B': torch.float16,
 }
 VICUNA_MODELS_PARAMS = _infer_model_sizes(VICUNA_MODELS_MAPPING)
+VICUNA_ADDITIONAL_TOKENIZER_KWARGS = {
+    'vicuna-7B': {'use_fast_tokenizer': False, 'legacy': False},
+    'vicuna-13B': {'use_fast_tokenizer': False, 'legacy': False},
+}
 
 # Pretrained llama-2 models
 LLAMA2_MODELS_MAPPING = {
@@ -326,6 +330,7 @@ DECODER_ADDITIONAL_MODEL_KWARGS_MAPPING = {
 }
 DECODER_ADDITIONAL_TOKENIZER_KWARGS_MAPPING = {
     **CODEGEN2_ADDITIONAL_TOKENIZER_KWARGS,
+    **VICUNA_ADDITIONAL_TOKENIZER_KWARGS,
 }
 
 
@@ -496,6 +501,10 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
 
     if dtype not in ALLOWED_DTYPES:
         raise ValueError(f'The dtype must be one of {*ALLOWED_DTYPES,}.')
+    
+    # torch.float16 is not supported on cpu
+    if not torch.cuda.is_available() and dtype != torch.float32:
+        dtype = torch.float32
     
     # Override quantization if we don't have access to GPUs
     if not torch.cuda.is_available() and quantization:
