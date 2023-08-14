@@ -256,9 +256,10 @@ VICUNA_MODELS_DTYPES = {
     'vicuna-13B': torch.float16,
 }
 VICUNA_MODELS_PARAMS = _infer_model_sizes(VICUNA_MODELS_MAPPING)
+# Fast tokenizers are bugged in current transformers and tokenizers versions
 VICUNA_ADDITIONAL_TOKENIZER_KWARGS = {
-    'vicuna-7B': {'use_fast_tokenizer': False, 'legacy': False},
-    'vicuna-13B': {'use_fast_tokenizer': False, 'legacy': False},
+    'vicuna-7B': {'use_fast_tokenizer': False},
+    'vicuna-13B': {'use_fast_tokenizer': False},
 }
 
 # Pretrained llama-2 models
@@ -279,6 +280,15 @@ LLAMA2_MODELS_DTYPES = {
     'llama2-70B-chat': torch.float16,
 }
 LLAMA2_MODELS_PARAMS = _infer_model_sizes(LLAMA2_MODELS_MAPPING)
+# Fast tokenizers are bugged in current transformers and tokenizers versions
+LLAMA2_ADDITIONAL_TOKENIZER_KWARGS = {
+    'llama2-7B': {'use_fast_tokenizer': False},
+    'llama2-13B': {'use_fast_tokenizer': False},
+    'llama2-70B': {'use_fast_tokenizer': False},
+    'llama2-7B-chat': {'use_fast_tokenizer': False},
+    'llama2-13B-chat': {'use_fast_tokenizer': False},
+    'llama2-70B-chat': {'use_fast_tokenizer': False},
+}
 
 
 # Decoder-based models
@@ -331,6 +341,7 @@ DECODER_ADDITIONAL_MODEL_KWARGS_MAPPING = {
 DECODER_ADDITIONAL_TOKENIZER_KWARGS_MAPPING = {
     **CODEGEN2_ADDITIONAL_TOKENIZER_KWARGS,
     **VICUNA_ADDITIONAL_TOKENIZER_KWARGS,
+    **LLAMA2_ADDITIONAL_TOKENIZER_KWARGS,
 }
 
 
