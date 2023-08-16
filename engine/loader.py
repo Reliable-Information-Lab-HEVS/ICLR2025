@@ -254,10 +254,11 @@ VICUNA_MODELS_DTYPES = {
     'vicuna-13B': torch.float16,
 }
 VICUNA_MODELS_PARAMS = _infer_model_sizes(VICUNA_MODELS_MAPPING)
-# Fast tokenizers are bugged in current transformers and tokenizers versions
+# Fast tokenizers and non-legacy behaviour are bugged in current transformers and tokenizers versions
+# TODO: may need to be changed in future versions if they correct the bug
 VICUNA_ADDITIONAL_TOKENIZER_KWARGS = {
-    'vicuna-7B': {'use_fast_tokenizer': False},
-    'vicuna-13B': {'use_fast_tokenizer': False},
+    'vicuna-7B': {'use_fast_tokenizer': False, 'legacy':True},
+    'vicuna-13B': {'use_fast_tokenizer': False, 'legacy':True},
 }
 
 # Pretrained llama-2 models
@@ -278,14 +279,15 @@ LLAMA2_MODELS_DTYPES = {
     'llama2-70B-chat': torch.float16,
 }
 LLAMA2_MODELS_PARAMS = _infer_model_sizes(LLAMA2_MODELS_MAPPING)
-# Fast tokenizers are bugged in current transformers and tokenizers versions
+# Fast tokenizers and non-legacy behaviour are bugged in current transformers and tokenizers versions
+# TODO: may need to be changed in future versions if they correct the bug
 LLAMA2_ADDITIONAL_TOKENIZER_KWARGS = {
-    'llama2-7B': {'use_fast_tokenizer': False},
-    'llama2-13B': {'use_fast_tokenizer': False},
-    'llama2-70B': {'use_fast_tokenizer': False},
-    'llama2-7B-chat': {'use_fast_tokenizer': False},
-    'llama2-13B-chat': {'use_fast_tokenizer': False},
-    'llama2-70B-chat': {'use_fast_tokenizer': False},
+    'llama2-7B': {'use_fast_tokenizer': False, 'legacy':True},
+    'llama2-13B': {'use_fast_tokenizer': False, 'legacy':True},
+    'llama2-70B': {'use_fast_tokenizer': False, 'legacy':True},
+    'llama2-7B-chat': {'use_fast_tokenizer': False, 'legacy':True},
+    'llama2-13B-chat': {'use_fast_tokenizer': False, 'legacy':True},
+    'llama2-70B-chat': {'use_fast_tokenizer': False, 'legacy':True},
 }
 
 
