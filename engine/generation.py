@@ -74,8 +74,9 @@ class HFModel(object):
 
     def __call__(self, prompt: str, max_new_tokens: int = 60, min_new_tokens: int = 5, do_sample: bool = True,
                  top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
-                 batch_size: int | None = None, seed: int | None = None, truncate_prompt_from_output: bool = False,
-                 stopping_patterns: tuple[str] | bool | None = None, **kwargs) -> str | list[str]:
+                 batch_size: int | None = None, seed: int | None = None, prompt_template_mode: str = 'default',
+                 truncate_prompt_from_output: bool = False, stopping_patterns: tuple[str] | bool | None = None,
+                 **kwargs) -> str | list[str]:
         """Generate text according to `prompt` using the parameters specified.
 
         Parameters
@@ -105,6 +106,10 @@ class HFModel(object):
             An optional seed to force the generation to be reproducible.
         truncate_prompt_from_output : bool, optional
             Whether to remove the prompt from the model answer or not, by default False.
+        prompt_template_mode: str
+            The template mode for formatting the prompt. Note that changing this value may result in errors
+            or inconsistent results as usually a model is optimized for only one given prompt format.
+            By default 'default'.
         stopping_patterns: tuple[str] | bool | None
             List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
             If `None`, no early stopping is performed, by default None.
@@ -120,7 +125,8 @@ class HFModel(object):
         return self.generate_text(prompt, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens, do_sample=do_sample,
                                   top_k=top_k, top_p=top_p, temperature=temperature, num_return_sequences=num_return_sequences,
                                   batch_size=batch_size, seed=seed, truncate_prompt_from_output=truncate_prompt_from_output,
-                                  stopping_patterns=stopping_patterns, input_device=self.input_device, **kwargs)
+                                  prompt_template_mode=prompt_template_mode, stopping_patterns=stopping_patterns,
+                                  input_device=self.input_device, **kwargs)
     
 
     def generate_text(self, prompt: str, max_new_tokens: int = 60, min_new_tokens: int = 5, do_sample: bool = True,
@@ -438,7 +444,7 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
                            dtype: torch.dtype | None = None, max_new_tokens: int = 60, min_new_tokens: int = 5,
                            do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
                            batch_size: int | None = None, num_return_sequences: int = 1, seed: int | None = None,
-                           truncate_prompt_from_output: bool = False,
+                           truncate_prompt_from_output: bool = False, prompt_template_mode: str = 'default',
                            stopping_patterns: list[str] | bool | None = None, input_device: int | str = 0,
                            **kwargs) -> str | list[str]:
     """Load a model and its tokenizer and generate text according to `prompt`.
@@ -479,6 +485,10 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
         An optional seed to force the generation to be reproducible.
     truncate_prompt_from_output : bool, optional
         Whether to remove the prompt from the model answer or not, by default False.
+    prompt_template_mode: str
+            The template mode for formatting the prompt. Note that changing this value may result in errors
+            or inconsistent results as usually a model is optimized for only one given prompt format.
+            By default 'default'.
     stopping_patterns: list[str] | bool | None
         List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
         If `None`, no early stopping is performed, by default None.
@@ -497,7 +507,7 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
     return model(prompt, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
                 do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
                 num_return_sequences=num_return_sequences, batch_size=batch_size, seed=seed,
-                truncate_prompt_from_output=truncate_prompt_from_output,
+                truncate_prompt_from_output=truncate_prompt_from_output, prompt_template_mode=prompt_template_mode,
                 stopping_patterns=stopping_patterns, input_device=input_device, **kwargs)
 
 
