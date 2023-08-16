@@ -40,44 +40,42 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
 }
 
 SMALL_MODELS = (
-    # 'bloom-560M',
-    # 'bloom-1.7B',
-    # 'bloom-3B',
-    # 'bloom-7.1B',
-    # 'stable-lm-3B',
-    # 'stable-lm-7B',
-    # 'star-coder-base',
-    # 'star-coder',
-    # 'star-coder-plus',
-    # 'star-chat-alpha',
-    # 'star-chat-beta',
-    # 'gpt2-medium',
-    # 'gpt2-large',
-    # 'gpt2-xl',
-    # 'gpt-j-6B',
-    # 'gpt-neo-125M',
-    # 'gpt-neo-1.3B',
-    # 'gpt-neo-2.7B',
-    # 'opt-125M',
-    # 'opt-350M',
-    # 'opt-1.3B',
-    # 'opt-2.7B',
-    # 'opt-6.7B',
-    # 'opt-13B',
-    # 'codegen-350M',
-    # 'codegen-2B',
-    # 'codegen-6B',
-    # 'codegen-16B',
-    # 'codegen2-1B',
-    # 'codegen2-3.7B',
-    # 'codegen2-7B',
-    # 'codegen2-16B',
-    # 'codegen25-7B',
-    # 'codegen25-7B-instruct',
-    # 'vicuna-7B',
-    # 'vicuna-13B',
-
-    # TODO:
+    'bloom-560M',
+    'bloom-1.7B',
+    'bloom-3B',
+    'bloom-7.1B',
+    'stable-lm-3B',
+    'stable-lm-7B',
+    'star-coder-base',
+    'star-coder',
+    'star-coder-plus',
+    'star-chat-alpha',
+    'star-chat-beta',
+    'gpt2-medium',
+    'gpt2-large',
+    'gpt2-xl',
+    'gpt-j-6B',
+    'gpt-neo-125M',
+    'gpt-neo-1.3B',
+    'gpt-neo-2.7B',
+    'opt-125M',
+    'opt-350M',
+    'opt-1.3B',
+    'opt-2.7B',
+    'opt-6.7B',
+    'opt-13B',
+    'codegen-350M',
+    'codegen-2B',
+    'codegen-6B',
+    'codegen-16B',
+    'codegen2-1B',
+    'codegen2-3.7B',
+    'codegen2-7B',
+    'codegen2-16B',
+    'codegen25-7B',
+    'codegen25-7B-instruct',
+    'vicuna-7B',
+    'vicuna-13B',
     'llama2-7B',
     'llama2-7B-chat',
     'llama2-13B',
@@ -116,7 +114,7 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
     quantization = True if model_name == 'bloom-176B' else False
 
     model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
-    folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
+    folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions_new', model_name)
 
     dataset = datasets.HumanEval()
 
@@ -134,10 +132,6 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
 
             task_id = sample['task_id']
             prompt = sample['prompt']
-
-            # Try infill mode for starcoder
-            if 'star-coder' in model_name:
-                prompt = "<fim_prefix>" + prompt + "<fim_suffix><fim_middle>"
 
             # GPT2 has only a context size of 1024, which can sometimes overflow with large `max_new_tokens`.
             if 'gpt2' in model_name:
