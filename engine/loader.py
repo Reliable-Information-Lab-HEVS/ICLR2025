@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
-from transformers.modeling_utils import PreTrainedModel
-from transformers.tokenization_utils_base import PreTrainedTokenizerBase
-from tokenizers.processors import TemplateProcessing
+from transformers import PreTrainedModel, PreTrainedTokenizerBase
 import warnings
 import re
 
@@ -246,7 +244,7 @@ CODEGEN2_ADDITIONAL_TOKENIZER_KWARGS = {
 }
 
 
-# Pretrained Vicuna models
+# Pretrained Vicuna (1.3) models
 VICUNA_MODELS_MAPPING = {
     'vicuna-7B': 'lmsys/vicuna-7b-v1.3',
     'vicuna-13B': 'lmsys/vicuna-13b-v1.3',

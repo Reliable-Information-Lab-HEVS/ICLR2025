@@ -1,18 +1,19 @@
+from engine.loader import ALLOWED_MODELS
 
-TEMPLATE_MODES = ('default', 'generation', 'infill', 'chat')
+PROMPT_MODES = ('default', 'generation', 'infill', 'chat')
 
 class GenericPrompt(object):
 
     def __init__(self, mode: str = 'default'):
 
-        if mode not in TEMPLATE_MODES:
-            raise ValueError(f'The mode for creating the prompt must be one of {*TEMPLATE_MODES,}')
+        if mode not in PROMPT_MODES:
+            raise ValueError(f'The mode for creating the prompt must be one of {*PROMPT_MODES,}')
         
         self.mode = mode
         self.default_mode = 'generation'
         self.extra_eos_tokens = []
 
-    def format(self, prompt: str, suffix: str = '') -> str:
+    def get_prompt(self, prompt: str, suffix: str = '') -> str:
 
         if self.mode == 'default':
             return self.format_default(prompt, suffix)
@@ -39,13 +40,13 @@ class GenericPrompt(object):
     
     def format_chat(self, prompt: str) -> str:
 
-        return prompt
+        raise RuntimeError(f'Chat mode not supported for {self.__class__.__name__}.')
     
     def format_infill(self, prefix: str, suffix: str = '') -> str:
 
-        raise RuntimeError(f'Infill not supported.')
+        raise RuntimeError(f'Infill mode not supported for {self.__class__.__name__}.')
     
-    def extra_eos(self) -> list[str]:
+    def get_extra_eos(self) -> list[str]:
 
         return self.extra_eos_tokens
     
@@ -97,7 +98,7 @@ class StarChatPrompt(GenericPrompt):
         self.user_token = '<|user|>'
         self.assistant_token = '<|assistant|>'
         self.sep_token = '<|end|>'
-        self.extra_eos_tokens = [self.end_turn_token]
+        self.extra_eos_tokens = [self.sep_token]
 
     
     def format_chat(self, prompt: str) -> str:
@@ -172,3 +173,68 @@ class Llama2ChatPrompt(GenericPrompt):
         return self.user_token + ' ' + embedded_prompt + self.sep_token + self.assistant_token
 
     
+
+# Mapping from model name to prompt class name
+PROMPT_MAPPING = {
+    # DialoGPT
+    'dialo-gpt-small': DialoGPTPrompt,
+    'dialo-gpt-medium': DialoGPTPrompt,
+    'dialo-gpt-large': DialoGPTPrompt,
+
+    # StarCoder
+    'star-coder-base': StarCoderPrompt,
+    'star-coder': StarCoderPrompt,
+    'star-coder-plus': StarCoderPrompt,
+
+    # StarChat
+    'star-chat-alpha': StarChatPrompt,
+    'star-chat-beta': StarChatPrompt,
+
+    # Codegen2
+    'codegen2-1B': Codegen2Prompt,
+    'codegen2-3.7B': Codegen2Prompt,
+    'codegen2-7B': Codegen2Prompt,
+    'codegen2-16B': Codegen2Prompt,
+    'codegen25-7B': Codegen2Prompt,
+    'codegen25-7B-instruct': Codegen2Prompt,
+
+    # Vicuna (1.3)
+    'vicuna-7B': VicunaPrompt,
+    'vicuna-13B': VicunaPrompt,
+
+    # Llama2-chat
+    'llama2-7B-chat': Llama2ChatPrompt,
+    'llama2-13B-chat': Llama2ChatPrompt,
+    'llama2-70B-chat': Llama2ChatPrompt,
+}
+
+
+def get_prompt_template(model_name: str, mode: str = 'default') -> GenericPrompt:
+    """Return the prompt class formating corresponding to `model_name`.
+
+    Parameters
+    ----------
+    model_name : str
+        Name of the current model.
+    mode : str, optional
+        The generation mode for the model, by default 'default'
+
+    Returns
+    -------
+    GenericPrompt
+        A prompt class corresponding to `model_name`.
+
+    """
+
+    if model_name not in ALLOWED_MODELS:
+        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.')
+    
+    if mode not in PROMPT_MODES:
+        raise ValueError(f'The mode for creating the prompt must be one of {*PROMPT_MODES,}')
+
+    if model_name in PROMPT_MAPPING.keys():
+        prompt = PROMPT_MAPPING[model_name](mode)
+    else:
+        prompt = GenericPrompt(mode)
+
+    return prompt
