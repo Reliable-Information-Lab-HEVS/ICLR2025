@@ -2,7 +2,7 @@ from engine.loader import ALLOWED_MODELS
 
 PROMPT_MODES = ('default', 'generation', 'infill', 'chat')
 
-class GenericPrompt(object):
+class GenericPromptTemplate(object):
 
     def __init__(self, mode: str = 'default'):
 
@@ -51,7 +51,7 @@ class GenericPrompt(object):
         return self.extra_eos_tokens
     
 
-class DialoGPTPrompt(GenericPrompt):
+class DialoGPTPromptTemplate(GenericPromptTemplate):
 
     def __init__(self, mode: str = 'default'):
 
@@ -66,7 +66,7 @@ class DialoGPTPrompt(GenericPrompt):
     
 
 
-class StarCoderPrompt(GenericPrompt):
+class StarCoderPromptTemplate(GenericPromptTemplate):
 
     def __init__(self, mode: str = 'default'):
 
@@ -85,8 +85,8 @@ class StarCoderPrompt(GenericPrompt):
 # Starchat prompt modeling (see https://huggingface.co/spaces/HuggingFaceH4/starchat-playground/blob/main/dialogues.py)
 # See also FastChat (/https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#817) but current
 # implementation is slightly wrong: it does not format the system prompt correctly (misses a line return)
-# see https://github.com/lm-sys/FastChat/issues/2220
-class StarChatPrompt(GenericPrompt):
+# see created issue https://github.com/lm-sys/FastChat/issues/2220
+class StarChatPromptTemplate(GenericPromptTemplate):
 
     def __init__(self, mode: str = 'default'):
 
@@ -108,7 +108,7 @@ class StarChatPrompt(GenericPrompt):
     
 
 
-class Codegen2Prompt(GenericPrompt):
+class Codegen2PromptTemplate(GenericPromptTemplate):
 
     def __init__(self, mode: str = 'default'):
 
@@ -126,7 +126,7 @@ class Codegen2Prompt(GenericPrompt):
     
 
 # Vicuna 1.3 prompt modeling (https://github.com/lm-sys/FastChat/blob/main/fastchat/model/model_adapter.py)
-class VicunaPrompt(GenericPrompt):
+class VicunaPromptTemplate(GenericPromptTemplate):
 
     def __init__(self, mode: str = 'default'):
 
@@ -151,8 +151,8 @@ class VicunaPrompt(GenericPrompt):
 # Llama2-chat prompt modeling (https://github.com/facebookresearch/llama/blob/main/llama/generation.py#L212)
 # See also FastChat (https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#L123) but current
 # implementation is slightly wrong: it does not add a space between the first prompt and [/INST] token
-# see https://github.com/lm-sys/FastChat/issues/2220
-class Llama2ChatPrompt(GenericPrompt):
+# see created issue https://github.com/lm-sys/FastChat/issues/2220
+class Llama2ChatPromptTemplate(GenericPromptTemplate):
 
     def __init__(self, mode: str = 'default'):
 
@@ -177,52 +177,53 @@ class Llama2ChatPrompt(GenericPrompt):
 # Mapping from model name to prompt class name
 PROMPT_MAPPING = {
     # DialoGPT
-    'dialo-gpt-small': DialoGPTPrompt,
-    'dialo-gpt-medium': DialoGPTPrompt,
-    'dialo-gpt-large': DialoGPTPrompt,
+    'dialo-gpt-small': DialoGPTPromptTemplate,
+    'dialo-gpt-medium': DialoGPTPromptTemplate,
+    'dialo-gpt-large': DialoGPTPromptTemplate,
 
     # StarCoder
-    'star-coder-base': StarCoderPrompt,
-    'star-coder': StarCoderPrompt,
-    'star-coder-plus': StarCoderPrompt,
+    'star-coder-base': StarCoderPromptTemplate,
+    'star-coder': StarCoderPromptTemplate,
+    'star-coder-plus': StarCoderPromptTemplate,
 
     # StarChat
-    'star-chat-alpha': StarChatPrompt,
-    'star-chat-beta': StarChatPrompt,
+    'star-chat-alpha': StarChatPromptTemplate,
+    'star-chat-beta': StarChatPromptTemplate,
 
     # Codegen2
-    'codegen2-1B': Codegen2Prompt,
-    'codegen2-3.7B': Codegen2Prompt,
-    'codegen2-7B': Codegen2Prompt,
-    'codegen2-16B': Codegen2Prompt,
-    'codegen25-7B': Codegen2Prompt,
-    'codegen25-7B-instruct': Codegen2Prompt,
+    'codegen2-1B': Codegen2PromptTemplate,
+    'codegen2-3.7B': Codegen2PromptTemplate,
+    'codegen2-7B': Codegen2PromptTemplate,
+    'codegen2-16B': Codegen2PromptTemplate,
+    'codegen25-7B': Codegen2PromptTemplate,
+    'codegen25-7B-instruct': Codegen2PromptTemplate,
 
     # Vicuna (1.3)
-    'vicuna-7B': VicunaPrompt,
-    'vicuna-13B': VicunaPrompt,
+    'vicuna-7B': VicunaPromptTemplate,
+    'vicuna-13B': VicunaPromptTemplate,
 
     # Llama2-chat
-    'llama2-7B-chat': Llama2ChatPrompt,
-    'llama2-13B-chat': Llama2ChatPrompt,
-    'llama2-70B-chat': Llama2ChatPrompt,
+    'llama2-7B-chat': Llama2ChatPromptTemplate,
+    'llama2-13B-chat': Llama2ChatPromptTemplate,
+    'llama2-70B-chat': Llama2ChatPromptTemplate,
 }
 
 
-def get_prompt_template(model_name: str, mode: str = 'default') -> GenericPrompt:
-    """Return the prompt class formating corresponding to `model_name`.
+def get_prompt_template(model_name: str, mode: str = 'default') -> GenericPromptTemplate:
+    """Return the prompt template class formating corresponding to `model_name`.
 
     Parameters
     ----------
     model_name : str
         Name of the current model.
     mode : str, optional
-        The generation mode for the model, by default 'default'
+        The generation mode for the model, by default 'default'. Note that changing this value may cause
+        issues as not all prompt templates support all modes.
 
     Returns
     -------
-    GenericPrompt
-        A prompt class corresponding to `model_name`.
+    GenericPromptTemplate
+        A prompt template class corresponding to `model_name`.
 
     """
 
@@ -235,6 +236,6 @@ def get_prompt_template(model_name: str, mode: str = 'default') -> GenericPrompt
     if model_name in PROMPT_MAPPING.keys():
         prompt = PROMPT_MAPPING[model_name](mode)
     else:
-        prompt = GenericPrompt(mode)
+        prompt = GenericPromptTemplate(mode)
 
     return prompt
