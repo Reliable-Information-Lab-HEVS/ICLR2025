@@ -4,10 +4,10 @@
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
-#SBATCH --cpus-per-task=18
-#SBATCH --mem=120G
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=10G
 #SBATCH --partition=nodes
-#SBATCH --gres=gpu:a100:6
+#SBATCH --gres=gpu:a100:0
 #SBATCH --chdir=/cluster/raid/home/vacy/LLMs
 
 # Initialize the shell to use local conda
