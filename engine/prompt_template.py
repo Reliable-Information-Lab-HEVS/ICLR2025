@@ -109,7 +109,7 @@ class StarChatPromptTemplate(GenericPromptTemplate):
     
     def format_chat(self, prompt: str) -> str:
 
-        return self.system_token + '\n' + self.system_prompt + self.sep_token + '\n' + self.user_token + '\n' + \
+        return self.system_token + '\n' + self.system_prompt + self.sep_token + '\n' + self.user_token + '\n' \
             + prompt + self.sep_token + '\n' + self.assistant_token + '\n'
     
 
