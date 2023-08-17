@@ -81,10 +81,10 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
     """
 
     # sample_file should be of the form utils.RESULTS_FOLDER/HumanEval_completions/model/temperature_X.jsonl
-    _, model, filename = sample_file.rsplit('/', 2)
+    _, folder, model, filename = sample_file.rsplit('/', 3)
 
     # Format the output filename
-    out_file = os.path.join(utils.RESULTS_FOLDER, 'HumanEval_results', model, filename)
+    out_file = os.path.join(utils.RESULTS_FOLDER, folder + '_results', model, filename)
 
     problems = datasets.HumanEval().samples_by_id()
 

@@ -2,7 +2,7 @@ FROM python:3.11.3
 
 WORKDIR /LLMs
 
-COPY results/HumanEval_completions results/HumanEval_completions
+COPY results results
 COPY data/HumanEval.jsonl data/HumanEval.jsonl
 COPY code_execution code_execution
 COPY helpers helpers
