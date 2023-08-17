@@ -9,7 +9,7 @@ import warnings
 
 from engine import loader
 from engine import stopping
-from engine.prompt import get_prompt_template
+from engine.prompt_template import get_prompt_template
 from helpers import utils
 
 
@@ -63,7 +63,7 @@ class HFModel(object):
 
     
     def __repr__(self) -> str:
-        return f'HFModel({self.model_name}, {self.quantization}, {self.device_map})'
+        return f'HFModel({self.model_name}, {self.quantization}, {self.device_map}, {self.dtype})'
     
     def __str__(self) -> str:
         if self.quantization:

@@ -1,3 +1,9 @@
+"""
+This file contains the prompt templates for the models we use, for causal generation. These
+templates are especially not meant for conversations with the models, only for prompt completion, without
+memory of previous prompts.
+"""
+
 from engine.loader import ALLOWED_MODELS
 
 PROMPT_MODES = ('default', 'generation', 'infill', 'chat')
@@ -88,13 +94,13 @@ class StarCoderPromptTemplate(GenericPromptTemplate):
 # see created issue https://github.com/lm-sys/FastChat/issues/2220
 class StarChatPromptTemplate(GenericPromptTemplate):
 
-    def __init__(self, mode: str = 'default'):
+    def __init__(self, mode: str = 'default', system_prompt: str = ''):
 
         super().__init__(mode)
         self.default_mode = 'chat'
 
         self.system_token = '<|system|>'
-        self.system_prompt = ''
+        self.system_prompt = system_prompt
         self.user_token = '<|user|>'
         self.assistant_token = '<|assistant|>'
         self.sep_token = '<|end|>'
@@ -128,12 +134,12 @@ class Codegen2PromptTemplate(GenericPromptTemplate):
 # Vicuna 1.3 prompt modeling (https://github.com/lm-sys/FastChat/blob/main/fastchat/model/model_adapter.py)
 class VicunaPromptTemplate(GenericPromptTemplate):
 
-    def __init__(self, mode: str = 'default'):
+    def __init__(self, mode: str = 'default', system_prompt: str = ''):
 
         super().__init__(mode)
         self.default_mode = 'chat'
 
-        self.system_prompt = ''
+        self.system_prompt = system_prompt
         self.user_token = 'USER'
         self.assistant_token = 'ASSISTANT'
         self.sep_token = ' '
@@ -154,12 +160,12 @@ class VicunaPromptTemplate(GenericPromptTemplate):
 # see created issue https://github.com/lm-sys/FastChat/issues/2220
 class Llama2ChatPromptTemplate(GenericPromptTemplate):
 
-    def __init__(self, mode: str = 'default'):
+    def __init__(self, mode: str = 'default', system_prompt: str = ''):
 
         super().__init__(mode)
         self.default_mode = 'chat'
 
-        self.system_prompt = ''
+        self.system_prompt = system_prompt
         self.system_template = '<<SYS>>\n{system_prompt}\n<</SYS>>\n\n'
         self.user_token = '[INST]'
         self.assistant_token = '[/INST]'
@@ -209,7 +215,7 @@ PROMPT_MAPPING = {
 }
 
 
-def get_prompt_template(model_name: str, mode: str = 'default') -> GenericPromptTemplate:
+def get_prompt_template(model_name: str, mode: str = 'default', system_prompt: str = '') -> GenericPromptTemplate:
     """Return the prompt template class formating corresponding to `model_name`.
 
     Parameters
@@ -219,6 +225,9 @@ def get_prompt_template(model_name: str, mode: str = 'default') -> GenericPrompt
     mode : str, optional
         The generation mode for the model, by default 'default'. Note that changing this value may cause
         issues as not all prompt templates support all modes.
+    system_prompt : str, optional
+        The system prompt for templates with chat mode that support it, by default ''. Ignored by all non-chat
+        templates.
 
     Returns
     -------
@@ -234,7 +243,10 @@ def get_prompt_template(model_name: str, mode: str = 'default') -> GenericPrompt
         raise ValueError(f'The mode for creating the prompt must be one of {*PROMPT_MODES,}')
 
     if model_name in PROMPT_MAPPING.keys():
-        prompt = PROMPT_MAPPING[model_name](mode)
+        try:
+            prompt = PROMPT_MAPPING[model_name](mode=mode, system_prompt=system_prompt)
+        except TypeError:
+            prompt = PROMPT_MAPPING[model_name](mode=mode)
     else:
         prompt = GenericPromptTemplate(mode)
 
