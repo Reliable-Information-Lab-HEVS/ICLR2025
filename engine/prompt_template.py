@@ -89,9 +89,8 @@ class StarCoderPromptTemplate(GenericPromptTemplate):
     
     
 # Starchat prompt modeling (see https://huggingface.co/spaces/HuggingFaceH4/starchat-playground/blob/main/dialogues.py)
-# See also FastChat (/https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#817) but current
-# implementation is slightly wrong: it does not format the system prompt correctly (misses a line return)
-# see created issue https://github.com/lm-sys/FastChat/issues/2220
+# See also FastChat (/https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#817) but note that
+# it was modified by me (https://github.com/lm-sys/FastChat/pull/2239)
 class StarChatPromptTemplate(GenericPromptTemplate):
 
     def __init__(self, mode: str = 'default', system_prompt: str = ''):
@@ -142,22 +141,19 @@ class VicunaPromptTemplate(GenericPromptTemplate):
         self.system_prompt = system_prompt
         self.user_token = 'USER'
         self.assistant_token = 'ASSISTANT'
-        self.sep_token = ' '
 
     
     def format_chat(self, prompt: str) -> str:
 
         if self.system_prompt == '':
-            return self.user_token + ': ' + prompt + self.sep_token + self.assistant_token + ':'
+            return self.user_token + ': ' + prompt + ' ' + self.assistant_token + ':'
         else:
-            return self.system_prompt + self.sep_token + self.user_token + ': ' + prompt + self.sep_token + \
-                self.assistant_token + ':'
+            return self.system_prompt + ' ' + self.user_token + ': ' + prompt + ' ' + self.assistant_token + ':'
 
 
 # Llama2-chat prompt modeling (https://github.com/facebookresearch/llama/blob/main/llama/generation.py#L212)
-# See also FastChat (https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#L123) but current
-# implementation is slightly wrong: it does not add a space between the first prompt and [/INST] token
-# see created issue https://github.com/lm-sys/FastChat/issues/2220
+# See also FastChat (https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#L123) but note that
+# it was modified by me (https://github.com/lm-sys/FastChat/pull/2239)
 class Llama2ChatPromptTemplate(GenericPromptTemplate):
 
     def __init__(self, mode: str = 'default', system_prompt: str = ''):
@@ -169,14 +165,13 @@ class Llama2ChatPromptTemplate(GenericPromptTemplate):
         self.system_template = '<<SYS>>\n{system_prompt}\n<</SYS>>\n\n'
         self.user_token = '[INST]'
         self.assistant_token = '[/INST]'
-        self.sep_token = ' '
 
     def format_chat(self, prompt: str) -> str:
 
         # System prompt must be embedded in first user prompt
         embedded_prompt = self.system_template.format(system_prompt=self.system_prompt) + prompt
         # Note that we do not call strip() as meta does in source code, because some prompts explicitly end with '\n'
-        return self.user_token + ' ' + embedded_prompt + self.sep_token + self.assistant_token
+        return self.user_token + ' ' + embedded_prompt + ' ' + self.assistant_token
 
     
 
