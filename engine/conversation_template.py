@@ -2,6 +2,7 @@
 This file contains the conversation templates for the models we use.
 """
 
+from engine import loader
 
 class GenericConversation(object):
     """Class used to store a conversation with a model."""
@@ -115,13 +116,26 @@ class GenericConversation(object):
         return prompt
     
 
+    def get_extra_eos(self) -> list[str]:
+        return self.extra_eos_tokens
+    
+
     def erase_conversation(self):
         """Reinitialize the conversation.
         """
 
         self.user_history_text = []
         self.model_history_text = []
+
+    
+    def set_conversation(self, past_user_inputs: list[str], past_model_outputs: list[str]):
+        """Set the conversation.
+        """
+
+        self.user_history_text = past_user_inputs
+        self.model_history_text = past_model_outputs
         
+
 
 class StarChatConversation(GenericConversation):
 
@@ -137,6 +151,7 @@ class StarChatConversation(GenericConversation):
 
         # extra eos
         self.extra_eos_tokens = [self.sep_token]
+
 
     def get_prompt(self) -> str:
         """Format the prompt representing the conversation that we will feed to the tokenizer.
@@ -162,12 +177,12 @@ class VicunaConversation(GenericConversation):
 
         super().__init__(eos_token)
 
-        self.eos_token = '</s>'
         self.system_prompt = ("A chat between a curious user and an artificial intelligence assistant. "
                               "The assistant gives helpful, detailed, and polite answers to the user's questions.")
 
         self.user_token = 'USER'
         self.assistant_token = 'ASSISTANT'
+
 
     def get_prompt(self) -> str:
         """Format the prompt representing the conversation that we will feed to the tokenizer.
@@ -193,7 +208,6 @@ class Llama2ChatConversation(GenericConversation):
 
         super().__init__(eos_token)
 
-        self.eos_token = '</s>'
         self.bos_token = '<s>'
 
         self.system_template = '<<SYS>>\n{system_prompt}\n<</SYS>>\n\n'
@@ -222,3 +236,53 @@ class Llama2ChatConversation(GenericConversation):
                 prompt += self.assistant_token
 
         return prompt
+    
+
+
+# Mapping from model name to conversation class name
+CONVERSATION_MAPPING = {
+    # StarChat
+    'star-chat-alpha': StarChatConversation,
+    'star-chat-beta': StarChatConversation,
+
+    # Vicuna (1.3)
+    'vicuna-7B': VicunaConversation,
+    'vicuna-13B': VicunaConversation,
+
+    # Llama2-chat
+    'llama2-7B-chat': Llama2ChatConversation,
+    'llama2-13B-chat': Llama2ChatConversation,
+    'llama2-70B-chat': Llama2ChatConversation,
+}
+
+
+def get_conversation_template(model_name: str) -> GenericConversation:
+    """Return the conversation object corresponding to `model_name`.
+
+    Parameters
+    ----------
+    model_name : str
+        Name of the current model.
+
+    Returns
+    -------
+    GenericConversation
+        A conversation object template class corresponding to `model_name`.
+
+    """
+
+    if model_name not in loader.ALLOWED_MODELS:
+        raise ValueError(f'The model name must be one of {*loader.ALLOWED_MODELS,}.')
+    
+    # TODO: maybe change this way of obtaining the eos token for a given model as it forces to load the
+    # tokenizer for nothing (maybe create a mapping from name to eos?). For now it is sufficient as 
+    # loading a tokenizer is sufficiently fast
+    tokenizer = loader.load_tokenizer(model_name)
+    eos_token = tokenizer.eos_token
+
+    if model_name in CONVERSATION_MAPPING.keys():
+        conversation = CONVERSATION_MAPPING[model_name](eos_token=eos_token)
+    else:
+        conversation = GenericConversation(eos_token=eos_token)
+
+    return conversation

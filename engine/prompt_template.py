@@ -19,6 +19,7 @@ class GenericPromptTemplate(object):
         self.default_mode = 'generation'
         self.extra_eos_tokens = []
 
+
     def get_prompt(self, prompt: str, suffix: str = '') -> str:
 
         if self.mode == 'default':
@@ -30,6 +31,7 @@ class GenericPromptTemplate(object):
         elif self.mode == 'chat':
             return self.format_chat(prompt)
         
+
     def format_default(self, prompt: str, suffix: str = '') -> str:
 
         if self.default_mode == 'generation':
@@ -41,19 +43,18 @@ class GenericPromptTemplate(object):
 
 
     def format_generation(self, prompt: str) -> str:
-
         return prompt
     
-    def format_chat(self, prompt: str) -> str:
 
+    def format_chat(self, prompt: str) -> str:
         raise RuntimeError(f'Chat mode not supported for {self.__class__.__name__}.')
     
-    def format_infill(self, prefix: str, suffix: str = '') -> str:
 
+    def format_infill(self, prefix: str, suffix: str = '') -> str:
         raise RuntimeError(f'Infill mode not supported for {self.__class__.__name__}.')
     
-    def get_extra_eos(self) -> list[str]:
 
+    def get_extra_eos(self) -> list[str]:
         return self.extra_eos_tokens
     
 

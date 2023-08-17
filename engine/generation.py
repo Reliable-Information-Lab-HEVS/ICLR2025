@@ -63,7 +63,7 @@ class HFModel(object):
 
     
     def __repr__(self) -> str:
-        return f'HFModel({self.model_name}, {self.quantization}, {self.device_map}, {self.dtype})'
+        return f'HFModel({self.model_name}, {self.quantization}, {self.dtype})'
     
     def __str__(self) -> str:
         if self.quantization:
