@@ -8,10 +8,6 @@ from transformers import AutoModelForCausalLM
 import engine
 from helpers import datasets
 
-dataset = datasets.HumanEvalInstruct()
-sample = dataset[0]
-prompt = sample['instruction'] + sample['context']
-
 HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
     'max_new_tokens': 512,
     'min_new_tokens': 5,
@@ -24,9 +20,20 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
     'stopping_patterns': False
 }
 
-model = engine.HFModel('vicuna-7B')
-out = model(prompt, **HUMAN_EVAL_GREEDY_GENERATION_KWARGS)
+# dataset = datasets.HumanEvalInstruct()
+# sample = dataset[0]
+# prompt = sample['instruction'] + sample['context']
 
+# model = engine.HFModel('vicuna-7B')
+# out = model(prompt, batch_size=1, **HUMAN_EVAL_GREEDY_GENERATION_KWARGS)
+# print(prompt + out)
+
+
+dataset = datasets.HumanEval()
+sample = dataset[17]
+prompt = sample['prompt']
+
+model = engine.HFModel('star-chat-beta')
+out = model(prompt, batch_size=1, **HUMAN_EVAL_GREEDY_GENERATION_KWARGS)
 print(prompt + out)
-
 
