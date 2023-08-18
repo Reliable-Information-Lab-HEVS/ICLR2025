@@ -119,7 +119,9 @@ class Codegen2PromptTemplate(GenericPromptTemplate):
     def __init__(self, mode: str = 'default'):
 
         super().__init__(mode)
-        self.default_mode = 'infill'
+        # Keep the default to generation as the infill mode seems to be worse (at least on HumanEval)
+        # self.default_mode = 'infill'
+        self.default_mode = 'generation'
 
         self.mask_token = '<mask_1>'
         self.eos_token = '<|endoftext|>'
