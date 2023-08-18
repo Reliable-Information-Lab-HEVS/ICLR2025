@@ -5,7 +5,7 @@ import engine
 from helpers import datasets
 from transformers import AutoModelForCausalLM
 
-from engine import loader
+import engine
 from helpers import datasets
 
 dataset = datasets.HumanEvalInstruct()
@@ -24,7 +24,7 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
     'stopping_patterns': False
 }
 
-model = loader.load_model('vicuna-7B')
+model = engine.HFModel('vicuna-7B')
 out = model(prompt, **HUMAN_EVAL_GREEDY_GENERATION_KWARGS)
 
 print(prompt + out)
