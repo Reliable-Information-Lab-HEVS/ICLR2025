@@ -114,10 +114,7 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
     quantization = True if model_name == 'bloom-176B' else False
 
     model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
-    folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions_test', model_name)
-
-    greedy_generation_kwargs = copy.deepcopy(greedy_generation_kwargs)
-    greedy_generation_kwargs['stopping_patterns'] = None
+    folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
 
     dataset = datasets.HumanEval()
 
