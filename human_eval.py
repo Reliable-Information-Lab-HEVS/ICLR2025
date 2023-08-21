@@ -40,45 +40,45 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
 }
 
 SMALL_MODELS = (
-    'bloom-560M',
-    'bloom-1.7B',
-    'bloom-3B',
-    'bloom-7.1B',
-    'stable-lm-3B',
-    'stable-lm-7B',
-    'star-coder-base',
-    'star-coder',
-    'star-coder-plus',
-    'star-chat-alpha',
-    'star-chat-beta',
-    'gpt2-medium',
-    'gpt2-large',
-    'gpt2-xl',
-    'gpt-j-6B',
-    'gpt-neo-125M',
-    'gpt-neo-1.3B',
-    'gpt-neo-2.7B',
-    'opt-125M',
-    'opt-350M',
-    'opt-1.3B',
-    'opt-2.7B',
-    'opt-6.7B',
-    'opt-13B',
-    'codegen-350M',
-    'codegen-2B',
-    'codegen-6B',
-    'codegen-16B',
-    'codegen2-1B',
-    'codegen2-3.7B',
-    'codegen2-7B',
-    'codegen2-16B',
-    'codegen25-7B',
-    'codegen25-7B-instruct',
+    # 'bloom-560M',
+    # 'bloom-1.7B',
+    # 'bloom-3B',
+    # 'bloom-7.1B',
+    # 'stable-lm-3B',
+    # 'stable-lm-7B',
+    # 'star-coder-base',
+    # 'star-coder',
+    # 'star-coder-plus',
+    # 'star-chat-alpha',
+    # 'star-chat-beta',
+    # 'gpt2-medium',
+    # 'gpt2-large',
+    # 'gpt2-xl',
+    # 'gpt-j-6B',
+    # 'gpt-neo-125M',
+    # 'gpt-neo-1.3B',
+    # 'gpt-neo-2.7B',
+    # 'opt-125M',
+    # 'opt-350M',
+    # 'opt-1.3B',
+    # 'opt-2.7B',
+    # 'opt-6.7B',
+    # 'opt-13B',
+    # 'codegen-350M',
+    # 'codegen-2B',
+    # 'codegen-6B',
+    # 'codegen-16B',
+    # 'codegen2-1B',
+    # 'codegen2-3.7B',
+    # 'codegen2-7B',
+    # 'codegen2-16B',
+    # 'codegen25-7B',
+    # 'codegen25-7B-instruct',
     'vicuna-7B',
     'vicuna-13B',
-    'llama2-7B',
+    # 'llama2-7B',
     'llama2-7B-chat',
-    'llama2-13B',
+    # 'llama2-13B',
     'llama2-13B-chat',
 )
 
@@ -114,7 +114,10 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
     quantization = True if model_name == 'bloom-176B' else False
 
     model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
-    folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
+    folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions_test', model_name)
+
+    greedy_generation_kwargs = copy.deepcopy(greedy_generation_kwargs)
+    greedy_generation_kwargs['stopping_patterns'] = None
 
     dataset = datasets.HumanEval()
 
@@ -237,7 +240,7 @@ def human_eval_instruct(model_name: str, temperatures: tuple[int] = TEMPERATURES
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='HumanEval benchmark')
-    parser.add_argument('--gpus', type=int, default=8, help='The number of GPUs to use.')
+    parser.add_argument('--gpus', type=int, default=4, help='The number of GPUs to use.')
     parser.add_argument('--big_models', type=str, default='False', choices=['False', 'True'],
                         help='Whether to run the benchmark on large models that do not fit on a single gpu.')
     parser.add_argument('--instruct', type=str, default='False', choices=['False', 'True'],
