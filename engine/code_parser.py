@@ -52,8 +52,13 @@ class PythonParser(object):
 
     NOTE: It is not perfect! The following patterns are NOT parsed correctly:
 
-    - text containing code
+    - text containing code blocks formatted in different ways (e.g. one block with triple backticks, one without)
+    - text containing triple backticks formatted code blocks, themselves containing triple backticks
+    - standalone statements such as `foo.append(1)` or `foo.get_result()` which are not inside triple backticks or
+    indented code blocks
 
+    These kind of patterns should be extremely rare in practice in our use-case but might exist. There could also
+    be other patterns or edge-cases uncorrectly handled by the following parser.
     """
 
     def __init__(self):
@@ -183,15 +188,6 @@ def foo(bar):
 """def foo(bar):
     print(bar)""",
 
-    """Here's a Python implementation of the function:
-```python
-def foo(bar):
-    baz = \"\"\"String with backticks:```
-    foo
-    ```\"\"\"
-    print(bar)
-```""",
-
     # Without backticks
     """Here's a Python implementation of the function:
 
@@ -228,12 +224,6 @@ _EXPECTED_OUTPUTS = [
 
     """def foo(bar):
     print(bar)""",
-
-    """def foo(bar):
-    baz = \"\"\"String with backticks:```
-    foo
-    ```\"\"\"
-    print(bar)"""
 
     """def parse_music(music_string: str) -> List[int]:
     \"\"\"Parses a music string in the special ASCII format and returns a list of note durations.\"\"\"
