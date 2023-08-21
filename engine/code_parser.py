@@ -1,7 +1,5 @@
 import re
 
-from engine import stopping
-
 # NOTE: This parser is not perfect! It was designed for a specific use case, and is not foolproof.
 
 # Python keywords suseptible to start a line
@@ -67,29 +65,26 @@ class PythonParser(object):
         self.code_regexes = PYTHON_CODE_REGEXES
 
     
-    def __call__(self, s: str, stopping_patterns: list[str] | tuple[str] | None = None) -> str:
-        """Parse all Python code contained in `s`, concatenate it, and truncate it according to the 
-        patterns in `stopping_patterns`.
+    def __call__(self, s: str) -> str | None:
+        """Parse all Python code contained in `s`, and concatenate it.
 
         Parameters
         ----------
         s : str
             String to parse.
-        stopping_patterns : list[str] | tuple[str] | None, optional
-            Patterns on which to truncate the result, by default None
 
         Returns
         -------
         str
             The truncated code output.
         """
-        return self.full_parse(s, stopping_patterns)
+        return self.full_parse(s)
     
 
-    def parse(self, s: str) -> list[str]:
+    def parse(self, s: str) -> list[str] | None:
         """Parse a string `s`, and return all Python code blocks withon `s`. This function try to parse `s`
         with methods of increasing complexity. As soon, as one method produces at least one match, we consider
-        the parsing as succesful and return that match.
+        the parsing as succesful and return that match. Return `None` if there are no matches.
 
         Parameters
         ----------
@@ -98,7 +93,7 @@ class PythonParser(object):
 
         Returns
         -------
-        list[str]
+        list[str] | None
             List containing all code blocks.
         """
 
@@ -108,8 +103,10 @@ class PythonParser(object):
                 # remove trailing (and leading, but there should not be any) newlines
                 return [x.strip() for x in matches]
             
+        return None
+            
 
-    def concatenate(self, code_blocks: list[str]) -> str:
+    def concatenate(self, code_blocks: list[str] | None) -> str | None:
         """Concatenate multiple code blocks into a single code block.
 
         Parameters
@@ -123,39 +120,18 @@ class PythonParser(object):
             Single code block.
         """
             
+        if code_blocks is None:
+            return None
         return '\n\n'.join(code_blocks)
-
-
-    def truncate(self, code_block: str, stopping_patterns: list[str] | tuple[str] | None = None) -> str:
-        """Truncate `code_block` as soon as one of `stopping_patterns` is found.
-
-        Parameters
-        ----------
-        code_block : str
-            The code block to possibly truncate.
-        stopping_patterns : list[str] | tuple[str] | None, optional
-            The list of patterns to scan for, by default None
-
-        Returns
-        -------
-        str
-            The truncated `code_block`.
-        """
-        
-        truncated = stopping.post_process_stopping_patterns([code_block], stopping_patterns)
-        return truncated[0]
     
 
-    def full_parse(self, s: str, stopping_patterns: list[str] | tuple[str] | None = None) -> str:
-        """Parse all Python code contained in `s`, concatenate it, and truncate it according to the 
-        patterns in `stopping_patterns`.
+    def full_parse(self, s: str) -> str:
+        """Parse all Python code contained in `s`, and concatenate it.
 
         Parameters
         ----------
         s : str
             String to parse.
-        stopping_patterns : list[str] | tuple[str] | None, optional
-            Patterns on which to truncate the result, by default None
 
         Returns
         -------
@@ -165,13 +141,13 @@ class PythonParser(object):
 
         blocks = self.parse(s)
         block = self.concatenate(blocks)
-        truncated_block = self.truncate(block, stopping_patterns)
-        return truncated_block
+        return block
     
 
 
 
 # Some simple tests (because parsing code is very prone to errors)
+# Note that some known issue (see class docstring) are not tested for
 
 _TEST_INPUTS = [
     """Here's a Python implementation of the function:
