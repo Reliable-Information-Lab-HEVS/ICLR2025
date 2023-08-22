@@ -1,6 +1,8 @@
 import torch
 from transformers import PreTrainedTokenizerBase, StoppingCriteria
 
+from engine.code_parser import PythonParser
+
 # If we reach one of these patterns, it means that the model has finished generating the solution as a 
 # function and continues useless generation (basically stop words used in the Codex/HumanEval 
 # paper: https://arxiv.org/pdf/2107.03374.pdf). Should only be used when the prompt is a python function definition.
@@ -13,18 +15,25 @@ CODE_STOP_PATTERNS = (
     '\n@'
 )
 
+# Extended code stopping patterns. This is mostly useful for chat models which often output code blocks 
+# starting with ">>>" to show examples
+EXTENDED_CODE_STOP_PATTERNS = CODE_STOP_PATTERNS + (
+    '\n>>>'
+)
+
 
 class TextPatternStopping(StoppingCriteria):
 
     def __init__(self, prompt_ids_length: int, tokenizer: PreTrainedTokenizerBase,
                  stopping_patterns: list[str] | tuple[str] | None = CODE_STOP_PATTERNS,
-                 extra_eos_tokens: list[str] | None = None):
+                 extra_eos_tokens: list[str] | None = None, parser: PythonParser | None = None):
 
         super().__init__()
         self.prompt_ids_length = prompt_ids_length
         self.tokenizer = tokenizer
         self.stopping_patterns = stopping_patterns
         self.extra_eos_tokens = extra_eos_tokens
+        self.parser = parser
         self.all_patterns = tuple()
 
         # Add stopping_patterns to the tuple of patterns if there are any
@@ -48,6 +57,8 @@ class TextPatternStopping(StoppingCriteria):
 
         outputs = input_ids[:, self.prompt_ids_length:]
         generated_sequences = self.tokenizer.batch_decode(outputs)
+        if self.parser is not None:
+            generated_sequences = [self.parser(sequence) for sequence in generated_sequences]
         done_sequences = []
 
         for sequence in generated_sequences:

@@ -65,7 +65,7 @@ class PythonParser(object):
         self.code_regexes = PYTHON_CODE_REGEXES
 
     
-    def __call__(self, s: str) -> str | None:
+    def __call__(self, s: str) -> str:
         """Parse all Python code contained in `s`, and concatenate it.
 
         Parameters
@@ -76,7 +76,7 @@ class PythonParser(object):
         Returns
         -------
         str
-            The truncated code output.
+            The code output.
         """
         return self.full_parse(s)
     
@@ -106,7 +106,7 @@ class PythonParser(object):
         return None
             
 
-    def concatenate(self, code_blocks: list[str] | None) -> str | None:
+    def concatenate(self, code_blocks: list[str] | None) -> str:
         """Concatenate multiple code blocks into a single code block.
 
         Parameters
@@ -121,7 +121,7 @@ class PythonParser(object):
         """
             
         if code_blocks is None:
-            return None
+            return ''
         return '\n\n'.join(code_blocks)
     
 
