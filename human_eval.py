@@ -24,7 +24,7 @@ HUMAN_EVAL_GENERATION_KWARGS = {
     'num_return_sequences': 200,
     'seed': 1234,
     'truncate_prompt_from_output': True,
-    'stopping_patterns': stopping.CODE_STOP_PATTERNS
+    'stopping_patterns': stopping.EXTENDED_CODE_STOP_PATTERNS
 }
 
 HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
@@ -36,7 +36,7 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
     'num_return_sequences': 1,
     'seed': 1234,
     'truncate_prompt_from_output': True,
-    'stopping_patterns': stopping.CODE_STOP_PATTERNS
+    'stopping_patterns': stopping.EXTENDED_CODE_STOP_PATTERNS
 }
 
 SMALL_MODELS = (

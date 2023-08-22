@@ -8,6 +8,7 @@ from engine.loader import ALLOWED_MODELS
 
 PROMPT_MODES = ('default', 'generation', 'infill', 'chat')
 
+
 class GenericPromptTemplate(object):
 
     def __init__(self, mode: str = 'default'):
@@ -20,43 +21,138 @@ class GenericPromptTemplate(object):
         self.extra_eos_tokens = []
 
 
-    def get_prompt(self, prompt: str, suffix: str = '') -> str:
+    def get_prompt(self, prompt: str, model_context: str = '', suffix: str = '', system_prompt: str = '') -> str:
+        """Format the `prompt` according to `self.mode`.
+
+        Parameters
+        ----------
+        prompt : str
+            The prompt to format.
+        model_context : str, optional
+            An optional context forming the start of the model answer. By default ''.
+        suffix : str, optional
+            An optional suffix to form the prompt. This is ignored for all modes except `infill`, by default ''.
+        system_prompt : str, optional
+            An optional system prompt to append at the beginning for chat mode. This is ignored for all modes
+            except `chat`, by default ''.
+
+        Returns
+        -------
+        str
+            Formatted prompt.
+        """
 
         if self.mode == 'default':
-            return self.format_default(prompt, suffix)
+            return self.format_default(prompt, model_context=model_context, suffix=suffix, system_prompt=system_prompt)
         elif self.mode == 'generation':
-            return self.format_generation(prompt)
+            return self.format_generation(prompt, model_context=model_context)
         elif self.mode == 'infill':
-            return self.format_infill(prompt, suffix)
+            return self.format_infill(prompt, model_context=model_context, suffix=suffix)
         elif self.mode == 'chat':
-            return self.format_chat(prompt)
+            return self.format_chat(prompt, model_context=model_context, system_prompt=system_prompt)
         
 
-    def format_default(self, prompt: str, suffix: str = '') -> str:
+    def format_default(self, prompt: str, model_context: str = '', suffix: str = '', system_prompt: str = '') -> str:
+        """Format the `prompt` when `self.mode = 'default'`.
+
+        Parameters
+        ----------
+        prompt : str
+            The prompt to format.
+        model_context : str, optional
+            An optional context forming the start of the model answer. By default ''.
+        suffix : str, optional
+            An optional suffix to form the prompt. This is ignored for all modes except `infill`, by default ''.
+        system_prompt : str, optional
+            An optional system prompt to append at the beginning for chat mode. This is ignored for all modes
+            except `chat`, by default ''.
+
+        Returns
+        -------
+        str
+            Formatted prompt.
+        """
 
         if self.default_mode == 'generation':
-            return self.format_generation(prompt)
+            return self.format_generation(prompt, model_context=model_context)
         elif self.default_mode == 'infill':
-            return self.format_infill(prompt, suffix)
+            return self.format_infill(prompt, model_context=model_context, suffix=suffix)
         elif self.default_mode == 'chat':
-            return self.format_chat(prompt)
+            return self.format_chat(prompt, model_context=model_context, system_prompt=system_prompt)
 
 
-    def format_generation(self, prompt: str) -> str:
-        return prompt
+    def format_generation(self, prompt: str, model_context: str = '') -> str:
+        """Format the prompt for usual models.
+
+        Parameters
+        ----------
+        prompt : str
+            Prompt to format
+        model_context : str
+            An optional context. This is simply appended to `prompt`. By default ''.
+
+        Returns
+        -------
+        str
+            Formatted prompt.
+        """
+        return prompt + model_context
     
 
-    def format_chat(self, prompt: str) -> str:
+    def format_chat(self, prompt: str, model_context: str = '', system_prompt: str = '') -> str:
+        """Format the prompt for chat models.
+
+        Parameters
+        ----------
+        prompt : str
+            The prompt to format.
+        model_context : str, optional
+            An optional context forming the start of the model answer, by default ''.
+        system_prompt : str, optional
+            An optional system prompt to append at the beginning, by default ''.
+
+        Returns
+        -------
+        str
+            Formatted prompt.
+        """
         raise RuntimeError(f'Chat mode not supported for {self.__class__.__name__}.')
     
 
-    def format_infill(self, prefix: str, suffix: str = '') -> str:
+    def format_infill(self, prefix: str, model_context: str = '', suffix: str = '') -> str:
+        """Format the prompt for models supporting infilling.
+
+        Parameters
+        ----------
+        prompt : str
+            The prompt to format.
+        suffix : str, optional
+            An optional suffix to form the prompt, by default ''.
+        model_context : str, optional
+            An optional context forming the start of the model answer, by default ''.
+        
+        Returns
+        -------
+        str
+            Formatted prompt.
+        """
         raise RuntimeError(f'Infill mode not supported for {self.__class__.__name__}.')
     
 
     def get_extra_eos(self) -> list[str]:
+        """Return the potential extra eos tokens upon which to stop generation.
+        """
         return self.extra_eos_tokens
     
+
+    def set_mode(self, mode: str):
+        """Set the formatting mode.
+        """
+        if mode not in PROMPT_MODES:
+            raise ValueError(f'The mode for creating the prompt must be one of {*PROMPT_MODES,}')
+        self.mode = mode
+    
+
 
 class DialoGPTPromptTemplate(GenericPromptTemplate):
 
@@ -67,9 +163,10 @@ class DialoGPTPromptTemplate(GenericPromptTemplate):
 
         self.eos_token = '<|endoftext|>'
 
-    def format_chat(self, prompt: str) -> str:
-
-        return prompt + self.eos_token
+    def format_chat(self, prompt: str, model_context: str = '', system_prompt: str = '') -> str:
+        # The system prompt is ignored, and the model context is just appended to the prompt
+        # This is because DialoGPT is a an extremely basic chat model which does not really handle these parameters
+        return prompt + model_context + self.eos_token
     
 
 
@@ -84,33 +181,33 @@ class StarCoderPromptTemplate(GenericPromptTemplate):
         self.suffix_token = '<fim_suffix>'
         self.middle_token = '<fim_middle>'
 
-    def format_infill(self, prefix: str, suffix: str = '') -> str:
+    def format_infill(self, prefix: str, model_context: str = '', suffix: str = '') -> str:
 
-        return self.prefix_token + prefix + self.suffix_token + suffix + self.middle_token
+        return self.prefix_token + prefix + self.suffix_token + suffix + self.middle_token + model_context
     
     
+
 # Starchat prompt modeling (see https://huggingface.co/spaces/HuggingFaceH4/starchat-playground/blob/main/dialogues.py)
 # See also FastChat (/https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#817) but note that
 # it was modified by me (https://github.com/lm-sys/FastChat/pull/2239)
 class StarChatPromptTemplate(GenericPromptTemplate):
 
-    def __init__(self, mode: str = 'default', system_prompt: str = ''):
+    def __init__(self, mode: str = 'default'):
 
         super().__init__(mode)
         self.default_mode = 'chat'
 
         self.system_token = '<|system|>'
-        self.system_prompt = system_prompt
         self.user_token = '<|user|>'
         self.assistant_token = '<|assistant|>'
         self.sep_token = '<|end|>'
         self.extra_eos_tokens = [self.sep_token]
 
     
-    def format_chat(self, prompt: str) -> str:
+    def format_chat(self, prompt: str, model_context: str = '', system_prompt: str = '') -> str:
 
-        return self.system_token + '\n' + self.system_prompt + self.sep_token + '\n' + self.user_token + '\n' \
-            + prompt + self.sep_token + '\n' + self.assistant_token + '\n'
+        return self.system_token + '\n' + system_prompt + self.sep_token + '\n' + self.user_token + '\n' \
+            + prompt + self.sep_token + '\n' + self.assistant_token + '\n' + model_context
     
 
 
@@ -128,30 +225,36 @@ class Codegen2PromptTemplate(GenericPromptTemplate):
         self.sep_token = '<sep>'
         self.extra_eos_tokens = ['<eom>']
 
-    def format_infill(self, prefix: str, suffix: str = '') -> str:
+    def format_infill(self, prefix: str, model_context: str = '', suffix: str = '') -> str:
 
-        return prefix + self.mask_token + suffix + self.eos_token + self.sep_token + self.mask_token
+        return prefix + self.mask_token + suffix + self.eos_token + self.sep_token + self.mask_token + model_context
     
+
 
 # Vicuna 1.3 prompt modeling (https://github.com/lm-sys/FastChat/blob/main/fastchat/model/model_adapter.py)
 class VicunaPromptTemplate(GenericPromptTemplate):
 
-    def __init__(self, mode: str = 'default', system_prompt: str = ''):
+    def __init__(self, mode: str = 'default'):
 
         super().__init__(mode)
         self.default_mode = 'chat'
 
-        self.system_prompt = system_prompt
         self.user_token = 'USER'
         self.assistant_token = 'ASSISTANT'
 
     
-    def format_chat(self, prompt: str) -> str:
+    def format_chat(self, prompt: str, model_context: str = '', system_prompt: str = '') -> str:
 
-        if self.system_prompt == '':
-            return self.user_token + ': ' + prompt + ' ' + self.assistant_token + ':'
+        if system_prompt == '':
+            formatted_prompt = self.user_token + ': ' + prompt + ' ' + self.assistant_token + ':'
         else:
-            return self.system_prompt + ' ' + self.user_token + ': ' + prompt + ' ' + self.assistant_token + ':'
+            formatted_prompt = system_prompt + ' ' + self.user_token + ': ' + prompt + ' ' + self.assistant_token + ':'
+
+        if model_context != '':
+            formatted_prompt += ' ' + model_context
+
+        return formatted_prompt
+
 
 
 # Llama2-chat prompt modeling (https://github.com/facebookresearch/llama/blob/main/llama/generation.py#L212)
@@ -159,22 +262,25 @@ class VicunaPromptTemplate(GenericPromptTemplate):
 # it was modified by me (https://github.com/lm-sys/FastChat/pull/2239)
 class Llama2ChatPromptTemplate(GenericPromptTemplate):
 
-    def __init__(self, mode: str = 'default', system_prompt: str = ''):
+    def __init__(self, mode: str = 'default'):
 
         super().__init__(mode)
         self.default_mode = 'chat'
 
-        self.system_prompt = system_prompt
         self.system_template = '<<SYS>>\n{system_prompt}\n<</SYS>>\n\n'
         self.user_token = '[INST]'
         self.assistant_token = '[/INST]'
 
-    def format_chat(self, prompt: str) -> str:
+    def format_chat(self, prompt: str, model_context: str = '', system_prompt: str = '') -> str:
 
         # System prompt must be embedded in first user prompt
-        embedded_prompt = self.system_template.format(system_prompt=self.system_prompt) + prompt
+        embedded_prompt = self.system_template.format(system_prompt=system_prompt) + prompt
         # Note that we do not call strip() as meta does in source code, because some prompts explicitly end with '\n'
-        return self.user_token + ' ' + embedded_prompt + ' ' + self.assistant_token
+        formatted_prompt = self.user_token + ' ' + embedded_prompt + ' ' + self.assistant_token
+        if model_context != '':
+            formatted_prompt += ' ' + model_context
+
+        return formatted_prompt
 
     
 
@@ -213,7 +319,7 @@ PROMPT_MAPPING = {
 }
 
 
-def get_prompt_template(model_name: str, mode: str = 'default', system_prompt: str = '') -> GenericPromptTemplate:
+def get_prompt_template(model_name: str, mode: str = 'default') -> GenericPromptTemplate:
     """Return the prompt template class formating corresponding to `model_name`.
 
     Parameters
@@ -223,9 +329,6 @@ def get_prompt_template(model_name: str, mode: str = 'default', system_prompt: s
     mode : str, optional
         The generation mode for the model, by default 'default'. Note that changing this value may cause
         issues as not all prompt templates support all modes.
-    system_prompt : str, optional
-        The system prompt for templates with chat mode that support it, by default ''. Ignored by all non-chat
-        templates.
 
     Returns
     -------
@@ -241,10 +344,7 @@ def get_prompt_template(model_name: str, mode: str = 'default', system_prompt: s
         raise ValueError(f'The mode for creating the prompt must be one of {*PROMPT_MODES,}')
 
     if model_name in PROMPT_MAPPING.keys():
-        try:
-            prompt = PROMPT_MAPPING[model_name](mode=mode, system_prompt=system_prompt)
-        except TypeError:
-            prompt = PROMPT_MAPPING[model_name](mode=mode)
+        prompt = PROMPT_MAPPING[model_name](mode=mode)
     else:
         prompt = GenericPromptTemplate(mode)
 

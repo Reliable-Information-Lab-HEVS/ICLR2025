@@ -18,14 +18,14 @@ CODE_STOP_PATTERNS = (
 # Extended code stopping patterns. This is mostly useful for chat models which often output code blocks 
 # starting with ">>>" to show examples
 EXTENDED_CODE_STOP_PATTERNS = CODE_STOP_PATTERNS + (
-    '\n>>>'
+    '\n>>>',
 )
 
 
 class TextPatternStopping(StoppingCriteria):
 
     def __init__(self, prompt_ids_length: int, tokenizer: PreTrainedTokenizerBase,
-                 stopping_patterns: list[str] | tuple[str] | None = CODE_STOP_PATTERNS,
+                 stopping_patterns: list[str] | tuple[str] | None = EXTENDED_CODE_STOP_PATTERNS,
                  extra_eos_tokens: list[str] | None = None, parser: PythonParser | None = None):
 
         super().__init__()
@@ -70,7 +70,7 @@ class TextPatternStopping(StoppingCriteria):
 
 
 def post_process_stopping_patterns(prompt_truncated_generated_sequences: list[str],
-                                   stopping_patterns: list[str] | tuple[str] | None = CODE_STOP_PATTERNS) -> list[str]:
+                                   stopping_patterns: list[str] | tuple[str] | None = EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
     """Post-process the outputs of a model to truncate according to a list of patterns upon which we stop
     generation (this is needed because the StoppingCriteria cannot immediately stop the generation of each
     sequence upon meeting a pattern in the case of more than 1 `num_return_sequences`).
@@ -80,7 +80,7 @@ def post_process_stopping_patterns(prompt_truncated_generated_sequences: list[st
     prompt_truncated_generated_sequences : list[str]
         Decoded PROMPT-TRUNCATED outputs of a model. Passing the full decoded outputs may induce errors in the logic.
     stopping_patterns : list[str] | tuple[tr], optional
-        The list of patterns to use to stop generation, by default CODE_STOP_PATTERNS
+        The list of patterns to use to stop generation, by default EXTENDED_CODE_STOP_PATTERNS
 
     Returns
     -------
@@ -161,7 +161,7 @@ def post_process_extra_eos_tokens(prompt_truncated_outputs: torch.Tensor, pad_to
 
 
 def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: PreTrainedTokenizerBase,
-                           stopping_patterns: list[str] | tuple[str] | None = CODE_STOP_PATTERNS,
+                           stopping_patterns: list[str] | tuple[str] | None = EXTENDED_CODE_STOP_PATTERNS,
                            extra_eos_tokens: list[str] | None = None) -> list[str]:
     """Apply all steps of post-processing to the prompt-truncated outputs of a model.
 
@@ -172,7 +172,7 @@ def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: Pr
     tokenizer : PreTrainedTokenizerBase
         The tokenizer used by the model.
     stopping_patterns : list[str] | tuple[tr], optional
-        The list of patterns to use to stop generation, by default CODE_STOP_PATTERNS
+        The list of patterns to use to stop generation, by default EXTENDED_CODE_STOP_PATTERNS
     extra_eos_tokens : list[str] | None, optional
         The list of extra eos tokens, by default None
 

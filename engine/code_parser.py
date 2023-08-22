@@ -1,6 +1,87 @@
 import re
+from abc import ABC, abstractmethod
 
-# NOTE: This parser is not perfect! It was designed for a specific use case, and is not foolproof.
+"Il faut vérouiller son ordi quand on part au roulotte!"
+
+
+class CodeParser(ABC):
+    """Abstract base class for code parsers."""
+
+    @abstractmethod
+    def parse(self, s: str) -> list[str] | None:
+        """Parse a string `s`, and return all code blocks within `s`. This function try to parse `s`
+        with methods of increasing complexity. As soon, as one method produces at least one match, we consider
+        the parsing as succesful and return that match. Return `None` if there are no matches.
+
+        Parameters
+        ----------
+        s : str
+            String to parse.
+
+        Returns
+        -------
+        list[str] | None
+            List containing all code blocks.
+        """
+        return NotImplementedError('Abstract method.')
+    
+
+    def __call__(self, s: str) -> str:
+        """Parse all Python code contained in `s`, and concatenate it. Return an empty string if no code
+        was detected.
+
+        Parameters
+        ----------
+        s : str
+            String to parse.
+
+        Returns
+        -------
+        str
+            The truncated code output.
+        """
+        return self.full_parse(s)
+
+
+    def concatenate(self, code_blocks: list[str] | None) -> str:
+        """Concatenate multiple code blocks into a single code block.
+
+        Parameters
+        ----------
+        code_blocks : list[str]
+            The strings representing the code blocks
+
+        Returns
+        -------
+        str
+            Single code block.
+        """
+            
+        if code_blocks is None:
+            return ''
+        return '\n\n'.join(code_blocks)
+    
+
+    def full_parse(self, s: str) -> str:
+        """Parse all Python code contained in `s`, and concatenate it. Return an empty string if no code
+        was detected.
+
+        Parameters
+        ----------
+        s : str
+            String to parse.
+
+        Returns
+        -------
+        str
+            The truncated code output.
+        """
+
+        blocks = self.parse(s)
+        block = self.concatenate(blocks)
+        return block
+
+
 
 # Python keywords suseptible to start a line
 PYTHON_START_KEYWORDS = [
@@ -45,7 +126,8 @@ PYTHON_CODE_REGEXES = [
 ]
 
 
-class PythonParser(object):
+
+class PythonParser(CodeParser):
     """Parser that extracts Python code from strings.
 
     NOTE: It is not perfect! The following patterns are NOT parsed correctly:
@@ -63,39 +145,9 @@ class PythonParser(object):
         self.python_start_keywords = PYTHON_START_KEYWORDS
         self.python_patterns = PYTHON_PATTERNS
         self.code_regexes = PYTHON_CODE_REGEXES
-
-    
-    def __call__(self, s: str) -> str:
-        """Parse all Python code contained in `s`, and concatenate it.
-
-        Parameters
-        ----------
-        s : str
-            String to parse.
-
-        Returns
-        -------
-        str
-            The code output.
-        """
-        return self.full_parse(s)
     
 
     def parse(self, s: str) -> list[str] | None:
-        """Parse a string `s`, and return all Python code blocks withon `s`. This function try to parse `s`
-        with methods of increasing complexity. As soon, as one method produces at least one match, we consider
-        the parsing as succesful and return that match. Return `None` if there are no matches.
-
-        Parameters
-        ----------
-        s : str
-            String to parse.
-
-        Returns
-        -------
-        list[str] | None
-            List containing all code blocks.
-        """
 
         for regex in self.code_regexes:
             matches = re.findall(regex, s, re.DOTALL)
@@ -104,44 +156,6 @@ class PythonParser(object):
                 return [x.strip() for x in matches]
             
         return None
-            
-
-    def concatenate(self, code_blocks: list[str] | None) -> str:
-        """Concatenate multiple code blocks into a single code block.
-
-        Parameters
-        ----------
-        code_blocks : list[str]
-            The strings representing the code blocks
-
-        Returns
-        -------
-        str
-            Single code block.
-        """
-            
-        if code_blocks is None:
-            return ''
-        return '\n\n'.join(code_blocks)
-    
-
-    def full_parse(self, s: str) -> str:
-        """Parse all Python code contained in `s`, and concatenate it.
-
-        Parameters
-        ----------
-        s : str
-            String to parse.
-
-        Returns
-        -------
-        str
-            The truncated code output.
-        """
-
-        blocks = self.parse(s)
-        block = self.concatenate(blocks)
-        return block
     
 
 
@@ -232,3 +246,9 @@ def _run_tests():
         assert parser(input) == output, f'test {i} failed'
 
     print('All tests completed succesfully')
+
+
+
+if __name__ == '__main__':
+
+    _run_tests()

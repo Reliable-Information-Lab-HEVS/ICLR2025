@@ -61,6 +61,12 @@ class HFModel(object):
         if self.device_map == 'cpu':
             self.gpu_memory_map = {}
 
+        # Initialize the prompt template to use 
+        self.prompt_template = get_prompt_template(self.model_name)
+
+        # Extra eos tokens
+        self.extra_eos_tokens = self.prompt_template.get_extra_eos()
+
     
     def __repr__(self) -> str:
         return f'HFModel({self.model_name}, {self.quantization}, {self.dtype})'
@@ -111,7 +117,7 @@ class HFModel(object):
             or inconsistent results as usually a model is optimized for only one given prompt format.
             By default 'default'.
         stopping_patterns: tuple[str] | bool | None
-            List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
+            List of words/patterns to stop the generation. Pass `True` to use the default `EXTENDED_CODE_STOP_PATTERNS` patterns.
             If `None`, no early stopping is performed, by default None.
         input_device : int | str, optional
             The device on which to put the inputs, by default 0.
@@ -129,17 +135,91 @@ class HFModel(object):
                                   input_device=self.input_device, **kwargs)
     
 
-    def generate_text(self, prompt: str, max_new_tokens: int = 60, min_new_tokens: int = 5, do_sample: bool = True,
-                      top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
-                      batch_size: int | None = None, seed: int | None = None, truncate_prompt_from_output: bool = False,
-                      prompt_template_mode: str = 'default', stopping_patterns: tuple[str] | bool | None = None,
-                      input_device: int | str = 0, **kwargs) -> str | list[str]:
+    def format_prompt(self, prompt: str, infill_suffix: str = '', system_prompt: str = '', model_context: str = '',
+                      prompt_template_mode: str = 'default') -> str:
+        
+        # Set the template mode
+        self.prompt_template.set_mode(prompt_template_mode)
+
+        formatted_prompt = self.prompt_template.get_prompt(prompt, model_context=model_context, suffix=infill_suffix,
+                                                           system_prompt=system_prompt)
+        
+        # Reset template mode to default
+        self.prompt_template.set_mode('default')
+
+        return formatted_prompt
+    
+
+    def create_stopping_criteria(self, input_length: int,
+                                 stopping_patterns: list[str] | tuple[str] | bool | None = None
+        ) -> StoppingCriteriaList | None:
+
+        # Possible early stopping
+        if isinstance(stopping_patterns, list) or isinstance(stopping_patterns, tuple):
+            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns, self.extra_eos_tokens)
+            stopping_criteria = StoppingCriteriaList([stopping_criteria])
+        elif isinstance(stopping_patterns, bool) and stopping_patterns:
+            stopping_patterns = stopping.EXTENDED_CODE_STOP_PATTERNS
+            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns, self.extra_eos_tokens)
+            stopping_criteria = StoppingCriteriaList([stopping_criteria])
+        else:
+            stopping_patterns = None
+            if len(self.extra_eos_tokens) == 0:
+                stopping_criteria = None
+            else:
+                stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
+                                                                 self.extra_eos_tokens)
+                stopping_criteria = StoppingCriteriaList([stopping_criteria])
+
+        return stopping_criteria, stopping_patterns
+    
+
+    def generate_text(
+            self,
+            prompt: str,
+            model_context: str = '',
+            infill_suffix: str = '',
+            system_prompt: str = '',
+            prompt_template_mode: str = 'default',
+            max_new_tokens: int = 60,
+            min_new_tokens: int = 5,
+            do_sample: bool = True,
+            top_k: int = 40,
+            top_p: float = 0.90,
+            temperature: float = 0.9,
+            num_return_sequences: int = 1,
+            batch_size: int | None = None,
+            seed: int | None = None,
+            stopping_patterns: tuple[str] | bool | None = None,
+            truncate_prompt_from_output: bool = True,
+            post_process_output: bool = True,
+            **kwargs
+        ) -> str | list[str]:
         """Generate text according to `prompt` using the parameters specified.
 
-        Parameters
-        ----------
+        Prompt formatting parameters
+        ----------------------------
+
         prompt : str
             The prompt to the model.
+        model_context : str, optional
+            An optional context forming the start of the model answer. For `generation` mode, this is simply
+            appended to `prompt`. By default ''.
+        infill_suffix : str, optional
+            An optional suffix to form the prompt. This is ignored for all `prompt_template_mode` except
+            `infill`, by default ''.
+        system_prompt : str, optional
+            An optional system prompt to append at the beginning for chat mode. This is ignored for all 
+            `prompt_template_mode` except `chat`, by default ''.
+        prompt_template_mode: str
+            The template mode for formatting the prompt. One of `('default', 'generation', 'infill', 'chat')`.
+            Note that changing this value may result in errors or inconsistent results as usually a model is
+            optimized for only one given prompt format. By default 'default', which chooses the best mode for
+            the current model.
+
+        Generation parameters
+        ---------------------
+        
         max_new_tokens : int, optional
             How many new tokens to generate, by default 60.
         min_new_tokens : int, optional
@@ -161,17 +241,18 @@ class HFModel(object):
             If None, will try to determine the largest possible batch size that does not result in memory error.
         seed : int | None, optional
             An optional seed to force the generation to be reproducible.
-        truncate_prompt_from_output : bool, optional
-            Whether to remove the prompt from the model answer or not, by default False.
-        prompt_template_mode: str
-            The template mode for formatting the prompt. Note that changing this value may result in errors
-            or inconsistent results as usually a model is optimized for only one given prompt format.
-            By default 'default'.
         stopping_patterns: tuple[str] | bool | None
-            List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
+            List of words/patterns to stop the generation. Pass `True` to use the default `EXTENDED_CODE_STOP_PATTERNS` patterns.
             If `None`, no early stopping is performed, by default None.
-        input_device : int | str, optional
-            The device on which to put the inputs, by default 0.
+
+        Output formatting parameters
+        ----------------------------
+
+        truncate_prompt_from_output : bool, optional
+            Whether to remove the prompt from the model answer or not, by default True.
+        post_process_output : bool, optional
+            Whether to post-process the outputs, i.e. truncate according to the `stopping_patterns`. This is
+            needed to correctly truncate all sequences if `num_return_sequences > 1`. By default True.
 
         Returns
         -------
@@ -183,39 +264,23 @@ class HFModel(object):
             utils.set_all_seeds(seed)
 
         # Prompt formatting
-        original_prompt = prompt
-        prompt_template = get_prompt_template(self.model_name, mode=prompt_template_mode)
-        prompt = prompt_template.get_prompt(prompt)
+        formatted_prompt = self.format_prompt(prompt, infill_suffix=infill_suffix, system_prompt=system_prompt,
+                                              model_context=model_context, prompt_template_mode=prompt_template_mode)
 
         # Tokenize the prompt
-        input = self.tokenizer.encode(prompt, return_tensors='pt')
+        input = self.tokenizer.encode(formatted_prompt, return_tensors='pt')
         input_length = input.shape[-1]
         if torch.cuda.is_available():
-            input = input.to(device=input_device)
+            input = input.to(device=self.input_device)
 
-        # Additional eos tokens
-        extra_eos_tokens = prompt_template.get_extra_eos()
-
-        # Possible early stopping
-        if isinstance(stopping_patterns, list) or isinstance(stopping_patterns, tuple):
-            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns, extra_eos_tokens)
-            stopping_criteria = StoppingCriteriaList([stopping_criteria])
-        elif isinstance(stopping_patterns, bool) and stopping_patterns:
-            stopping_patterns = stopping.CODE_STOP_PATTERNS
-            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns, extra_eos_tokens)
-            stopping_criteria = StoppingCriteriaList([stopping_criteria])
-        else:
-            stopping_patterns = None
-            if len(extra_eos_tokens) == 0:
-                stopping_criteria = None
-            else:
-                stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
-                                                                 extra_eos_tokens)
-                stopping_criteria = StoppingCriteriaList([stopping_criteria])
+        # Create the stopping criteria
+        stopping_criteria, stopping_patterns = self.create_stopping_criteria(input_length,
+                                                                             stopping_patterns=stopping_patterns)
 
         # Suppress pad_token_id warning
         pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else self.tokenizer.eos_token_id
 
+        # Infer batch size if not given
         if batch_size is None:
             batch_size = self.infer_best_batch_size(input_length, max_new_tokens, num_return_sequences)
 
@@ -275,12 +340,15 @@ class HFModel(object):
             truncated_outputs = outputs[:, input_length:]
 
             # Post-process the sequences according to stopping patterns and extra eos
-            generated_batch = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_patterns,
-                                                              extra_eos_tokens)
+            if post_process_output:
+                generated_batch = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_patterns,
+                                                                  self.extra_eos_tokens)
+            else:
+                generated_batch = self.tokenizer.batch_decode(truncated_outputs, skip_special_tokens=True)
             
             # reattach the prompt if needed
             if not truncate_prompt_from_output:
-                generated_batch = [original_prompt + sequence for sequence in generated_batch]
+                generated_batch = [formatted_prompt + sequence for sequence in generated_batch]
             
             generated_text += generated_batch
 
@@ -289,7 +357,6 @@ class HFModel(object):
             generated_text = generated_text[0]
 
         return generated_text
-    
     
 
     def infer_best_batch_size(self, input_size: int, max_new_tokens: int, num_return_sequences: int) -> int:
@@ -490,7 +557,7 @@ def load_and_generate_text(model_name: str, prompt: str, quantization: bool = Fa
             or inconsistent results as usually a model is optimized for only one given prompt format.
             By default 'default'.
     stopping_patterns: list[str] | bool | None
-        List of words/patterns to stop the generation. Pass `True` to use the default `CODE_STOP_PATTERNS` patterns.
+        List of words/patterns to stop the generation. Pass `True` to use the default `EXTENDED_CODE_STOP_PATTERNS` patterns.
         If `None`, no early stopping is performed, by default None.
     input_device : int | str, optional
         The device on which to put the inputs, by default 0.
