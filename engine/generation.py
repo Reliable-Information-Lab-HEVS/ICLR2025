@@ -9,7 +9,7 @@ import warnings
 
 from engine import loader
 from engine import stopping
-from engine.prompt_template import get_prompt_template
+from engine.prompt_template import GenericPromptTemplate, get_prompt_template
 from helpers import utils
 
 
@@ -78,89 +78,109 @@ class HFModel(object):
             return f'{self.model_name} model, original (not quantized) version'
         
 
-    def __call__(self, prompt: str, max_new_tokens: int = 60, min_new_tokens: int = 5, do_sample: bool = True,
-                 top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
-                 batch_size: int | None = None, seed: int | None = None, prompt_template_mode: str = 'default',
-                 truncate_prompt_from_output: bool = False, stopping_patterns: tuple[str] | bool | None = None,
-                 **kwargs) -> str | list[str]:
-        """Generate text according to `prompt` using the parameters specified.
+    def __call__(self,
+            prompt: str,
+            model_context: str = '',
+            infill_suffix: str = '',
+            system_prompt: str = '',
+            prompt_template_mode: str = 'default',
+            max_new_tokens: int = 60,
+            min_new_tokens: int = 5,
+            do_sample: bool = True,
+            top_k: int = 40,
+            top_p: float = 0.90,
+            temperature: float = 0.9,
+            num_return_sequences: int = 1,
+            batch_size: int | None = None,
+            seed: int | None = None,
+            stopping_patterns: tuple[str] | bool | None = None,
+            truncate_prompt_from_output: bool = True,
+            post_process_output: bool = True,
+            **kwargs
+        ) -> str | list[str]:
+        
+        
+        return self.generate_text(prompt, model_context=model_context, infill_suffix=infill_suffix, system_prompt=system_prompt,
+                                  prompt_template_mode=prompt_template_mode, max_new_tokens=max_new_tokens,
+                                  min_new_tokens=min_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
+                                  temperature=temperature, num_return_sequences=num_return_sequences,
+                                  batch_size=batch_size, seed=seed, stopping_patterns=stopping_patterns,
+                                  truncate_prompt_from_output=truncate_prompt_from_output,
+                                  post_process_output=post_process_output, **kwargs)
+    
+
+    def format_prompt(self, prompt: str, model_context: str = '', infill_suffix: str = '', system_prompt: str = '',
+                      prompt_template_mode: str = 'default') -> str:
+        """Format the prompt according to the prompt template.
 
         Parameters
         ----------
         prompt : str
             The prompt to the model.
-        max_new_tokens : int, optional
-            How many new tokens to generate, by default 60.
-        min_new_tokens : int, optional
-            The minimum number of tokens to generate, by setting the probability of EOS token to 0. It is useful to
-            force the model to generate an output, instead of immediately generating EOS, by default 5.
-        do_sample : bool, optional
-            Whether to introduce randomness in the generation, by default True.
-        top_k : int, optional
-            How many tokens with max probability to consider for randomness, by default 50.
-        top_p : float, optional
-            The probability density covering the new tokens to consider for randomness, by default 0.92.
-        temperature : float, optional
-            How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
-            no randomness), by default 0.9.
-        num_return_sequences : int, optional
-            How many sequences to generate according to the `prompt`, by default 1.
-        batch_size : int | None, optional
-            Max batch size for the model forward pass, in case `num_return_sequences` is large, by default None.
-            If None, will try to determine the largest possible batch size that does not result in memory error.
-        seed : int | None, optional
-            An optional seed to force the generation to be reproducible.
-        truncate_prompt_from_output : bool, optional
-            Whether to remove the prompt from the model answer or not, by default False.
+        model_context : str, optional
+            An optional context forming the start of the model answer. For `generation` mode, this is simply
+            appended to `prompt`. By default ''.
+        infill_suffix : str, optional
+            An optional suffix to form the prompt. This is ignored for all `prompt_template_mode` except
+            `infill`, by default ''.
+        system_prompt : str, optional
+            An optional system prompt to append at the beginning for chat mode. This is ignored for all 
+            `prompt_template_mode` except `chat`, by default ''.
         prompt_template_mode: str
-            The template mode for formatting the prompt. Note that changing this value may result in errors
-            or inconsistent results as usually a model is optimized for only one given prompt format.
-            By default 'default'.
-        stopping_patterns: tuple[str] | bool | None
-            List of words/patterns to stop the generation. Pass `True` to use the default `EXTENDED_CODE_STOP_PATTERNS` patterns.
-            If `None`, no early stopping is performed, by default None.
-        input_device : int | str, optional
-            The device on which to put the inputs, by default 0.
+            The template mode for formatting the prompt. One of `('default', 'generation', 'infill', 'chat')`.
+            Note that changing this value may result in errors or inconsistent results as usually a model is
+            optimized for only one given prompt format. By default 'default', which chooses the best mode for
+            the current model.
 
         Returns
         -------
-        str | list[str]
-            Str containing the generated sequence, or list[str] if `num_return_sequences` > 1.
+        str
+            The formatted prompt to use in the model forward.
         """
         
-        return self.generate_text(prompt, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens, do_sample=do_sample,
-                                  top_k=top_k, top_p=top_p, temperature=temperature, num_return_sequences=num_return_sequences,
-                                  batch_size=batch_size, seed=seed, truncate_prompt_from_output=truncate_prompt_from_output,
-                                  prompt_template_mode=prompt_template_mode, stopping_patterns=stopping_patterns,
-                                  input_device=self.input_device, **kwargs)
-    
-
-    def format_prompt(self, prompt: str, infill_suffix: str = '', system_prompt: str = '', model_context: str = '',
-                      prompt_template_mode: str = 'default') -> str:
-        
         # Set the template mode
+        old_mode = self.prompt_template.mode
         self.prompt_template.set_mode(prompt_template_mode)
 
         formatted_prompt = self.prompt_template.get_prompt(prompt, model_context=model_context, suffix=infill_suffix,
                                                            system_prompt=system_prompt)
         
-        # Reset template mode to default
-        self.prompt_template.set_mode('default')
+        # Reset template mode to previous mode
+        self.prompt_template.set_mode(old_mode)
 
         return formatted_prompt
     
 
-    def create_stopping_criteria(self, input_length: int,
+    def create_stopping_criteria(self,
+                                 input_length: int,
                                  stopping_patterns: list[str] | tuple[str] | bool | None = None
-        ) -> StoppingCriteriaList | None:
+        ) -> (StoppingCriteriaList | None, tuple[str] | list[str] | None):
+        """Create the stopping criteria to use from the `stopping_patterns`.
+
+        Parameters
+        ----------
+        input_length : int
+            Length of the input prompt.
+        stopping_patterns : list[str] | tuple[str] | bool | None, optional
+            List of words/patterns to stop the generation. Pass `True` to use the default 
+            `EXTENDED_CODE_STOP_PATTERNS` patterns. If `None`, no early stopping is performed, by default None.
+
+        Returns
+        -------
+        (StoppingCriteriaList | None, tuple[str] | list[str] | None)
+            Tuple containing the stopping criteria to use in the model forward, and the stopping patterns
+            to use if we post-process the outputs.
+        """
 
         # Possible early stopping
         if isinstance(stopping_patterns, list) or isinstance(stopping_patterns, tuple):
-            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns, self.extra_eos_tokens)
+            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
+                                                             self.extra_eos_tokens)
             stopping_criteria = StoppingCriteriaList([stopping_criteria])
         elif isinstance(stopping_patterns, bool) and stopping_patterns:
             stopping_patterns = stopping.EXTENDED_CODE_STOP_PATTERNS
-            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns, self.extra_eos_tokens)
+            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
+                                                             self.extra_eos_tokens)
             stopping_criteria = StoppingCriteriaList([stopping_criteria])
         else:
             stopping_patterns = None
@@ -264,8 +284,16 @@ class HFModel(object):
             utils.set_all_seeds(seed)
 
         # Prompt formatting
-        formatted_prompt = self.format_prompt(prompt, infill_suffix=infill_suffix, system_prompt=system_prompt,
-                                              model_context=model_context, prompt_template_mode=prompt_template_mode)
+        formatted_prompt = self.format_prompt(prompt, model_context=model_context, infill_suffix=infill_suffix,
+                                              system_prompt=system_prompt, prompt_template_mode=prompt_template_mode)
+        
+        # Prompt to reattach to output if `truncate_prompt_from_output` is False. This way we reattach the
+        # prompt given directly by the user, and not the prompt formatted with potential keywords in all
+        # but the most complicated cases
+        if infill_suffix == '' and system_prompt == '':
+            original_prompt = prompt + model_context
+        else:
+            original_prompt = formatted_prompt
 
         # Tokenize the prompt
         input = self.tokenizer.encode(formatted_prompt, return_tensors='pt')
@@ -287,9 +315,6 @@ class HFModel(object):
         # Anything larger than `num_return_sequences` is useless
         batch_size = min(batch_size, num_return_sequences)
 
-        # Possible past key values
-        past_key_values = kwargs.pop('past_key_values', None)
-
         # This will lower the batch size if needed, in case of possible OOM. This allows to continue without crashing,
         # by reducing the batch size automatically
         first_output, batch_size = self.oom_safe_batch_generation(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
@@ -308,14 +333,6 @@ class HFModel(object):
         else:
             batch_sizes = [num_return_sequences]
 
-        past = False
-        # Past key values generation
-        if past_key_values is not None:
-            unique_batch_sizes = np.unique(batch_sizes) # already sorted
-            # Maximum 2 elements in the following dict: one for common batch size and one for remainder
-            past_keys = {size: expand_past_keys(past_key_values, size) for size in unique_batch_sizes}
-            past = True
-
         generated_text = []
 
         for i, size in enumerate(batch_sizes):
@@ -324,17 +341,10 @@ class HFModel(object):
             if i == 0:
                 outputs = first_output
             else:
-                if past:
-                    outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                                do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                                num_return_sequences=size, stopping_criteria=stopping_criteria,
-                                                pad_token_id=pad_token_id, past_key_values=past_keys[size], **kwargs)
-                    
-                else:
-                    outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                                do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                                num_return_sequences=size, stopping_criteria=stopping_criteria,
-                                                pad_token_id=pad_token_id, **kwargs)
+                outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                              do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                              num_return_sequences=size, stopping_criteria=stopping_criteria,
+                                              pad_token_id=pad_token_id, **kwargs)
                 
             # Truncate the prompt from the output
             truncated_outputs = outputs[:, input_length:]
@@ -348,7 +358,7 @@ class HFModel(object):
             
             # reattach the prompt if needed
             if not truncate_prompt_from_output:
-                generated_batch = [formatted_prompt + sequence for sequence in generated_batch]
+                generated_batch = [original_prompt + sequence for sequence in generated_batch]
             
             generated_text += generated_batch
 
@@ -484,6 +494,11 @@ class HFModel(object):
         """
 
         return sum(map(torch.numel, self.model.parameters())) / 1e9
+    
+
+    def set_prompt_template(self, template: GenericPromptTemplate):
+        """Set the prompt template"""
+        self.prompt_template = template
         
 
 
@@ -504,78 +519,6 @@ def expand_past_keys(past_key_values, batch_size):
 
     return tuple(new)
 
-
-
-
-def load_and_generate_text(model_name: str, prompt: str, quantization: bool = False, device_map: str | None = None,
-                           dtype: torch.dtype | None = None, max_new_tokens: int = 60, min_new_tokens: int = 5,
-                           do_sample: bool = True, top_k: int = 100, top_p: float = 0.92, temperature: float = 0.9,
-                           batch_size: int | None = None, num_return_sequences: int = 1, seed: int | None = None,
-                           truncate_prompt_from_output: bool = False, prompt_template_mode: str = 'default',
-                           stopping_patterns: list[str] | bool | None = None, input_device: int | str = 0,
-                           **kwargs) -> str | list[str]:
-    """Load a model and its tokenizer and generate text according to `prompt`.
-
-    Parameters
-    ----------
-    model_name : str
-        The model used to generate the text.
-    prompt : str
-        The prompt to the model.
-    quantization : bool, optional
-        Whether to load the model in 8 bits mode to save memory, by default False.
-    device_map : str | None, optional
-        The device map to decide how to split the model between available devices, by default None. If not
-        provided, the model will be put on a single GPU if relatively small, else split using 'auto'.
-    dtype : torch.dtype | None, optional
-        The dtype to use for the model. If not provided, we use the dtype with which the model was trained
-        if it is known, else we use float32, by default None.
-    max_new_tokens : int, optional
-        How many new tokens to generate, by default 60.
-    min_new_tokens : int, optional
-        The minimum number of tokens to generate, by setting the probability of EOS token to 0. It is useful to
-        force the model to generate an output, instead of immediately generating EOS, by default 5.
-    do_sample : bool, optional
-        Whether to introduce randomness in the generation, by default True.
-    top_k : int, optional
-        How many tokens with max probability to consider for randomness, by default 100.
-    top_p : float, optional
-        The probability density covering the new tokens to consider for randomness, by default 0.92.
-    temperature : float, optional
-        How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
-        no randomness), by default 0.9.
-    num_return_sequences : int, optional
-        How many sequences to generate according to the `prompt`, by default 1.
-    batch_size : int | None, optional
-        Max batch size for the model forward pass, in case `num_return_sequences` is large, by default None.
-    seed : Union[None, int], optional
-        An optional seed to force the generation to be reproducible.
-    truncate_prompt_from_output : bool, optional
-        Whether to remove the prompt from the model answer or not, by default False.
-    prompt_template_mode: str
-            The template mode for formatting the prompt. Note that changing this value may result in errors
-            or inconsistent results as usually a model is optimized for only one given prompt format.
-            By default 'default'.
-    stopping_patterns: list[str] | bool | None
-        List of words/patterns to stop the generation. Pass `True` to use the default `EXTENDED_CODE_STOP_PATTERNS` patterns.
-        If `None`, no early stopping is performed, by default None.
-    input_device : int | str, optional
-        The device on which to put the inputs, by default 0.
-
-
-    Returns
-    -------
-    str | list[str]
-        Str containing the generated sequence, or list[str] if `num_return_sequences` > 1.
-    """
-    
-    model = HFModel(model_name, quantization=quantization, device_map=device_map, dtype=dtype)
-
-    return model(prompt, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                num_return_sequences=num_return_sequences, batch_size=batch_size, seed=seed,
-                truncate_prompt_from_output=truncate_prompt_from_output, prompt_template_mode=prompt_template_mode,
-                stopping_patterns=stopping_patterns, input_device=input_device, **kwargs)
 
 
 
