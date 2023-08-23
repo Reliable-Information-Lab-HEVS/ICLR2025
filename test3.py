@@ -1,39 +1,27 @@
-import time
-import torch
-
 import engine
-from helpers import datasets
-from transformers import AutoModelForCausalLM
-
-import engine
+from engine import stopping
 from helpers import datasets
 
-HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
-    'max_new_tokens': 512,
-    'min_new_tokens': 5,
-    'do_sample': False,
-    'top_k': 0,
-    'top_p': 1.,
-    'num_return_sequences': 1,
-    'seed': 1234,
-    'truncate_prompt_from_output': True,
-    'stopping_patterns': False
-}
+model = engine.HFModel('llama2-7B-chat')
 
-# dataset = datasets.HumanEvalInstruct()
-# sample = dataset[0]
-# prompt = sample['instruction'] + sample['context']
+dataset = datasets.HumanEvalInstruct()
+sample = dataset[0]
 
-# model = engine.HFModel('vicuna-7B')
-# out = model(prompt, batch_size=1, **HUMAN_EVAL_GREEDY_GENERATION_KWARGS)
-# print(prompt + out)
+instruction = sample['instruction']
+context = sample['context']
+
+out1 = model(instruction + context, max_new_tokens=40, do_sample=False, top_k=0, top_p=1., batch_size=1,
+             post_process_output=False, truncate_prompt_from_output=False)
+out2 = model(instruction.strip() + '\n' + context.strip(), max_new_tokens=40, do_sample=False, top_k=0, top_p=1., batch_size=1,
+             post_process_output=False, truncate_prompt_from_output=False)
+out3 = model(instruction, model_context=context, max_new_tokens=40, do_sample=False, top_k=0, top_p=1., batch_size=1,
+             post_process_output=False, truncate_prompt_from_output=False)
+out4 = model(instruction.strip(), model_context=context.strip(), max_new_tokens=40, do_sample=False, top_k=0, top_p=1., batch_size=1,
+             post_process_output=False, truncate_prompt_from_output=False)
 
 
-dataset = datasets.HumanEval()
-sample = dataset[17]
-prompt = sample['prompt']
-
-model = engine.HFModel('star-chat-beta')
-out = model(prompt, batch_size=1, **HUMAN_EVAL_GREEDY_GENERATION_KWARGS)
-print(prompt + out)
+print(f'Without context and without strip:\n\n{out1}\n\n')
+print(f'Without context and with strip:\n\n{out2}\n\n')
+print(f'With context and without strip:\n\n{out3}\n\n')
+print(f'With context and with strip:\n\n{out4}')
 

@@ -328,7 +328,8 @@ class HFModel(object):
             
             # reattach the prompt if needed
             if not truncate_prompt_from_output:
-                generated_batch = [original_prompt + sequence for sequence in generated_batch]
+                # generated_batch = [original_prompt + sequence for sequence in generated_batch]
+                generated_batch = [formatted_prompt + sequence for sequence in generated_batch]
             
             generated_text += generated_batch
 
