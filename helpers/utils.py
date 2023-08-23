@@ -3,6 +3,10 @@ import random
 import os
 import json
 import multiprocessing as mp
+from typing import Callable, TypeVar, ParamSpec
+
+P = ParamSpec("P")
+T = TypeVar("T")
 
 # Path to the root of the project
 ROOT_FOLDER = os.path.dirname(os.path.dirname(__file__))
@@ -284,3 +288,23 @@ def set_cuda_visible_device_of_subprocess():
 
     gpu_rank = find_rank_of_subprocess_inside_the_pool()
     set_cuda_visible_device(gpu_rank)
+
+
+def copy_docstring_and_signature(copied_func: Callable[P, T]):
+    """Decorator that copies the docstring and signature of another function.
+    Note: the type hints are absolutely necessary for VScode to properly show the signature and docstring
+    of the new function. There is some black magic in how VScode shows the docstrings because simply
+    updating the __doc__ property does not work...
+    
+    Parameters
+    ----------
+    copied_func : Callable[P, T]
+        The function from which to copy docstring and signature.
+    """
+
+    def wrapper(original_func: Callable[P, T]) -> Callable[P, T]:
+        original_func.__doc__ = copied_func.__doc__
+        return original_func
+    
+    return wrapper
+

@@ -69,45 +69,15 @@ class HFModel(object):
 
     
     def __repr__(self) -> str:
-        return f'HFModel({self.model_name}, {self.quantization}, {self.dtype})'
+        return f'{self.__class__.__name__}({self.model_name}, quantization={self.quantization}, dtype={self.dtype})'
+    
     
     def __str__(self) -> str:
         if self.quantization:
-            return f'{self.model_name} model, quantized 8 bits version'
+            return f'{self.model_name}, quantized 8 bits version'
         else:
-            return f'{self.model_name} model, original (not quantized) version'
-        
+            return f'{self.model_name}, using dtype {self.dtype}'
 
-    def __call__(self,
-            prompt: str,
-            model_context: str = '',
-            infill_suffix: str = '',
-            system_prompt: str = '',
-            prompt_template_mode: str = 'default',
-            max_new_tokens: int = 60,
-            min_new_tokens: int = 5,
-            do_sample: bool = True,
-            top_k: int = 40,
-            top_p: float = 0.90,
-            temperature: float = 0.9,
-            num_return_sequences: int = 1,
-            batch_size: int | None = None,
-            seed: int | None = None,
-            stopping_patterns: tuple[str] | bool | None = None,
-            truncate_prompt_from_output: bool = True,
-            post_process_output: bool = True,
-            **kwargs
-        ) -> str | list[str]:
-        
-        
-        return self.generate_text(prompt, model_context=model_context, infill_suffix=infill_suffix, system_prompt=system_prompt,
-                                  prompt_template_mode=prompt_template_mode, max_new_tokens=max_new_tokens,
-                                  min_new_tokens=min_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
-                                  temperature=temperature, num_return_sequences=num_return_sequences,
-                                  batch_size=batch_size, seed=seed, stopping_patterns=stopping_patterns,
-                                  truncate_prompt_from_output=truncate_prompt_from_output,
-                                  post_process_output=post_process_output, **kwargs)
-    
 
     def format_prompt(self, prompt: str, model_context: str = '', infill_suffix: str = '', system_prompt: str = '',
                       prompt_template_mode: str = 'default') -> str:
@@ -369,6 +339,11 @@ class HFModel(object):
         return generated_text
     
 
+    @utils.copy_docstring_and_signature(generate_text)
+    def __call__(self, *args, **kwargs):
+        return self.generate_text(*args, **kwargs)
+    
+
     def infer_best_batch_size(self, input_size: int, max_new_tokens: int, num_return_sequences: int) -> int:
         """Try to infer the best (largest) possible batch size for the model given the current `input_size`,
         and `max_new_tokens`. By default, this function checks if a batch memory footprint estimation exists
@@ -497,10 +472,8 @@ class HFModel(object):
     
 
     def set_prompt_template(self, template: GenericPromptTemplate):
-        """Set the prompt template"""
+        """Set the prompt template."""
         self.prompt_template = template
-        
-
 
    
 
