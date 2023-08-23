@@ -1,7 +1,7 @@
 import torch
 from transformers import PreTrainedTokenizerBase, StoppingCriteria
 
-from engine.code_parser import PythonParser
+from engine.code_parser import CodeParser, PythonParser
 
 # If we reach one of these patterns, it means that the model has finished generating the solution as a 
 # function and continues useless generation (basically stop words used in the Codex/HumanEval 
@@ -26,14 +26,13 @@ class TextPatternStopping(StoppingCriteria):
 
     def __init__(self, prompt_ids_length: int, tokenizer: PreTrainedTokenizerBase,
                  stopping_patterns: list[str] | tuple[str] | None = EXTENDED_CODE_STOP_PATTERNS,
-                 extra_eos_tokens: list[str] | None = None, parser: PythonParser | None = None):
+                 extra_eos_tokens: list[str] | None = None):
 
         super().__init__()
         self.prompt_ids_length = prompt_ids_length
         self.tokenizer = tokenizer
         self.stopping_patterns = stopping_patterns
         self.extra_eos_tokens = extra_eos_tokens
-        self.parser = parser
         self.all_patterns = tuple()
 
         # Add stopping_patterns to the tuple of patterns if there are any
@@ -57,8 +56,6 @@ class TextPatternStopping(StoppingCriteria):
 
         outputs = input_ids[:, self.prompt_ids_length:]
         generated_sequences = self.tokenizer.batch_decode(outputs)
-        if self.parser is not None:
-            generated_sequences = [self.parser(sequence) for sequence in generated_sequences]
         done_sequences = []
 
         for sequence in generated_sequences:
@@ -79,7 +76,7 @@ def post_process_stopping_patterns(prompt_truncated_generated_sequences: list[st
     ----------
     prompt_truncated_generated_sequences : list[str]
         Decoded PROMPT-TRUNCATED outputs of a model. Passing the full decoded outputs may induce errors in the logic.
-    stopping_patterns : list[str] | tuple[tr], optional
+    stopping_patterns : list[str] | tuple[tr] | None, optional
         The list of patterns to use to stop generation, by default EXTENDED_CODE_STOP_PATTERNS
 
     Returns
@@ -171,7 +168,7 @@ def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: Pr
         The PROMPT-TRUNCATED output of a model. Passing the full outputs may induce errors in the logic.
     tokenizer : PreTrainedTokenizerBase
         The tokenizer used by the model.
-    stopping_patterns : list[str] | tuple[tr], optional
+    stopping_patterns : list[str] | tuple[tr] | None, optional
         The list of patterns to use to stop generation, by default EXTENDED_CODE_STOP_PATTERNS
     extra_eos_tokens : list[str] | None, optional
         The list of extra eos tokens, by default None
@@ -194,3 +191,28 @@ def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: Pr
     final_sequences = post_process_stopping_patterns(prompt_truncated_sequences, stopping_patterns)
 
     return final_sequences
+
+
+
+def parse_code_and_truncate(generated_sequences: list[str], parser: CodeParser = PythonParser(),
+                            stopping_patterns: list[str] | tuple[str] | None = EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
+    """Extract code from `generated_sequences`, and truncate according to `stopping_patterns`.
+
+    Parameters
+    ----------
+    generated_sequences : list[str]
+        The sequences to process.
+    parser : CodeParser
+        A parser that extract code from strings.
+    stopping_patterns : list[str] | tuple[tr] | None, optional
+        The list of patterns to use to stop generation, by default EXTENDED_CODE_STOP_PATTERNS
+
+    Returns
+    -------
+    list[str]
+        Code output.
+    """
+    
+    parsed_sequences = [parser(sequence) for sequence in generated_sequences]
+    truncated_sequences = post_process_stopping_patterns(parsed_sequences, stopping_patterns)
+    return truncated_sequences

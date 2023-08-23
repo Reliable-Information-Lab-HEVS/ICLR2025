@@ -1,7 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 
-"Il faut vérouiller son ordi quand on part au roulotte!"
+from helpers import utils
 
 
 class CodeParser(ABC):
@@ -24,23 +24,6 @@ class CodeParser(ABC):
             List containing all code blocks.
         """
         return NotImplementedError('Abstract method.')
-    
-
-    def __call__(self, s: str) -> str:
-        """Parse all Python code contained in `s`, and concatenate it. Return an empty string if no code
-        was detected.
-
-        Parameters
-        ----------
-        s : str
-            String to parse.
-
-        Returns
-        -------
-        str
-            The truncated code output.
-        """
-        return self.full_parse(s)
 
 
     def concatenate(self, code_blocks: list[str] | None) -> str:
@@ -80,6 +63,11 @@ class CodeParser(ABC):
         blocks = self.parse(s)
         block = self.concatenate(blocks)
         return block
+    
+
+    @utils.copy_docstring_and_signature(full_parse)
+    def __call__(self, *args, **kwargs):
+        return self.full_parse(*args, **kwargs)
 
 
 

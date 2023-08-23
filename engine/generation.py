@@ -10,6 +10,7 @@ import warnings
 from engine import loader
 from engine import stopping
 from engine.prompt_template import GenericPromptTemplate, get_prompt_template
+from engine.code_parser import CodeParser, PythonParser
 from helpers import utils
 
 
@@ -67,6 +68,9 @@ class HFModel(object):
         # Extra eos tokens
         self.extra_eos_tokens = self.prompt_template.get_extra_eos()
 
+        # Flag to check if the model is a chat model by default
+        self.is_chat_model = self.prompt_template.default_mode == 'chat'
+
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.model_name}, quantization={self.quantization}, dtype={self.dtype})'
@@ -123,7 +127,7 @@ class HFModel(object):
 
     def create_stopping_criteria(self,
                                  input_length: int,
-                                 stopping_patterns: list[str] | tuple[str] | bool | None = None
+                                 stopping_patterns: list[str] | tuple[str] | bool | None = None,
         ) -> (StoppingCriteriaList | None, tuple[str] | list[str] | None):
         """Create the stopping criteria to use from the `stopping_patterns`.
 

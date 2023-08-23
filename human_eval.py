@@ -8,6 +8,7 @@ import copy
 
 import engine
 from engine import stopping
+from engine.code_parser import CodeParser, PythonParser
 from helpers import datasets
 from helpers import utils
 
@@ -24,7 +25,6 @@ HUMAN_EVAL_GENERATION_KWARGS = {
     'num_return_sequences': 200,
     'seed': 1234,
     'truncate_prompt_from_output': True,
-    'stopping_patterns': stopping.EXTENDED_CODE_STOP_PATTERNS
 }
 
 HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
@@ -36,7 +36,6 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
     'num_return_sequences': 1,
     'seed': 1234,
     'truncate_prompt_from_output': True,
-    'stopping_patterns': stopping.EXTENDED_CODE_STOP_PATTERNS
 }
 
 SMALL_MODELS = (
@@ -92,6 +91,31 @@ LARGE_MODELS = (
 )
 
 
+def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = PythonParser(),
+                        stopping_patterns: tuple[str] = stopping.EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
+    
+    code_outputs = stopping.parse_code_and_truncate(outputs, parser, stopping_patterns)
+
+    completions = []
+    for output in code_outputs:
+        if output.startswith('def ' + sample['entry_point']):
+            # Remove the function definition
+            _, output = output.split(':\n', 1)
+            if '"""\n' in output:
+                _, completion = output.split('"""\n', 1)
+            else:
+                completion = output
+        else:
+            completion = output
+
+        completions.append(completion)
+
+    return completions
+
+
+
+
+
 def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
                generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
                greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
@@ -114,6 +138,7 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
     quantization = True if model_name == 'bloom-176B' else False
 
     model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
+    stopping_patterns = None if model.is_chat_model else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEval_completions', model_name)
 
     dataset = datasets.HumanEval()
@@ -147,13 +172,19 @@ def human_eval(model_name: str, temperatures: tuple[int] = TEMPERATURES,
             # In this case we use greedy decoding (the temperature parameters does not matter anymore
             # so we set it to the default which is 1)
             if temperature == 0:
-                completions = [model(prompt, temperature=1., batch_size=1, **greedy_generation_kwargs)]
+                completions = [model(prompt, temperature=1., batch_size=1, stopping_patterns=stopping_patterns,
+                                     **greedy_generation_kwargs)]
             # In this case we use top-p sampling
             else:
-                completions = model(prompt, temperature=temperature, **generation_kwargs)
+                completions = model(prompt, temperature=temperature, stopping_patterns=stopping_patterns,
+                                    **generation_kwargs)
 
             # Save the model completions
-            results = [{'task_id': task_id, 'completion': completion} for completion in completions]
+            if model.is_chat_model:
+                true_completions = extract_completions(completions, sample)
+                results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
+            else:
+                results = [{'task_id': task_id, 'completion': completion} for completion in completions]
             utils.save_jsonl(results, filename, append=True)
 
     dt = time.time() - t0
@@ -185,6 +216,7 @@ def human_eval_instruct(model_name: str, temperatures: tuple[int] = TEMPERATURES
     quantization = True if model_name == 'bloom-176B' else False
 
     model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
+    stopping_patterns = None if model.is_chat_model else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , 'HumanEvalInstruct_completions', model_name)
 
     dataset = datasets.HumanEvalInstruct()
@@ -218,13 +250,19 @@ def human_eval_instruct(model_name: str, temperatures: tuple[int] = TEMPERATURES
             # In this case we use greedy decoding (the temperature parameters does not matter anymore
             # so we set it to the default which is 1)
             if temperature == 0:
-                completions = [model(prompt, temperature=1., batch_size=1, **greedy_generation_kwargs)]
+                completions = [model(prompt, temperature=1., batch_size=1, stopping_patterns=stopping_patterns,
+                                     **greedy_generation_kwargs)]
             # In this case we use top-p sampling
             else:
-                completions = model(prompt, temperature=temperature, **generation_kwargs)
+                completions = model(prompt, temperature=temperature, stopping_patterns=stopping_patterns,
+                                    **generation_kwargs)
 
             # Save the model completions
-            results = [{'task_id': task_id, 'completion': completion} for completion in completions]
+            if model.is_chat_model:
+                true_completions = extract_completions(completions, sample)
+                results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
+            else:
+                results = [{'task_id': task_id, 'completion': completion} for completion in completions]
             utils.save_jsonl(results, filename, append=True)
 
     dt = time.time() - t0
