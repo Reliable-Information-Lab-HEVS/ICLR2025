@@ -128,7 +128,8 @@ class HFModel(object):
     def create_stopping_criteria(self,
                                  input_length: int,
                                  stopping_patterns: list[str] | tuple[str] | bool | None = None,
-        ) -> (StoppingCriteriaList | None, tuple[str] | list[str] | None):
+                                 parser: CodeParser | None = None
+        ) -> tuple[StoppingCriteriaList | None, tuple[str] | list[str] | None]:
         """Create the stopping criteria to use from the `stopping_patterns`.
 
         Parameters
@@ -138,10 +139,14 @@ class HFModel(object):
         stopping_patterns : list[str] | tuple[str] | bool | None, optional
             List of words/patterns to stop the generation. Pass `True` to use the default 
             `EXTENDED_CODE_STOP_PATTERNS` patterns. If `None`, no early stopping is performed, by default None.
+        parser: CodeParser | None, optional
+            A parser to extract code from generated sequences. The `stopping_patterns` will be applied on the
+            parsed sequences. This should be used with caution, as it was designed only for chat models that
+            embed code in their output in natural language. The default is None, i.e. no parsing.
 
         Returns
         -------
-        (StoppingCriteriaList | None, tuple[str] | list[str] | None)
+        tuple[StoppingCriteriaList | None, tuple[str] | list[str] | None]
             Tuple containing the stopping criteria to use in the model forward, and the stopping patterns
             to use if we post-process the outputs.
         """
@@ -149,12 +154,12 @@ class HFModel(object):
         # Possible early stopping
         if isinstance(stopping_patterns, list) or isinstance(stopping_patterns, tuple):
             stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
-                                                             self.extra_eos_tokens)
+                                                             self.extra_eos_tokens, parser)
             stopping_criteria = StoppingCriteriaList([stopping_criteria])
         elif isinstance(stopping_patterns, bool) and stopping_patterns:
             stopping_patterns = stopping.EXTENDED_CODE_STOP_PATTERNS
             stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
-                                                             self.extra_eos_tokens)
+                                                             self.extra_eos_tokens, parser)
             stopping_criteria = StoppingCriteriaList([stopping_criteria])
         else:
             stopping_patterns = None
@@ -162,7 +167,7 @@ class HFModel(object):
                 stopping_criteria = None
             else:
                 stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
-                                                                 self.extra_eos_tokens)
+                                                                 self.extra_eos_tokens, parser)
                 stopping_criteria = StoppingCriteriaList([stopping_criteria])
 
         return stopping_criteria, stopping_patterns
@@ -185,6 +190,7 @@ class HFModel(object):
             batch_size: int | None = None,
             seed: int | None = None,
             stopping_patterns: tuple[str] | bool | None = None,
+            parser: CodeParser | None = None,
             truncate_prompt_from_output: bool = True,
             post_process_output: bool = True,
             **kwargs
@@ -235,9 +241,14 @@ class HFModel(object):
             If None, will try to determine the largest possible batch size that does not result in memory error.
         seed : int | None, optional
             An optional seed to force the generation to be reproducible.
-        stopping_patterns: tuple[str] | bool | None
+        stopping_patterns: tuple[str] | bool | None, optional
             List of words/patterns to stop the generation. Pass `True` to use the default `EXTENDED_CODE_STOP_PATTERNS` patterns.
             If `None`, no early stopping is performed, by default None.
+        parser: CodeParser | None, optional
+            A parser to extract code from generated sequences. The final outputs will only consist of the parsed
+            sequences if `post_process_output` is True. Also, the `stopping_patterns` will be applied on the
+            parsed sequences. This should be used with caution, as it was designed only for chat models that
+            embed code in their output in natural language. The default is None, i.e. no parsing.
 
         Output formatting parameters
         ----------------------------
@@ -277,7 +288,8 @@ class HFModel(object):
 
         # Create the stopping criteria
         stopping_criteria, stopping_patterns = self.create_stopping_criteria(input_length,
-                                                                             stopping_patterns=stopping_patterns)
+                                                                             stopping_patterns=stopping_patterns,
+                                                                             parser=parser)
 
         # Suppress pad_token_id warning
         pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else self.tokenizer.eos_token_id
@@ -326,7 +338,7 @@ class HFModel(object):
             # Post-process the sequences according to stopping patterns and extra eos
             if post_process_output:
                 generated_batch = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_patterns,
-                                                                  self.extra_eos_tokens)
+                                                                  self.extra_eos_tokens, parser)
             else:
                 generated_batch = self.tokenizer.batch_decode(truncated_outputs, skip_special_tokens=True)
             

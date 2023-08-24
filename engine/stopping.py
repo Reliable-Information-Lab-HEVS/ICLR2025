@@ -167,7 +167,7 @@ def post_process_extra_eos_tokens(prompt_truncated_outputs: torch.Tensor, pad_to
 
 def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: PreTrainedTokenizerBase,
                            stopping_patterns: list[str] | tuple[str] | None = EXTENDED_CODE_STOP_PATTERNS,
-                           extra_eos_tokens: list[str] | None = None) -> list[str]:
+                           extra_eos_tokens: list[str] | None = None, parser: CodeParser | None = None) -> list[str]:
     """Apply all steps of post-processing to the prompt-truncated outputs of a model.
 
     Parameters
@@ -180,6 +180,10 @@ def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: Pr
         The list of patterns to use to stop generation, by default EXTENDED_CODE_STOP_PATTERNS
     extra_eos_tokens : list[str] | None, optional
         The list of extra eos tokens, by default None
+    parser: CodeParser | None, optional
+            A parser to extract code from generated sequences. This should be used with caution, as it was
+            designed only for chat models that embed code in their output in natural language.
+            The default is None, i.e. no parsing.
 
     Returns
     -------
@@ -187,15 +191,20 @@ def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: Pr
         The post-processed generated sequences.
     """
     
+    # Return None if extra_eos_tokens is Npne
     extra_eos_tokens_ids = tokenizer.convert_tokens_to_ids(extra_eos_tokens)
     pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
 
     # Check if we find any of the extra eos tokens. We first look for extra eos in this way so that we
     # can later use tokenizer.batch_decode(..., skip_special_tokens=True), i.e. easily remove all the 
     # special tokens
-    
     processed_outputs = post_process_extra_eos_tokens(prompt_truncated_outputs, pad_token_id, extra_eos_tokens_ids)
+    # Decode sequences
     prompt_truncated_sequences = tokenizer.batch_decode(processed_outputs, skip_special_tokens=True)
+    # Parse sequences
+    if parser is not None:
+        prompt_truncated_sequences = [parser(sequence) for sequence in prompt_truncated_sequences]
+    # Truncate according to stopping patterns
     final_sequences = post_process_stopping_patterns(prompt_truncated_sequences, stopping_patterns)
 
     return final_sequences
