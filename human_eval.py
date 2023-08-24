@@ -440,7 +440,7 @@ if __name__ == '__main__':
         # else:
             # pool.map(human_eval, small_models, mode_iter, chunksize=1)
         # pool.map(target, small_models, chunksize=1)
-        pool.map(lambda x: print('Fuck you'), [i for i in range(10)])
+        list(pool.map(lambda x: print('Fuck you'), [i for i in range(10)]))
 
     if big_models:
         for model in large_models:
