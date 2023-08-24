@@ -428,15 +428,17 @@ if __name__ == '__main__':
     # Run all models that fit on a single gpu in parallel using all gpus
     # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
     # with mp.Pool(processes=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-    with ProcessPoolExecutor(max_workers=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-        if instruct:
-            pool.map(human_eval_instruct, small_models, mode_iter, use_context_iter, chunksize=1)
-        else:
-            pool.map(human_eval, small_models, mode_iter, chunksize=1)
+    # with ProcessPoolExecutor(max_workers=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+    #     if instruct:
+    #         pool.map(human_eval_instruct, small_models, mode_iter, use_context_iter, chunksize=1)
+    #     else:
+    #         pool.map(human_eval, small_models, mode_iter, chunksize=1)
 
-    if big_models:
-        for model in large_models:
-            if instruct:
-                human_eval_instruct(model, mode, use_context)
-            else:
-                human_eval(model, mode)
+    # if big_models:
+    #     for model in large_models:
+    #         if instruct:
+    #             human_eval_instruct(model, mode, use_context)
+    #         else:
+    #             human_eval(model, mode)
+
+    human_eval(SMALL_MODELS[0], mode)
