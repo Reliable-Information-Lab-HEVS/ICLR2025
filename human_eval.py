@@ -417,6 +417,7 @@ if __name__ == '__main__':
         raise RuntimeError("I'm begging you, run this benchmark with some GPUs...")
     
     num_gpus = torch.cuda.device_count()
+    print(num_gpus)
 
     small_models = SMALL_MODELS_SPECIAL_PROMPT if only_special else SMALL_MODELS
     large_models = LARGE_MODELS_SPECIAL_PROMPT if only_special else LARGE_MODELS
