@@ -429,7 +429,7 @@ if __name__ == '__main__':
     # Run all models that fit on a single gpu in parallel using all gpus
     # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
     # with mp.Pool(processes=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-    with ProcessPoolExecutor(max_workers=num_gpus, mp_context='spawn', initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'), initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
         if instruct:
             _ = list(pool.map(human_eval_instruct, small_models, mode_iter, use_context_iter, chunksize=1))
         else:
