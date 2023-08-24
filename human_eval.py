@@ -439,7 +439,10 @@ if __name__ == '__main__':
             # pool.map(human_eval_instruct, small_models, mode_iter, use_context_iter, chunksize=1)
         # else:
             # pool.map(human_eval, small_models, mode_iter, chunksize=1)
-        pool.map(target, small_models, chunksize=1)
+        try:
+            pool.map(target, small_models, chunksize=1)
+        except BaseException as e:
+            print(e)
 
     if big_models:
         for model in large_models:
