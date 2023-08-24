@@ -425,6 +425,8 @@ if __name__ == '__main__':
     mode_iter = (mode,)*len(small_models)
     use_context_iter = (use_context,)*len(small_models)
 
+    print(mode_iter)
+
     # Run all models that fit on a single gpu in parallel using all gpus
     # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
     # with mp.Pool(processes=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
