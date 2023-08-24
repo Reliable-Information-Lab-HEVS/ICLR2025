@@ -206,6 +206,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         process.join()
 
 
+
 def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = PythonParser(),
                         stopping_patterns: tuple[str] = stopping.EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
     
