@@ -426,6 +426,7 @@ if __name__ == '__main__':
     use_context_iter = (use_context,)*len(small_models)
 
     print(mode_iter)
+    print(use_context_iter)
 
     # Run all models that fit on a single gpu in parallel using all gpus
     # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
