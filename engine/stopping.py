@@ -1,5 +1,6 @@
 import torch
 from transformers import PreTrainedTokenizerBase, StoppingCriteria
+import numpy as np
 
 from engine.code_parser import CodeParser, PythonParser
 
@@ -26,43 +27,50 @@ class TextPatternStopping(StoppingCriteria):
 
     def __init__(self, prompt_ids_length: int, tokenizer: PreTrainedTokenizerBase,
                  stopping_patterns: list[str] | tuple[str] | None = EXTENDED_CODE_STOP_PATTERNS,
-                 extra_eos_tokens: list[str] | None = None):
+                 extra_eos_tokens: list[str] | None = None, parser: CodeParser | None = None):
 
         super().__init__()
         self.prompt_ids_length = prompt_ids_length
         self.tokenizer = tokenizer
-        self.stopping_patterns = stopping_patterns
-        self.extra_eos_tokens = extra_eos_tokens
-        self.all_patterns = tuple()
-
-        # Add stopping_patterns to the tuple of patterns if there are any
-        if self.stopping_patterns is not None and len(self.stopping_patterns) > 0:
-            self.all_patterns += tuple(self.stopping_patterns)
-        # Add extra eos to the tuple of patterns if there are any
-        if self.extra_eos_tokens is not None and len(self.extra_eos_tokens) > 0:
-            self.all_patterns += tuple(self.extra_eos_tokens)
+        self.parser = parser
+        self.stopping_patterns = tuple() if stopping_patterns is None else tuple(stopping_patterns)
+        self.extra_eos_tokens = tuple() if extra_eos_tokens is None else tuple(extra_eos_tokens)
+        self.all_patterns = self.stopping_patterns + self.extra_eos_tokens
 
         if len(self.all_patterns) == 0:
             raise ValueError('You did not provide any patterns or extra eos tokens upon which to stop generation.')
-        
         
     def __repr__(self):
         return f'TextPatternStopping{*self.all_patterns,}'
     
     def __str__(self):
         return f'{*self.all_patterns,}'
+    
+    def check_patterns(self, generated_sequences: list[str], patterns: tuple[str]) -> list[bool]:
+
+        done_sequences = []
+
+        for sequence in generated_sequences:
+            done = any([pattern in sequence for pattern in patterns])
+            done_sequences.append(done)
+
+        return done_sequences
 
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
 
         outputs = input_ids[:, self.prompt_ids_length:]
         generated_sequences = self.tokenizer.batch_decode(outputs)
-        done_sequences = []
-
-        for sequence in generated_sequences:
-            done = any([pattern in sequence for pattern in self.all_patterns])
-            done_sequences.append(done)
-
-        return all(done_sequences)
+        
+        # If we don't use a parser, just check against all patterns
+        if self.parser is None:
+            done_sequences = self.check_patterns(generated_sequences, self.all_patterns)
+            return all(done_sequences)
+        # Else first check the eos is the full sequences, then parse and check for the other patterns
+        else:
+            done_with_eos = self.check_patterns(generated_sequences, self.extra_eos_tokens)
+            parsed_sequences = [self.parser(sequence) for sequence in generated_sequences]
+            done_with_patterns = self.check_patterns(parsed_sequences, self.stopping_patterns)
+            return all(np.logical_or(done_with_eos, done_with_patterns))
 
 
 
