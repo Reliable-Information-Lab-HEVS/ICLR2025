@@ -474,6 +474,54 @@ def get_model_dtype(model_name: str) -> torch.dtype:
     return ALL_MODELS_DTYPES_MAPPING[model_name]
 
 
+def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dtype | None = None) -> tuple[int, float]:
+    """Estimate the minimum number of gpu needed to perform inference with a model. This relies on
+    simple heuristics.
+
+    Parameters
+    ----------
+    model_name : str
+        The model name.
+    quantization : bool
+        Whether the model will be loaded in 8 bits mode.
+    dtype : torch.dtype | None, optional
+        The dtype to use for the model. If not provided, we use the dtype with which the model was trained
+        if it is known, else we use float32, by default None.
+
+    Returns
+    -------
+    tuple[int, float]
+        Tuple containing the minimum number of gpus needed, and the maximum size (in GiB) to reserve for the
+        model per gpu.
+    """
+
+    # If not provided take the default one
+    if dtype is None:
+        dtype = get_model_dtype(model_name)
+
+    if quantization:
+        size_multiplier = 1
+    elif (dtype == torch.float16) or (dtype == torch.bfloat16):
+        size_multiplier = 2
+    else:
+        size_multiplier = 4
+
+    # Estimate of the memory size of the model
+    rough_model_size_estimate = ALL_MODELS_PARAMS_MAPPING[model_name] * size_multiplier
+    
+    # We assume that we always have identical gpus when using multiple gpus
+    gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
+    # Say we only have access to a portion of that memory for our model
+    gpu_memory = 0.8 * gpu_memory
+
+    # Compute the minimum number of gpus needed
+    min_gpu_needed = rough_model_size_estimate // gpu_memory
+    # Heuristic: if the remainder is smaller than 2% of each gpu_memory, do not add a gpu and distill
+    # the small excess between existing gpus
+    if rough_model_size_estimate % gpu_memory >= (0.02 * gpu_memory) * min_gpu_needed:
+        min_gpu_needed += 1
+
+    return min_gpu_needed, gpu_memory
 
 
 
@@ -532,37 +580,17 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         additional_kwargs = {}
 
 
-    if quantization:
-        size_multiplier = 1
-    elif (dtype == torch.float16) or (dtype == torch.bfloat16):
-        size_multiplier = 2
-    else:
-        size_multiplier = 4
-
-    # Estimate of the memory size of the model
-    rough_model_size_estimate = ALL_MODELS_PARAMS_MAPPING[model_name] * size_multiplier
-
     # Flag that will be set to True if we don't even need a device_map and can just put the model on one gpu
     only_move_to_one_gpu = False
     
     # Automatically find the best device_map depending on the model size and gpu size.
     # Try to minimize the number of gpus to use because using more will slow inference (but allow larger
-    # batch size). Indeed, the parallelism of device_map is naive and gpus are only used sequentially
+    # batch size -> hard trade-off to find). Indeed, the parallelism of device_map is naive and gpus are only
+    # used sequentially
     if (device_map is None) and torch.cuda.is_available():
     
-        # We assume that we always have identical gpus when using multiple gpus
-        gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
-        # Say we only have access to a portion of that memory for our model
-        gpu_memory = 0.8 * gpu_memory
+        min_gpu_needed, gpu_memory = estimate_model_gpu_footprint(model_name, quantization, dtype)
         gpu_number = torch.cuda.device_count()
-
-        # Compute the minimum number of gpus needed
-        min_gpu_needed = rough_model_size_estimate // gpu_memory
-        # Heuristic: if the remainder is smaller than 2% of each gpu_memory, do not add a gpu and distill
-        # the small excess between existing gpus
-        if rough_model_size_estimate % gpu_memory >= (0.02 * gpu_memory) * min_gpu_needed:
-            min_gpu_needed += 1
-
 
         if min_gpu_needed > gpu_number:
             raise RuntimeError(("The model seems too big for the gpu resources you have. To offload to the cpu as well, "
