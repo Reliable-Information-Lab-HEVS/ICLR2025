@@ -24,9 +24,10 @@ prompt = sample['prompt']
 
 completions = [model(prompt, temperature=1., batch_size=1, stopping_patterns=None,
                     **HUMAN_EVAL_GREEDY_GENERATION_KWARGS)]
+print(completions)
+
 true_completions = human_eval.extract_completions(completions, sample)
 results = [{'task_id': 26, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
-print(completions)
 
 print('\n\n')
 print(true_completions)
