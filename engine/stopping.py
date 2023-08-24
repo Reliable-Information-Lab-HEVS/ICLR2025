@@ -40,13 +40,30 @@ class TextPatternStopping(StoppingCriteria):
         if len(self.all_patterns) == 0:
             raise ValueError('You did not provide any patterns or extra eos tokens upon which to stop generation.')
         
+
     def __repr__(self):
         return f'TextPatternStopping{*self.all_patterns,}'
     
+
     def __str__(self):
         return f'{*self.all_patterns,}'
     
+
     def check_patterns(self, generated_sequences: list[str], patterns: tuple[str]) -> list[bool]:
+        """Check if there is at least one of the `patterns` in each of the `generated_sequences`.
+
+        Parameters
+        ----------
+        generated_sequences : list[str]
+            Decoded outputs of the models.
+        patterns : tuple[str]
+            Patterns to check for.
+
+        Returns
+        -------
+        list[bool]
+            Whether each sequence is finished or not.
+        """
 
         done_sequences = []
 
@@ -56,7 +73,25 @@ class TextPatternStopping(StoppingCriteria):
 
         return done_sequences
 
+
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
+        """Return `True` if all sequences are finished being generated (i.e. there is at least one stopping
+        pattern or eos in each sequence). Unfortunately, this cannot return a list of boolean to inform
+        the generation function which sequences are done or not, and append <pad-token> to the finished
+        sequences.
+
+        Parameters
+        ----------
+        input_ids : torch.LongTensor
+            Outputs ids of the model.
+        scores : torch.FloatTensor
+            Scores.
+
+        Returns
+        -------
+        bool
+            `True` if all sequences are done being generated, `False` otherwise.
+        """
 
         outputs = input_ids[:, self.prompt_ids_length:]
         generated_sequences = self.tokenizer.batch_decode(outputs)
