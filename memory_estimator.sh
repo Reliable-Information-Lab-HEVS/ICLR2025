@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=batch_estimations
+#SBATCH --job-name=memory_estimator
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
