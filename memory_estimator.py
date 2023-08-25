@@ -1,13 +1,16 @@
 import torch
 import os
 from concurrent.futures import ProcessPoolExecutor
-import argparse
+import multiprocessing as mp
 import gc
+import argparse
+import numpy as np
 
 import engine
 from helpers import utils
 
 
+# Random long text about monkeys (thanks ChatGPT!!)
 large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 
 One of the defining features of monkeys is their incredible diversity. There are over 260 known species of monkeys, each with its own distinct traits and adaptations. They come in a wide range of sizes, from the tiny pygmy marmoset, which can fit in the palm of your hand, to the large and powerful mandrill, known for its strikingly colorful face. This diversity allows monkeys to occupy various ecological niches and adapt to different habitats and diets.
@@ -24,6 +27,7 @@ Despite their significance, monkeys face numerous challenges and threats. Habita
 
 In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
 """
+
 
 SMALL_MODELS = (
     'bloom-560M',
@@ -62,13 +66,28 @@ SMALL_MODELS = (
     'codegen25-7B-instruct',
     'vicuna-7B',
     'vicuna-13B',
+    'llama2-7B',
+    'llama2-7B-chat',
+    'llama2-13B',
+    'llama2-13B-chat',
 )
+
+
+LARGE_MODELS = (
+    'gpt-neoX-20B',
+    'opt-30B',
+    'opt-66B',
+    'llama-2-70B',
+    'llama-2-70B-chat',
+    'bloom-176B',
+)
+
 
 input_sizes = [50*i for i in range(1, 11)]
 max_tokens = [50*i for i in range(1, 11)]
 max_tokens += [512]
 
-def memory_estimation(model_name: str):
+def memory_estimation(model_name: str, N_repeat: int = 10):
 
     model = engine.HFModel(model_name)
     # model_memory = torch.cuda.max_memory_allocated() / 1024**3
@@ -83,13 +102,18 @@ def memory_estimation(model_name: str):
 
         for j, max_token in enumerate(max_tokens):
 
-            torch.cuda.reset_peak_memory_stats()
-            actual_peak = torch.cuda.max_memory_allocated() / 1024**3
+            results = []
+            for k in range(N_repeat):
 
-            foo = model(prompt, num_return_sequences=1, max_new_tokens=max_token, batch_size=1)
-            # mem = torch.cuda.max_memory_allocated() / 1024**3 - model_memory
-            mem = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
-            input_size_memory_consumption[max_token] = mem
+                torch.cuda.reset_peak_memory_stats()
+                actual_peak = torch.cuda.max_memory_allocated() / 1024**3
+
+                foo = model(prompt, num_return_sequences=1, max_new_tokens=max_token, batch_size=1)
+                # mem = torch.cuda.max_memory_allocated() / 1024**3 - model_memory
+                mem = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
+                results.append(mem)
+
+            input_size_memory_consumption[max_token] = np.mean(results)
 
         model_memory_consumption[input_size] = input_size_memory_consumption
 
@@ -102,15 +126,28 @@ def memory_estimation(model_name: str):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Memory estimation')
-    parser.add_argument('--gpus', type=int, default=5, help='The number of GPUs to use.')
+    parser = argparse.ArgumentParser(description='Memory estimator')
+    parser.add_argument('--big_models', action='store_true',
+                        help='If given, also run on large models that do not fit on a single gpu.')
+    parser.add_argument('--big_models_only', action='store_true',
+                        help='If given, only run on large models that do not fit on a single gpu.')
     
     args = parser.parse_args()
-    num_gpus = args.gpus
+    big_models = args.big_models
+    big_models_only = args.big_models_only
 
-    if num_gpus > 1:
-        with ProcessPoolExecutor(max_workers=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-            pool.map(memory_estimation, SMALL_MODELS, chunksize=1)
-    else:
-        for model in SMALL_MODELS:
-            memory_estimation(model)
+    num_gpus = torch.cuda.device_count()
+
+    if not big_models_only:
+        if num_gpus > 1:
+            with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
+                                        initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+                pool.map(memory_estimation, SMALL_MODELS, chunksize=1)
+        else:
+            for model in SMALL_MODELS:
+                memory_estimation(model)
+
+    # TODO: update memory_estimation to compute memory estimation when running on multiple gpus!!!!
+    if big_models or big_models_only:
+        print('Still not implemented for big models. This is a remainder to do it!')
+        pass
