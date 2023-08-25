@@ -118,7 +118,11 @@ def memory_estimation(model_name: str, N_repeat: int = 10):
         model_memory_consumption[input_size] = input_size_memory_consumption
 
     filename = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{model_name}.json')
+    if os.path.exists(filename):
+        os.remove(filename)
     utils.save_json(model_memory_consumption, filename)
+
+    print(f'Done with {model_name}!')
 
     del model
     gc.collect()
