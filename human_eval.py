@@ -6,6 +6,7 @@ from concurrent.futures import ProcessPoolExecutor
 import argparse
 import time
 import copy
+import re
 
 import engine
 from engine import stopping
@@ -209,22 +210,25 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = PythonParser(),
                         stopping_patterns: tuple[str] = stopping.EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
     
-    code_outputs = stopping.parse_code_and_truncate(outputs, parser, stopping_patterns)
+    # code_outputs = stopping.parse_code_and_truncate(outputs, parser, stopping_patterns)
+    code_outputs = [parser(sequence) for sequence in outputs]
 
     completions = []
     for output in code_outputs:
-        if output.startswith('def ' + sample['entry_point']):
+
+        regex = r'def ' + re.escape(sample['entry_point']) + r'[^\n]*\n(.*)$'
+        code_after_func_def = re.search(regex, output, re.DOTALL)
+
+        if code_after_func_def:
+            output = code_after_func_def.group(1)
+            output = stopping.post_process_stopping_patterns([output], stopping_patterns)[0]
             # Remove the function definition
-            if '\n' in output:
-                _, output = output.split('\n', 1)
-                if '"""\n' in output:
-                    _, completion = output.split('"""\n', 1)
-                else:
-                    completion = output
+            if re.search(r'"""(.*?)"""', output, re.DOTALL):
+                _, _, completion = output.split('"""', 2)
             else:
                 completion = output
         else:
-            completion = output
+            completion = stopping.post_process_stopping_patterns([output], stopping_patterns)[0]
 
         completions.append(completion)
 
@@ -257,7 +261,7 @@ def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[i
 
     model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
     stopping_patterns = None if (model.is_chat_model and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
-    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_completions_{prompt_template_mode}', model_name)
+    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name)
 
     dataset = datasets.HumanEval()
 
@@ -335,7 +339,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
     model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
     stopping_patterns = None if (model.is_chat_model and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
-    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_completions_{prompt_template_mode}_{use_context}', model_name)
+    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}', 'completions', model_name)
 
     dataset = datasets.HumanEvalInstruct()
 

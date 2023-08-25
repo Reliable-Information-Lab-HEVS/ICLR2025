@@ -80,11 +80,11 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
         Timeout after which to stop the test , by default 3.0
     """
 
-    # sample_file should be of the form utils.RESULTS_FOLDER/HumanEval_completions/model/temperature_X.jsonl
-    _, folder, model, filename = sample_file.rsplit('/', 3)
+    # sample_file should be of the form utils.RESULTS_FOLDER/HumanEval/completions/model/temperature.jsonl
+    base, _, model, filename = sample_file.rsplit('/', 3)
 
-    # Format the output filename
-    out_file = os.path.join(utils.RESULTS_FOLDER, folder + '_results', model, filename)
+    # Format the output filename to utils.RESULTS_FOLDER/HumanEval/results/model/temperature.jsonl
+    out_file = os.path.join(base, 'results', model, filename)
 
     problems = datasets.HumanEval().samples_by_id()
 
