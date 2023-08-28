@@ -27,6 +27,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 
     ctx = mp.get_context('spawn')
 
+    global func_extended
     def func_extended(gpus, *args, **kwargs):
         utils.set_cuda_visible_device(gpus)
         return target_func(*args, **kwargs)
