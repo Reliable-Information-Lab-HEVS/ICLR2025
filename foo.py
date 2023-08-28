@@ -107,7 +107,7 @@ def target(foo, bar):
 
 LARGE_MODELS = (
     'gpt-neoX-20B',
-    'llama-2-70B',
+    'llama2-70B',
 )
 
 

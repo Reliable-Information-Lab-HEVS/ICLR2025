@@ -107,13 +107,13 @@ LARGE_MODELS = (
     'gpt-neoX-20B',
     'opt-30B',
     'opt-66B',
-    'llama-2-70B',
-    'llama-2-70B-chat',
+    'llama2-70B',
+    'llama2-70B-chat',
     'bloom-176B',
 )
 
 LARGE_MODELS_SPECIAL_PROMPT = (
-    'llama-2-70B-chat',
+    'llama2-70B-chat',
 )
 
 
