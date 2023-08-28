@@ -516,6 +516,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
 
     # Compute the minimum number of gpus needed
     min_gpu_needed = rough_model_size_estimate // gpu_memory
+    min_gpu_needed = int(min_gpu_needed)
     # Heuristic: if the remainder is smaller than 2% of each gpu_memory, do not add a gpu and distill
     # the small excess between existing gpus
     if rough_model_size_estimate % gpu_memory >= (0.02 * gpu_memory) * min_gpu_needed:
