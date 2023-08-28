@@ -27,10 +27,6 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 
     ctx = mp.get_context('spawn')
 
-    def target_func_on_gpu(visible_devices, *func_args, **func_kwargs):
-        utils.set_cuda_visible_device(visible_devices)
-        return target_func(*func_args, **func_kwargs)
-
     model_names = list(model_names)
     model_footprints = []
 
@@ -67,7 +63,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             available_gpus = available_gpus[footprint:]
 
             # p = mp.Process(target=target_func_on_gpu, args=(allocated_gpus,))
-            p = ctx.Process(target=target_func_on_gpu, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            # p = ctx.Process(target=target_func_on_gpu, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             p.start()
 
             # Add them to the list of running processes
@@ -109,6 +106,11 @@ def target(foo, bar):
     print('Done!')
 
 
+def target_func_on_gpu(visible_devices, *func_args, **func_kwargs):
+        utils.set_cuda_visible_device(visible_devices)
+        return target(*func_args, **func_kwargs)
+
+
 LARGE_MODELS = (
     'gpt-neoX-20B',
     'llama2-70B',
@@ -117,7 +119,8 @@ LARGE_MODELS = (
 
 if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
-    dispatch_jobs(LARGE_MODELS, num_gpus, target, [1,2], [3,4])
+    # dispatch_jobs(LARGE_MODELS, num_gpus, target, [1,2], [3,4])
+    dispatch_jobs(LARGE_MODELS, num_gpus, target_func_on_gpu, [1,2], [3,4])
 
     # with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
     #                          initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
