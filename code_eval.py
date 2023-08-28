@@ -30,5 +30,7 @@ if __name__ == '__main__':
 
     # Format of the results is utils.RESULTS_FOLDER/HumanEval/results/model/temperature.jsonl
     result_folders = set([file.rsplit('/', 2)[0] for file in result_files])
-
-    print(result_folders)
+    # Extract the relative paths (relative to current dir, i.e. utils.ROOT_FOLDER)
+    result_folders = [os.path.relpath(path) for path in result_folders]
+    # This is used to determine which files we need to copy back to the host outside of the docker instance
+    utils.save_txt(result_folders, 'folders_to_copy.txt')

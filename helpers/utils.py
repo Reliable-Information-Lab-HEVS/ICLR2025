@@ -195,6 +195,32 @@ def save_jsonl(dictionaries: list[dict], filename: str, append: bool = False):
             fp.write(json.dumps(dic) + '\n')
 
 
+def save_txt(strings: list[str] | str, filename: str, separator: str = '\n'):
+    """Write a list of strings to txt file, separated by `separator` character.
+
+    Parameters
+    ----------
+    strings : list[str] | str
+        String(s) to save.
+    filename : str
+        Filename to save the file.
+    separator : str, optional
+        Character used to separate each list element, by default '\n'.
+    """
+
+    if isinstance(strings, str):
+        strings = [strings]
+
+    filename = validate_filename(filename, extension='txt')
+
+    with open(filename, 'w') as fp:
+        for i, s in enumerate(strings):
+            fp.write(s)
+            # Only add separator if s is not the last item
+            if i < len(strings) - 1:
+                fp.write(separator)
+
+
 def load_json(filename: str) -> dict:
     """
     Load a json file and return a dictionary.
@@ -240,6 +266,30 @@ def load_jsonl(filename: str) -> list[dict]:
                 dictionaries.append(json.loads(line))
 
     return dictionaries
+
+
+def load_txt(filename: str, separator: str = '\n') -> list[str]:
+    """Load a txt file into a list of strings.
+
+    Parameters
+    ----------
+    filename : str
+        Filename to load.
+    separator : str, optional
+        The separator used to separate the file, by default '\n'
+
+    Returns
+    -------
+    list[str]
+        The content of the file.
+    """
+
+    with open(filename, 'r') as fp:
+        file = fp.read()
+
+    strings = file.split(separator)
+
+    return strings
 
 
 def find_rank_of_subprocess_inside_the_pool():

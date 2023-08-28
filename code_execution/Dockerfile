@@ -12,8 +12,8 @@ RUN pip install --no-cache-dir -r code_execution/requirements.txt
 
 # Set user to non-root to avoid potential issues when running arbitrary code inside the container
 RUN groupadd -r random_group && useradd --no-log-init -r -g random_group random_user
-# Give user ownership of the results directory so that it has write permission to save the results
-RUN chown -R random_user results
+# Give user ownership of the directory so that it has write permission to save the results
+RUN chown -R random_user /LLMs
 USER random_user
 
 CMD [ "python3", "code_eval.py" ]
