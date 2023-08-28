@@ -25,6 +25,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         _description_
     """
 
+    ctx = mp.get_context('spawn')
+
     def target_func_on_gpu(visible_devices):
         utils.set_cuda_visible_device(visible_devices)
         return target_func(*func_args, **func_kwargs)
@@ -64,7 +66,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            p = mp.Process(target=target_func_on_gpu, args=(allocated_gpus,))
+            # p = mp.Process(target=target_func_on_gpu, args=(allocated_gpus,))
+            p = ctx.Process(target=target_func_on_gpu, args=(allocated_gpus,))
             p.start()
 
             # Add them to the list of running processes
@@ -114,9 +117,9 @@ LARGE_MODELS = (
 
 if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
-    # dispatch_jobs(LARGE_MODELS, num_gpus, target, [1,2], [3,4])
+    dispatch_jobs(LARGE_MODELS, num_gpus, target, [1,2], [3,4])
 
-    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
-                             initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+    # with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
+    #                          initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
         
-        _ = list(pool.map(target, LARGE_MODELS, LARGE_MODELS, chunksize=1))
+    #     _ = list(pool.map(target, LARGE_MODELS, LARGE_MODELS, chunksize=1))
