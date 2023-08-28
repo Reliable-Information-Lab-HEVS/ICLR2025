@@ -63,7 +63,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            p = mp.Process(target=target_func_on_gpu, args=allocated_gpus)
+            p = mp.Process(target=target_func_on_gpu, args=(allocated_gpus,))
             p.start()
 
             # Add them to the list of running processes
