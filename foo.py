@@ -27,7 +27,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 
     ctx = mp.get_context('spawn')
 
-    def target_func_on_gpu(visible_devices):
+    def target_func_on_gpu(visible_devices, *func_args, **func_kwargs):
         utils.set_cuda_visible_device(visible_devices)
         return target_func(*func_args, **func_kwargs)
 
@@ -67,7 +67,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             available_gpus = available_gpus[footprint:]
 
             # p = mp.Process(target=target_func_on_gpu, args=(allocated_gpus,))
-            p = ctx.Process(target=target_func_on_gpu, args=(allocated_gpus,))
+            p = ctx.Process(target=target_func_on_gpu, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             p.start()
 
             # Add them to the list of running processes
