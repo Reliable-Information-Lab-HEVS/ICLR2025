@@ -134,9 +134,9 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         _description_
     """
 
-    # TODO: set cuda devices then call target_func
-    def target_func_on_gpu():
-        pass
+    def target_func_on_gpu(visible_devices):
+        utils.set_cuda_visible_device(visible_devices)
+        return target_func(*func_args, **func_kwargs)
 
     model_names = list(model_names)
     model_footprints = []
@@ -170,7 +170,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             footprint = model_footprints.pop(0)
 
             # Update gpu resources
-            allocated_gpu = available_gpus[0:footprint]
+            allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
             p = mp.Process(target=target_func, args=func_args, kwargs=func_kwargs)
@@ -178,7 +178,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 
             # Add them to the list of running processes
             processes.append(p)
-            associated_gpus.append(allocated_gpu)
+            associated_gpus.append(allocated_gpus)
 
         # Find the indices of the processes that are finished
         indices_to_remove = []
