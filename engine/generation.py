@@ -1,5 +1,5 @@
 import torch
-from transformers import PreTrainedModel, PreTrainedTokenizerBase, StoppingCriteriaList
+from transformers import StoppingCriteriaList
 import numpy as np
 import math
 import gc
@@ -10,7 +10,7 @@ import warnings
 from engine import loader
 from engine import stopping
 from engine.prompt_template import GenericPromptTemplate, get_prompt_template
-from engine.code_parser import CodeParser, PythonParser
+from engine.code_parser import CodeParser
 from helpers import utils
 
 
