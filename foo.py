@@ -36,6 +36,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
         model_footprints.append(gpu_needed)
 
+    print(model_footprints)
+
     # Sort both lists according to gpu footprint
     sorting = sorted(zip(model_names, model_footprints), key=lambda x: x[1])
     model_names = [x for x, _ in sorting]
