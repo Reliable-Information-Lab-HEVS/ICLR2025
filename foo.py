@@ -27,6 +27,11 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 
     ctx = mp.get_context('spawn')
 
+    def func_extended(gpus, *args, **kwargs):
+        utils.set_cuda_visible_device(gpus)
+        return target_func(*args, **kwargs)
+
+
     model_names = list(model_names)
     model_footprints = []
 
@@ -64,8 +69,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            # p = mp.Process(target=target_func_on_gpu, args=(allocated_gpus,))
-            p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            p = ctx.Process(target=func_extended, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            # p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             # p = ctx.Process(target=target_func_on_gpu, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             p.start()
 

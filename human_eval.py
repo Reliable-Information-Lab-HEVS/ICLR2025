@@ -134,9 +134,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         _description_
     """
 
-    def target_func_on_gpu(visible_devices):
-        utils.set_cuda_visible_device(visible_devices)
-        return target_func(*func_args, **func_kwargs)
+    # Need to use spawn to create subprocesses in order to set correctly the CUDA_VISIBLE_DEVICE env variable
+    ctx = mp.get_context('spawn')
 
     model_names = list(model_names)
     model_footprints = []
@@ -173,7 +172,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            p = mp.Process(target=target_func, args=func_args, kwargs=func_kwargs)
+            p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             p.start()
 
             # Add them to the list of running processes
