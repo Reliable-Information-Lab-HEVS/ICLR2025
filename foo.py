@@ -83,7 +83,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         processes = [process for i, process in enumerate(processes) if i not in indices_to_remove]
         associated_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i not in indices_to_remove]
 
-        # If we scheduled all jobs break from the infinite loop
+        # If we already scheduled all jobs, break from the infinite loop
         if len(model_names) == 0:
             break
 
@@ -100,13 +100,14 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 
 def target(foo, bar):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
+    print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
     time.sleep(5)
     print('Done!')
 
 
 LARGE_MODELS = (
     'gpt-neoX-20B',
-    'opt-30B',
+    'bloom-176B',
 )
 
 
