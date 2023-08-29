@@ -3,6 +3,7 @@ import random
 import os
 import json
 import time
+import textwrap
 import multiprocessing as mp
 from typing import Callable, TypeVar, ParamSpec
 
@@ -404,28 +405,46 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
         a new one in addition.
     """
 
-    if '__foobar__' in globals().keys():
-        raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
-                            " variable with the name '__foobar__'"))
+    # if '__foobar__' in globals().keys():
+    #     raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
+    #                         " variable with the name '__foobar__'"))
     
     correct_name = f'{func.__name__}_gpu_dispatch'
     if correct_name in globals().keys():
         raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
                             f" variable with the name '{correct_name}'"))
     
-    # Define global function which is identical but has the gpus to use as first arg, and set the visible
-    # devices to those gpus. We give it a random name that should not be used elsewhere, because we cannot
-    # create a function directly from a string
-    global __foobar__
-    def __foobar__(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
-        set_cuda_visible_device(gpus)
-        return func(*args, **kwargs)
+    block_str = f"""
+                global {correct_name}
+                def {correct_name}(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
+                    set_cuda_visible_device(gpus)
+                    return func(*args, **kwargs)
+                """
+    # remove indentation before each new line (triple quotes don't respect indentation level)
+    block_str = textwrap.dedent(block_str)
+
+
+    exec(block_str)
     
-    # Change the name of the newly created function to the correct one
-    __foobar__.__name__ = correct_name
-    # Update the names inside the globals dictionary
-    globals()[correct_name] = __foobar__
-    # globals().pop('__foobar__', None)
+    # # Define global function which is identical but has the gpus to use as first arg, and set the visible
+    # # devices to those gpus. We give it a random name that should not be used elsewhere, because we cannot
+    # # create a function directly from a string
+    # # block_str = """
+    # global __foobar__
+    # def __foobar__(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
+    #     set_cuda_visible_device(gpus)
+    #     return func(*args, **kwargs)
+    # # """
+    # # block_str = textwrap.dedent(block_str)
+    # # exec(block_str)
+    
+    # # Change the name of the newly created function to the correct one
+    # __foobar__.__name__ = correct_name
+    # # Update the names inside the globals dictionary
+    # globals()[correct_name] = __foobar__
+    # # globals().pop('__foobar__', None)
+
+
     
     return func
 
