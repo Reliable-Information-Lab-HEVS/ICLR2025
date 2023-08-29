@@ -362,12 +362,14 @@ def copy_docstring_and_signature(copied_func: Callable[P, T]):
 
 
 def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
-    """This decorator creates a function identical to the decorated function in the GLOBAL scope, with 
-    `_gpu_dispatch` concatenated to the name. The only difference with the original function is that the
-    first argument is a list[int] | int, representing the gpus that are set to be visible in the
+    """This decorator is used for convenience when working with `dispatch_jobs` to run a function using
+    an arbitrary number of gpus in parallel. It creates a function identical to the decorated function in the
+    GLOBAL scope, with `_gpu_dispatch` concatenated to the name. The only difference with the original function
+    is that the first argument is a `list[int] | int`, representing the gpus that are set to be visible in the
     `CUDA_VISIBLE_DEVICES` env variable. This is needed to start a new process and correctly set the visible
     gpus for the process. The function needs to be global because otherwise it's not pickable, and
-    we cannot start a mp.Process with spawn context and a non-pickable function. Since the decorator is
+    we cannot start a `mp.Process` with `spawn` context and a non-pickable function. This is why we do not simply
+    define the extended function inside the `dispatch_jobs` function. Since the decorator is
     executed when the file is first read, the function will correctly exist in the global scope.
 
     NOTE: The function will exist only in the global scope of the current module, i.e. `utils`. If you import 
@@ -390,7 +392,7 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     test_gpu_dispatch(gpus, 10)
     >>> 10
 
-    # Missing `gpus` argument
+    # Missing first `gpus` argument, so it will complain that the original function miss the first argument
     test_gpu_dispatch(10)
     >>> TypeError: test() missing 1 required positional argument: 'a'
     ```
@@ -448,6 +450,9 @@ def dispatch_jobs(model_names, model_footprints, num_gpus, target_func, *func_ar
     # Need to use spawn to create subprocesses in order to set correctly the CUDA_VISIBLE_DEVICE env variable
     ctx = mp.get_context('spawn')
 
+    # Retrieve the function that will be used (the function created by the decorator)
+    target_func_gpu_dispatch = globals()[f'{target_func.__name__}_gpu_dispatch']
+
     model_names = list(model_names)
     model_footprints = list(model_footprints)
 
@@ -478,7 +483,7 @@ def dispatch_jobs(model_names, model_footprints, num_gpus, target_func, *func_ar
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            p = ctx.Process(target=target_func_gpu_dispatch, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             p.start()
 
             # Add them to the list of running processes
