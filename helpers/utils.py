@@ -404,7 +404,7 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
         a new one in addition.
     """
 
-    if '__foobar__' in globals().keys():
+    if 'foobar__' in globals().keys():
         raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
                             " variable with the name '__foobar__'"))
     
@@ -416,15 +416,15 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     # Define global function which is identical but has the gpus to use as first arg, and set the visible
     # devices to those gpus. We give it a random name that should not be used elsewhere, because we cannot
     # create a function directly from a string
-    global __foobar__
-    def __foobar__(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
+    global foobar__
+    def foobar__(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
         set_cuda_visible_device(gpus)
         return func(*args, **kwargs)
     
     # Change the name of the newly created function to the correct one
-    __foobar__.__name__ = correct_name
+    foobar__.__name__ = correct_name
     # Update the names inside the globals dictionary
-    globals()[correct_name] = __foobar__
+    globals()[correct_name] = foobar__
     globals().pop('__foobar__', None)
     
     return func
