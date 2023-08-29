@@ -365,13 +365,14 @@ def copy_docstring_and_signature(copied_func: Callable[P, T]):
 def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     """This decorator is used for convenience when working with `dispatch_jobs` to run a function using
     an arbitrary number of gpus in parallel. It creates a function identical to the decorated function in the
-    GLOBAL scope, with `_gpu_dispatch` concatenated to the name. The only difference with the original function
-    is that the first argument is a `list[int] | int`, representing the gpus that are set to be visible in the
-    `CUDA_VISIBLE_DEVICES` env variable. This is needed to start a new process and correctly set the visible
-    gpus for the process. The function needs to be global because otherwise it's not pickable, and
+    GLOBAL scope of the `utils` module, with `_gpu_dispatch` concatenated to the name. The only difference with
+    the original function is that the first argument is a `list[int] | int`, representing the gpus that are set
+    to be visible in the `CUDA_VISIBLE_DEVICES` env variable. This is needed to start a new process and correctly
+    set the visible gpus for the process. The function needs to be global because otherwise it's not pickable, and
     we cannot start a `mp.Process` with `spawn` context and a non-pickable function. This is why we do not simply
     define the extended function inside the `dispatch_jobs` function. Since the decorator is
-    executed when the file is first read, the function will correctly exist in the global scope.
+    executed when the file is first read, the function will correctly exist in the global scope. The original
+    function `func` is also added to the global scope of the `utils` module so that it can be called later.
 
     NOTE: The function will exist only in the global scope of the current module, i.e. `utils`. If you import 
     the module elsewhere, e.g. `from helpers import utils`, then you will need to call the function as
@@ -405,12 +406,9 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
         a new one in addition.
     """
 
-    # if '__foobar__' in globals().keys():
-    #     raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
-    #                         " variable with the name '__foobar__'"))
-    
     name = func.__name__
     correct_name = f'{name}_gpu_dispatch'
+
     if name in globals().keys():
         raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
                             f" variable with the name '{name}'"))
@@ -418,8 +416,8 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
         raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
                             f" variable with the name '{correct_name}'"))
     
-    if name not in globals().keys():
-        globals()[name] = func
+    # Add the function to current globals() so that it can be called later on
+    globals()[name] = func
     
     block_str = f"""
                 global {correct_name}
@@ -430,28 +428,8 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     # remove indentation before each new line (triple quotes don't respect indentation level)
     block_str = textwrap.dedent(block_str)
 
-
+    # Execute the string to actually define the new function in global scope
     exec(block_str)
-    
-    # # Define global function which is identical but has the gpus to use as first arg, and set the visible
-    # # devices to those gpus. We give it a random name that should not be used elsewhere, because we cannot
-    # # create a function directly from a string
-    # # block_str = """
-    # global __foobar__
-    # def __foobar__(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
-    #     set_cuda_visible_device(gpus)
-    #     return func(*args, **kwargs)
-    # # """
-    # # block_str = textwrap.dedent(block_str)
-    # # exec(block_str)
-    
-    # # Change the name of the newly created function to the correct one
-    # __foobar__.__name__ = correct_name
-    # # Update the names inside the globals dictionary
-    # globals()[correct_name] = __foobar__
-    # # globals().pop('__foobar__', None)
-
-
     
     return func
 
