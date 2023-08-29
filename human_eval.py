@@ -160,6 +160,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 
         no_sleep = False
 
+        # In this case we have enough gpus available to launch the job that needs the less gpus
         if len(available_gpus) >= model_footprints[0]:
 
             no_sleep = True
@@ -184,6 +185,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         for i, process in enumerate(processes):
             if not process.is_alive():
                 indices_to_remove.append(i)
+                # TODO: check necesity of this!!!
+                process.close()
 
         # Update gpu resources
         released_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i in indices_to_remove]

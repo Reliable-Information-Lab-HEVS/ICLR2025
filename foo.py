@@ -8,6 +8,26 @@ from engine import loader
 from helpers import utils
 
 
+def create_global_func(func):
+
+    global foo_bar_foo_foo_bar
+    def foo_bar_foo_foo_bar(gpus, *args, **kwargs):
+        utils.set_cuda_visible_device(gpus)
+        return func(*args, **kwargs)
+    
+    correct_name = f'{func.__name__}_gpu'
+    globals()[correct_name] = foo_bar_foo_foo_bar
+    globals().pop('foo_bar_foo_foo_bar', None)
+
+    def inner(*args, **kwargs):
+        return func(*args, **kwargs)
+    
+    return inner
+
+
+
+
+
 def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs):
     """Run all jobs that need more than one gpu in parallel. Since the number of gpus needed by the models
     is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or create processes and
@@ -27,11 +47,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
 
     ctx = mp.get_context('spawn')
 
-    global func_extended
-    def func_extended(gpus, *args, **kwargs):
-        utils.set_cuda_visible_device(gpus)
-        return target_func(*args, **kwargs)
-
+    target_func = globals()[f'{target_func.__name__}_gpu']
 
     model_names = list(model_names)
     model_footprints = []
@@ -70,8 +86,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            p = ctx.Process(target=func_extended, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
-            # p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            # p = ctx.Process(target=func_extended, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             # p = ctx.Process(target=target_func_on_gpu, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             p.start()
 
@@ -84,6 +100,8 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         for i, process in enumerate(processes):
             if not process.is_alive():
                 indices_to_remove.append(i)
+                # TODO: check this!!!
+                process.close()
 
         # Update gpu resources
         released_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i in indices_to_remove]
@@ -106,7 +124,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         process.join()
 
 
-
+@create_global_func
 def target(foo, bar):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
