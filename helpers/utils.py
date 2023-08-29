@@ -2,8 +2,10 @@ import numpy as np
 import random
 import os
 import json
+import time
 import multiprocessing as mp
 from typing import Callable, TypeVar, ParamSpec
+
 
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -358,3 +360,155 @@ def copy_docstring_and_signature(copied_func: Callable[P, T]):
     
     return wrapper
 
+
+def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
+    """This decorator creates a function identical to the decorated function in the GLOBAL scope, with 
+    `_gpu_dispatch` concatenated to the name. The only difference with the original function is that the
+    first argument is a list[int] | int, representing the gpus that are set to be visible in the
+    `CUDA_VISIBLE_DEVICES` env variable. This is needed to start a new process and correctly set the visible
+    gpus for the process. The function needs to be global because otherwise it's not pickable, and
+    we cannot start a mp.Process with spawn context and a non-pickable function. Since the decorator is
+    executed when the file is first read, the function will correctly exist in the global scope.
+
+    NOTE: The function will exist only in the global scope of the current module, i.e. `utils`. If you import 
+    the module elsewhere, e.g. `from helpers import utils`, then you will need to call the function as
+    `utils.xxx_gpu_dispatch` as it lives in the globals of `utils`.
+
+    Example:
+
+    ```python
+    @duplicate_function_for_gpu_dispatch
+    def test(a: int):
+        return a
+
+    # original function
+    test(10)
+    >>> 10
+
+    gpus = [0,1]
+    # global created by the decorator
+    test_gpu_dispatch(gpus, 10)
+    >>> 10
+
+    # Missing `gpus` argument
+    test_gpu_dispatch(10)
+    >>> TypeError: test() missing 1 required positional argument: 'a'
+    ```
+
+    Returns
+    -------
+    Callable[P, T]
+        The original function `func`. The original is not modified and is returned as is, we only create
+        a new one in addition.
+    """
+
+    if '__foobar__' in globals().keys():
+        raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
+                            " variable with the name '__foobar__'"))
+    
+    correct_name = f'{func.__name__}_gpu_dispatch'
+    if correct_name in globals().keys():
+        raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
+                            f" variable with the name '{correct_name}'"))
+    
+    # Define global function which is identical but has the gpus to use as first arg, and set the visible
+    # devices to those gpus. We give it a random name that should not be used elsewhere, because we cannot
+    # create a function directly from a string
+    global __foobar__
+    def __foobar__(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
+        set_cuda_visible_device(gpus)
+        return func(*args, **kwargs)
+    
+    # Change the name of the newly created function to the correct one
+    __foobar__.__name__ = correct_name
+    # Update the names inside the globals dictionary
+    globals()[correct_name] = __foobar__
+    globals().pop('__foobar__', None)
+    
+    return func
+
+
+def dispatch_jobs(model_names, model_footprints, num_gpus, target_func, *func_args, **func_kwargs):
+    """Run all jobs that need more than one gpu in parallel. Since the number of gpus needed by the models
+    is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or create processes and
+    then ".join" them. To overcome this limitation, we use an infinite while loop that is refreshed by the main
+    process every 10s. The dispatch of models to gpus is very naive: as soon as enough gpus are available to
+    run the job that requires the less gpu, we launch it. Thus the gpu efficiency may not be the best possible.
+    However, this would be extremely hard to improve on this simple strategy, especially since we do not know
+    the runtime of each job.
+
+    Parameters
+    ----------
+    model_names : _type_
+        _description_
+    num_gpus : _type_
+        _description_
+    """
+
+    # Need to use spawn to create subprocesses in order to set correctly the CUDA_VISIBLE_DEVICE env variable
+    ctx = mp.get_context('spawn')
+
+    model_names = list(model_names)
+    model_footprints = list(model_footprints)
+
+    # Sort both lists according to gpu footprint
+    sorting = sorted(zip(model_names, model_footprints), key=lambda x: x[1])
+    model_names = [x for x, _ in sorting]
+    model_footprints = [x for _, x in sorting]
+
+    # Initialize the lists we will maintain
+    available_gpus = [i for i in range(num_gpus)]
+    processes = []
+    associated_gpus = []
+
+    while True:
+
+        no_sleep = False
+
+        # In this case we have enough gpus available to launch the job that needs the less gpus
+        if len(available_gpus) >= model_footprints[0]:
+
+            no_sleep = True
+
+            # Remove them from the list of models to process
+            name = model_names.pop(0)
+            footprint = model_footprints.pop(0)
+
+            # Update gpu resources
+            allocated_gpus = available_gpus[0:footprint]
+            available_gpus = available_gpus[footprint:]
+
+            p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            p.start()
+
+            # Add them to the list of running processes
+            processes.append(p)
+            associated_gpus.append(allocated_gpus)
+
+        # Find the indices of the processes that are finished
+        indices_to_remove = []
+        for i, process in enumerate(processes):
+            if not process.is_alive():
+                indices_to_remove.append(i)
+                # TODO: check necesity of this!!!
+                process.close()
+
+        # Update gpu resources
+        released_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i in indices_to_remove]
+        available_gpus += [gpu for gpus in released_gpus for gpu in gpus]
+        # Remove processes which are done
+        processes = [process for i, process in enumerate(processes) if i not in indices_to_remove]
+        associated_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i not in indices_to_remove]
+
+        # If we scheduled all jobs break from the infinite loop
+        if len(model_names) == 0:
+            break
+
+        # Sleep for 10 seconds before restarting the loop and check if we have enough resources to launch
+        # a new job
+        if not no_sleep:
+            time.sleep(10)
+
+    # Sleep until all processes are finished (they have all been scheduled at this point)
+    for process in processes:
+        process.join()

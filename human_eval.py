@@ -449,3 +449,9 @@ if __name__ == '__main__':
             else:
                 human_eval(model, mode)
 
+        # # Estimate number of gpus needed for each model
+        # for model in model_names:
+        #     quantization = model == 'bloom-176B'
+        #     gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+        #     model_footprints.append(gpu_needed)
+
