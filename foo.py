@@ -69,7 +69,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
             available_gpus = available_gpus[footprint:]
 
             # p = ctx.Process(target=func_extended, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
-            p = ctx.Process(target=target_func_gpu_dispatch, args=func_args, kwargs=func_kwargs)
+            p = ctx.Process(target=target_func_gpu_dispatch, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             # p = ctx.Process(target=target_func_on_gpu, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
             p.start()
 
