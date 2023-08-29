@@ -517,11 +517,3 @@ def dispatch_jobs(model_names, model_footprints, num_gpus, target_func, *func_ar
     # Sleep until all processes are finished (they have all been scheduled at this point)
     for process in processes:
         process.join()
-
-@duplicate_function_for_gpu_dispatch
-def target(foo, bar):
-    import torch
-    print(os.environ['CUDA_VISIBLE_DEVICES'])
-    print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
-    time.sleep(5)
-    print('Done!')
