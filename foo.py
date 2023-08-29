@@ -135,7 +135,8 @@ if __name__ == '__main__':
         gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
         model_footprints.append(gpu_needed)
 
-    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, [1,2], [3,4])
+    # utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, [1,2], [3,4])
+    dispatch_jobs(LARGE_MODELS, num_gpus, utils.target, [1,2], [3,4])
     # dispatch_jobs(LARGE_MODELS, num_gpus, target_func_on_gpu, [1,2], [3,4])
 
     # with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
