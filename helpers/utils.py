@@ -409,16 +409,23 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     #     raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
     #                         " variable with the name '__foobar__'"))
     
-    correct_name = f'{func.__name__}_gpu_dispatch'
+    name = func.__name__
+    correct_name = f'{name}_gpu_dispatch'
+    if name in globals().keys():
+        raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
+                            f" variable with the name '{name}'"))
     if correct_name in globals().keys():
         raise RuntimeError(("Cannot duplicate the function, because it would overwrite an existing global",
                             f" variable with the name '{correct_name}'"))
+    
+    if name not in globals().keys():
+        globals()[name] = func
     
     block_str = f"""
                 global {correct_name}
                 def {correct_name}(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
                     set_cuda_visible_device(gpus)
-                    return func(*args, **kwargs)
+                    return {name}(*args, **kwargs)
                 """
     # remove indentation before each new line (triple quotes don't respect indentation level)
     block_str = textwrap.dedent(block_str)
