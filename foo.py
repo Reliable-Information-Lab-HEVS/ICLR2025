@@ -106,7 +106,7 @@ def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs)
         process.join()
 
 
-@utils.duplicate_function_for_gpu_dispatch
+# @utils.duplicate_function_for_gpu_dispatch
 def target(foo, bar):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
