@@ -425,7 +425,7 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     __foobar__.__name__ = correct_name
     # Update the names inside the globals dictionary
     globals()[correct_name] = __foobar__
-    globals().pop('__foobar__', None)
+    # globals().pop('__foobar__', None)
     
     return func
 
