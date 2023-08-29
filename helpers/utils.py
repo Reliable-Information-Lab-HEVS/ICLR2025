@@ -518,7 +518,7 @@ def dispatch_jobs(model_names, model_footprints, num_gpus, target_func, *func_ar
     for process in processes:
         process.join()
 
-
+@duplicate_function_for_gpu_dispatch
 def target(foo, bar):
     import torch
     print(os.environ['CUDA_VISIBLE_DEVICES'])
