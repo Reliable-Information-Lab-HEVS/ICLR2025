@@ -11,7 +11,7 @@ def test():
      print('This is a test')
 
 @utils.duplicate_function_for_gpu_dispatch
-def target(name: str, foo, bar):
+def target(name: str, foo, bar = 3):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
     time.sleep(5)
