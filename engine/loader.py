@@ -606,7 +606,8 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         # between all gpus, because the parallelism is not optimized and thus using a lot of gpus is not efficient
         # if not needed
         else:
-            max_memory = {i: f'{gpu_memory:.2f}GiB' for i in range(min_gpu_needed)}
+            # The specified memory per gpu needs to be an integer, thus we round
+            max_memory = {i: f'{round(gpu_memory)}GiB' for i in range(min_gpu_needed)}
             additional_kwargs['max_memory'] = max_memory
             device_map = 'balanced'
 
