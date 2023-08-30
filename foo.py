@@ -7,6 +7,8 @@ from concurrent.futures import ProcessPoolExecutor
 from engine import loader
 from helpers import utils
 
+device = 'cuda' if torch.cuda.is_available() 
+
 def test():
      print('This is a test')
 
@@ -20,7 +22,7 @@ def target(name: str, foo, bar):
 
 
 @utils.duplicate_function_for_gpu_dispatch
-def target2(name: str, foo, bar):
+def target2(name: str, foo, bar = 3):
     time.sleep(5)
     print('target2')
     test()
@@ -43,12 +45,6 @@ if __name__ == '__main__':
         gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
         model_footprints.append(gpu_needed)
 
-    args = ([1,2], [3,4])
-    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target2, args)
-    # dispatch_jobs(LARGE_MODELS, num_gpus, utils.target_gpu_dispatch, [1,2], [3,4])
-    # dispatch_jobs(LARGE_MODELS, num_gpus, target_func_on_gpu, [1,2], [3,4])
-
-    # with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
-    #                          initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-        
-    #     _ = list(pool.map(target, LARGE_MODELS, LARGE_MODELS, chunksize=1))
+    args = ([1,2],)
+    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
+    
