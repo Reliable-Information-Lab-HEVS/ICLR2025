@@ -44,7 +44,7 @@ if __name__ == '__main__':
         model_footprints.append(gpu_needed)
 
     args = ([1,2], [3,4])
-    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
+    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target2, args)
     # dispatch_jobs(LARGE_MODELS, num_gpus, utils.target_gpu_dispatch, [1,2], [3,4])
     # dispatch_jobs(LARGE_MODELS, num_gpus, target_func_on_gpu, [1,2], [3,4])
 
