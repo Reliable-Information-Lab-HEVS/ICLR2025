@@ -44,44 +44,30 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 # model_name = 'llama2-7B'
 # model_name = 'codegen-16B'
 # model_name = 'bloom-1.7B'
-model_name = 'star_coder'
-input_size = 432
-max_new_tokens = 512
+# model_name = 'star_coder'
+model_name = 'llama2-70B-chat'
+input_size = 400
+max_new_tokens = 100
 
-
+t0 = time.time()
 model = engine.HFModel(model_name)
+dt0 = time.time() - t0
+print(f'Time to load the model {dt0:.2f} s')
 
 large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
-t0 = time.time()
-# print(model.infer_best_batch_size(input_size, max_new_tokens, 100))
+memories = []
+for i in range(torch.cuda.device_count()):
+    memories.append(torch.cuda.max_memory_allocated(i) / 1024**3)
+
+t1 = time.time()
 foo = model(prompt, max_new_tokens=max_new_tokens, min_new_tokens=max_new_tokens - 1, num_return_sequences=100)
-dt0 = time.time() - t0
-print(f'Time with a single gpu: {dt0:.2f} s')
+dt1 = time.time() - t1
+print(f'Time for forward: {dt1:.2f} s')
 
-# for i in range(torch.cuda.device_count()):
-#     memory = torch.cuda.max_memory_allocated(i) / 1024**3
-#     print(f'Max memory usage gpu {i}: {memory:.2f} GiB')
+consumptions = []
+for i in range(torch.cuda.device_count()):
+    consumptions.append(torch.cuda.max_memory_allocated(i) / 1024**3 - memories[i])
 
-# del model
-# gc.collect()
-
-# for i in range(torch.cuda.device_count()):
-#     torch.cuda.reset_peak_memory_stats(i) 
-
-# model = engine.HFModel(model_name, device_map='balanced')
-
-# t1 = time.time()
-# foo = model(prompt, max_new_tokens=max_new_tokens, num_return_sequences=100)
-# dt1 = time.time() - t0
-# print(f'Time with 2 gpus: {dt1:.2f} s')
-
-# for i in range(torch.cuda.device_count()):
-#     memory = torch.cuda.max_memory_allocated(i) / 1024**3
-#     print(f'Max memory usage gpu {i}: {memory:.2f} GiB')
-
-
-
-# gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
-# print(f'Total gpu memory: {gpu_mem:.2f} GiB')
+print(f'Max memory allocated of the gpus: {max(consumptions)} GiB')
