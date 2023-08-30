@@ -6,23 +6,25 @@
 
 import os
 import sys
-# Add top-level package to the path
+# Add top-level package to the path (only way to import custom module in a script that is not in the root folder)
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from helpers import utils
 
-# change working directory for relative imports
-os.chdir(utils.ROOT_FOLDER)
+if __name__ == '__main__':
 
-# copy the file indicating which files we will need to copy
-os.system('docker cp my_container:/LLMs/folders_to_copy.txt folders_to_copy.txt')
+    # change working directory for relative imports
+    os.chdir(utils.ROOT_FOLDER)
 
-folders_to_copy = utils.load_txt('folders_to_copy.txt')
+    # copy the file indicating which files we will need to copy
+    os.system('docker cp my_container:/LLMs/folders_to_copy.txt folders_to_copy.txt')
 
-for folder in folders_to_copy:
-    # copy the folder to the host machine (folder should be the relative path, relative to utils.ROOT_FOLDER)
-    os.system(f'docker cp my_container:/LLMs/{folder} {folder}')
+    folders_to_copy = utils.load_txt('folders_to_copy.txt')
 
-# Delete the map of the folders we copied
-os.remove('folders_to_copy.txt')
+    for folder in folders_to_copy:
+        # copy the folder to the host machine (folder should be the relative path, relative to utils.ROOT_FOLDER)
+        os.system(f'docker cp my_container:/LLMs/{folder} {folder}')
+
+    # Delete the map of the folders we copied
+    os.remove('folders_to_copy.txt')
 
