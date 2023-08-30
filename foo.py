@@ -7,8 +7,6 @@ from concurrent.futures import ProcessPoolExecutor
 from engine import loader
 from helpers import utils
 
-device = 'cuda' if torch.cuda.is_available() 
-
 def test():
      print('This is a test')
 
