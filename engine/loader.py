@@ -632,9 +632,8 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         # This operation is in-place for nn.Module
         model.cuda(gpu_rank)
 
-    # For some reason bettertransformer makes codegen2 models crash during the forward
-    # if not ('codegen2-' in model_name):
-    if True:
+    # For some reason bettertransformer is supported for codegen2 models but makes them crash during the forward
+    if not ('codegen2-' in model_name):
         # Convert to better transformer to use Pytorch optimizations if supported by the model
         try:
             model = model.to_bettertransformer()
