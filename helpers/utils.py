@@ -455,7 +455,7 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
         The total number of gpus available to dispatch the jobs.
     target_func : Callable[..., None]
         The function to call with each `model_names`. The first argument of the function should be a str
-        representing the model name. The function should also be decorated with @duplicate_function_for_gpu_dispatch.
+        representing the model name. The function should also be decorated with `@duplicate_function_for_gpu_dispatch`.
         If it returns a value, this value will be ignored.
     func_args : tuple | None, optional
         A tuple of additional arguments to pass to `target_func`. Calls for each `model_names` will be made with

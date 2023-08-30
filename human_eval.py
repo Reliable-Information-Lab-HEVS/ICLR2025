@@ -117,97 +117,6 @@ LARGE_MODELS_SPECIAL_PROMPT = (
 )
 
 
-def dispatch_jobs(model_names, num_gpus, target_func, *func_args, **func_kwargs):
-    """Run all jobs that need more than one gpu in parallel. Since the number of gpus needed by the models
-    is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or create processes and
-    then ".join" them. To overcome this limitation, we use an infinite while loop that is refreshed by the main
-    process every 10s. The dispatch of models to gpus is very naive: as soon as enough gpus are available to
-    run the job that requires the less gpu, we launch it. Thus the gpu efficiency may not be the best possible.
-    However, this would be extremely hard to improve on this simple strategy, especially since we do not know
-    the runtime of each job.
-
-    Parameters
-    ----------
-    model_names : _type_
-        _description_
-    num_gpus : _type_
-        _description_
-    """
-
-    # Need to use spawn to create subprocesses in order to set correctly the CUDA_VISIBLE_DEVICE env variable
-    ctx = mp.get_context('spawn')
-
-    model_names = list(model_names)
-    model_footprints = []
-
-    # Estimate number of gpus needed for each model
-    for model in model_names:
-        quantization = model == 'bloom-176B'
-        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
-        model_footprints.append(gpu_needed)
-
-    # Sort both lists according to gpu footprint
-    sorting = sorted(zip(model_names, model_footprints), key=lambda x: x[1])
-    model_names = [x for x, _ in sorting]
-    model_footprints = [x for _, x in sorting]
-
-    # Initialize the lists we will maintain
-    available_gpus = [i for i in range(num_gpus)]
-    processes = []
-    associated_gpus = []
-
-    while True:
-
-        no_sleep = False
-
-        # In this case we have enough gpus available to launch the job that needs the less gpus
-        if len(available_gpus) >= model_footprints[0]:
-
-            no_sleep = True
-
-            # Remove them from the list of models to process
-            name = model_names.pop(0)
-            footprint = model_footprints.pop(0)
-
-            # Update gpu resources
-            allocated_gpus = available_gpus[0:footprint]
-            available_gpus = available_gpus[footprint:]
-
-            p = ctx.Process(target=target_func, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
-            p.start()
-
-            # Add them to the list of running processes
-            processes.append(p)
-            associated_gpus.append(allocated_gpus)
-
-        # Find the indices of the processes that are finished
-        indices_to_remove = []
-        for i, process in enumerate(processes):
-            if not process.is_alive():
-                indices_to_remove.append(i)
-                # TODO: check necesity of this!!!
-                process.close()
-
-        # Update gpu resources
-        released_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i in indices_to_remove]
-        available_gpus += [gpu for gpus in released_gpus for gpu in gpus]
-        # Remove processes which are done
-        processes = [process for i, process in enumerate(processes) if i not in indices_to_remove]
-        associated_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i not in indices_to_remove]
-
-        # If we scheduled all jobs break from the infinite loop
-        if len(model_names) == 0:
-            break
-
-        # Sleep for 10 seconds before restarting the loop and check if we have enough resources to launch
-        # a new job
-        if not no_sleep:
-            time.sleep(10)
-
-    # Sleep until all processes are finished (they have all been scheduled at this point)
-    for process in processes:
-        process.join()
-
 
 def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = PythonParser(),
                         stopping_patterns: tuple[str] = stopping.EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
@@ -238,8 +147,7 @@ def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = P
 
 
 
-
-
+@utils.duplicate_function_for_gpu_dispatch
 def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[int] = TEMPERATURES,
                generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
                greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
@@ -318,6 +226,8 @@ def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[i
     gc.collect()
 
 
+
+@utils.duplicate_function_for_gpu_dispatch
 def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context: bool,
                         temperatures: tuple[int] = TEMPERATURES, generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
                         greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
@@ -402,7 +312,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='HumanEval benchmark')
     parser.add_argument('--big_models', action='store_true',
                         help='If given, run the benchmark on large models that do not fit on a single gpu.')
-    parser.add_argument('--only_special', action='store_true',
+    parser.add_argument('--big_models_only', action='store_true',
+                        help='If given, only run the benchmark on large models that do not fit on a single gpu.')
+    parser.add_argument('--special_only', action='store_true',
                         help='If given, will only run the benchmark on models with a non-default prompt template.')
     parser.add_argument('--mode', type=str, default='default', choices=PROMPT_MODES,
                         help='The mode for the prompt template.')
@@ -413,7 +325,8 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     big_models = args.big_models
-    only_special = args.only_special
+    big_models_only = args.big_models_only
+    special_only = args.special_only
     instruct = args.instruct
     mode = args.mode
     use_context = args.no_context
@@ -423,35 +336,37 @@ if __name__ == '__main__':
         raise RuntimeError("I'm begging you, run this benchmark with some GPUs...")
     
     num_gpus = torch.cuda.device_count()
-    print(num_gpus)
 
-    small_models = SMALL_MODELS_SPECIAL_PROMPT if only_special else SMALL_MODELS
-    large_models = LARGE_MODELS_SPECIAL_PROMPT if only_special else LARGE_MODELS
+    small_models = SMALL_MODELS_SPECIAL_PROMPT if special_only else SMALL_MODELS
+    large_models = LARGE_MODELS_SPECIAL_PROMPT if special_only else LARGE_MODELS
 
     # Create the iterables to pass to the processing pool
     mode_iter = (mode,)*len(small_models)
     use_context_iter = (use_context,)*len(small_models)
 
-    # Run all models that fit on a single gpu in parallel using all gpus
-    # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
-    # with mp.Pool(processes=num_gpus, initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
-                             initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-        if instruct:
-            _ = list(pool.map(human_eval_instruct, small_models, mode_iter, use_context_iter, chunksize=1))
-        else:
-            _ = list(pool.map(human_eval, small_models, mode_iter, chunksize=1))
+    # target function
+    target_func = human_eval_instruct if instruct else human_eval
 
-    if big_models:
+    print(f'Launching computations with {num_gpus} gpus available.')
+
+    if not big_models_only:
+        args = (mode_iter, use_context_iter) if instruct else (mode_iter,)
+        
+        # Run all models that fit on a single gpu in parallel using all gpus
+        # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
+        with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
+                                initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+            _ = list(pool.map(target_func, small_models, *args, chunksize=1))
+
+    if big_models or big_models_only:
+        # Estimate number of gpus needed for each model
+        model_footprints = []
         for model in large_models:
-            if instruct:
-                human_eval_instruct(model, mode, use_context)
-            else:
-                human_eval(model, mode)
+            quantization = model == 'bloom-176B'
+            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+            model_footprints.append(gpu_needed)
 
-        # # Estimate number of gpus needed for each model
-        # for model in model_names:
-        #     quantization = model == 'bloom-176B'
-        #     gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
-        #     model_footprints.append(gpu_needed)
+        args = (mode, use_context) if instruct else (mode,)
+
+        utils.dispatch_jobs(large_models, model_footprints, num_gpus, target_func, args)
 

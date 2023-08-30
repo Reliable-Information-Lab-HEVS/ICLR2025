@@ -7,6 +7,8 @@ from concurrent.futures import ProcessPoolExecutor
 from engine import loader
 from helpers import utils
 
+def test():
+     print('This is a test')
 
 @utils.duplicate_function_for_gpu_dispatch
 def target(foo, bar):
@@ -14,11 +16,8 @@ def target(foo, bar):
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
     time.sleep(5)
     print('Done!')
+    test()
 
-
-def target_func_on_gpu(visible_devices, *func_args, **func_kwargs):
-        utils.set_cuda_visible_device(visible_devices)
-        return target(*func_args, **func_kwargs)
 
 
 LARGE_MODELS = (
