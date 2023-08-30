@@ -71,3 +71,5 @@ for i in range(torch.cuda.device_count()):
     consumptions.append(torch.cuda.max_memory_allocated(i) / 1024**3 - memories[i])
 
 print(f'Max memory allocated of the gpus: {max(consumptions)} GiB')
+
+print(f'All memories used: {*consumptions,}')
