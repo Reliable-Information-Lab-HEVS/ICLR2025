@@ -434,7 +434,9 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     return func
 
 
-def dispatch_jobs(model_names, model_footprints, num_gpus, target_func, *func_args, **func_kwargs):
+def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus: int,
+                  target_func: Callable[..., None], func_args: tuple | None = None,
+                  func_kwargs: dict | None = None):
     """Run all jobs that need more than one gpu in parallel. Since the number of gpus needed by the models
     is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or create processes and
     then ".join" them. To overcome this limitation, we use an infinite while loop that is refreshed by the main
@@ -445,13 +447,33 @@ def dispatch_jobs(model_names, model_footprints, num_gpus, target_func, *func_ar
 
     Parameters
     ----------
-    model_names : _type_
-        _description_
-    num_gpus : _type_
-        _description_
+    model_names : list[str]
+        The list of model names to map to the `target_func`. This should be the first argument of `target_func`.
+    model_footprints : list[int]
+        The number of gpus required for each call to `target_func` (corresponding to each `model_names`). 
+    num_gpus : int
+        The total number of gpus available to dispatch the jobs.
+    target_func : Callable[..., None]
+        The function to call with each `model_names`. The first argument of the function should be a str
+        representing the model name. The function should also be decorated with @duplicate_function_for_gpu_dispatch.
+        If it returns a value, this value will be ignored.
+    func_args : tuple | None, optional
+        A tuple of additional arguments to pass to `target_func`. Calls for each `model_names` will be made with
+        the same `func_args`. By default None.
+    func_kwargs : dict | None, optional
+        A dict of additional keyword arguments to pass to `target_func`. Calls for each `model_names` will be
+        made with the same `func_kwargs`. By default None.
     """
 
-    # Need to use spawn to create subprocesses in order to set correctly the CUDA_VISIBLE_DEVICE env variable
+    if len(model_names) != len(model_footprints):
+        raise ValueError('The `model_names` and `model_footprints` arguments should have the same length.')
+    
+    if any([x > num_gpus for x in model_footprints]):
+        raise ValueError('One of the function calls needs more gpus than the total number available `num_gpus`.')
+    
+    func_kwargs = {} if func_kwargs is None else func_kwargs
+
+    # Need to use spawn to create subprocesses in order to set correctly the CUDA_VISIBLE_DEVICES env variable
     ctx = mp.get_context('spawn')
 
     # Retrieve the function that will be used (the function created by the decorator)
@@ -487,7 +509,8 @@ def dispatch_jobs(model_names, model_footprints, num_gpus, target_func, *func_ar
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            p = ctx.Process(target=target_func_gpu_dispatch, args=(allocated_gpus, *func_args), kwargs=func_kwargs)
+            args = (allocated_gpus, name) if func_args is None else (allocated_gpus, name, *func_args)
+            p = ctx.Process(target=target_func_gpu_dispatch, args=args, kwargs=func_kwargs)
             p.start()
 
             # Add them to the list of running processes
