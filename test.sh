@@ -16,6 +16,6 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
-python3 "$@"
+python3 test.py "$@"
 
 conda deactivate
