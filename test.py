@@ -47,8 +47,8 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 # model_name = 'star_coder'
 
 
-# model_name = 'llama2-70B-chat'
-model_name = 'opt-66B'
+model_name = 'llama2-70B-chat'
+# model_name = 'opt-66B'
 input_size = 400
 max_new_tokens = 100
 
