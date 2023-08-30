@@ -19,6 +19,13 @@ def target(name: str, foo, bar):
     test()
 
 
+@utils.duplicate_function_for_gpu_dispatch
+def target2(name: str, foo, bar):
+    time.sleep(5)
+    print('target2')
+    test()
+
+
 
 LARGE_MODELS = (
     'gpt-neoX-20B',
