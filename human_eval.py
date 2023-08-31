@@ -169,7 +169,7 @@ def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[i
     # Load in 8 bits for bloom due to model size
     quantization = True if model_name == 'bloom-176B' else False
 
-    model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
+    model = engine.HFModel(model_name, quantization=quantization)
     stopping_patterns = None if (model.is_chat_model and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name)
 
@@ -249,7 +249,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
     # Load in 8 bits for bloom due to model size
     quantization = True if model_name == 'bloom-176B' else False
 
-    model = engine.HFModel(model_name, quantization=quantization, gpu_rank=0)
+    model = engine.HFModel(model_name, quantization=quantization)
     stopping_patterns = None if (model.is_chat_model and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}', 'completions', model_name)
 
