@@ -62,6 +62,7 @@ prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special
 
 memories = []
 for i in range(torch.cuda.device_count()):
+    torch.cuda.reset_peak_memory_stats(i)
     memories.append(torch.cuda.max_memory_allocated(i) / 1024**3)
 
 t1 = time.time()
