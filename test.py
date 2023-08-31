@@ -66,7 +66,7 @@ for i in range(torch.cuda.device_count()):
     memories.append(torch.cuda.max_memory_allocated(i) / 1024**3)
 
 t1 = time.time()
-foo = model(prompt, max_new_tokens=max_new_tokens, batch_size=1, num_return_sequences=1,)
+foo = model(prompt, max_new_tokens=max_new_tokens, batch_size=1, num_return_sequences=1)
 dt1 = time.time() - t1
 print(f'Time for forward: {dt1:.2f} s')
 
