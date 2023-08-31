@@ -24,7 +24,7 @@ config = AutoConfig.from_pretrained(model_name, torch_dtype=torch.float16)
 with init_empty_weights():
     model = AutoModelForCausalLM.from_config(config)
     model.tie_weights()
-    device_map = infer_auto_device_map(model, max_memory=max_memory, torch_dtype=torch.float16)
+    device_map = infer_auto_device_map(model, max_memory=max_memory, dtype=torch.float16)
 dt0 = time.time() - t0
 print(f'Time to compute device_map: {dt0:.2f} s')
 
