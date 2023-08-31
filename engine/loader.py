@@ -477,7 +477,8 @@ def get_model_dtype(model_name: str) -> torch.dtype:
 
 def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dtype | None = None,
                                  max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8) -> tuple[int, dict]:
-    """Estimate the minimum number of gpus needed to perform inference with a model. This relies on
+    """Estimate the minimum number of gpus needed to perform inference with a model, given the maximum gpu memory
+    proportion `max_fraction_gpu_0` and `max_fraction_gpus` that we allow for the model. This relies on
     simple heuristics.
 
     Parameters
@@ -528,7 +529,8 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
     gpu_0_available_memory = max_fraction_gpu_0 * gpu_memory
     gpus_available_memory = max_fraction_gpus * gpu_memory
 
-    if rough_model_size_estimate <= gpu_0_available_memory:
+    # Heuristic: if the remainder is smaller than 2% of gpu_memory, do not add a gpu 
+    if rough_model_size_estimate <= gpu_0_available_memory + 0.02 * gpu_memory:
         return 1, None
     
     else:
