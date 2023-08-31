@@ -40,22 +40,24 @@ model = engine.HFModel(model_name)
 dt0 = time.time() - t0
 print(f'Time to load the model {dt0:.2f} s')
 
-large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
-prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
+print(model.gpu_memory_map)
 
-memories = []
-for i in range(torch.cuda.device_count()):
-    memories.append(torch.cuda.max_memory_allocated(i) / 1024**3)
+# large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
+# prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
-t1 = time.time()
-foo = model(prompt, max_new_tokens=max_new_tokens, batch_size=1, num_return_sequences=1,)
-dt1 = time.time() - t1
-print(f'Time for forward: {dt1:.2f} s')
+# memories = []
+# for i in range(torch.cuda.device_count()):
+#     memories.append(torch.cuda.max_memory_allocated(i) / 1024**3)
 
-consumptions = []
-for i in range(torch.cuda.device_count()):
-    consumptions.append(torch.cuda.max_memory_allocated(i) / 1024**3 - memories[i])
+# t1 = time.time()
+# foo = model(prompt, max_new_tokens=max_new_tokens, batch_size=1, num_return_sequences=1,)
+# dt1 = time.time() - t1
+# print(f'Time for forward: {dt1:.2f} s')
 
-print(f'Max memory allocated of the gpus: {max(consumptions)} GiB')
+# consumptions = []
+# for i in range(torch.cuda.device_count()):
+#     consumptions.append(torch.cuda.max_memory_allocated(i) / 1024**3 - memories[i])
 
-print(f'All memories used: {*consumptions,}')
+# print(f'Max memory allocated of the gpus: {max(consumptions)} GiB')
+
+# print(f'All memories used: {*consumptions,}')
