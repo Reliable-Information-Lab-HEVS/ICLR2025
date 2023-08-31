@@ -5,7 +5,7 @@ import time
 
 model_name = 'facebook/opt-13b'
 
-max_memory = {0: '10GiB', 1: '25GiB', 2:'25GiB'}
+max_memory = {0: '3GiB', 1: '25GiB', 2:'25GiB'}
 device_map = 'balanced'
 t0 = time.time()
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map=device_map,
