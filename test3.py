@@ -7,10 +7,13 @@ model_name = 'facebook/opt-13b'
 
 max_memory = {0: '10GiB', 1: '25GiB', 2:'25GiB'}
 device_map = 'balanced'
+t0 = time.time()
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map=device_map,
                                              max_memory=max_memory)
+dt0 = time.time() - t0
+print(f'Total time to load: {dt0:.2f} s')
 
-for i in torch.cuda.device_count():
+for i in range(torch.cuda.device_count()):
     print(f'GPU {i}: {torch.cuda.memory_allocated(i) / 1024**3:.2f} GiB')
 
 print(model.hf_device_map)
