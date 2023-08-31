@@ -18,8 +18,9 @@ class HFModel(object):
     """Class encapsulating a HuggingFace model and its tokenizer to generate text. 
     """
 
-    def __init__(self, model_name: str, quantization: bool = False, device_map: str | None = None,
-                 gpu_rank: int = 0, dtype: torch.dtype | None = None):
+    def __init__(self, model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
+                max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
+                gpu_rank: int = 0):
         
         # Save the current allocated memory on each gpu to estimate model size after loading
         if torch.cuda.is_available():
@@ -28,8 +29,9 @@ class HFModel(object):
                 reference_memory[i] = torch.cuda.memory_allocated(i)
 
         self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
-                                                                     device_map=device_map, gpu_rank=gpu_rank,
-                                                                     dtype=dtype)
+                                                                     dtype=dtype, max_fraction_gpu_0=max_fraction_gpu_0,
+                                                                     max_fraction_gpus=max_fraction_gpus,
+                                                                     device_map=device_map, gpu_rank=gpu_rank)
         
         # Compute the memory footprint of the model on each gpu
         self.gpu_memory_map = {}

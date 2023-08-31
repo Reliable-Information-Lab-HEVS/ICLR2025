@@ -719,8 +719,10 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
-def load_model_and_tokenizer(model_name: str, quantization: bool = False, device_map: str | None = None,
-               gpu_rank: int = 0, dtype: torch.dtype | None = None) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
+def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
+                             max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
+                             device_map: dict | None = None,
+                             gpu_rank: int = 0) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
     """Load both a model and corresponding tokenizer.
 
     Parameters
@@ -729,15 +731,22 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, device
         The model name.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
-    device_map : str | None, optional
-        The device map to decide how to split the model between available devices, by default None. If not
-        provided, the model will be put on a single GPU if relatively small, else split using 'auto'.
-    gpu_rank : int, optional
-        The gpu rank on which to put the model if it can fit on a single gpu. This is ignored if `device_map`
-        is provided. By default 0.
     dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
+    max_fraction_gpu_0 : float, optional
+        The maximum fraction of the gpu 0 memory to reserve for the model. The default is 0.8. This is only
+        used if `device_map` is `None`.
+    max_fraction_gpus : float, optional
+        The maximum fraction of the other gpus memory to reserve for the model. The default is 0.8. This is only
+        used if `device_map` is `None`.
+    device_map : dict | None, optional
+        The device map to decide how to split the model between available devices, by default None. If not
+        provided, the model dispatch to GPU(s) is made according to `max_fraction_gpu_0` and `max_fraction_gpus`
+        in such a way to use the smallest number of gpus that respect these two values.
+    gpu_rank : int, optional
+        The gpu rank on which to put the model if it can fit on a single gpu. This is ignored if `device_map`
+        is provided. By default 0.
 
     Returns
     -------
@@ -745,5 +754,6 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, device
         The model and tokenizer.
     """
 
-    return load_model(model_name, quantization=quantization, device_map=device_map,
-                      gpu_rank=gpu_rank, dtype=dtype), load_tokenizer(model_name)
+    return (load_model(model_name, quantization=quantization, dtype=dtype, max_fraction_gpu_0=max_fraction_gpu_0,
+                       max_fraction_gpus=max_fraction_gpus, device_map=device_map, gpu_rank=gpu_rank),
+            load_tokenizer(model_name))
