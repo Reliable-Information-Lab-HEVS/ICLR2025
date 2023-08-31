@@ -4,6 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMasked
 from transformers import PreTrainedModel, PreTrainedTokenizerBase
 import warnings
 import re
+import math
 
 def _infer_model_size(model_name: str) -> float:
     """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
@@ -474,8 +475,9 @@ def get_model_dtype(model_name: str) -> torch.dtype:
     return ALL_MODELS_DTYPES_MAPPING[model_name]
 
 
-def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dtype | None = None) -> tuple[int, float]:
-    """Estimate the minimum number of gpu needed to perform inference with a model. This relies on
+def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dtype | None = None,
+                                 max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8) -> tuple[int, dict]:
+    """Estimate the minimum number of gpus needed to perform inference with a model. This relies on
     simple heuristics.
 
     Parameters
@@ -487,13 +489,24 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
     dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
+    max_fraction_gpu_0 : float, optional
+        The maximum fraction of the gpu 0 memory to reserve for the model. The default is 0.8.
+    max_fraction_gpus : float, optional
+        The maximum fraction of the other gpus memory to reserve for the model. The default is 0.8.
 
     Returns
     -------
-    tuple[int, float]
-        Tuple containing the minimum number of gpus needed, and the maximum size (in GiB) to reserve for the
-        model per gpu.
+    tuple[int, dict]
+        Tuple containing the minimum number of gpus needed, and a dictionary mapping each gpu needed to the
+        maximum size reserved by the model for this gpu.
     """
+
+    if max_fraction_gpu_0 < 0 or max_fraction_gpus < 0:
+        raise ValueError('The maximum fraction of gpu memory to use cannot be negative.')
+    
+    if max_fraction_gpu_0 > 0.85 or max_fraction_gpus > 0.85:
+        raise ValueError(('The maximum fraction of gpu memory to use cannot be larger than 0.85 because some '
+                         'memory need to stay free for the forward pass and other computations.'))
 
     # If not provided take the default one
     if dtype is None:
@@ -512,22 +525,37 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
     # We assume that we always have identical gpus when using multiple gpus
     gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
     # Say we only have access to a portion of that memory for our model
-    gpu_memory = 0.8 * gpu_memory
+    gpu_0_available_memory = max_fraction_gpu_0 * gpu_memory
+    gpus_available_memory = max_fraction_gpus * gpu_memory
 
-    # Compute the minimum number of gpus needed
-    min_gpu_needed = rough_model_size_estimate // gpu_memory
-    min_gpu_needed = int(min_gpu_needed)
-    # Heuristic: if the remainder is smaller than 2% of each gpu_memory, do not add a gpu and distill
-    # the small excess between existing gpus
-    if rough_model_size_estimate % gpu_memory >= (0.02 * gpu_memory) * min_gpu_needed:
-        min_gpu_needed += 1
+    if rough_model_size_estimate <= gpu_0_available_memory:
+        return 1, None
+    
+    else:
+        max_memory_map = {0: f'{math.ceil(gpu_0_available_memory)}GiB'}
+        to_fit_on_other_gpus = rough_model_size_estimate - gpu_0_available_memory
+        additional_gpus_needed = int(to_fit_on_other_gpus // gpus_available_memory)
 
-    return min_gpu_needed, gpu_memory
+        # Heuristic: if the remainder is smaller than 2% of each gpu_memory, do not add a gpu and distill
+        # the small excess between existing gpus
+        if to_fit_on_other_gpus % gpus_available_memory >= (0.02 * gpu_memory) * additional_gpus_needed:
+            additional_gpus_needed += 1
+            available_gpu_size = math.ceil(gpus_available_memory)
+        else:
+            # Add the 2% to the gpus size requirements
+            available_gpu_size = math.ceil((max_fraction_gpus + 0.02) * gpu_memory)
+
+        gpu_needed = 1 + additional_gpus_needed
+        for i in range(1, gpu_needed):
+            max_memory_map[i] = f'{available_gpu_size}GiB'
+
+        return gpu_needed, max_memory_map
 
 
 
-def load_model(model_name: str, quantization: bool = False, device_map: str | None = None,
-               gpu_rank: int = 0, dtype: torch.dtype | None = None) -> PreTrainedModel:
+def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
+               max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
+               gpu_rank: int = 0) -> PreTrainedModel:
     """Load one of the supported pretrained model.
 
     Parameters
@@ -536,15 +564,22 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         The model name.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
-    device_map : str | None, optional
-        The device map to decide how to split the model between available devices, by default None. If not
-        provided, the model will be put on a single GPU if relatively small, else split using 'balanced'.
-    gpu_rank : int, optional
-        The gpu rank on which to put the model if it can fit on a single gpu. This is ignored if `device_map`
-        is provided. By default 0.
     dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
+    max_fraction_gpu_0 : float, optional
+        The maximum fraction of the gpu 0 memory to reserve for the model. The default is 0.8. This is only
+        used if `device_map` is `None`.
+    max_fraction_gpus : float, optional
+        The maximum fraction of the other gpus memory to reserve for the model. The default is 0.8. This is only
+        used if `device_map` is `None`.
+    device_map : dict | None, optional
+        The device map to decide how to split the model between available devices, by default None. If not
+        provided, the model dispatch to GPU(s) is made according to `max_fraction_gpu_0` and `max_fraction_gpus`
+        in such a way to use the smallest number of gpus that respect these two values.
+    gpu_rank : int, optional
+        The gpu rank on which to put the model if it can fit on a single gpu. This is ignored if `device_map`
+        is provided. By default 0.
 
     Returns
     -------
@@ -553,7 +588,7 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     """
 
     if model_name not in ALLOWED_MODELS:
-        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.') 
+        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.')
     
     # Set the dtype if not provided
     if dtype is None:
@@ -561,6 +596,11 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
 
     if dtype not in ALLOWED_DTYPES:
         raise ValueError(f'The dtype must be one of {*ALLOWED_DTYPES,}.')
+    
+    if isinstance(device_map, str):
+        raise ValueError(("You cannot provide the `device_map` as a string. Please use the `max_fraction_gpu_0` "
+                         "and `max_fraction_gpus` arguments to mimic `device_map='balanced'` or "
+                         "`device_map='balanced_low_0'` in a more coherent way."))
     
     # torch.float16 is not supported on cpu
     if not torch.cuda.is_available() and dtype != torch.float32:
@@ -590,7 +630,8 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
     # used sequentially
     if (device_map is None) and torch.cuda.is_available():
     
-        min_gpu_needed, gpu_memory = estimate_model_gpu_footprint(model_name, quantization, dtype)
+        min_gpu_needed, max_memory_map = estimate_model_gpu_footprint(model_name, quantization, dtype, max_fraction_gpu_0,
+                                                                  max_fraction_gpus)
         gpu_number = torch.cuda.device_count()
 
         if min_gpu_needed > gpu_number:
@@ -606,9 +647,8 @@ def load_model(model_name: str, quantization: bool = False, device_map: str | No
         # between all gpus, because the parallelism is not optimized and thus using a lot of gpus is not efficient
         # if not needed
         else:
-            # The specified memory per gpu needs to be an integer, thus we round
-            max_memory = {i: f'{round(gpu_memory)}GiB' for i in range(min_gpu_needed)}
-            additional_kwargs['max_memory'] = max_memory
+            additional_kwargs['max_memory'] = max_memory_map
+            # Providing 'balanced' dispatch correctly with respect to the max_memory_map we provide
             device_map = 'balanced'
 
     
