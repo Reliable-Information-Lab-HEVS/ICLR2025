@@ -31,3 +31,7 @@ print(f'Time to load model: {dt1:.2f} s')
 
 print(f'Total time: {dt0 + dt1:.2f} s')
 
+print(f'GPU 0: {torch.cuda.memory_allocated(0) / 1024**3:.2f} GiB')
+print(f'GPU 1: {torch.cuda.memory_allocated(1) / 1024**3:.2f} GiB')
+
+print(model.hf_device_map)
