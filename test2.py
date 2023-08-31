@@ -29,18 +29,16 @@ Despite their significance, monkeys face numerous challenges and threats. Habita
 In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
 """
 
-print(torch.cuda.get_device_properties(0).total_memory / 1024**3)
+model_name = 'codegen2-16B'
+input_size = 400
+max_new_tokens = 100
 
-# model_name = 'codegen2-16B'
-# input_size = 400
-# max_new_tokens = 100
+t0 = time.time()
+model = engine.HFModel(model_name)
+dt0 = time.time() - t0
+print(f'Time to load the model {dt0:.2f} s')
 
-# t0 = time.time()
-# model = engine.HFModel(model_name)
-# dt0 = time.time() - t0
-# print(f'Time to load the model {dt0:.2f} s')
-
-# print(model.gpu_memory_map)
+print(model.gpu_memory_map)
 
 # large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 # prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
