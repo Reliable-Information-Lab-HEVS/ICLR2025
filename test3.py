@@ -4,7 +4,7 @@ import torch
 model_name = 'facebook/opt-13b'
 
 max_memory = {0: '10GiB', 1: '25GiB'}
-device_map = 'balanced_low_0'
+device_map = 'balanced'
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map=device_map,
                                              max_memory=max_memory)
 
