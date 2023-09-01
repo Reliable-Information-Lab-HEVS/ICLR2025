@@ -5,12 +5,12 @@ import torch
 from concurrent.futures import ProcessPoolExecutor
 
 from engine import loader, loader2
-from helpers import utils
+from helpers import utils, utils2
 
 def test():
      print('This is a test')
 
-@utils.duplicate_function_for_gpu_dispatch2
+@utils2.duplicate_function_for_gpu_dispatch
 def target(name: str, foo, bar = 3):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
@@ -19,7 +19,7 @@ def target(name: str, foo, bar = 3):
     test()
 
 
-@utils.duplicate_function_for_gpu_dispatch2
+@utils2.duplicate_function_for_gpu_dispatch
 def target2(name: str, foo, bar = 3):
     time.sleep(5)
     print('target2')
@@ -45,5 +45,5 @@ if __name__ == '__main__':
         model_footprints.append(gpu_needed)
 
     args = ([1,2],)
-    utils.dispatch_jobs2(LARGE_MODELS, model_footprints, num_gpus, target, args)
+    utils2.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
     
