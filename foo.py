@@ -7,7 +7,7 @@ import torch
 import transformers
 from transformers import StoppingCriteriaList
 
-# from engine import test
+from engine import test
 from helpers import utils
 
 
