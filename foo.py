@@ -9,17 +9,13 @@ from engine import loader
 from helpers import utils
 
 
-print(f'Has been initialized at the beginning in foo: {torch.cuda.is_initialized()}')
-
 def test():
      print('This is a test')
 
 @utils.duplicate_function_for_gpu_dispatch
 def target(name: str, foo, bar = 3):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
-    print(f'Has been initialized at the beginning in func: {torch.cuda.is_initialized()}')
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
-    print(f'Has been initialized at the end in func: {torch.cuda.is_initialized()}')
     time.sleep(5)
     print('Done!')
     test()
