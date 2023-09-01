@@ -122,7 +122,7 @@ def tokenize_for_conversation(tokenizer, conversation: Conversation,
 
 
 
-def generate_conversation(model, tokenizer, prompt: str,
+def generate_conversation(model: transformers.PreTrainedModel, tokenizer, prompt: str,
                           conv_history: Conversation | None, max_new_tokens: int = 60, do_sample: bool = True,
                           top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9,
                           seed: int | None = None, input_device: int | str = 0) -> Conversation:
