@@ -9,6 +9,7 @@ from transformers import StoppingCriteriaList
 
 # from engine import test
 from engine import loader
+from engine.conversation import HFChatModel
 from helpers import utils
 
 
