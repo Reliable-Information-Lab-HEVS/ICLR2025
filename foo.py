@@ -4,7 +4,8 @@ import os
 # import torch
 from concurrent.futures import ProcessPoolExecutor
 
-from engine import loader, loader2
+# from engine import loader, loader2
+from engine import loader2
 from helpers import utils, utils2
 
 def test():
