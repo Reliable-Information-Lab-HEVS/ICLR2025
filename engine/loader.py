@@ -432,7 +432,7 @@ ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING = {
 # Summarize all supported model names
 ALLOWED_MODELS = tuple(ALL_MODELS_MAPPING.keys())
 
-ALLOWED_DTYPES = (torch.float16, torch.bfloat16, torch.float32)
+# ALLOWED_DTYPES = (torch.float16, torch.bfloat16, torch.float32)
 
 
 
