@@ -1,11 +1,11 @@
 import multiprocessing as mp
 import time
 import os
-# import torch
+import torch
 from concurrent.futures import ProcessPoolExecutor
 
 # from engine import loader, loader2
-from engine import loader2
+# from engine import loader2
 from helpers import utils, utils2
 
 def test():
@@ -13,7 +13,6 @@ def test():
 
 @utils2.duplicate_function_for_gpu_dispatch
 def target(name: str, foo, bar = 3):
-    import torch
     print(os.environ['CUDA_VISIBLE_DEVICES'])
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
     time.sleep(5)
