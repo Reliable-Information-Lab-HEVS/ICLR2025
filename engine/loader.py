@@ -3,7 +3,7 @@ import re
 import math
 
 import torch
-# import transformers
+import transformers
 
 def _infer_model_size(model_name: str) -> float:
     """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
