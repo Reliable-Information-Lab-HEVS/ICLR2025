@@ -4,12 +4,7 @@ import os
 import torch
 from concurrent.futures import ProcessPoolExecutor
 
-# from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
-from transformers.modeling_utils import PreTrainedModel
-# from transformers import PreTrainedTokenizerBase
-
-# from engine import loader
-# from engine import loader2
+from engine import loader
 from helpers import utils
 
 
@@ -45,17 +40,15 @@ LARGE_MODELS = (
 
 
 if __name__ == '__main__':
-    # num_gpus = torch.cuda.device_count()
-    num_gpus = 5
+    num_gpus = torch.cuda.device_count()
 
-    # model_footprints = []
-    # # Estimate number of gpus needed for each model
-    # for model in LARGE_MODELS:
-    #     quantization = model == 'bloom-176B'
-    #     gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
-    #     model_footprints.append(gpu_needed)
+    model_footprints = []
+    # Estimate number of gpus needed for each model
+    for model in LARGE_MODELS:
+        quantization = model == 'bloom-176B'
+        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+        model_footprints.append(gpu_needed)
 
-    model_footprints = [2,5]
 
     args = ([1,2],)
     utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)

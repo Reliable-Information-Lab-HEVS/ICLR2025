@@ -1,5 +1,5 @@
 import torch
-from transformers import PreTrainedModel, PreTrainedTokenizerBase
+import transformers
 
 from engine import loader
 from helpers import utils
@@ -68,13 +68,13 @@ class Conversation(object):
 
 
 
-def tokenize_for_conversation(tokenizer: PreTrainedTokenizerBase, conversation: Conversation,
+def tokenize_for_conversation(tokenizer: transformers.PreTrainedTokenizerBase, conversation: Conversation,
                               prompt: str) -> torch.Tensor:
     """Tokenize a `conversation` and a new `prompt` according to `tokenizer`.
 
     Parameters
     ----------
-    tokenizer : PreTrainedTokenizerBase
+    tokenizer : transformers.PreTrainedTokenizerBase
        The tokenizer to use.
     conversation : Conversation
         The conversation object keeping past inputs and answers.
@@ -122,7 +122,7 @@ def tokenize_for_conversation(tokenizer: PreTrainedTokenizerBase, conversation: 
 
 
 
-def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, prompt: str,
+def generate_conversation(model: transformers.PreTrainedModel, tokenizer: transformers.PreTrainedTokenizerBase, prompt: str,
                           conv_history: Conversation | None, max_new_tokens: int = 60, do_sample: bool = True,
                           top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9,
                           seed: int | None = None, input_device: int | str = 0) -> Conversation:
@@ -131,9 +131,9 @@ def generate_conversation(model: PreTrainedModel, tokenizer: PreTrainedTokenizer
 
     Parameters
     ----------
-    model : PreTrainedModel
+    model : transformers.PreTrainedModel
         The model to converse with.
-    tokenizer : PreTrainedTokenizerBase
+    tokenizer : transformers.PreTrainedTokenizerBase
         The tokenizer to use to process the input and output text.
     prompt : str
         The user input to the conversation.

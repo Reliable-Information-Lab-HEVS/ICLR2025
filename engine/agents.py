@@ -1,8 +1,7 @@
 from typing import Any
 import re
 
-from transformers.modeling_utils import PreTrainedModel
-from transformers.tokenization_utils_base import PreTrainedTokenizerBase
+import transformers
 
 from langchain.llms.base import LLM
 from langchain.callbacks.manager import CallbackManagerForLLMRun, CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
@@ -19,9 +18,9 @@ class HuggingFaceLLM(LLM):
     # LLM is a child of BaseModel in pydantic (https://docs.pydantic.dev/latest/) which overrides
     # the class attribute system (except if the type is explicitly defined as ClassVar[...]).
     # Note also that BaseModel provides a default __init__() based on these arguments.
-    model: PreTrainedModel
+    model: transformers.PreTrainedModel
     model_id: str
-    tokenizer: PreTrainedTokenizerBase
+    tokenizer: transformers.PreTrainedTokenizerBase
     quantization: bool = False
     device_map: str = 'auto'
     max_new_tokens: int = 60

@@ -1,6 +1,5 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
-from transformers import PreTrainedModel, PreTrainedTokenizerBase
+import transformers
 import warnings
 import re
 import math
@@ -557,7 +556,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
 
 def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
-               gpu_rank: int = 0) -> PreTrainedModel:
+               gpu_rank: int = 0) -> transformers.PreTrainedModel:
     """Load one of the supported pretrained model.
 
     Parameters
@@ -585,7 +584,7 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
 
     Returns
     -------
-    PreTrainedModel
+    transformers.PreTrainedModel
         The model.
     """
 
@@ -656,15 +655,15 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
     
     # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
-        model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map=device_map,
+        model = transformers.AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map=device_map,
                                                     torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
                                                     **additional_kwargs)
     elif model_name in ENCODER_MODELS_MAPPING.keys():
-        model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name], device_map=device_map,
+        model = transformers.AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name], device_map=device_map,
                                                     torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
                                                     **additional_kwargs)
     elif model_name in TRANSFORMER_MODELS_MAPPING.keys():
-        model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map=device_map,
+        model = transformers.AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map=device_map,
                                                       torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
                                                       **additional_kwargs)
     
@@ -687,7 +686,7 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
     return model
 
 
-def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
+def load_tokenizer(model_name: str) -> transformers.PreTrainedTokenizerBase:
     """Load a pretrained tokenizer corresponding to one of the supported models.
 
     Parameters
@@ -697,7 +696,7 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
 
     Returns
     -------
-    PreTrainedTokenizerBase
+    transformers.PreTrainedTokenizerBase
         The tokenizer.
     """
 
@@ -709,7 +708,7 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     else:
         additional_kwargs = {}
     
-    tokenizer = AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name], **additional_kwargs)
+    tokenizer = transformers.AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name], **additional_kwargs)
 
     # For Dialo-GPT models, update the post-processor to automatically add the eos token at the end
     # We need to sacrifice the ByteLevel processor for that because it is currently not possible to
@@ -724,7 +723,7 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
 def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                              max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
                              device_map: dict | None = None,
-                             gpu_rank: int = 0) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
+                             gpu_rank: int = 0) -> tuple[transformers.PreTrainedModel, transformers.PreTrainedTokenizerBase]:
     """Load both a model and corresponding tokenizer.
 
     Parameters
@@ -752,7 +751,7 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
 
     Returns
     -------
-    tuple[PreTrainedModel, PreTrainedTokenizerBase]
+    tuple[transformers.PreTrainedModel, transformers.PreTrainedTokenizerBase]
         The model and tokenizer.
     """
 
