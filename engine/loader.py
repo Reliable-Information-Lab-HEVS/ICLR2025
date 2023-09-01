@@ -3,7 +3,7 @@ import re
 import math
 
 import torch
-import transformers
+# import transformers
 
 def _infer_model_size(model_name: str) -> float:
     """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
@@ -556,7 +556,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
 
 def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
-               gpu_rank: int = 0) -> str:
+               gpu_rank: int = 0):
     """Load one of the supported pretrained model.
 
     Parameters
@@ -686,7 +686,7 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
     return model
 
 
-def load_tokenizer(model_name: str) -> transformers.PreTrainedTokenizerBase:
+def load_tokenizer(model_name: str):
     """Load a pretrained tokenizer corresponding to one of the supported models.
 
     Parameters
@@ -723,7 +723,7 @@ def load_tokenizer(model_name: str) -> transformers.PreTrainedTokenizerBase:
 def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                              max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
                              device_map: dict | None = None,
-                             gpu_rank: int = 0) -> tuple[str, transformers.PreTrainedTokenizerBase]:
+                             gpu_rank: int = 0):
     """Load both a model and corresponding tokenizer.
 
     Parameters
