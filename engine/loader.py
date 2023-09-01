@@ -6,6 +6,8 @@ import warnings
 import re
 import math
 
+print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
+
 def _infer_model_size(model_name: str) -> float:
     """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
     ValueError otherwise.
@@ -759,3 +761,6 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
     return (load_model(model_name, quantization=quantization, dtype=dtype, max_fraction_gpu_0=max_fraction_gpu_0,
                        max_fraction_gpus=max_fraction_gpus, device_map=device_map, gpu_rank=gpu_rank),
             load_tokenizer(model_name))
+
+
+print(f'Has been initialized at the end: {torch.cuda.is_initialized()}')
