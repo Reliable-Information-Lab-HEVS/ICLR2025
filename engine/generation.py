@@ -185,8 +185,8 @@ class HFModel(object):
             max_new_tokens: int = 60,
             min_new_tokens: int = 5,
             do_sample: bool = True,
-            top_k: int = 40,
-            top_p: float = 0.90,
+            top_k: int | None = 40,
+            top_p: float | None = 0.90,
             temperature: float = 0.9,
             num_return_sequences: int = 1,
             batch_size: int | None = None,
@@ -229,18 +229,20 @@ class HFModel(object):
             force the model to generate an output, instead of immediately generating EOS, by default 5.
         do_sample : bool, optional
             Whether to introduce randomness in the generation, by default True.
-        top_k : int, optional
-            How many tokens with max probability to consider for randomness, by default 50.
-        top_p : float, optional
-            The probability density covering the new tokens to consider for randomness, by default 0.92.
+        top_k : int | None, optional
+            How many tokens with max probability to consider for random sampling, by default 50. Not used if 
+            `do_sample=False`. You can deactivate top_k sampling by providing `top_k=0` or `top_k=None`.
+        top_p : float | None, optional
+            The probability density covering the new tokens to consider for random sampling, by default 0.9. Not used if 
+            `do_sample=False`. You can deactivate top_p sampling by providing `top_p=1` or `top_p=None`.
         temperature : float, optional
             How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
-            no randomness), by default 0.9.
+            no randomness), by default 0.9. Passing 0 is equivalent to setting `do_sample=False`.
         num_return_sequences : int, optional
             How many sequences to generate according to the `prompt`, by default 1.
         batch_size : int | None, optional
-            Max batch size for the model forward pass, in case `num_return_sequences` is large, by default None.
-            If None, will try to determine the largest possible batch size that does not result in memory error.
+            Max batch size for the model forward pass, in case `num_return_sequences` is large. If `None`, will
+            try to determine the largest possible batch size that does not result in memory error. By default None.
         seed : int | None, optional
             An optional seed to force the generation to be reproducible.
         stopping_patterns: tuple[str] | bool | None, optional
@@ -269,6 +271,22 @@ class HFModel(object):
     
         if seed is not None:
             utils.set_all_seeds(seed)
+
+        # Setting the temperature to 0 is equivalent to greedy search thus we explicitly set do_sample=False
+        if temperature == 0:
+            do_sample = False
+
+        if num_return_sequences > 1 and not do_sample:
+            warnings.warn(('You provided `do_sample=False` or `temperature=0`, i.e. greedy search generation, '
+                           'but with `num_return_sequences>1`. All sequences will be identical with greedy search, '
+                           'so we explicitly set `num_return_sequences=1`'))
+            num_return_sequences = 1
+
+        if do_sample:
+            generation_kwargs = {'do_sample': do_sample, 'top_k': top_k, 'top_p': top_p, 'temperature': temperature}
+        # If we are doing greedy search, do not pass arguments that alter the model output logits to `generate`
+        else:
+            generation_kwargs = {'do_sample': do_sample}
 
         # Prompt formatting
         formatted_prompt = self.format_prompt(prompt, model_context=model_context, infill_suffix=infill_suffix,
@@ -305,9 +323,11 @@ class HFModel(object):
 
         # This will lower the batch size if needed, in case of possible OOM. This allows to continue without crashing,
         # by reducing the batch size automatically
-        first_output, batch_size = self.oom_safe_batch_generation(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                                                  do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                                                  batch_size=batch_size, stopping_criteria=stopping_criteria,
+        first_output, batch_size = self.oom_safe_batch_generation(input, max_new_tokens=max_new_tokens,
+                                                                  min_new_tokens=min_new_tokens,
+                                                                  generation_kwargs=generation_kwargs,
+                                                                  batch_size=batch_size,
+                                                                  stopping_criteria=stopping_criteria,
                                                                   pad_token_id=pad_token_id, **kwargs)
 
         # If we require more sequences than the allowed batch size, we need to split the generation into
@@ -330,9 +350,8 @@ class HFModel(object):
                 outputs = first_output
             else:
                 outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                              do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                              num_return_sequences=size, stopping_criteria=stopping_criteria,
-                                              pad_token_id=pad_token_id, **kwargs)
+                                              **generation_kwargs, num_return_sequences=size,
+                                              stopping_criteria=stopping_criteria, pad_token_id=pad_token_id, **kwargs)
                 
             # Truncate the prompt from the output
             truncated_outputs = outputs[:, input_length:]
@@ -438,8 +457,8 @@ class HFModel(object):
         return int(available_memory // ref_batch_footprint)
 
 
-    def oom_safe_batch_generation(self, input: torch.Tensor, max_new_tokens: int, min_new_tokens: int, do_sample: bool,
-                                  top_k: int, top_p: float, temperature: float, batch_size: int,
+    def oom_safe_batch_generation(self, input: torch.Tensor, max_new_tokens: int, min_new_tokens: int,
+                                  generation_kwargs: dict, batch_size: int,
                                   stopping_criteria: StoppingCriteriaList | None, pad_token_id: int,
                                   **kwargs) -> tuple[torch.Tensor, int]:
         """Generate text by recursively recovering from possible memory errors (OOMs) by lowering the batch size.
@@ -452,9 +471,8 @@ class HFModel(object):
         # Try generating result
         try:
             out = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                      do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                      num_return_sequences=batch_size, stopping_criteria=stopping_criteria,
-                                      pad_token_id=pad_token_id, **kwargs)
+                                      **generation_kwargs, num_return_sequences=batch_size,
+                                      stopping_criteria=stopping_criteria, pad_token_id=pad_token_id, **kwargs)
         
         except RuntimeError as e:
             if isinstance(e, torch.cuda.OutOfMemoryError):
@@ -470,9 +488,8 @@ class HFModel(object):
             gc.collect()
             torch.cuda.empty_cache()
             return self.oom_safe_batch_generation(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
-                                                  do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                                  batch_size=new_batch_size, stopping_criteria=stopping_criteria,
-                                                  pad_token_id=pad_token_id, **kwargs)
+                                                  generation_kwargs=generation_kwargs, batch_size=new_batch_size,
+                                                  stopping_criteria=stopping_criteria, pad_token_id=pad_token_id, **kwargs)
         else:
             return out, batch_size
         
