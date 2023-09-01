@@ -13,7 +13,6 @@ def test():
 @utils.duplicate_function_for_gpu_dispatch
 def target(name: str, foo, bar = 3):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
-    # print(torch.cuda.get_device_properties(0).total_memory / 1024**3)
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
     time.sleep(5)
     print('Done!')
@@ -36,7 +35,7 @@ LARGE_MODELS = (
 
 
 if __name__ == '__main__':
-    # num_gpus = torch.cuda.device_count()
+    num_gpus = torch.cuda.device_count()
 
     model_footprints = []
     # Estimate number of gpus needed for each model
@@ -46,5 +45,5 @@ if __name__ == '__main__':
         model_footprints.append(gpu_needed)
 
     args = ([1,2],)
-    utils.dispatch_jobs(LARGE_MODELS, model_footprints, 5, target, args)
+    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
     
