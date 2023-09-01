@@ -556,7 +556,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
 
 def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
-               gpu_rank: int = 0) -> transformers.PreTrainedModel:
+               gpu_rank: int = 0) -> str:
     """Load one of the supported pretrained model.
 
     Parameters
@@ -723,7 +723,7 @@ def load_tokenizer(model_name: str) -> transformers.PreTrainedTokenizerBase:
 def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                              max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
                              device_map: dict | None = None,
-                             gpu_rank: int = 0) -> tuple[transformers.PreTrainedModel, transformers.PreTrainedTokenizerBase]:
+                             gpu_rank: int = 0) -> tuple[str, transformers.PreTrainedTokenizerBase]:
     """Load both a model and corresponding tokenizer.
 
     Parameters
