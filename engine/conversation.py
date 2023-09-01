@@ -68,7 +68,7 @@ class Conversation(object):
 
 
 
-def tokenize_for_conversation(tokenizer: transformers.PreTrainedTokenizerBase, conversation: Conversation,
+def tokenize_for_conversation(tokenizer, conversation: Conversation,
                               prompt: str) -> torch.Tensor:
     """Tokenize a `conversation` and a new `prompt` according to `tokenizer`.
 
@@ -122,7 +122,7 @@ def tokenize_for_conversation(tokenizer: transformers.PreTrainedTokenizerBase, c
 
 
 
-def generate_conversation(model: transformers.PreTrainedModel, tokenizer: transformers.PreTrainedTokenizerBase, prompt: str,
+def generate_conversation(model, tokenizer, prompt: str,
                           conv_history: Conversation | None, max_new_tokens: int = 60, do_sample: bool = True,
                           top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9,
                           seed: int | None = None, input_device: int | str = 0) -> Conversation:
