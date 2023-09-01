@@ -5,6 +5,9 @@ import warnings
 import re
 import math
 
+class Dtype(object):
+    pass
+
 # print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
 
 def _infer_model_size(model_name: str) -> float:
@@ -456,27 +459,27 @@ def get_model_params(model_name: str) -> float:
     return ALL_MODELS_PARAMS_MAPPING[model_name]
 
 
-# def get_model_dtype(model_name: str) -> torch.dtype:
-#     """Return the default dtype used by the model.
+def get_model_dtype(model_name: str) -> Dtype:
+    """Return the default dtype used by the model.
 
-#     Parameters
-#     ----------
-#     model_name : str
-#         The name of the model.
+    Parameters
+    ----------
+    model_name : str
+        The name of the model.
 
-#     Returns
-#     -------
-#     torch.dtype
-#         The default dtype.
-#     """
+    Returns
+    -------
+    Dtype
+        The default dtype.
+    """
 
-#     if model_name not in ALLOWED_MODELS:
-#         raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.')
+    if model_name not in ALLOWED_MODELS:
+        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.')
     
-#     return ALL_MODELS_DTYPES_MAPPING[model_name]
+    return ALL_MODELS_DTYPES_MAPPING[model_name]
 
 
-def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dtype | None = None,
+def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: Dtype | None = None,
                                  max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8) -> tuple[int, dict]:
     """Estimate the minimum number of gpus needed to perform inference with a model, given the maximum gpu memory
     proportion `max_fraction_gpu_0` and `max_fraction_gpus` that we allow for the model. This relies on
@@ -488,7 +491,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
         The model name.
     quantization : bool
         Whether the model will be loaded in 8 bits mode.
-    dtype : torch.dtype | None, optional
+    dtype : Dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
     max_fraction_gpu_0 : float, optional
@@ -556,7 +559,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
 
 
 
-def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
+def load_model(model_name: str, quantization: bool = False, dtype: Dtype | None = None,
                max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
                gpu_rank: int = 0) -> PreTrainedModel:
     """Load one of the supported pretrained model.
@@ -567,7 +570,7 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
         The model name.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
-    dtype : torch.dtype | None, optional
+    dtype : Dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
     max_fraction_gpu_0 : float, optional
@@ -722,7 +725,7 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
-def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
+def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: Dtype | None = None,
                              max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
                              device_map: dict | None = None,
                              gpu_rank: int = 0) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
@@ -734,7 +737,7 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
         The model name.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
-    dtype : torch.dtype | None, optional
+    dtype : Dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
     max_fraction_gpu_0 : float, optional
