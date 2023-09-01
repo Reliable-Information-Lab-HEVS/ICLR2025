@@ -36,7 +36,7 @@ LARGE_MODELS = (
 
 
 if __name__ == '__main__':
-    num_gpus = torch.cuda.device_count()
+    # num_gpus = torch.cuda.device_count()
 
     model_footprints = []
     # Estimate number of gpus needed for each model
@@ -46,5 +46,5 @@ if __name__ == '__main__':
         model_footprints.append(gpu_needed)
 
     args = ([1,2],)
-    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
+    utils.dispatch_jobs(LARGE_MODELS, model_footprints, 5, target, args)
     
