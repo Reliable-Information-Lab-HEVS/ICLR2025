@@ -423,6 +423,7 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
                 global {correct_name}
                 def {correct_name}(gpus: list[int] | int, *args: P.args, **kwargs: P.kwargs) -> T:
                     set_cuda_visible_device(gpus)
+                    torch.cuda.init()
                     return {name}(*args, **kwargs)
                 """
     # remove indentation before each new line (triple quotes don't respect indentation level)
