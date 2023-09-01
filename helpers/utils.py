@@ -1,11 +1,12 @@
-import numpy as np
-import random
 import os
 import json
 import time
+import random
 import textwrap
 import multiprocessing as mp
 from typing import Callable, TypeVar, ParamSpec
+
+import numpy as np
 
 
 P = ParamSpec("P")

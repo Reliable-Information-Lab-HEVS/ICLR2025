@@ -1,6 +1,6 @@
 import torch
-from transformers import PreTrainedTokenizerBase, StoppingCriteria
 import numpy as np
+from transformers import PreTrainedTokenizerBase, StoppingCriteria
 
 from engine.code_parser import CodeParser, PythonParser
 
