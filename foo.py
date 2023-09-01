@@ -1,7 +1,7 @@
 import multiprocessing as mp
 import time
 import os
-import torch
+# import torch
 from concurrent.futures import ProcessPoolExecutor
 
 from engine import loader, loader2
@@ -35,7 +35,8 @@ LARGE_MODELS = (
 
 
 if __name__ == '__main__':
-    num_gpus = torch.cuda.device_count()
+    # num_gpus = torch.cuda.device_count()
+    num_gpus = 5
 
     model_footprints = []
     # Estimate number of gpus needed for each model
