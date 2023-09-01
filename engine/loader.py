@@ -524,7 +524,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
     rough_model_size_estimate = ALL_MODELS_PARAMS_MAPPING[model_name] * size_multiplier
     
     # We assume that we always have identical gpus when using multiple gpus
-    gpu_memory = torch.cuda.get_device_properties().total_memory / 1024**3
+    gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
     # Say we only have access to a portion of that memory for our model
     gpu_0_available_memory = max_fraction_gpu_0 * gpu_memory
     gpus_available_memory = max_fraction_gpus * gpu_memory

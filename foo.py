@@ -30,6 +30,7 @@ def target2(name: str, foo, bar = 3):
 
 LARGE_MODELS = (
     'gpt-neoX-20B',
+    'opt-30B',
     'llama2-70B',
 )
 
