@@ -13,6 +13,7 @@ def test():
 @utils.duplicate_function_for_gpu_dispatch
 def target(name: str, foo, bar = 3):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
+    print(torch.cuda.get_device_properties(0).total_memory / 1024**3)
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
     time.sleep(5)
     print('Done!')
