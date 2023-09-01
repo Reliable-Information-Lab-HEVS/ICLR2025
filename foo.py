@@ -6,8 +6,10 @@ from concurrent.futures import ProcessPoolExecutor
 import torch
 import transformers
 
-from engine import loader
+# from engine import loader
 from helpers import utils
+
+import transformers
 
 
 def test():
