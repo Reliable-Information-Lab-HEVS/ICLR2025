@@ -8,6 +8,8 @@ from engine import loader, loader2
 # from engine import loader2
 from helpers import utils, utils2
 
+print(f'Has been initialized at the beginning in foo: {torch.cuda.is_initialized()}')
+
 def test():
      print('This is a test')
 
