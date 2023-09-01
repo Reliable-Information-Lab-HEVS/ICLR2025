@@ -2,7 +2,7 @@ import warnings
 import re
 import math
 
-import torch
+# import torch
 # import transformers
 
 def _infer_model_size(model_name: str) -> float:
