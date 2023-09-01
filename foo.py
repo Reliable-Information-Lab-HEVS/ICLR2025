@@ -4,7 +4,7 @@ import os
 # import torch
 from concurrent.futures import ProcessPoolExecutor
 
-from engine import loader, loader2
+# from engine import loader, loader2
 from helpers import utils, utils2
 
 def test():
@@ -39,12 +39,14 @@ if __name__ == '__main__':
     # num_gpus = torch.cuda.device_count()
     num_gpus = 5
 
-    model_footprints = []
-    # Estimate number of gpus needed for each model
-    for model in LARGE_MODELS:
-        quantization = model == 'bloom-176B'
-        gpu_needed, _ = loader2.estimate_model_gpu_footprint(model, quantization)
-        model_footprints.append(gpu_needed)
+    # model_footprints = []
+    # # Estimate number of gpus needed for each model
+    # for model in LARGE_MODELS:
+    #     quantization = model == 'bloom-176B'
+    #     gpu_needed, _ = loader2.estimate_model_gpu_footprint(model, quantization)
+    #     model_footprints.append(gpu_needed)
+
+    model_footprints = [2,5]
 
     args = ([1,2],)
     utils2.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
