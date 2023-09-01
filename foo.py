@@ -4,9 +4,11 @@ import os
 import torch
 from concurrent.futures import ProcessPoolExecutor
 
-from engine import loader
+# from engine import loader
 # from engine import loader2
 from helpers import utils
+
+import torch
 
 print(f'Has been initialized at the beginning in foo: {torch.cuda.is_initialized()}')
 
