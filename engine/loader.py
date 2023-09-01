@@ -456,24 +456,24 @@ def get_model_params(model_name: str) -> float:
     return ALL_MODELS_PARAMS_MAPPING[model_name]
 
 
-def get_model_dtype(model_name: str) -> torch.dtype:
-    """Return the default dtype used by the model.
+# def get_model_dtype(model_name: str) -> torch.dtype:
+#     """Return the default dtype used by the model.
 
-    Parameters
-    ----------
-    model_name : str
-        The name of the model.
+#     Parameters
+#     ----------
+#     model_name : str
+#         The name of the model.
 
-    Returns
-    -------
-    torch.dtype
-        The default dtype.
-    """
+#     Returns
+#     -------
+#     torch.dtype
+#         The default dtype.
+#     """
 
-    if model_name not in ALLOWED_MODELS:
-        raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.')
+#     if model_name not in ALLOWED_MODELS:
+#         raise ValueError(f'The model name must be one of {*ALLOWED_MODELS,}.')
     
-    return ALL_MODELS_DTYPES_MAPPING[model_name]
+#     return ALL_MODELS_DTYPES_MAPPING[model_name]
 
 
 def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dtype | None = None,
