@@ -10,6 +10,8 @@
 #SBATCH --gres=gpu:a100:5
 #SBATCH --chdir=/cluster/raid/home/vacy/LLMs
 
+git pull
+
 # Initialize the shell to use local conda
 eval "$(conda shell.bash hook)"
 
