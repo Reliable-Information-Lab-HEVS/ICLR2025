@@ -1,8 +1,9 @@
 import multiprocessing as mp
 import time
 import os
-import torch
 from concurrent.futures import ProcessPoolExecutor
+
+import torch
 
 from engine import loader
 from helpers import utils

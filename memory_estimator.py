@@ -1,9 +1,10 @@
-import torch
 import os
-from concurrent.futures import ProcessPoolExecutor
-import multiprocessing as mp
 import gc
 import argparse
+import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor
+
+import torch
 import numpy as np
 
 import engine
