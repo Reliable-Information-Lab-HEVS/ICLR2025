@@ -4,7 +4,7 @@ import os
 import torch
 from concurrent.futures import ProcessPoolExecutor
 
-from engine import loader
+from engine import loader, loader2
 from helpers import utils
 
 def test():
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # Estimate number of gpus needed for each model
     for model in LARGE_MODELS:
         quantization = model == 'bloom-176B'
-        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+        gpu_needed, _ = loader2.estimate_model_gpu_footprint(model, quantization)
         model_footprints.append(gpu_needed)
 
     args = ([1,2],)
