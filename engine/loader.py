@@ -1,14 +1,10 @@
-# import torch
+import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
 from transformers import PreTrainedModel, PreTrainedTokenizerBase
 import warnings
 import re
 import math
 
-class Dtype(object):
-    pass
-
-# print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
 
 def _infer_model_size(model_name: str) -> float:
     """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
@@ -68,11 +64,11 @@ BLOOM_MODELS_MAPPING = {
     'bloom-176B': 'bigscience/bloom',
 }
 BLOOM_MODELS_DTYPES = {
-    # 'bloom-560M': torch.float16,
-    # 'bloom-1.7B': torch.float16,
-    # 'bloom-3B': torch.float16,
-    # 'bloom-7.1B':torch.float16,
-    # 'bloom-176B': torch.bfloat16,
+    'bloom-560M': torch.float16,
+    'bloom-1.7B': torch.float16,
+    'bloom-3B': torch.float16,
+    'bloom-7.1B':torch.float16,
+    'bloom-176B': torch.bfloat16,
 }
 BLOOM_MODELS_PARAMS = _infer_model_sizes(BLOOM_MODELS_MAPPING)
 
@@ -84,9 +80,9 @@ DIALO_GPT_MODELS_MAPPING = {
     'dialo-gpt-large': 'microsoft/DialoGPT-large',
 }
 DIALO_GPT_MODELS_DTYPES = {
-    # 'dialo-gpt-small': torch.float32,
-    # 'dialo-gpt-medium': torch.float32,
-    # 'dialo-gpt-large': torch.float32,
+    'dialo-gpt-small': torch.float32,
+    'dialo-gpt-medium': torch.float32,
+    'dialo-gpt-large': torch.float32,
 }
 DIALO_GPT_MODELS_PARAMS = {
     'dialo-gpt-small': 125/1e3,
@@ -100,8 +96,8 @@ STABLE_LM_MODELS_MAPPING = {
     'stable-lm-7B': 'stabilityai/stablelm-base-alpha-7b',
 }
 STABLE_LM_MODELS_DTYPES = {
-    # 'stable-lm-3B': torch.float16,
-    # 'stable-lm-7B': torch.float16,
+    'stable-lm-3B': torch.float16,
+    'stable-lm-7B': torch.float16,
 }
 STABLE_LM_MODELS_PARAMS = _infer_model_sizes(STABLE_LM_MODELS_MAPPING)
 
@@ -114,9 +110,9 @@ STAR_CODER_MODELS_MAPPING = {
     'star-coder-plus': 'bigcode/starcoderplus',
 }
 STAR_CODER_MODELS_DTYPES = {
-    # 'star-coder-base': torch.bfloat16,
-    # 'star-coder': torch.bfloat16,
-    # 'star-coder-plus': torch.bfloat16,
+    'star-coder-base': torch.bfloat16,
+    'star-coder': torch.bfloat16,
+    'star-coder-plus': torch.bfloat16,
 }
 STAR_CODER_MODELS_PARAMS = {
     'star-coder-base': 15.5,
@@ -134,8 +130,8 @@ STAR_CHAT_MODELS_MAPPING = {
     'star-chat-beta': 'HuggingFaceH4/starchat-beta',
 }
 STAR_CHAT_MODELS_DTYPES = {
-    # 'star-chat-alpha': torch.float16,
-    # 'star-chat-beta': torch.bfloat16,
+    'star-chat-alpha': torch.float16,
+    'star-chat-beta': torch.bfloat16,
 }
 STAR_CHAT_MODELS_PARAMS = {
     'star-chat-alpha': 16,
@@ -150,9 +146,9 @@ GPT2_MODELS_MAPPING = {
     'gpt2-xl': 'gpt2-xl',
 }
 GPT2_MODELS_DTYPES = {
-    # 'gpt2-medium': torch.float32,
-    # 'gpt2-large': torch.float32,
-    # 'gpt2-xl': torch.float32,
+    'gpt2-medium': torch.float32,
+    'gpt2-large': torch.float32,
+    'gpt2-xl': torch.float32,
 }
 GPT2_MODELS_PARAMS = {
     'gpt2-medium': 355/1e3,
@@ -170,11 +166,11 @@ GPT_J_AND_NEO_MODELS_MAPPING = {
     'gpt-neoX-20B': 'EleutherAI/gpt-neox-20b',
 }
 GPT_J_AND_NEO_MODELS_DTYPES = {
-    # 'gpt-j-6B': torch.float32,
-    # 'gpt-neo-125M': torch.float32,
-    # 'gpt-neo-1.3B': torch.float32,
-    # 'gpt-neo-2.7B': torch.float32,
-    # 'gpt-neoX-20B': torch.float16,
+    'gpt-j-6B': torch.float32,
+    'gpt-neo-125M': torch.float32,
+    'gpt-neo-1.3B': torch.float32,
+    'gpt-neo-2.7B': torch.float32,
+    'gpt-neoX-20B': torch.float16,
 }
 GPT_J_AND_NEO_MODELS_PARAMS = _infer_model_sizes(GPT_J_AND_NEO_MODELS_MAPPING)
 
@@ -191,14 +187,14 @@ OPT_MODELS_MAPPING = {
     'opt-66B': 'facebook/opt-66b',
 }
 OPT_MODELS_DTYPES = {
-    # 'opt-125M': torch.float16,
-    # 'opt-350M': torch.float16,
-    # 'opt-1.3B': torch.float16,
-    # 'opt-2.7B': torch.float16,
-    # 'opt-6.7B': torch.float16,
-    # 'opt-13B': torch.float16,
-    # 'opt-30B': torch.float16,
-    # 'opt-66B': torch.float16,
+    'opt-125M': torch.float16,
+    'opt-350M': torch.float16,
+    'opt-1.3B': torch.float16,
+    'opt-2.7B': torch.float16,
+    'opt-6.7B': torch.float16,
+    'opt-13B': torch.float16,
+    'opt-30B': torch.float16,
+    'opt-66B': torch.float16,
 }
 OPT_MODELS_PARAMS = _infer_model_sizes(OPT_MODELS_MAPPING)
 
@@ -211,10 +207,10 @@ CODEGEN_MODELS_MAPPING = {
     'codegen-16B': 'Salesforce/codegen-16B-mono',
 }
 CODEGEN_MODELS_DTYPES = {
-    # 'codegen-350M': torch.float16,
-    # 'codegen-2B': torch.float16,
-    # 'codegen-6B': torch.float16,
-    # 'codegen-16B': torch.float16,
+    'codegen-350M': torch.float16,
+    'codegen-2B': torch.float16,
+    'codegen-6B': torch.float16,
+    'codegen-16B': torch.float16,
 }
 CODEGEN_MODELS_PARAMS = _infer_model_sizes(CODEGEN_MODELS_MAPPING)
 
@@ -229,12 +225,12 @@ CODEGEN2_MODELS_MAPPING = {
     'codegen25-7B-instruct': 'Salesforce/codegen25-7b-instruct',
 }
 CODEGEN2_MODELS_DTYPES = {
-    # 'codegen2-1B': torch.float16,
-    # 'codegen2-3.7B': torch.float16,
-    # 'codegen2-7B': torch.float16,
-    # 'codegen2-16B': torch.float16,
-    # 'codegen25-7B': torch.float16,
-    # 'codegen25-7B-instruct': torch.float16,
+    'codegen2-1B': torch.float16,
+    'codegen2-3.7B': torch.float16,
+    'codegen2-7B': torch.float16,
+    'codegen2-16B': torch.float16,
+    'codegen25-7B': torch.float16,
+    'codegen25-7B-instruct': torch.float16,
 }
 CODEGEN2_MODELS_PARAMS = _infer_model_sizes(CODEGEN2_MODELS_MAPPING)
 CODEGEN2_ADDITIONAL_MODEL_KWARGS = {
@@ -255,8 +251,8 @@ VICUNA_MODELS_MAPPING = {
     'vicuna-13B': 'lmsys/vicuna-13b-v1.3',
 }
 VICUNA_MODELS_DTYPES = {
-    # 'vicuna-7B': torch.float16,
-    # 'vicuna-13B': torch.float16,
+    'vicuna-7B': torch.float16,
+    'vicuna-13B': torch.float16,
 }
 VICUNA_MODELS_PARAMS = _infer_model_sizes(VICUNA_MODELS_MAPPING)
 # Fast tokenizers and non-legacy behaviour are bugged in current transformers and tokenizers versions
@@ -276,12 +272,12 @@ LLAMA2_MODELS_MAPPING = {
     'llama2-70B-chat': 'meta-llama/Llama-2-70b-chat-hf',
 }
 LLAMA2_MODELS_DTYPES = {
-    # 'llama2-7B': torch.float16,
-    # 'llama2-13B': torch.float16,
-    # 'llama2-70B': torch.float16,
-    # 'llama2-7B-chat': torch.float16,
-    # 'llama2-13B-chat': torch.float16,
-    # 'llama2-70B-chat': torch.float16,
+    'llama2-7B': torch.float16,
+    'llama2-13B': torch.float16,
+    'llama2-70B': torch.float16,
+    'llama2-7B-chat': torch.float16,
+    'llama2-13B-chat': torch.float16,
+    'llama2-70B-chat': torch.float16,
 }
 LLAMA2_MODELS_PARAMS = _infer_model_sizes(LLAMA2_MODELS_MAPPING)
 # Fast tokenizers and non-legacy behaviour are bugged in current transformers and tokenizers versions
@@ -435,7 +431,7 @@ ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS_MAPPING = {
 # Summarize all supported model names
 ALLOWED_MODELS = tuple(ALL_MODELS_MAPPING.keys())
 
-# ALLOWED_DTYPES = (torch.float16, torch.bfloat16, torch.float32)
+ALLOWED_DTYPES = (torch.float16, torch.bfloat16, torch.float32)
 
 
 
@@ -459,7 +455,7 @@ def get_model_params(model_name: str) -> float:
     return ALL_MODELS_PARAMS_MAPPING[model_name]
 
 
-def get_model_dtype(model_name: str) -> Dtype:
+def get_model_dtype(model_name: str) -> torch.dtype:
     """Return the default dtype used by the model.
 
     Parameters
@@ -469,7 +465,7 @@ def get_model_dtype(model_name: str) -> Dtype:
 
     Returns
     -------
-    Dtype
+    torch.dtype
         The default dtype.
     """
 
@@ -479,7 +475,7 @@ def get_model_dtype(model_name: str) -> Dtype:
     return ALL_MODELS_DTYPES_MAPPING[model_name]
 
 
-def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: Dtype | None = None,
+def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dtype | None = None,
                                  max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8) -> tuple[int, dict]:
     """Estimate the minimum number of gpus needed to perform inference with a model, given the maximum gpu memory
     proportion `max_fraction_gpu_0` and `max_fraction_gpus` that we allow for the model. This relies on
@@ -491,7 +487,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: Dtype | 
         The model name.
     quantization : bool
         Whether the model will be loaded in 8 bits mode.
-    dtype : Dtype | None, optional
+    dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
     max_fraction_gpu_0 : float, optional
@@ -559,7 +555,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: Dtype | 
 
 
 
-def load_model(model_name: str, quantization: bool = False, dtype: Dtype | None = None,
+def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
                gpu_rank: int = 0) -> PreTrainedModel:
     """Load one of the supported pretrained model.
@@ -570,7 +566,7 @@ def load_model(model_name: str, quantization: bool = False, dtype: Dtype | None 
         The model name.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
-    dtype : Dtype | None, optional
+    dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
     max_fraction_gpu_0 : float, optional
@@ -725,7 +721,7 @@ def load_tokenizer(model_name: str) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
-def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: Dtype | None = None,
+def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                              max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
                              device_map: dict | None = None,
                              gpu_rank: int = 0) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
@@ -737,7 +733,7 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
         The model name.
     quantization : bool, optional
         Whether to load the model in 8 bits mode to save memory, by default False.
-    dtype : Dtype | None, optional
+    dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
     max_fraction_gpu_0 : float, optional
@@ -764,5 +760,3 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
                        max_fraction_gpus=max_fraction_gpus, device_map=device_map, gpu_rank=gpu_rank),
             load_tokenizer(model_name))
 
-
-# print(f'Has been initialized at the end: {torch.cuda.is_initialized()}')
