@@ -5,7 +5,7 @@ import torch
 from concurrent.futures import ProcessPoolExecutor
 
 # from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
-from transformers import PreTrainedModel
+from transformers.modeling_utils import PreTrainedModel
 # from transformers import PreTrainedTokenizerBase
 
 # from engine import loader
