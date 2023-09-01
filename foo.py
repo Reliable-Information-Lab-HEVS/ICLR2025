@@ -4,16 +4,9 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 
 import torch
-import transformers
-# from transformers import StoppingCriteriaList
 
-# from engine import test
-# from engine import loader
-# from engine.conversation import HFChatModel
+from engine import loader
 from helpers import utils
-
-def foo(a: transformers.PreTrainedModel):
-    pass
 
 
 def test():

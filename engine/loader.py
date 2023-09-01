@@ -3,7 +3,7 @@ import re
 import math
 
 import torch
-import transformers
+from transformers import AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM, AutoTokenizer
 
 def _infer_model_size(model_name: str) -> float:
     """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
@@ -584,7 +584,6 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
 
     Returns
     -------
-    transformers.PreTrainedModel
         The model.
     """
 
@@ -655,15 +654,15 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
     
     # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
-        model = transformers.AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map=device_map,
+        model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map=device_map,
                                                     torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
                                                     **additional_kwargs)
     elif model_name in ENCODER_MODELS_MAPPING.keys():
-        model = transformers.AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name], device_map=device_map,
+        model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name], device_map=device_map,
                                                     torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
                                                     **additional_kwargs)
     elif model_name in TRANSFORMER_MODELS_MAPPING.keys():
-        model = transformers.AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map=device_map,
+        model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map=device_map,
                                                       torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
                                                       **additional_kwargs)
     
@@ -696,7 +695,6 @@ def load_tokenizer(model_name: str):
 
     Returns
     -------
-    transformers.PreTrainedTokenizerBase
         The tokenizer.
     """
 
@@ -708,7 +706,7 @@ def load_tokenizer(model_name: str):
     else:
         additional_kwargs = {}
     
-    tokenizer = transformers.AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name], **additional_kwargs)
+    tokenizer = AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name], **additional_kwargs)
 
     # For Dialo-GPT models, update the post-processor to automatically add the eos token at the end
     # We need to sacrifice the ByteLevel processor for that because it is currently not possible to
@@ -723,7 +721,7 @@ def load_tokenizer(model_name: str):
 def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
                              max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
                              device_map: dict | None = None,
-                             gpu_rank: int = 0):
+                             gpu_rank: int = 0) -> tuple:
     """Load both a model and corresponding tokenizer.
 
     Parameters
@@ -751,7 +749,7 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
 
     Returns
     -------
-    tuple[transformers.PreTrainedModel, transformers.PreTrainedTokenizerBase]
+    tuple
         The model and tokenizer.
     """
 

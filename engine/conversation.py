@@ -1,5 +1,4 @@
 import torch
-import transformers
 
 from engine import loader
 from helpers import utils
@@ -122,7 +121,7 @@ def tokenize_for_conversation(tokenizer, conversation: Conversation,
 
 
 
-def generate_conversation(model: transformers.PreTrainedModel, tokenizer, prompt: str,
+def generate_conversation(model, tokenizer, prompt: str,
                           conv_history: Conversation | None, max_new_tokens: int = 60, do_sample: bool = True,
                           top_k: int = 40, top_p: float = 0.90, temperature: float = 0.9,
                           seed: int | None = None, input_device: int | str = 0) -> Conversation:
@@ -131,9 +130,9 @@ def generate_conversation(model: transformers.PreTrainedModel, tokenizer, prompt
 
     Parameters
     ----------
-    model : transformers.PreTrainedModel
+    model : transformers model
         The model to converse with.
-    tokenizer : transformers.PreTrainedTokenizerBase
+    tokenizer : transformers tokenizer
         The tokenizer to use to process the input and output text.
     prompt : str
         The user input to the conversation.

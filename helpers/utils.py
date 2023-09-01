@@ -446,6 +446,21 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
     However, this would be extremely hard to improve on this simple strategy, especially since we do not know
     the runtime of each job.
 
+    ## Caution - Insidious issues
+    Some imports on the launching script (the script in which this function is called) may somehow cause 
+    `torch.cuda` to be initialized before seeing the `CUDA_VISIBLE_DEVICES` that were set in the child processes.
+    This is especially the case of the following: `from transformers import PreTrainedModel`. Even doing
+    ```python
+    import transformers
+    def test(a: transformers.PreTrainedModel):
+        pass
+    ``` 
+    i.e. using `PreTrainedModel` as a type hint in some file that was imported causes the issue of initializing
+    `torch.cuda` before seeing the env variable. This creates bugs that are very hard to understand and follow,
+    so be careful about what you actually import in the launching script. For this reason, all `PreTrainedModel`
+    references were suppressed of the files in this project.
+
+
     Parameters
     ----------
     model_names : list[str]
