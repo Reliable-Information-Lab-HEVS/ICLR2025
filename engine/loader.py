@@ -1,4 +1,4 @@
-import torch
+# import torch
 import torch.nn as nn
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
 from transformers import PreTrainedModel, PreTrainedTokenizerBase
@@ -6,7 +6,7 @@ import warnings
 import re
 import math
 
-print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
+# print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
 
 def _infer_model_size(model_name: str) -> float:
     """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
@@ -763,4 +763,4 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
             load_tokenizer(model_name))
 
 
-print(f'Has been initialized at the end: {torch.cuda.is_initialized()}')
+# print(f'Has been initialized at the end: {torch.cuda.is_initialized()}')

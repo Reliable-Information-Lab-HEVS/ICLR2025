@@ -12,9 +12,9 @@ import math
 import engine
 from helpers import utils
 
-print(f'Has been initialized at the beginning in foo: {torch.cuda.is_initialized()}')
+print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
 a = torch.cuda.is_available()
-print(f'Has been initialized at the beginning in foo: {torch.cuda.is_initialized()}')
+print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
 
 foo = torch.tensor([1,2,3]).cuda()
 
