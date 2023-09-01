@@ -1,5 +1,5 @@
-# import torch
-import torch.nn as nn
+import torch
+# import torch.nn as nn
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
 from transformers import PreTrainedModel, PreTrainedTokenizerBase
 import warnings
