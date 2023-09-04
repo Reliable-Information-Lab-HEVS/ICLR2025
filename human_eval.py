@@ -378,8 +378,11 @@ if __name__ == '__main__':
         # Estimate number of gpus needed for each model
         model_footprints = []
         for model in large_models:
-            quantization = model == 'bloom-176B'
-            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+            # Override quantization for bloom because it's too big
+            if model == 'bloom-176B' and not (int8 or int4):
+                int8 = True
+            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8,
+                                                                quantization_4bits=int4)
             model_footprints.append(gpu_needed)
 
         args = (mode, use_context, int8, int4) if instruct else (mode, int8, int4)
