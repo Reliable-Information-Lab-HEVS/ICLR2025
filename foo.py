@@ -31,7 +31,7 @@ def target2(name: str, foo, bar = 3):
 
 LARGE_MODELS = (
     'bloom-560M',
-    'bloom-1.3B',
+    'bloom-1.7B',
     'gpt-neoX-20B',
     'opt-30B',
     # 'llama2-70B',
