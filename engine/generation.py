@@ -30,6 +30,7 @@ class HFModel(object):
             for i in range(torch.cuda.device_count()):
                 reference_memory[i] = torch.cuda.memory_allocated(i)
 
+        # Actually load the model and tokenizer
         self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
                                                                      dtype=dtype, max_fraction_gpu_0=max_fraction_gpu_0,
                                                                      max_fraction_gpus=max_fraction_gpus,
@@ -38,7 +39,7 @@ class HFModel(object):
         # Compute the memory footprint of the model on each gpu
         self.gpu_memory_map = {}
 
-        # The model is on multiple devices
+        # In this case, the model is on multiple devices
         if hasattr(self.model, 'hf_device_map'):
             self.device_map = self.model.hf_device_map
 
@@ -51,7 +52,7 @@ class HFModel(object):
             for device in gpu_devices:
                 self.gpu_memory_map[device] = (torch.cuda.memory_allocated(device) - reference_memory[device]) / 1024**3
         
-        # The model is on a single device
+        # In this case, the model is on a single device
         else:
             device = next(self.model.parameters()).get_device()
             self.device_map = 'cpu' if device == -1 else f'cuda:{device}'
@@ -61,7 +62,7 @@ class HFModel(object):
             if device != -1:
                 self.gpu_memory_map[device] = (torch.cuda.memory_allocated(device) - reference_memory[device]) / 1024**3
 
-        # Maximum memory taken by the model on a single gpu, or on the cpu
+        # Maximum memory taken by the model on gpus, or on the cpu
         if len(self.gpu_memory_map) > 0:
             self.max_memory_footprint = max(self.gpu_memory_map.values())
         else:
