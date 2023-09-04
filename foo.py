@@ -13,6 +13,8 @@ from engine.code_parser import CodeParser, PythonParser
 from helpers import datasets
 from helpers import utils
 
+from transformers import PreTrainedModel
+
 
 @utils.duplicate_function_for_gpu_dispatch
 def target(name: str, foo, bar = 3):
