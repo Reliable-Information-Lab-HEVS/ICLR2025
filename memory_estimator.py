@@ -36,6 +36,9 @@ SMALL_MODELS = (
     'bloom-1.7B',
     'bloom-3B',
     'bloom-7.1B',
+    'dialo-gpt-small',
+    'dialo-gpt-medium',
+    'dialo-gpt-large',
     'stable-lm-3B',
     'stable-lm-7B',
     'star-coder-base',
@@ -162,7 +165,7 @@ if __name__ == '__main__':
                 memory_estimation(model)
 
     if big_models or big_models_only:
-        
+
         model_footprints = []
         for model in LARGE_MODELS:
             quantization = model == 'bloom-176B'

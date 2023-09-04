@@ -14,30 +14,27 @@ from helpers import datasets
 from helpers import utils
 
 
-def test():
-     print('This is a test')
-
 @utils.duplicate_function_for_gpu_dispatch
 def target(name: str, foo, bar = 3):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
-    time.sleep(5)
-    print('Done!')
-    test()
+    model = engine.HFModel(name)
+    print(f'Gpus as seen by torch: {model.get_gpu_devices()}')
 
 
 @utils.duplicate_function_for_gpu_dispatch
 def target2(name: str, foo, bar = 3):
     time.sleep(5)
     print('target2')
-    test()
 
 
 
 LARGE_MODELS = (
+    'bloom-560M',
+    'bloom-1.3B',
     'gpt-neoX-20B',
-    # 'opt-30B',
-    'llama2-70B',
+    'opt-30B',
+    # 'llama2-70B',
 )
 
 
