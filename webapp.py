@@ -2,9 +2,8 @@ import gradio as gr
 import gc
 import os
 
+import engine
 from engine import loader
-from engine.conversation import Conversation, generate_conversation
-from engine import generation
 from helpers import utils
 
 
@@ -14,15 +13,15 @@ DEFAULT = 'bloom-560M'
 # File where the valid credentials are stored
 CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
 
-# Initialize global model and tokenizer (necessary not to reload the model for each new inference)
-model, tokenizer = loader.load_model_and_tokenizer(DEFAULT)
+# Initialize global model (necessary not to reload the model for each new inference)
+model = engine.HFModel(DEFAULT)
 
 # Initialize a global conversation object for chatting with the models
-conversation = Conversation()
+conversation = model.get_empty_conversation()
 
 
 def update_model(model_name: str, quantization:bool = False):
-    """Update the model and tokenizer in the global scope so that we can reuse it and speed up inference.
+    """Update the model and conversation in the global scope so that we can reuse them and speed up inference.
 
     Parameters
     ----------
@@ -33,28 +32,27 @@ def update_model(model_name: str, quantization:bool = False):
     """
     
     global model
-    global tokenizer
+    global conversation
 
     # Delete the variables if they exist (they should except if there was an error when loading a model at some point)
+    # to save memory before loading the new one
     try:
         del model
-        del tokenizer
+        del conversation
     except NameError:
         pass
     gc.collect()
 
-    # Try loading the model and tokenizer
+    # Try loading the model
     try:
-        model = loader.load_model(model_name, quantization)
-        tokenizer = loader.load_tokenizer(model_name)
+        model = engine.HFModel(model_name, quantization)
+        conversation = model.get_empty_conversation()
     except:
         gr.Error('There was an error loading this model. Please choose another one.')
 
-    # Clear current conversation (if any) when switching the model
-    conversation.erase_conversation()
 
 
-def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40,
+def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 50,
                     top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
                     use_seed: bool = False, seed: int | None = None) -> str:
     """Text generation using the model and tokenizer in the global scope, so that we can reuse them for multiple
@@ -69,9 +67,9 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     do_sample : bool, optional
         Whether to introduce randomness in the generation, by default True.
     top_k : int, optional
-        How many tokens with max probability to consider for randomness, by default 100.
+        How many tokens with max probability to consider for randomness, by default 50.
     top_p : float, optional
-        The probability density covering the new tokens to consider for randomness, by default 0.92.
+        The probability density covering the new tokens to consider for randomness, by default 0.9.
     temperature : float, optional
         How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
         no randomness), by default 0.9.
@@ -89,9 +87,9 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     
     if not use_seed:
         seed = None
-    predictions = generation.generate_text(model, tokenizer, prompt, max_new_tokens=max_new_tokens,
-                                           do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                           num_return_sequences=num_return_sequences, seed=seed)
+    predictions = model(prompt, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
+                        temperature=temperature, num_return_sequences=num_return_sequences, seed=seed,
+                        truncate_prompt_from_output=True)
     if num_return_sequences > 1:
         return utils.format_output(predictions)
     else:
@@ -135,11 +133,12 @@ def chat_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
         seed = None
     
     # This will update the global conversation in-place
-    _ = generate_conversation(model, tokenizer, prompt, conv_history=conversation, max_new_tokens=max_new_tokens,
-                              do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature, seed=seed)
+    _ = model.generate_conversation(prompt, conv_history=conversation, max_new_tokens=max_new_tokens,
+                                    do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                    seed=seed)
     # The first output is an empty string to clear the input box, the second cast the 2 list of chat history 
     # into a single list of tuples (user, model)
-    return '', list(zip(conversation.user_history_text, conversation.model_history_text))
+    return '', conversation.to_gradio_format()
 
 
 
@@ -179,12 +178,12 @@ def clear_chatbot():
 
     # Erase the conversation history before
     conversation.erase_conversation()
-    return '', [(None, None)]
+    return '', conversation.to_gradio_format()
     
 
 
 # Define general elements of the UI (generation parameters)
-model_name = gr.Dropdown(loader.AUTHORIZED_MODELS, value=DEFAULT, label='Model name',
+model_name = gr.Dropdown(loader.ALLOWED_MODELS, value=DEFAULT, label='Model name',
                          info='Choose the model you want to use.', multiselect=False)
 quantization = gr.Checkbox(value=False, label='Quantization', info='Whether to load the model in 8 bits mode.')
 max_new_tokens = gr.Slider(10, 200, value=50, step=5, label='Max new tokens',
