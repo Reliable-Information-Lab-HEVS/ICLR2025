@@ -169,7 +169,7 @@ def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[i
     quantization = True if model_name == 'bloom-176B' else False
 
     model = engine.HFModel(model_name, quantization=quantization)
-    stopping_patterns = None if (model.is_chat_model and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
+    stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name)
 
     dataset = datasets.HumanEval()
@@ -211,7 +211,7 @@ def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[i
                                     prompt_template_mode=prompt_template_mode, **generation_kwargs)
 
             # Save the model completions
-            if model.is_chat_model and prompt_template_mode in ['default', 'chat']:
+            if model.is_chat_model() and prompt_template_mode in ['default', 'chat']:
                 true_completions = extract_completions(completions, sample)
                 results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
             else:
@@ -249,7 +249,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
     quantization = True if model_name == 'bloom-176B' else False
 
     model = engine.HFModel(model_name, quantization=quantization)
-    stopping_patterns = None if (model.is_chat_model and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
+    stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}', 'completions', model_name)
 
     dataset = datasets.HumanEvalInstruct()
@@ -292,7 +292,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
                                     prompt_template_mode=prompt_template_mode, **generation_kwargs)
 
             # Save the model completions
-            if model.is_chat_model and prompt_template_mode in ['default', 'chat']:
+            if model.is_chat_model() and prompt_template_mode in ['default', 'chat']:
                 true_completions = extract_completions(completions, sample)
                 results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
             else:

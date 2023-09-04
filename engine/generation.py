@@ -3,6 +3,7 @@ import warnings
 import gc
 import psutil
 import math
+import copy
 
 import torch
 import numpy as np
@@ -36,34 +37,42 @@ class HFModel(object):
         
         # Compute the memory footprint of the model on each gpu
         self.gpu_memory_map = {}
-        if hasattr(self.model, 'hf_device_map'):
-            devices = set(self.model.hf_device_map.values())
-            devices.discard('cpu')
-            for device in devices:
-                self.gpu_memory_map[device] = (torch.cuda.memory_allocated(device) - reference_memory[device]) / 1024**3
-        # In this case the model is on a single device thus we directly estimate its size with the number of parameters
-        else:
-            self.gpu_memory_map[gpu_rank] = self.model.get_memory_footprint() / 1024**3
 
-        # Maximum memory taken by the model on a single gpu, or on the cpu
-        self.max_memory_footprint = max(self.gpu_memory_map.values())
-
-        self.model_name = model_name
-        self.quantization = quantization
         # The model is on multiple devices
         if hasattr(self.model, 'hf_device_map'):
             self.device_map = self.model.hf_device_map
-            self.input_device = min(devices) if len(devices) > 0 else 'cpu'
+
+            gpu_devices = set(self.model.hf_device_map.values())
+            gpu_devices.discard('cpu')
+            gpu_devices.discard('disk')
+
+            # Compute the gpus memory footprint
+            self.input_device = min(gpu_devices) if len(gpu_devices) > 0 else 'cpu'
+            for device in gpu_devices:
+                self.gpu_memory_map[device] = (torch.cuda.memory_allocated(device) - reference_memory[device]) / 1024**3
+        
         # The model is on a single device
         else:
             device = next(self.model.parameters()).get_device()
             self.device_map = 'cpu' if device == -1 else f'cuda:{device}'
             self.input_device = 'cpu' if device == -1 else device
+
+            # Compute the gpu memory if the device is a gpu
+            if device != -1:
+                self.gpu_memory_map[device] = (torch.cuda.memory_allocated(device) - reference_memory[device]) / 1024**3
+
+        # Maximum memory taken by the model on a single gpu, or on the cpu
+        if len(self.gpu_memory_map) > 0:
+            self.max_memory_footprint = max(self.gpu_memory_map.values())
+        else:
+            # Estimate the footprint via the number of parameters in this case
+            self.max_memory_footprint = self.model.get_memory_footprint() / 1024**3
+
+        self.model_name = model_name
+        self.quantization = quantization
+        # May be different from the dtype given in the arguments so use the model attribute
         self.dtype = self.model.dtype
 
-        # In this case the gpu memory map is erroneous
-        if self.device_map == 'cpu':
-            self.gpu_memory_map = {}
 
         # Initialize the prompt template to use 
         self.prompt_template = get_prompt_template(self.model_name)
@@ -72,7 +81,7 @@ class HFModel(object):
         self.extra_eos_tokens = self.prompt_template.get_extra_eos()
 
         # Flag to check if the model is a chat model by default
-        self.is_chat_model = self.prompt_template.default_mode == 'chat'
+        self._is_chat_model = self.prompt_template.default_mode == 'chat'
 
     
     def __repr__(self) -> str:
@@ -84,6 +93,30 @@ class HFModel(object):
             return f'{self.model_name}, quantized 8 bits version'
         else:
             return f'{self.model_name}, using dtype {self.dtype}'
+        
+        
+    def is_chat_model(self) -> bool:
+        """Check if the model was originally optimized as a chat agent."""
+        return self._is_chat_model
+    
+
+    def get_gpu_memory_footprint(self) -> dict:
+        """Return the memory footprint of the model on each GPU device it uses, in GiB."""
+        return copy.deepcopy(self.gpu_memory_map)
+    
+
+    def get_memory_footprint(self) -> dict:
+        """Return the memory footprint of the model on each device it uses, in GiB. In case of a custom `device_map`
+        where both gpu devices AND cpu and/or disk were specified, this function is not accurate."""
+
+        gpu_footprint = self.get_gpu_memory_footprint()
+        if len(gpu_footprint) == 0:
+            return {'cpu': self.max_memory_footprint}
+        else:
+            # If the custom device map contains both gpu device and cpu (and/or disk), this is not accurate as
+            # we only return the footprint of the gpus (computing the footprint of the cpu is hard and not
+            # precise, and this case should never appear in practice)
+            return gpu_footprint
 
 
     def format_prompt(self, prompt: str, model_context: str = '', infill_suffix: str = '', system_prompt: str = '',

@@ -478,7 +478,7 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
                                  max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8) -> tuple[int, dict]:
     """Estimate the minimum number of gpus needed to perform inference with a model, given the maximum gpu memory
     proportion `max_fraction_gpu_0` and `max_fraction_gpus` that we allow for the model. This relies on
-    simple heuristics.
+    simple heuristics. This also computes the corresponding `memory_map` to use when creating a `device_map`.
 
     Parameters
     ----------
@@ -497,8 +497,8 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
     Returns
     -------
     tuple[int, dict]
-        Tuple containing the minimum number of gpus needed, and a dictionary mapping each gpu needed to the
-        maximum size reserved by the model for this gpu.
+        Tuple containing the minimum number of gpus needed, the `memory_map`, i.e. a dictionary mapping each gpu
+        needed to the maximum size reserved by the model for this gpu.
     """
 
     if max_fraction_gpu_0 < 0 or max_fraction_gpus < 0:

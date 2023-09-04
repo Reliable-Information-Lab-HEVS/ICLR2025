@@ -88,6 +88,8 @@ input_sizes = [50*i for i in range(1, 11)]
 max_tokens = [50*i for i in range(1, 11)]
 max_tokens += [512]
 
+
+@utils.duplicate_function_for_gpu_dispatch
 def memory_estimation(model_name: str, N_repeat: int = 10):
 
     model = engine.HFModel(model_name)
@@ -147,7 +149,7 @@ if __name__ == '__main__':
         if num_gpus > 1:
             with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
                                         initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-                pool.map(memory_estimation, SMALL_MODELS, chunksize=1)
+                _ = list(pool.map(memory_estimation, SMALL_MODELS, chunksize=1))
         else:
             for model in SMALL_MODELS:
                 memory_estimation(model)
