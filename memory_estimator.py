@@ -104,8 +104,17 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
     model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
     gpus = model.get_gpu_devices()
     large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
+
+    # Initialize dicts
     model_memory_consumption = {}
     model_time_consumption = {}
+
+    # Initialize filenames and return if files already exist
+    dtype_name = model.dtype_category()
+    filename_memory = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', model_name, f'{dtype_name}.json')
+    filename_time = os.path.join(utils.ROOT_FOLDER, 'time_estimator', model_name, f'{dtype_name}.json')
+    if os.path.exists(filename_memory) and os.path.exists(filename_time):
+        return
 
     for i, input_size in enumerate(input_sizes):
 
@@ -144,17 +153,8 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
         model_memory_consumption[input_size] = input_size_memory_consumption
         model_time_consumption[input_size] = input_size_time_consumption
 
-    
-    dtype_name = model.dtype_category()
-    
-    filename_memory = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', model_name, f'{dtype_name}.json')
-    if os.path.exists(filename_memory):
-        os.remove(filename_memory)
+    # Save results
     utils.save_json(model_memory_consumption, filename_memory)
-
-    filename_time = os.path.join(utils.ROOT_FOLDER, 'time_estimator', model_name, f'{dtype_name}.json')
-    if os.path.exists(filename_time):
-        os.remove(filename_time)
     utils.save_json(model_time_consumption, filename_time)
 
     print(f'Done with {model_name}!')
