@@ -147,8 +147,8 @@ def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = P
 
 
 @utils.duplicate_function_for_gpu_dispatch
-def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[int] = TEMPERATURES,
-               generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
+def human_eval(model_name: str, prompt_template_mode: str, quantization: bool = False,
+               temperatures: tuple[int] = TEMPERATURES, generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
                greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
     """Generate the HumanEval completions for different temperatures with the model `model_name` and
     save the results.
@@ -166,11 +166,12 @@ def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[i
     """
 
     # Load in 8 bits for bloom due to model size
-    quantization = True if model_name == 'bloom-176B' else False
+    quantization = True if model_name == 'bloom-176B' else quantization
 
     model = engine.HFModel(model_name, quantization=quantization)
     stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
-    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name)
+    name = f'{model_name}_8bits' if quantization else model_name
+    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', name)
 
     dataset = datasets.HumanEval()
 
@@ -227,7 +228,7 @@ def human_eval(model_name: str, prompt_template_mode: str, temperatures: tuple[i
 
 
 @utils.duplicate_function_for_gpu_dispatch
-def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context: bool,
+def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context: bool, quantization: bool = False,
                         temperatures: tuple[int] = TEMPERATURES, generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
                         greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
     """Generate the HumanEvalInstruct completions for different temperatures with the model `model_name` and
@@ -246,11 +247,12 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
     """
 
     # Load in 8 bits for bloom due to model size
-    quantization = True if model_name == 'bloom-176B' else False
+    quantization = True if model_name == 'bloom-176B' else quantization
 
     model = engine.HFModel(model_name, quantization=quantization)
     stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
-    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}', 'completions', model_name)
+    name = f'{model_name}_8bits' if quantization else model_name
+    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}', 'completions', name)
 
     dataset = datasets.HumanEvalInstruct()
 

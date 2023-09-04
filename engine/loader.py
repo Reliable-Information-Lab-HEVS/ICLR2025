@@ -474,8 +474,9 @@ def get_model_dtype(model_name: str) -> torch.dtype:
     return ALL_MODELS_DTYPES_MAPPING[model_name]
 
 
-def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dtype | None = None,
-                                 max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8) -> tuple[int, dict]:
+def estimate_model_gpu_footprint(model_name, quantization_8bits: bool = False, quantization_4bits: bool = False,
+                                 dtype: torch.dtype | None = None, max_fraction_gpu_0: float = 0.8,
+                                 max_fraction_gpus: float = 0.8) -> tuple[int, dict]:
     """Estimate the minimum number of gpus needed to perform inference with a model, given the maximum gpu memory
     proportion `max_fraction_gpu_0` and `max_fraction_gpus` that we allow for the model. This relies on
     simple heuristics. This also computes the corresponding `memory_map` to use when creating a `device_map`.
@@ -484,8 +485,10 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
     ----------
     model_name : str
         The model name.
-    quantization : bool
-        Whether the model will be loaded in 8 bits mode.
+    quantization_8bits : bool
+        Whether the model will be loaded in 8 bits mode, by default False.
+    quantization_4bits : bool
+        Whether the model will be loaded in 4 bits mode, by default False.
     dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
@@ -507,12 +510,18 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
     if max_fraction_gpu_0 > 0.85 or max_fraction_gpus > 0.85:
         raise ValueError(('The maximum fraction of gpu memory to use cannot be larger than 0.85 because some '
                          'memory need to stay free for the forward pass and other computations.'))
+    
+    # Silently use 4bits when both are True
+    if quantization_4bits and quantization_8bits:
+        quantization_8bits = False
 
     # If not provided take the default one
     if dtype is None:
         dtype = get_model_dtype(model_name)
 
-    if quantization:
+    if quantization_4bits:
+        size_multiplier = 1/2
+    elif quantization_8bits:
         size_multiplier = 1
     elif (dtype == torch.float16) or (dtype == torch.bfloat16):
         size_multiplier = 2
@@ -554,17 +563,21 @@ def estimate_model_gpu_footprint(model_name, quantization: bool, dtype: torch.dt
 
 
 
-def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
-               max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
-               gpu_rank: int = 0):
+def load_model(model_name: str, quantization_8bits: bool = False, quantization_4bits: bool = False,
+               dtype: torch.dtype | None = None, max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
+               device_map: dict | None = None, gpu_rank: int = 0):
     """Load one of the supported pretrained model.
 
     Parameters
     ----------
     model_name : str
         The model name.
-    quantization : bool, optional
-        Whether to load the model in 8 bits mode to save memory, by default False.
+    quantization_8bits : bool
+        Whether the model will be loaded in 4 bits mode, by default False. This argument is mutually exclusive
+        with `quantization_4bits`.
+    quantization_4bits : bool
+        Whether the model will be loaded in 4 bits mode, by default False. This argument is mutually exclusive
+        with `quantization_8bits`.
     dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
@@ -597,6 +610,10 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
     if dtype not in ALLOWED_DTYPES:
         raise ValueError(f'The dtype must be one of {*ALLOWED_DTYPES,}.')
     
+    if quantization_8bits and quantization_4bits:
+        raise ValueError(('You cannot load a model with both `quantization_8bits` and `quantization_4bits`. '
+                         'Please choose one'))
+    
     if isinstance(device_map, str):
         raise ValueError(("You cannot provide the `device_map` as a string. Please use the `max_fraction_gpu_0` "
                          "and `max_fraction_gpus` arguments to mimic `device_map='balanced'` or "
@@ -607,12 +624,13 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
         dtype = torch.float32
     
     # Override quantization if we don't have access to GPUs
-    if not torch.cuda.is_available() and quantization:
-        quantization = False
-        warnings.warn('There are no GPUs available. The model will NOT be loaded in 8 bits mode.', RuntimeWarning)
+    if not torch.cuda.is_available() and (quantization_8bits or quantization_4bits):
+        quantization_4bits = False
+        quantization_8bits = False
+        warnings.warn('There are no GPUs available. The model will NOT be quantized.', RuntimeWarning)
 
     # Override dtype if we quantize the model as only float16 is acceptable for quantization
-    dtype = torch.float16 if quantization else dtype
+    dtype = torch.float16 if (quantization_4bits or quantization_8bits) else dtype
 
     # Add possible additional kwargs
     if model_name in ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING.keys():
@@ -630,8 +648,10 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
     # used sequentially
     if (device_map is None) and torch.cuda.is_available():
     
-        min_gpu_needed, max_memory_map = estimate_model_gpu_footprint(model_name, quantization, dtype, max_fraction_gpu_0,
-                                                                  max_fraction_gpus)
+        min_gpu_needed, max_memory_map = estimate_model_gpu_footprint(model_name, quantization_8bits=quantization_8bits,
+                                                                      quantization_4bits=quantization_4bits, dtype=dtype,
+                                                                      max_fraction_gpu_0=max_fraction_gpu_0,
+                                                                      max_fraction_gpus=max_fraction_gpus)
         gpu_number = torch.cuda.device_count()
 
         if min_gpu_needed > gpu_number:
@@ -655,15 +675,18 @@ def load_model(model_name: str, quantization: bool = False, dtype: torch.dtype |
     # Initiate different model types depending on architecture
     if model_name in DECODER_MODELS_MAPPING.keys():
         model = AutoModelForCausalLM.from_pretrained(DECODER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                    torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
+                                                    torch_dtype=dtype, load_in_8bit=quantization_8bits,
+                                                    load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
                                                     **additional_kwargs)
     elif model_name in ENCODER_MODELS_MAPPING.keys():
         model = AutoModelForMaskedLM.from_pretrained(ENCODER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                    torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
+                                                    torch_dtype=dtype, load_in_8bit=quantization_8bits,
+                                                    load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
                                                     **additional_kwargs)
     elif model_name in TRANSFORMER_MODELS_MAPPING.keys():
         model = AutoModelForSeq2SeqLM.from_pretrained(TRANSFORMER_MODELS_MAPPING[model_name], device_map=device_map,
-                                                      torch_dtype=dtype, load_in_8bit=quantization, low_cpu_mem_usage=True,
+                                                      torch_dtype=dtype, load_in_8bit=quantization_8bits,
+                                                      load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
                                                       **additional_kwargs)
     
     # If the flag is active we directly put our model on one gpu without using any device_map (this is 
@@ -708,19 +731,12 @@ def load_tokenizer(model_name: str):
     
     tokenizer = AutoTokenizer.from_pretrained(ALL_MODELS_MAPPING[model_name], **additional_kwargs)
 
-    # For Dialo-GPT models, update the post-processor to automatically add the eos token at the end
-    # We need to sacrifice the ByteLevel processor for that because it is currently not possible to
-    # chain post-processors (should only impact the offsets, that we do not care about)
-    # if model_name in DIALO_GPT_MODELS_MAPPING.keys():
-    #     tokenizer.backend_tokenizer.post_processor = \
-    #         TemplateProcessing(single="$0 <|endoftext|>", special_tokens=[("<|endoftext|>", tokenizer.eos_token_id)])
-
     return tokenizer
 
 
-def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
-                             max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
-                             device_map: dict | None = None,
+def load_model_and_tokenizer(model_name: str, quantization_8bits: bool = False, quantization_4bits: bool = False,
+                             dtype: torch.dtype | None = None, max_fraction_gpu_0: float = 0.8,
+                             max_fraction_gpus: float = 0.8, device_map: dict | None = None,
                              gpu_rank: int = 0) -> tuple:
     """Load both a model and corresponding tokenizer.
 
@@ -728,8 +744,12 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
     ----------
     model_name : str
         The model name.
-    quantization : bool, optional
-        Whether to load the model in 8 bits mode to save memory, by default False.
+    quantization_8bits : bool
+        Whether the model will be loaded in 4 bits mode, by default False. This argument is mutually exclusive
+        with `quantization_4bits`.
+    quantization_4bits : bool
+        Whether the model will be loaded in 4 bits mode, by default False. This argument is mutually exclusive
+        with `quantization_8bits`.
     dtype : torch.dtype | None, optional
         The dtype to use for the model. If not provided, we use the dtype with which the model was trained
         if it is known, else we use float32, by default None.
@@ -753,7 +773,8 @@ def load_model_and_tokenizer(model_name: str, quantization: bool = False, dtype:
         The model and tokenizer.
     """
 
-    return (load_model(model_name, quantization=quantization, dtype=dtype, max_fraction_gpu_0=max_fraction_gpu_0,
-                       max_fraction_gpus=max_fraction_gpus, device_map=device_map, gpu_rank=gpu_rank),
+    return (load_model(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits,
+                       dtype=dtype, max_fraction_gpu_0=max_fraction_gpu_0, max_fraction_gpus=max_fraction_gpus,
+                       device_map=device_map, gpu_rank=gpu_rank),
             load_tokenizer(model_name))
 

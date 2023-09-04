@@ -96,7 +96,8 @@ max_tokens += [512]
 @utils.duplicate_function_for_gpu_dispatch
 def memory_estimation(model_name: str, N_repeat: int = 10):
 
-    model = engine.HFModel(model_name)
+    quantization_8bits = model_name == 'bloom-176B'
+    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits)
     gpus = model.get_gpu_devices()
     large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
     model_memory_consumption = {}
@@ -130,7 +131,8 @@ def memory_estimation(model_name: str, N_repeat: int = 10):
 
         model_memory_consumption[input_size] = input_size_memory_consumption
 
-    filename = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{model_name}.json')
+    name = f'{model_name}_8bits' if quantization_8bits else model_name
+    filename = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{name}.json')
     if os.path.exists(filename):
         os.remove(filename)
     utils.save_json(model_memory_consumption, filename)
@@ -168,8 +170,8 @@ if __name__ == '__main__':
 
         model_footprints = []
         for model in LARGE_MODELS:
-            quantization = model == 'bloom-176B'
-            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+            quantization_8bits = model == 'bloom-176B'
+            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=quantization_8bits)
             model_footprints.append(gpu_needed)
 
         utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, memory_estimation)

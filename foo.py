@@ -18,8 +18,8 @@ from helpers import utils
 def target(name: str, foo, bar = 3):
     print(os.environ['CUDA_VISIBLE_DEVICES'])
     print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
-    model = engine.HFModel(name)
-    print(f'Gpus as seen by torch: {model.get_gpu_devices()}')
+    # model = engine.HFModel(name)
+    # print(f'Gpus as seen by torch: {model.get_gpu_devices()}')
 
 
 @utils.duplicate_function_for_gpu_dispatch
@@ -41,14 +41,19 @@ LARGE_MODELS = (
 if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
-    model_footprints = []
-    # Estimate number of gpus needed for each model
-    for model in LARGE_MODELS:
-        quantization = model == 'bloom-176B'
-        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
-        model_footprints.append(gpu_needed)
+    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
+                                        initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+            
+            _ = list(pool.map(target, LARGE_MODELS, chunksize=1))
+
+    # model_footprints = []
+    # # Estimate number of gpus needed for each model
+    # for model in LARGE_MODELS:
+    #     quantization = model == 'bloom-176B'
+    #     gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+    #     model_footprints.append(gpu_needed)
 
 
-    args = ([1,2],)
-    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
+    # args = ([1,2],)
+    # utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
     

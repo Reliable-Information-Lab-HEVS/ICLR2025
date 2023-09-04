@@ -141,7 +141,7 @@ class GenericConversation(object):
         if len(self) == 0:
             return [(None, None)]
 
-        return [turn for turn in self]
+        return [conv_turn for conv_turn in self]
         
 
 

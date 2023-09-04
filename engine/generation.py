@@ -21,9 +21,9 @@ class HFModel(object):
     """Class encapsulating a HuggingFace model and its tokenizer to generate text. 
     """
 
-    def __init__(self, model_name: str, quantization: bool = False, dtype: torch.dtype | None = None,
-                max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8, device_map: dict | None = None,
-                gpu_rank: int = 0):
+    def __init__(self, model_name: str, quantization_8bits: bool = False, quantization_4bits: bool = False,
+                 dtype: torch.dtype | None = None, max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
+                 device_map: dict | None = None, gpu_rank: int = 0):
         
         # Save the current allocated memory on each gpu to estimate model size after loading
         if torch.cuda.is_available():
@@ -32,8 +32,9 @@ class HFModel(object):
                 reference_memory[i] = torch.cuda.memory_allocated(i)
 
         # Actually load the model and tokenizer
-        self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization=quantization,
-                                                                     dtype=dtype, max_fraction_gpu_0=max_fraction_gpu_0,
+        self.model, self.tokenizer = loader.load_model_and_tokenizer(model_name, quantization_8bits=quantization_8bits,
+                                                                     quantization_4bits=quantization_4bits, dtype=dtype,
+                                                                     max_fraction_gpu_0=max_fraction_gpu_0,
                                                                      max_fraction_gpus=max_fraction_gpus,
                                                                      device_map=device_map, gpu_rank=gpu_rank)
         
@@ -71,7 +72,8 @@ class HFModel(object):
             self.max_memory_footprint = self.model.get_memory_footprint() / 1024**3
 
         self.model_name = model_name
-        self.quantization = quantization
+        self.quantization_8bits = quantization_8bits
+        self.quantization_4bits = quantization_4bits
         # May be different from the dtype given in the arguments so use the model attribute
         self.dtype = self.model.dtype
 
@@ -87,12 +89,15 @@ class HFModel(object):
 
     
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.model_name}, quantization={self.quantization}, dtype={self.dtype})'
+        return (f'{self.__class__.__name__}({self.model_name}, quantization_8bits={self.quantization_8bits}, '
+                f'quantization_4bits={self.quantization_4bits}, dtype={self.dtype})')
     
     
     def __str__(self) -> str:
-        if self.quantization:
+        if self.quantization_8bits:
             return f'{self.model_name}, quantized 8 bits version'
+        elif self.quantization_4bits:
+            return f'{self.model_name}, quantized 4 bits version'
         else:
             return f'{self.model_name}, using dtype {self.dtype}'
         
@@ -561,19 +566,20 @@ class HFModel(object):
         self.prompt_template = template
 
 
-    def generate_conversation(self,
-                            prompt: str,
-                            system_prompt: str = '',
-                            conv_history: GenericConversation | None = None,
-                            max_new_tokens: int = 60,
-                            min_new_tokens: int = 5,
-                            do_sample: bool = True,
-                            top_k: int = 50,
-                            top_p: float = 0.90,
-                            temperature: float = 0.9,
-                            seed: int | None = None,
-                            truncate_if_conv_too_long: bool = True,
-                            **kwargs
+    def generate_conversation(
+            self,
+            prompt: str,
+            system_prompt: str = '',
+            conv_history: GenericConversation | None = None,
+            max_new_tokens: int = 60,
+            min_new_tokens: int = 5,
+            do_sample: bool = True,
+            top_k: int = 50,
+            top_p: float = 0.90,
+            temperature: float = 0.9,
+            seed: int | None = None,
+            truncate_if_conv_too_long: bool = True,
+            **kwargs
     ) -> GenericConversation:
         """Generate a conversation turn between a user and the model, according to new user input `prompt`.
 
@@ -677,6 +683,8 @@ class HFModel(object):
         """Return a new empty conversation with the template of the current model."""
         return get_conversation_template(self.model_name)
    
+
+
 
 def expand_past_keys(past_key_values, batch_size):
 
