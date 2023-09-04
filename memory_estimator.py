@@ -134,7 +134,8 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
                     actual_peaks[gpu_rank] = torch.cuda.max_memory_allocated(gpu_rank) / 1024**3
 
                 t0 = time.time()
-                foo = model(prompt, num_return_sequences=1, max_new_tokens=max_token, batch_size=1)
+                foo = model(prompt, num_return_sequences=1, max_new_tokens=max_token, batch_size=1,
+                            min_new_tokens=max_token-1)
                 dt = time.time() - t0
                 
                 memory_used = {}
