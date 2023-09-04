@@ -13,8 +13,6 @@ from engine.code_parser import CodeParser, PythonParser
 from helpers import datasets
 from helpers import utils
 
-from transformers import PreTrainedModel
-
 
 @utils.duplicate_function_for_gpu_dispatch
 def target(name: str, foo, bar = 3):
@@ -43,19 +41,20 @@ LARGE_MODELS = (
 if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
-    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
-                                        initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+    # with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
+    #                                     initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
             
-            _ = list(pool.map(target, LARGE_MODELS, (3,)*len(LARGE_MODELS), chunksize=1))
+    #         _ = list(pool.map(target, LARGE_MODELS, (3,)*len(LARGE_MODELS), chunksize=1))
+    
 
-    # model_footprints = []
-    # # Estimate number of gpus needed for each model
-    # for model in LARGE_MODELS:
-    #     quantization = model == 'bloom-176B'
-    #     gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
-    #     model_footprints.append(gpu_needed)
+    model_footprints = []
+    # Estimate number of gpus needed for each model
+    for model in LARGE_MODELS:
+        quantization = model == 'bloom-176B'
+        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+        model_footprints.append(gpu_needed)
 
 
-    # args = ([1,2],)
-    # utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
+    args = ([1,2],)
+    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
     
