@@ -232,10 +232,12 @@ class HFModel(object):
             Whether to introduce randomness in the generation, by default True.
         top_k : int | None, optional
             How many tokens with max probability to consider for random sampling, by default 50. Not used if 
-            `do_sample=False`. You can deactivate top_k sampling by providing `top_k=0` or `top_k=None`.
+            `do_sample=False`. You can deactivate top_k sampling by providing `top_k=0` or `top_k=None`. Note 
+            that if you provide both `top_k` and `top_p`, the `top_k` is applied before.
         top_p : float | None, optional
             The probability density covering the new tokens to consider for random sampling, by default 0.9. Not used if 
-            `do_sample=False`. You can deactivate top_p sampling by providing `top_p=1` or `top_p=None`.
+            `do_sample=False`. You can deactivate top_p sampling by providing `top_p=1` or `top_p=None`. Note 
+            that if you provide both `top_k` and `top_p`, the `top_k` is applied before.
         temperature : float, optional
             How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
             no randomness), by default 0.9. Passing 0 is equivalent to setting `do_sample=False`.
