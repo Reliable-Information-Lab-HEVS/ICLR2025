@@ -538,7 +538,6 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
         for i, process in enumerate(processes):
             if not process.is_alive():
                 indices_to_remove.append(i)
-                # TODO: check necesity of this!!!
                 process.close()
 
         # Update gpu resources

@@ -99,10 +99,8 @@ class GenericConversation(object):
         """Format the prompt representing the conversation that we will feed to the tokenizer.
         """
 
-        # After a close inspection of source code
-        # (https://github.com/huggingface/transformers/blob/v4.30.0/src/transformers/pipelines/conversational.py#L18)
-        # for conversational pipeline and all tokenizers, this seems to be the accepted way to treat inputs for
-        # conversation with a model. This is the DialoGPT way of handling conversation, but is in fact reused by
+        # This seems to be the accepted way to treat inputs for conversation with a model that was not specifically
+        # fine-tuned for conversation. This is the DialoGPT way of handling conversation, but is in fact reused by
         # all other tokenizers that we use.
 
         prompt = ''

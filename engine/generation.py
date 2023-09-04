@@ -12,6 +12,7 @@ from transformers import StoppingCriteriaList
 from engine import loader
 from engine import stopping
 from engine.prompt_template import GenericPromptTemplate, get_prompt_template
+from engine.conversation_template import GenericConversation, get_conversation_template
 from engine.code_parser import CodeParser
 from helpers import utils
 
@@ -559,6 +560,122 @@ class HFModel(object):
         """Set the prompt template."""
         self.prompt_template = template
 
+
+    def generate_conversation(self,
+                            prompt: str,
+                            system_prompt: str = '',
+                            conv_history: GenericConversation | None = None,
+                            max_new_tokens: int = 60,
+                            min_new_tokens: int = 5,
+                            do_sample: bool = True,
+                            top_k: int = 50,
+                            top_p: float = 0.90,
+                            temperature: float = 0.9,
+                            seed: int | None = None,
+                            truncate_if_conv_too_long: bool = True,
+                            **kwargs
+    ) -> GenericConversation:
+        """Generate a conversation turn between a user and the model, according to new user input `prompt`.
+
+        Input parameters
+        ----------------
+        prompt : str
+            The new prompt of the user to the model.
+        system_prompt : str
+            An optional system prompt to guide the style of the model answers.
+        conv_history : GenericConversation | None
+            An optional existing conversation object, representing the current dialogue between the user and
+            the model.
+
+        Generation parameters
+        ---------------------
+
+        max_new_tokens : int, optional
+            How many new tokens to generate, by default 60.
+        min_new_tokens : int, optional
+            The minimum number of tokens to generate, by setting the probability of EOS token to 0. It is useful to
+            force the model to generate an output, instead of immediately generating EOS, by default 5.
+        do_sample : bool, optional
+            Whether to introduce randomness in the generation, by default True.
+        top_k : int | None, optional
+            How many tokens with max probability to consider for random sampling, by default 50. Not used if 
+            `do_sample=False`. You can deactivate top_k sampling by providing `top_k=0` or `top_k=None`. Note 
+            that if you provide both `top_k` and `top_p`, the `top_k` is applied before.
+        top_p : float | None, optional
+            The probability density covering the new tokens to consider for random sampling, by default 0.9. Not used if 
+            `do_sample=False`. You can deactivate top_p sampling by providing `top_p=1` or `top_p=None`. Note 
+            that if you provide both `top_k` and `top_p`, the `top_k` is applied before.
+        temperature : float, optional
+            How to cool down the probability distribution. Value between 1 (no cooldown) and 0 (greedy search,
+            no randomness), by default 0.9. Passing 0 is equivalent to setting `do_sample=False`.
+        seed : int | None, optional
+            An optional seed to force the generation to be reproducible.
+        truncate_if_conv_too_long : bool, optional
+            Whether to truncate the conversation history if it becomes larger than the model maximum capacity,
+            by default True.
+
+        Returns
+        -------
+        GenericConversation
+            A conversation object, with the dialogue history updated with the current turn.
+        """
+
+        if seed is not None:
+            utils.set_all_seeds(seed)
+
+        # Setting the temperature to 0 is equivalent to greedy search thus we explicitly set do_sample=False
+        if temperature == 0:
+            do_sample = False
+
+        if do_sample:
+            generation_kwargs = {'do_sample': do_sample, 'top_k': top_k, 'top_p': top_p, 'temperature': temperature}
+        # If we are doing greedy search, do not pass arguments that alter the model output logits to `generate`
+        else:
+            generation_kwargs = {'do_sample': do_sample}
+
+        # Check that the history is not empty
+        if conv_history is None:
+            conv_history = self.get_empty_conversation()
+
+        # Set system prompt
+        conv_history.set_system_prompt(system_prompt)
+
+        # Add the prompt to the current conversation
+        conv_history.append_user_message(prompt)
+
+        # Generate and tokenize the full prompt
+        full_prompt = conv_history.get_prompt()
+        input = self.tokenizer.encode(full_prompt, return_tensors='pt')
+        input_length = input.shape[-1]
+        if torch.cuda.is_available():
+            input = input.to(device=self.input_device)
+
+        # Create the stopping criteria in case the model has some extra eos tokens to process
+        stopping_criteria, _ = self.create_stopping_criteria(input_length)
+
+        # Suppress pad_token_id warning
+        pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else self.tokenizer.eos_token_id
+
+        outputs = self.model.generate(input, max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                      **generation_kwargs, num_return_sequences=1,
+                                      stopping_criteria=stopping_criteria, pad_token_id=pad_token_id, **kwargs)
+                
+        # Truncate the prompt from the output
+        truncated_outputs = outputs[:, input_length:]
+
+        # Post-process the sequences according to potential extra eos tokens
+        response = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_patterns=None,
+                                                   extra_eos_tokens=self.extra_eos_tokens)
+        
+        # Append output to the conv
+        conv_history.append_model_message(response[0])
+
+        return conv_history
+
+
+    def get_empty_conversation(self) -> GenericConversation:
+        """Return a new empty conversation with the template of the current model."""
+        return get_conversation_template(self.model_name)
    
 
 def expand_past_keys(past_key_values, batch_size):
