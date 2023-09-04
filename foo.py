@@ -44,7 +44,7 @@ if __name__ == '__main__':
     with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
                                         initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
             
-            _ = list(pool.map(target, LARGE_MODELS, chunksize=1))
+            _ = list(pool.map(target, LARGE_MODELS, (3,)*len(LARGE_MODELS), chunksize=1))
 
     # model_footprints = []
     # # Estimate number of gpus needed for each model
