@@ -147,8 +147,9 @@ def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = P
 
 
 @utils.duplicate_function_for_gpu_dispatch
-def human_eval(model_name: str, prompt_template_mode: str, quantization: bool = False,
-               temperatures: tuple[int] = TEMPERATURES, generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
+def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: bool = False,
+               quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
+               generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
                greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
     """Generate the HumanEval completions for different temperatures with the model `model_name` and
     save the results.
@@ -165,13 +166,14 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization: bool = 
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    # Load in 8 bits for bloom due to model size
-    quantization = True if model_name == 'bloom-176B' else quantization
+    # Override quantization for bloom because it's too big
+    if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
+        quantization_8bits = True
 
-    model = engine.HFModel(model_name, quantization=quantization)
+    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
     stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
-    name = f'{model_name}_8bits' if quantization else model_name
-    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', name)
+    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name,
+                          model.dtype_category())
 
     dataset = datasets.HumanEval()
 
@@ -228,8 +230,9 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization: bool = 
 
 
 @utils.duplicate_function_for_gpu_dispatch
-def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context: bool, quantization: bool = False,
-                        temperatures: tuple[int] = TEMPERATURES, generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
+def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context: bool, quantization_8bits: bool = False,
+                        quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
+                        generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
                         greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
     """Generate the HumanEvalInstruct completions for different temperatures with the model `model_name` and
     save the results.
@@ -246,13 +249,14 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    # Load in 8 bits for bloom due to model size
-    quantization = True if model_name == 'bloom-176B' else quantization
+    # Override quantization for bloom because it's too big
+    if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
+        quantization_8bits = True
 
-    model = engine.HFModel(model_name, quantization=quantization)
+    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
     stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
-    name = f'{model_name}_8bits' if quantization else model_name
-    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}', 'completions', name)
+    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}',
+                          'completions', model_name, model.dtype_category())
 
     dataset = datasets.HumanEvalInstruct()
 
@@ -311,6 +315,10 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='HumanEval benchmark')
+    parser.add_argument('--int8', action='store_true',
+                        help='If given, will estimate the memory footprint of the model quantized to int8.')
+    parser.add_argument('--int4', action='store_true',
+                        help='If given, will estimate the memory footprint of the model quantized to int4.')
     parser.add_argument('--big_models', action='store_true',
                         help='If given, run the benchmark on large models that do not fit on a single gpu.')
     parser.add_argument('--big_models_only', action='store_true',
@@ -325,12 +333,17 @@ if __name__ == '__main__':
                         help='If given, do NOT use the context in the HumanEvalInstruct benchmark.')
     
     args = parser.parse_args()
+    int8 = args.int8
+    int4 = args.int4
     big_models = args.big_models
     big_models_only = args.big_models_only
     special_only = args.special_only
     instruct = args.instruct
     mode = args.mode
     use_context = args.no_context
+
+    if int4 and int8:
+        raise ValueError('int4 and int8 quantization are mutually exclusive.')
 
     # Do not even attempt to run the script without access to gpus
     if not torch.cuda.is_available():
@@ -344,6 +357,8 @@ if __name__ == '__main__':
     # Create the iterables to pass to the processing pool
     mode_iter = (mode,)*len(small_models)
     use_context_iter = (use_context,)*len(small_models)
+    int8_iter = (int8,)*len(small_models)
+    int4_iter = (int4,)*len(small_models)
 
     # target function
     target_func = human_eval_instruct if instruct else human_eval
@@ -351,7 +366,7 @@ if __name__ == '__main__':
     print(f'Launching computations with {num_gpus} gpus available.')
 
     if not big_models_only:
-        args = (mode_iter, use_context_iter) if instruct else (mode_iter,)
+        args = (mode_iter, use_context_iter, int8_iter, int4_iter) if instruct else (mode_iter, int8_iter, int4_iter)
         
         # Run all models that fit on a single gpu in parallel using all gpus
         # Use ProcessPoolExecutor() instead of mp.Pool() because it is slightly more convenient
@@ -367,7 +382,7 @@ if __name__ == '__main__':
             gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
             model_footprints.append(gpu_needed)
 
-        args = (mode, use_context) if instruct else (mode,)
+        args = (mode, use_context, int8, int4) if instruct else (mode, int8, int4)
 
         utils.dispatch_jobs(large_models, model_footprints, num_gpus, target_func, args)
 
