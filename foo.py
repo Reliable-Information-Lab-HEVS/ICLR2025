@@ -45,13 +45,13 @@ if __name__ == '__main__':
     #                                     initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
             
     #         _ = list(pool.map(target, LARGE_MODELS, (3,)*len(LARGE_MODELS), chunksize=1))
-    
+
 
     model_footprints = []
     # Estimate number of gpus needed for each model
     for model in LARGE_MODELS:
-        quantization = model == 'bloom-176B'
-        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+        int8 = model == 'bloom-176B'
+        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8)
         model_footprints.append(gpu_needed)
 
 
