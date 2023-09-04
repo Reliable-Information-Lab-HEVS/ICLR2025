@@ -1,6 +1,7 @@
 import os
 import gc
 import argparse
+import time
 import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 
@@ -94,22 +95,28 @@ max_tokens += [512]
 
 
 @utils.duplicate_function_for_gpu_dispatch
-def memory_estimation(model_name: str, N_repeat: int = 10):
+def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4bits: bool, N_repeat: int = 10):
 
-    quantization_8bits = model_name == 'bloom-176B'
-    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits)
+    # Override quantization for bloom because it's too big
+    if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
+        quantization_8bits = True
+
+    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
     gpus = model.get_gpu_devices()
     large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
     model_memory_consumption = {}
+    model_time_consumption = {}
 
     for i, input_size in enumerate(input_sizes):
 
         prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
         input_size_memory_consumption = {}
+        input_size_time_consumption = {}
 
         for j, max_token in enumerate(max_tokens):
 
             results = []
+            times = []
             for k in range(N_repeat):
                 
                 actual_peaks = {}
@@ -117,7 +124,9 @@ def memory_estimation(model_name: str, N_repeat: int = 10):
                     torch.cuda.reset_peak_memory_stats(gpu_rank)
                     actual_peaks[gpu_rank] = torch.cuda.max_memory_allocated(gpu_rank) / 1024**3
 
+                t0 = time.time()
                 foo = model(prompt, num_return_sequences=1, max_new_tokens=max_token, batch_size=1)
+                dt = time.time() - t0
                 
                 memory_used = {}
                 for gpu_rank in gpus:
@@ -126,16 +135,27 @@ def memory_estimation(model_name: str, N_repeat: int = 10):
                 # Actual largest memory usage peak accross gpus
                 max_peak = max(memory_used.values())
                 results.append(max_peak)
+                # Time consumption
+                times.append(dt)
 
             input_size_memory_consumption[max_token] = np.mean(results)
+            input_size_time_consumption[max_token] = np.mean(times)
 
         model_memory_consumption[input_size] = input_size_memory_consumption
+        model_time_consumption[input_size] = input_size_time_consumption
 
-    name = f'{model_name}_8bits' if quantization_8bits else model_name
-    filename = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{name}.json')
-    if os.path.exists(filename):
-        os.remove(filename)
-    utils.save_json(model_memory_consumption, filename)
+    
+    dtype_name = model.dtype_category()
+    
+    filename_memory = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', model_name, f'{dtype_name}.json')
+    if os.path.exists(filename_memory):
+        os.remove(filename_memory)
+    utils.save_json(model_memory_consumption, filename_memory)
+
+    filename_time = os.path.join(utils.ROOT_FOLDER, 'time_estimator', model_name, f'{dtype_name}.json')
+    if os.path.exists(filename_time):
+        os.remove(filename_time)
+    utils.save_json(model_time_consumption, filename_time)
 
     print(f'Done with {model_name}!')
 
@@ -146,32 +166,47 @@ def memory_estimation(model_name: str, N_repeat: int = 10):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Memory estimator')
+    parser.add_argument('--int8', action='store_true',
+                        help='If given, will estimate the memory footprint of the model quantized to int8.')
+    parser.add_argument('--int4', action='store_true',
+                        help='If given, will estimate the memory footprint of the model quantized to int4.')
     parser.add_argument('--big_models', action='store_true',
                         help='If given, also run on large models that do not fit on a single gpu.')
     parser.add_argument('--big_models_only', action='store_true',
                         help='If given, only run on large models that do not fit on a single gpu.')
     
     args = parser.parse_args()
+    int8 = args.int8
+    int4 = args.int4
     big_models = args.big_models
     big_models_only = args.big_models_only
+
+    if int4 and int8:
+        raise ValueError('int4 and int8 quantization are mutually exclusive.')
 
     num_gpus = torch.cuda.device_count()
 
     if not big_models_only:
+
         if num_gpus > 1:
+            int8_iter = (int8,)*len(SMALL_MODELS)
+            int4_iter = (int4,)*len(SMALL_MODELS)
             with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
                                         initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-                _ = list(pool.map(memory_estimation, SMALL_MODELS, chunksize=1))
+                _ = list(pool.map(memory_estimation, SMALL_MODELS, int8_iter, int4_iter, chunksize=1))
         else:
             for model in SMALL_MODELS:
-                memory_estimation(model)
+                memory_estimation(model, int8, int4)
 
     if big_models or big_models_only:
 
         model_footprints = []
         for model in LARGE_MODELS:
-            quantization_8bits = model == 'bloom-176B'
-            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=quantization_8bits)
+            # Override quantization for bloom because it's too big
+            if model == 'bloom-176B' and not (int8 or int4):
+                int8 = True
+            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8,
+                                                                quantization_4bits=int4)
             model_footprints.append(gpu_needed)
 
-        utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, memory_estimation)
+        utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, memory_estimation, func_args=(int8, int4))

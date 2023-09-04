@@ -88,18 +88,23 @@ class HFModel(object):
         self._is_chat_model = self.prompt_template.default_mode == 'chat'
 
     
+    def dtype_category(self) -> str:
+        """Return a string representation of the model dtype."""
+        if self.quantization_4bits:
+            return 'int4'
+        elif self.quantization_8bits:
+            return 'int8'
+        else:
+            return str(self.dtype).split('.', 1)[1]
+
+    
     def __repr__(self) -> str:
         return (f'{self.__class__.__name__}({self.model_name}, quantization_8bits={self.quantization_8bits}, '
                 f'quantization_4bits={self.quantization_4bits}, dtype={self.dtype})')
     
     
     def __str__(self) -> str:
-        if self.quantization_8bits:
-            return f'{self.model_name}, quantized 8 bits version'
-        elif self.quantization_4bits:
-            return f'{self.model_name}, quantized 4 bits version'
-        else:
-            return f'{self.model_name}, using dtype {self.dtype}'
+        return f'{self.model_name}, with dtype {self.dtype_category()}'
         
         
     def is_chat_model(self) -> bool:
@@ -463,7 +468,8 @@ class HFModel(object):
         available_memory = memory*0.9 - self.max_memory_footprint
 
         try:
-            batch_footprint = utils.load_json(os.path.join(utils.ROOT_FOLDER, 'memory_estimator', f'{self.model_name}.json'))
+            reference_file = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', self.model_name, f'{self.dtype_category()}.json')
+            batch_footprint = utils.load_json(reference_file)
             # Convert keys to int
             batch_footprint = {int(k): {int(k1):v1 for k1,v1 in batch_footprint[k].items()} for k in batch_footprint.keys()}
         # If no precise estimate exist, fall back to simple heuristics
