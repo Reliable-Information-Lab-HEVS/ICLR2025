@@ -108,7 +108,8 @@ class HFModel(object):
 
     def get_memory_footprint(self) -> dict:
         """Return the memory footprint of the model on each device it uses, in GiB. In case of a custom `device_map`
-        where both gpu devices AND cpu and/or disk were specified, this function is not accurate."""
+        where both gpu devices AND cpu and/or disk were specified, this function is not accurate.
+        """
 
         gpu_footprint = self.get_gpu_memory_footprint()
         if len(gpu_footprint) == 0:
@@ -118,6 +119,16 @@ class HFModel(object):
             # we only return the footprint of the gpus (computing the footprint of the cpu is hard and not
             # precise, and this case should never appear in practice)
             return gpu_footprint
+        
+
+    def get_max_device_memory_footprint(self) -> float:
+        """Return the maximum (accross devices) memory used by the model."""
+        return self.max_memory_footprint
+    
+
+    def get_gpu_devices(self) -> tuple[int]:
+        """Return the gpu devices used by the model."""
+        return tuple(sorted(self.gpu_memory_map.keys()))
 
 
     def format_prompt(self, prompt: str, model_context: str = '', infill_suffix: str = '', system_prompt: str = '',

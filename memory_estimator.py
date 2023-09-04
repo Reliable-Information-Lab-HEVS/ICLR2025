@@ -8,6 +8,7 @@ import torch
 import numpy as np
 
 import engine
+from engine import loader
 from helpers import utils
 
 
@@ -93,8 +94,7 @@ max_tokens += [512]
 def memory_estimation(model_name: str, N_repeat: int = 10):
 
     model = engine.HFModel(model_name)
-    # model_memory = torch.cuda.max_memory_allocated() / 1024**3
-    model_memory = model.max_memory_footprint
+    gpus = model.get_gpu_devices()
     large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
     model_memory_consumption = {}
 
@@ -107,14 +107,21 @@ def memory_estimation(model_name: str, N_repeat: int = 10):
 
             results = []
             for k in range(N_repeat):
-
-                torch.cuda.reset_peak_memory_stats()
-                actual_peak = torch.cuda.max_memory_allocated() / 1024**3
+                
+                actual_peaks = {}
+                for gpu_rank in gpus:
+                    torch.cuda.reset_peak_memory_stats(gpu_rank)
+                    actual_peaks[gpu_rank] = torch.cuda.max_memory_allocated(gpu_rank) / 1024**3
 
                 foo = model(prompt, num_return_sequences=1, max_new_tokens=max_token, batch_size=1)
-                # mem = torch.cuda.max_memory_allocated() / 1024**3 - model_memory
-                mem = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
-                results.append(mem)
+                
+                memory_used = {}
+                for gpu_rank in gpus:
+                    memory_used[gpu_rank] = (torch.cuda.max_memory_allocated(gpu_rank) / 1024**3) - actual_peaks[gpu_rank]
+                
+                # Actual largest memory usage peak accross gpus
+                max_peak = max(memory_used.values())
+                results.append(max_peak)
 
             input_size_memory_consumption[max_token] = np.mean(results)
 
@@ -154,7 +161,12 @@ if __name__ == '__main__':
             for model in SMALL_MODELS:
                 memory_estimation(model)
 
-    # TODO: update memory_estimation to compute memory estimation when running on multiple gpus!!!!
     if big_models or big_models_only:
-        print('Still not implemented for big models. This is a remainder to do it!')
-        pass
+        
+        model_footprints = []
+        for model in LARGE_MODELS:
+            quantization = model == 'bloom-176B'
+            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization)
+            model_footprints.append(gpu_needed)
+
+        utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, memory_estimation)
