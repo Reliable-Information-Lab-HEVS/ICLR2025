@@ -6,54 +6,63 @@ import pandas as pd
 from engine import loader
 from code_execution import evaluation
 from helpers import utils
+from helpers import process
 
-# Files are at: utils.RESULTS_FOLDER/HumanEval.../results/model/temperature.jsonl
+def model_wise_pass_at_k(to_df: bool = True):
 
-human_eval_folders = [os.path.join(utils.RESULTS_FOLDER, folder) for folder in os.listdir(utils.RESULTS_FOLDER) if
-                      (not folder.startswith('.') and 'HumanEval' in folder)]
-# Only keep those that were not already processed
-human_eval_folders = [folder for folder in human_eval_folders if 'results' in os.listdir(folder)]
+    files = process.extract_all_human_eval_filenames(category='results')
 
-# This contains utils.RESULTS_FOLDER/HumanEval.../completions
-human_eval_results = [os.path.join(folder, 'results') for folder in human_eval_folders]
+    # Compute the pass at k for every result file
+    passes = []
+    for file in files:
+        attributes = process.parse_human_eval_filename(file)
+        benchmark = attributes['benchmark_name']
+        dtype = attributes['dtype']
+        if dtype == 'int4' or dtype == 'int8':
+            full_name = benchmark + '_' + dtype
+        else:
+            full_name = benchmark
+        model = attributes['model']
+        model_size = loader.ALL_MODELS_PARAMS_MAPPING[model]
 
-files = []
-for benchmark in human_eval_results:
-    for model_dir in os.listdir(benchmark):
-        if not model_dir.startswith('.'):
-            full_path = os.path.join(benchmark, model_dir)
-            files.extend([os.path.join(full_path, file) for file in os.listdir(full_path) if not file.startswith('.')])
+        pass_at_k = evaluation.evaluate_pass_at_k(file)
+        passes.append({'model': model, 'pass@1': pass_at_k['pass@1'], 'model_size': model_size, 'benchmark': full_name,
+                    'model_family': model.rsplit('-', 1)[0]})
+        
+    # Swap to a "by model view"
+    models = set([x['model'] for x in passes])
+
+    dics = []
+    for model in models:
+        dic = {}
+        dic['model'] = model
+
+        # Find all results corresponding to current model
+        model_results = [x for x in passes if x['model'] == model]
+        dic['model_family'] = model_results[0]['model_family']
+        dic['model_size'] = model_results[0]['model_size']
+        for res in model_results:
+            benchmark = res['benchmark']
+            dic[f'{benchmark}_pass@1'] = res['pass@1']*100
+
+        dics.append(dic)
+
+    if to_df:
+        df = pd.DataFrame(dics).set_index('model').sort_values(['model_family', 'model_size'])
+        df = df.drop(columns=['model_family', 'model_size']).fillna('-')
+        return df
+    else:
+        return dics
+    
 
 
-passes = []
-for file in tqdm(files):
-    _, benchmark, _, model, filename = file.rsplit('/', 4)
-    model_size = loader.ALL_MODELS_PARAMS_MAPPING[model]
-    pass_at_k = evaluation.evaluate_pass_at_k(file)
-    passes.append({'model': model, 'pass@1': pass_at_k['pass@1'], 'model_size': model_size, 'benchmark': benchmark,
-                   'model_family': model.rsplit('-', 1)[0]})
+# dfs = []
+# for benchmark in benchmarks:
+#     df = pd.DataFrame([x for x in passes if x['benchmark'] == benchmark]).set_index('model').sort_values(['model_family', 'model_size'])
+#     dfs.append(df)
 
-benchmarks = set([x['benchmark'] for x in passes])
-models = set([x['model'] for x in passes])
 
-dics = []
-for model in models:
-    dic = {}
-    dic['model'] = model
-    model_results = [x for x in passes if x['model'] == model]
-    dic['model_family'] = model_results[0]['model_family']
-    dic['model_size'] = model_results[0]['model_size']
-    for res in model_results:
-        benchmark = res['benchmark']
-        dic[f'{benchmark}_pass@1'] = res['pass@1']*100
-    dics.append(dic)
 
-benchmark_df = pd.DataFrame(dics).set_index('model').sort_values(['model_family', 'model_size']).drop(columns=['model_family', 'model_size']).fillna('-')
-
-dfs = []
-for benchmark in benchmarks:
-    df = pd.DataFrame([x for x in passes if x['benchmark'] == benchmark]).set_index('model').sort_values(['model_family', 'model_size'])
-    dfs.append(df)
 
 # # Sort according to name then model size
 # passes = sorted(passes, key=lambda x: (x['model'].split('-')[0], x['model_size']))

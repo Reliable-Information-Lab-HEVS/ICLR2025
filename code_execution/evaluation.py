@@ -12,6 +12,7 @@ import os
 from code_execution.safeguards import unsafe_execute
 from helpers import datasets
 from helpers import utils
+from helpers.process import parse_human_eval_filename
 
 
 def check_correctness(problem: dict, completion: str, timeout: float,
@@ -80,11 +81,8 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
         Timeout after which to stop the test , by default 3.0
     """
 
-    # sample_file should be of the form utils.RESULTS_FOLDER/HumanEval/completions/model/temperature.jsonl
-    base, _, model, filename = sample_file.rsplit('/', 3)
-
-    # Format the output filename to utils.RESULTS_FOLDER/HumanEval/results/model/temperature.jsonl
-    out_file = os.path.join(base, 'results', model, filename)
+    # Compute name of the output file
+    out_file = parse_human_eval_filename(sample_file)['associated_results_file']
 
     problems = datasets.HumanEval().samples_by_id()
 
