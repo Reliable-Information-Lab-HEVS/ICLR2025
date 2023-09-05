@@ -1,6 +1,8 @@
-import gradio as gr
 import gc
 import os
+
+import torch
+import gradio as gr
 
 import engine
 from engine import loader
@@ -20,7 +22,7 @@ model = engine.HFModel(DEFAULT)
 conversation = model.get_empty_conversation()
 
 
-def update_model(model_name: str, quantization:bool = False):
+def update_model(model_name: str, quantization_8bits: bool = False, quantization_4bits: bool = False):
     """Update the model and conversation in the global scope so that we can reuse them and speed up inference.
 
     Parameters
@@ -34,6 +36,12 @@ def update_model(model_name: str, quantization:bool = False):
     global model
     global conversation
 
+    if quantization_8bits and quantization_4bits:
+        raise gr.Error('You cannot use both int8 and int4 quantization. Choose either one.')
+    
+    if (quantization_8bits or quantization_4bits) and not torch.cuda.is_available():
+        raise gr.Error('You cannot use quantization if you run without GPUs.')
+
     # Delete the variables if they exist (they should except if there was an error when loading a model at some point)
     # to save memory before loading the new one
     try:
@@ -45,10 +53,11 @@ def update_model(model_name: str, quantization:bool = False):
 
     # Try loading the model
     try:
-        model = engine.HFModel(model_name, quantization)
+        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits,
+                               quantization_4bits=quantization_4bits)
         conversation = model.get_empty_conversation()
     except:
-        gr.Error('There was an error loading this model. Please choose another one.')
+        raise gr.Error('There was an error loading this model. Please choose another one.')
 
 
 
@@ -185,11 +194,12 @@ def clear_chatbot():
 # Define general elements of the UI (generation parameters)
 model_name = gr.Dropdown(loader.ALLOWED_MODELS, value=DEFAULT, label='Model name',
                          info='Choose the model you want to use.', multiselect=False)
-quantization = gr.Checkbox(value=False, label='Quantization', info='Whether to load the model in 8 bits mode.')
-max_new_tokens = gr.Slider(10, 200, value=50, step=5, label='Max new tokens',
+quantization_8bits = gr.Checkbox(value=False, label='int8 quantization')
+quantization_4bits = gr.Checkbox(value=False, label='int4 quantization')
+max_new_tokens = gr.Slider(10, 1000, value=250, step=10, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
 do_sample = gr.Checkbox(value=True, label='Sampling', info='Whether to incorporate randomness in generation.')
-top_k = gr.Slider(0, 200, value=40, step=5, label='Top-k',
+top_k = gr.Slider(0, 200, value=50, step=5, label='Top-k',
                info='How many tokens with max probability to consider.')
 top_p = gr.Slider(0, 1, value=0.90, step=0.01, label='Top-p',
               info='Probability density threshold for new tokens.')
@@ -198,6 +208,7 @@ temperature = gr.Slider(0, 1, value=0.9, step=0.01, label='Temperature',
 num_return_sequence = gr.Slider(1, 10, value=1, step=1, label='Sequence', info='Number of sequence to generate.')
 use_seed = gr.Checkbox(value=False, label='Use seed', info='Whether to use a fixed seed for reproducibility.')
 seed = gr.Number(0, label='Seed', info='Seed for reproducibility.', precision=0)
+load_button = gr.Button('Load model', variant='primary')
 
 # Define elements of the simple generation Tab
 prompt_text = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
@@ -217,8 +228,12 @@ flag_button_chat = gr.Button('Flag', variant='stop')
 inputs_to_simple_generation = [prompt_text, max_new_tokens, do_sample, top_k, top_p, temperature,
                                num_return_sequence, use_seed, seed]
 inputs_to_chatbot = [prompt_chat, max_new_tokens, do_sample, top_k, top_p, temperature, use_seed, seed]
-# set-up callback for flagging
-callback = gr.CSVLogger()
+
+# set-up callbacks for flagging and automatic logging
+callback_flag_text = gr.CSVLogger()
+callback_flag_chat = gr.CSVLogger()
+automatic_logging_text = gr.CSVLogger()
+automatic_logging_chat = gr.CSVLogger()
 
 
 prompt_examples = [
@@ -239,7 +254,7 @@ with demo:
     with gr.Row():
 
         # First column where we have prompts and outputs
-        with gr.Column(scale=2):
+        with gr.Column(scale=1.7):
 
             # Tab 1 for simple text generation
             with gr.Tab('Text generation'):
@@ -267,58 +282,63 @@ with demo:
         # Second column defines model selection and generation parameters
         with gr.Column(scale=1):
                 
-                # First box for model selection
-                with gr.Box():
-                    gr.Markdown("### Model selection")
-                    with gr.Row():
-                        model_name.render()
-                        quantization.render()
-                
-                # Second box for generation parameters
-                with gr.Box():
-                    gr.Markdown("### Text generation parameters")
-                    with gr.Row():
-                        max_new_tokens.render()
-                        do_sample.render()
-                    with gr.Row():
-                        top_k.render()
-                        top_p.render()
-                    with gr.Row():
-                        temperature.render()
-                        num_return_sequence.render()
-                    with gr.Row():
-                        use_seed.render()
-                        seed.render()
+            # First box for model selection
+            with gr.Box():
+                gr.Markdown("### Model selection")
+                with gr.Row():
+                    model_name.render()
+                with gr.Row():
+                    quantization_8bits.render()
+                    quantization_4bits.render()
+                with gr.Row():
+                    load_button.render()
+            
+            # Second box for generation parameters
+            with gr.Box():
+                gr.Markdown("### Text generation parameters")
+                with gr.Row():
+                    max_new_tokens.render()
+                    do_sample.render()
+                with gr.Row():
+                    top_k.render()
+                    top_p.render()
+                with gr.Row():
+                    temperature.render()
+                    num_return_sequence.render()
+                with gr.Row():
+                    use_seed.render()
+                    seed.render()
 
-    # Perform simple text generation when clicking the button or pressing enter in the prompt box
+    # Perform simple text generation when clicking the button
     generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation,
-                                                 outputs=output_text)
-    generate_event2 = prompt_text.submit(text_generation, inputs=inputs_to_simple_generation,
-                                         outputs=output_text)
+                            outputs=output_text).success(lambda *args: automatic_logging_text.flag(args),
+                            inputs=[model_name, *inputs_to_simple_generation, output_text], preprocess=False)
 
-    # Perform chat generation when clicking the button or pressing enter in the prompt box
-    generate_event3 = generate_button_chat.click(chat_generation, inputs=inputs_to_chatbot,
-                                                 outputs=[prompt_chat, output_chat])
-    generate_event4 = prompt_chat.submit(chat_generation, inputs=inputs_to_chatbot,
-                                         outputs=[prompt_chat, output_chat])
+    # Perform chat generation when clicking the button
+    generate_event2 = generate_button_chat.click(chat_generation, inputs=inputs_to_chatbot,
+                            outputs=[prompt_chat, output_chat]).success(lambda *args: automatic_logging_chat.flag(args),
+                            inputs=[model_name, *inputs_to_chatbot, output_chat], preprocess=False)
 
-    # Switch the model loaded in memory when clicking on a new model or changing quantization and clear outputs if any
-    events_to_cancel = [generate_event1, generate_event2, generate_event3, generate_event4]
-    model_name.input(update_model, inputs=[model_name, quantization], cancels=events_to_cancel).then(
+    # Switch the model loaded in memory when clicking and clear outputs if any
+    events_to_cancel = [generate_event1, generate_event2]
+    load_button.click(update_model, inputs=[model_name, quantization_8bits, quantization_4bits], cancels=events_to_cancel).then(
         lambda: '', outputs=output_text).then(clear_chatbot, outputs=[prompt_chat, output_chat])
-    quantization.input(update_model, inputs=[model_name, quantization], cancels=events_to_cancel).then(
-        lambda: '', outputs=output_text).then(clear_chatbot, outputs=[prompt_chat, output_chat])
-    # load_button.click(update_model, inputs=[model_name, quantization], cancels=[generate_event1, generate_event2])
     
     # Clear the prompt and output boxes when clicking the button
     clear_button_text.click(lambda: ['', ''], outputs=[prompt_text, output_text])
     clear_button_chat.click(clear_chatbot, outputs=[prompt_chat, output_chat])
 
     # Perform the flagging
-    callback.setup([model_name, *inputs_to_simple_generation, output_text], flagging_dir='flagged')
-    flag_button_text.click(lambda *args: callback.flag(args),
+    callback_flag_text.setup([model_name, *inputs_to_simple_generation, output_text], flagging_dir='flagged_text')
+    flag_button_text.click(lambda *args: callback_flag_text.flag(args),
                            inputs=[model_name, *inputs_to_simple_generation, output_text], preprocess=False)
+    
+    callback_flag_chat.setup([model_name, *inputs_to_chatbot, output_chat], flagging_dir='flagged_chat')
+    flag_button_chat.click(lambda *args: callback_flag_chat.flag(args),
+                           inputs=[model_name, *inputs_to_chatbot, output_chat], preprocess=False)
 
+    automatic_logging_text.setup([model_name, *inputs_to_simple_generation, output_text], flagging_dir='logging_text')
+    automatic_logging_chat.setup([model_name, *inputs_to_chatbot, output_chat], flagging_dir='logging_chat')
 
 
 if __name__ == '__main__':
