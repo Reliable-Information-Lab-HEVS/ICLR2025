@@ -629,8 +629,11 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
         quantization_8bits = False
         warnings.warn('There are no GPUs available. The model will NOT be quantized.', RuntimeWarning)
 
+    # Flag to know if the model is quantized
+    quantization = quantization_8bits or quantization_4bits
+
     # Override dtype if we quantize the model as only float16 is acceptable for quantization
-    dtype = torch.float16 if (quantization_4bits or quantization_8bits) else dtype
+    dtype = torch.float16 if quantization else dtype
 
     # Add possible additional kwargs
     if model_name in ALL_MODELS_ADDITIONAL_MODEL_KWARGS_MAPPING.keys():
@@ -690,8 +693,9 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
                                                       **additional_kwargs)
     
     # If the flag is active we directly put our model on one gpu without using any device_map (this is 
-    # more efficient)
-    if only_move_to_one_gpu:
+    # more efficient). But if the model is quantized, this is already done automatically because quantization
+    # happen only on gpu
+    if only_move_to_one_gpu and not quantization:
         # This operation is in-place for nn.Module
         model.cuda(gpu_rank)
 

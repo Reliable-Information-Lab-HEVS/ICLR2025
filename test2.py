@@ -12,13 +12,8 @@ import math
 import engine
 from helpers import utils
 
-print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
-a = torch.cuda.is_available()
-print(f'Has been initialized at the beginning: {torch.cuda.is_initialized()}')
-
-foo = torch.tensor([1,2,3]).cuda()
-
-print(f'Has been initialized at the beginning in foo: {torch.cuda.is_initialized()}')
+model = engine.HFModel('bloom-3B', quantization_8bits=True)
+print(model.get_gpu_memory_footprint())
 
 # large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 

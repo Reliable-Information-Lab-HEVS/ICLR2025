@@ -380,9 +380,11 @@ if __name__ == '__main__':
         for model in large_models:
             # Override quantization for bloom because it's too big
             if model == 'bloom-176B' and not (int8 or int4):
-                int8 = True
-            gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8,
-                                                                quantization_4bits=int4)
+                gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=True,
+                                                                    quantization_4bits=False)
+            else:
+                gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8,
+                                                                    quantization_4bits=int4)
             model_footprints.append(gpu_needed)
 
         args = (mode, use_context, int8, int4) if instruct else (mode, int8, int4)
