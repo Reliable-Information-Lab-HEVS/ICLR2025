@@ -12,7 +12,7 @@ import math
 import engine
 from helpers import utils
 
-model = engine.HFModel('opt-66BB', quantization_8bits=True)
+model = engine.HFModel('opt-66B', quantization_8bits=True)
 print(f'GPU usage: {model.get_gpu_memory_footprint()}')
 
 # large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
