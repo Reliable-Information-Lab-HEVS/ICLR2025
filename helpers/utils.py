@@ -298,8 +298,8 @@ def load_txt(filename: str, separator: str = '\n') -> list[str]:
 
 def find_rank_of_subprocess_inside_the_pool():
     """Find the rank of the current subprocess inside the pool that was launched either by 
-    multiprocessing.Pool() or concurrent.futures.ProcessPoolExecutor().
-    If called from the main process, return 0.
+    multiprocessing.Pool() or concurrent.futures.ProcessPoolExecutor(), starting with rank 0.
+    If called from the main process, return -1.
     Note that this is a bit hacky but work correctly because both methods provide the rank of the subprocesses
     inside the subprocesses name as 'SpawnPoolWorker-RANK' or 'SpawnProcess-RANK' respectively.
     """
@@ -307,11 +307,11 @@ def find_rank_of_subprocess_inside_the_pool():
     process = mp.current_process()
 
     if process.name == 'MainProcess':
-        rank = 0
+        rank = -1
     elif isinstance(process, mp.context.SpawnProcess) or isinstance(process, mp.context.ForkProcess):
         # Provide rank starting at 0 instead of 1
         try:
-            rank = int(process.name[-1]) - 1
+            rank = int(process.name.rsplit('-', 1)[1]) - 1
         except ValueError:
             raise RuntimeError('Cannot retrieve the rank of the current subprocess.')
     else:
