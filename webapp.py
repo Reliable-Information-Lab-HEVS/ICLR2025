@@ -37,7 +37,7 @@ def update_model(model_name: str, quantization_8bits: bool = False, quantization
     global conversation
 
     if quantization_8bits and quantization_4bits:
-        raise gr.Error('You cannot use both int8 and int4 quantization. Choose either one.')
+        raise gr.Error('You cannot use both int8 and int4 quantization. Choose either one and try reloading.')
     
     if (quantization_8bits or quantization_4bits) and not torch.cuda.is_available():
         raise gr.Error('You cannot use quantization if you run without GPUs.')
@@ -47,9 +47,9 @@ def update_model(model_name: str, quantization_8bits: bool = False, quantization
     try:
         del model
         del conversation
+        gc.collect()
     except NameError:
         pass
-    gc.collect()
 
     # Try loading the model
     try:
@@ -57,7 +57,10 @@ def update_model(model_name: str, quantization_8bits: bool = False, quantization
                                quantization_4bits=quantization_4bits)
         conversation = model.get_empty_conversation()
     except:
-        raise gr.Error('There was an error loading this model. Please choose another one.')
+        raise gr.Error('There was an error loading this model. Please retry or choose another one.')
+    
+    # Return values to clear the input and output textboxes, and input and output chatbot boxes
+    return '', '', '', [[None, None]]
 
 
 
@@ -96,9 +99,14 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     
     if not use_seed:
         seed = None
-    predictions = model(prompt, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
-                        temperature=temperature, num_return_sequences=num_return_sequences, seed=seed,
-                        truncate_prompt_from_output=True)
+
+    try:
+        predictions = model(prompt, max_new_tokens=max_new_tokens, do_sample=do_sample, top_k=top_k, top_p=top_p,
+                            temperature=temperature, num_return_sequences=num_return_sequences, seed=seed,
+                            truncate_prompt_from_output=True)
+    except BaseException as e:
+        raise gr.Error(f'The following error happened during generation: {repr(e)}')
+    
     if num_return_sequences > 1:
         return utils.format_output(predictions)
     else:
@@ -142,11 +150,15 @@ def chat_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
         seed = None
     
     # This will update the global conversation in-place
-    _ = model.generate_conversation(prompt, conv_history=conversation, max_new_tokens=max_new_tokens,
-                                    do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
-                                    seed=seed)
-    # The first output is an empty string to clear the input box, the second cast the 2 list of chat history 
-    # into a single list of tuples (user, model)
+    try:
+        _ = model.generate_conversation(prompt, conv_history=conversation, max_new_tokens=max_new_tokens,
+                                        do_sample=do_sample, top_k=top_k, top_p=top_p, temperature=temperature,
+                                        seed=seed)
+    except BaseException as e:
+        raise gr.Error(f'The following error happened during generation: {repr(e)}')
+    
+    # The first output is an empty string to clear the input box, the second is the format output to use in a
+    # gradio chatbot component
     return '', conversation.to_gradio_format()
 
 
@@ -194,8 +206,8 @@ def clear_chatbot():
 # Define general elements of the UI (generation parameters)
 model_name = gr.Dropdown(loader.ALLOWED_MODELS, value=DEFAULT, label='Model name',
                          info='Choose the model you want to use.', multiselect=False)
-quantization_8bits = gr.Checkbox(value=False, label='int8 quantization')
-quantization_4bits = gr.Checkbox(value=False, label='int4 quantization')
+quantization_8bits = gr.Checkbox(value=False, label='int8 quantization', visible=torch.cuda.is_available())
+quantization_4bits = gr.Checkbox(value=False, label='int4 quantization', visible=torch.cuda.is_available())
 max_new_tokens = gr.Slider(10, 1000, value=250, step=10, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
 do_sample = gr.Checkbox(value=True, label='Sampling', info='Whether to incorporate randomness in generation.')
@@ -214,20 +226,26 @@ load_button = gr.Button('Load model', variant='primary')
 prompt_text = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
 output_text = gr.Textbox(label='Model output')
 generate_button_text = gr.Button('Generate text', variant='primary')
-clear_button_text = gr.Button('Clear')
+clear_button_text = gr.Button('Clear prompt', variant='secondary')
 flag_button_text = gr.Button('Flag', variant='stop')
 
 # Define elements of the chatbot Tab
 prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
-output_chat = gr.Chatbot()
+output_chat = gr.Chatbot(label='Conversation')
 generate_button_chat = gr.Button('Generate text', variant='primary')
-clear_button_chat = gr.Button('Clear')
+clear_button_chat = gr.Button('Clear conversation')
 flag_button_chat = gr.Button('Flag', variant='stop')
 
 # Define the inputs for the main inference
 inputs_to_simple_generation = [prompt_text, max_new_tokens, do_sample, top_k, top_p, temperature,
                                num_return_sequence, use_seed, seed]
 inputs_to_chatbot = [prompt_chat, max_new_tokens, do_sample, top_k, top_p, temperature, use_seed, seed]
+
+# Define inputs for the logging callbacks
+inputs_to_text_callback = [model_name, quantization_8bits, quantization_4bits, *inputs_to_simple_generation,
+                           output_text]
+inputs_to_chat_callback = [model_name, quantization_8bits, quantization_4bits, *inputs_to_chatbot,
+                           output_chat]
 
 # set-up callbacks for flagging and automatic logging
 callback_flag_text = gr.CSVLogger()
@@ -241,8 +259,8 @@ prompt_examples = [
     "Hello, what's your name?",
     "What's the meaning of life?",
     "How can I write a Python function to generate the nth Fibonacci number?",
-    ("Give the following data {'Name':['Tom', 'Brad', 'Kyle', 'Jerry'], 'Age':[20, 21, 19, 18], 'Height' :"
-     " [6.1, 5.9, 6.0, 6.1]}. Can you plot a bar graph showing the height of each person."),
+    ("Here is my data {'Name':['Tom', 'Brad', 'Kyle', 'Jerry'], 'Age':[20, 21, 19, 18], 'Height' :"
+     " [6.1, 5.9, 6.0, 6.1]}. Can you provide Python code to plot a bar graph showing the height of each person?"),
 ]
 
 
@@ -253,8 +271,9 @@ with demo:
     # Need to wrap everything in a row because we want two side-by-side columns
     with gr.Row():
 
-        # First column where we have prompts and outputs
-        with gr.Column(scale=1.7):
+        # First column where we have prompts and outputs. We use large scale because we want a 1.7:1 ratio
+        # but scale needs to be an integer
+        with gr.Column(scale=17):
 
             # Tab 1 for simple text generation
             with gr.Tab('Text generation'):
@@ -280,7 +299,7 @@ with demo:
                 gr.Examples(prompt_examples, inputs=prompt_chat)
 
         # Second column defines model selection and generation parameters
-        with gr.Column(scale=1):
+        with gr.Column(scale=10):
                 
             # First box for model selection
             with gr.Box():
@@ -293,12 +312,11 @@ with demo:
                 with gr.Row():
                     load_button.render()
             
-            # Second box for generation parameters
-            with gr.Box():
-                gr.Markdown("### Text generation parameters")
+            # Accordion for generation parameters
+            with gr.Accordion("Text generation parameters", open=False):
                 with gr.Row():
-                    max_new_tokens.render()
                     do_sample.render()
+                    max_new_tokens.render()
                 with gr.Row():
                     top_k.render()
                     top_p.render()
@@ -311,35 +329,41 @@ with demo:
 
     # Perform simple text generation when clicking the button
     generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation,
-                            outputs=output_text).success(lambda *args: automatic_logging_text.flag(args),
-                            inputs=[model_name, *inputs_to_simple_generation, output_text], preprocess=False)
+                                                 outputs=output_text)
+    generate_event1.success(lambda *args: automatic_logging_text.flag(args), inputs=inputs_to_text_callback,
+                            preprocess=False)
 
     # Perform chat generation when clicking the button
     generate_event2 = generate_button_chat.click(chat_generation, inputs=inputs_to_chatbot,
-                            outputs=[prompt_chat, output_chat]).success(lambda *args: automatic_logging_chat.flag(args),
-                            inputs=[model_name, *inputs_to_chatbot, output_chat], preprocess=False)
+                                                 outputs=[prompt_chat, output_chat])
+    generate_event2.success(lambda *args: automatic_logging_chat.flag(args), inputs=inputs_to_chat_callback,
+                            preprocess=False)
 
     # Switch the model loaded in memory when clicking and clear outputs if any
     events_to_cancel = [generate_event1, generate_event2]
-    load_button.click(update_model, inputs=[model_name, quantization_8bits, quantization_4bits], cancels=events_to_cancel).then(
-        lambda: '', outputs=output_text).then(clear_chatbot, outputs=[prompt_chat, output_chat])
+    load_button.click(update_model, inputs=[model_name, quantization_8bits, quantization_4bits],
+                      outputs=[prompt_text, output_text, prompt_chat, output_chat], cancels=events_to_cancel)
     
     # Clear the prompt and output boxes when clicking the button
     clear_button_text.click(lambda: ['', ''], outputs=[prompt_text, output_text])
     clear_button_chat.click(clear_chatbot, outputs=[prompt_chat, output_chat])
 
     # Perform the flagging
-    callback_flag_text.setup([model_name, *inputs_to_simple_generation, output_text], flagging_dir='flagged_text')
+    callback_flag_text.setup(inputs_to_text_callback, flagging_dir='flagged_text')
     flag_button_text.click(lambda *args: callback_flag_text.flag(args),
-                           inputs=[model_name, *inputs_to_simple_generation, output_text], preprocess=False)
+                           inputs=inputs_to_text_callback, preprocess=False)
     
-    callback_flag_chat.setup([model_name, *inputs_to_chatbot, output_chat], flagging_dir='flagged_chat')
+    callback_flag_chat.setup(inputs_to_chat_callback, flagging_dir='flagged_chat')
     flag_button_chat.click(lambda *args: callback_flag_chat.flag(args),
-                           inputs=[model_name, *inputs_to_chatbot, output_chat], preprocess=False)
+                           inputs=inputs_to_chat_callback, preprocess=False)
 
-    automatic_logging_text.setup([model_name, *inputs_to_simple_generation, output_text], flagging_dir='logging_text')
-    automatic_logging_chat.setup([model_name, *inputs_to_chatbot, output_chat], flagging_dir='logging_chat')
+    automatic_logging_text.setup(inputs_to_text_callback, flagging_dir='logging_text')
+    automatic_logging_chat.setup(inputs_to_chat_callback, flagging_dir='logging_chat')
 
+    # Change visibility of generation parameters if we perform greedy search
+    do_sample.input(lambda value: [gr.update(visible=value) for _ in range(6)], inputs=do_sample,
+                    outputs=[top_k, top_p, temperature, num_return_sequence, use_seed, seed])
+    
 
 if __name__ == '__main__':
     demo.queue().launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])

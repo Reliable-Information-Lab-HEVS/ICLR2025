@@ -49,7 +49,7 @@ def unsafe_execute(program_str: str, result: mp.Queue, timeout: float):
         except TimeoutException:
             result.put_nowait("passed out")
         except BaseException as e:
-            result.put_nowait(f"failed: {e}")
+            result.put_nowait(f"failed: {repr(e)}")
     
         # Needed for cleaning up.
         shutil.rmtree = rmtree

@@ -134,14 +134,14 @@ class GenericConversation(object):
         self.model_history_text = past_model_outputs
 
 
-    def to_gradio_format(self) -> list[tuple[str, str]]:
+    def to_gradio_format(self) -> list[list[str, str]]:
         """Convert the current conversation to gradio chatbot format.
         """
 
         if len(self) == 0:
-            return [(None, None)]
+            return [[None, None]]
 
-        return [conv_turn for conv_turn in self]
+        return [list(conv_turn) for conv_turn in self]
         
 
 
