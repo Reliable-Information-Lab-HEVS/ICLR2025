@@ -10,7 +10,7 @@ from helpers import utils
 
 
 # Default model to load at start-up
-DEFAULT = 'bloom-560M'
+DEFAULT = 'llama2-7B-chat' if torch.cuda.is_available() else 'bloom-560M'
 
 # File where the valid credentials are stored
 CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
@@ -210,7 +210,8 @@ quantization_8bits = gr.Checkbox(value=False, label='int8 quantization', visible
 quantization_4bits = gr.Checkbox(value=False, label='int4 quantization', visible=torch.cuda.is_available())
 max_new_tokens = gr.Slider(10, 1000, value=250, step=10, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
-do_sample = gr.Checkbox(value=True, label='Sampling', info='Whether to incorporate randomness in generation.')
+do_sample = gr.Checkbox(value=True, label='Sampling', info=('Whether to incorporate randomness in generation. '
+                                                            'If not selected, perform greedy search.'))
 top_k = gr.Slider(0, 200, value=50, step=5, label='Top-k',
                info='How many tokens with max probability to consider.')
 top_p = gr.Slider(0, 1, value=0.90, step=0.01, label='Top-p',
@@ -227,14 +228,12 @@ prompt_text = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', 
 output_text = gr.Textbox(label='Model output')
 generate_button_text = gr.Button('Generate text', variant='primary')
 clear_button_text = gr.Button('Clear prompt', variant='secondary')
-flag_button_text = gr.Button('Flag', variant='stop')
 
 # Define elements of the chatbot Tab
 prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
 output_chat = gr.Chatbot(label='Conversation')
 generate_button_chat = gr.Button('Generate text', variant='primary')
 clear_button_chat = gr.Button('Clear conversation')
-flag_button_chat = gr.Button('Flag', variant='stop')
 
 # Define the inputs for the main inference
 inputs_to_simple_generation = [prompt_text, max_new_tokens, do_sample, top_k, top_p, temperature,
@@ -248,12 +247,10 @@ inputs_to_chat_callback = [model_name, quantization_8bits, quantization_4bits, *
                            output_chat]
 
 # set-up callbacks for flagging and automatic logging
-callback_flag_text = gr.CSVLogger()
-callback_flag_chat = gr.CSVLogger()
 automatic_logging_text = gr.CSVLogger()
 automatic_logging_chat = gr.CSVLogger()
 
-
+# Some prompt examples
 prompt_examples = [
     "Please write a function to multiply 2 numbers `a` and `b` in Python.",
     "Hello, what's your name?",
@@ -282,7 +279,6 @@ with demo:
                     generate_button_text.render()
                     clear_button_text.render()
                 output_text.render()
-                flag_button_text.render()
 
                 gr.Markdown("### Prompt Examples")
                 gr.Examples(prompt_examples, inputs=prompt_text)
@@ -330,16 +326,18 @@ with demo:
     # Perform simple text generation when clicking the button
     generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation,
                                                  outputs=output_text)
+    # Add automatic callback on success
     generate_event1.success(lambda *args: automatic_logging_text.flag(args), inputs=inputs_to_text_callback,
                             preprocess=False)
 
     # Perform chat generation when clicking the button
     generate_event2 = generate_button_chat.click(chat_generation, inputs=inputs_to_chatbot,
                                                  outputs=[prompt_chat, output_chat])
+    # Add automatic callback on success
     generate_event2.success(lambda *args: automatic_logging_chat.flag(args), inputs=inputs_to_chat_callback,
                             preprocess=False)
 
-    # Switch the model loaded in memory when clicking and clear outputs if any
+    # Switch the model loaded in memory when clicking
     events_to_cancel = [generate_event1, generate_event2]
     load_button.click(update_model, inputs=[model_name, quantization_8bits, quantization_4bits],
                       outputs=[prompt_text, output_text, prompt_chat, output_chat], cancels=events_to_cancel)
@@ -348,17 +346,9 @@ with demo:
     clear_button_text.click(lambda: ['', ''], outputs=[prompt_text, output_text])
     clear_button_chat.click(clear_chatbot, outputs=[prompt_chat, output_chat])
 
-    # Perform the flagging
-    callback_flag_text.setup(inputs_to_text_callback, flagging_dir='flagged_text')
-    flag_button_text.click(lambda *args: callback_flag_text.flag(args),
-                           inputs=inputs_to_text_callback, preprocess=False)
-    
-    callback_flag_chat.setup(inputs_to_chat_callback, flagging_dir='flagged_chat')
-    flag_button_chat.click(lambda *args: callback_flag_chat.flag(args),
-                           inputs=inputs_to_chat_callback, preprocess=False)
-
-    automatic_logging_text.setup(inputs_to_text_callback, flagging_dir='logging_text')
-    automatic_logging_chat.setup(inputs_to_chat_callback, flagging_dir='logging_chat')
+    # Setup the flagging callbacks
+    automatic_logging_text.setup(inputs_to_text_callback, flagging_dir='text_logs')
+    automatic_logging_chat.setup(inputs_to_chat_callback, flagging_dir='chatbot_logs')
 
     # Change visibility of generation parameters if we perform greedy search
     do_sample.input(lambda value: [gr.update(visible=value) for _ in range(6)], inputs=do_sample,
