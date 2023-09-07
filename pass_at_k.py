@@ -8,7 +8,7 @@ from code_execution import evaluation
 from helpers import utils
 from helpers import process
 
-def model_wise_pass_at_k(to_df: bool = True):
+def model_wise_pass_at_k(to_df: bool = True, NaN: str | None = None):
 
     files = process.extract_all_human_eval_filenames(category='results')
 
@@ -23,7 +23,7 @@ def model_wise_pass_at_k(to_df: bool = True):
         else:
             full_name = benchmark
         model = attributes['model']
-        model_size = loader.ALL_MODELS_PARAMS_MAPPING[model]
+        model_size = loader.ALL_MODELS_PARAMS[model]
 
         pass_at_k = evaluation.evaluate_pass_at_k(file)
         passes.append({'model': model, 'pass@1': pass_at_k['pass@1'], 'model_size': model_size, 'benchmark': full_name,
@@ -49,7 +49,9 @@ def model_wise_pass_at_k(to_df: bool = True):
 
     if to_df:
         df = pd.DataFrame(dics).set_index('model').sort_values(['model_family', 'model_size'])
-        df = df.drop(columns=['model_family', 'model_size']).fillna('-')
+        df = df.drop(columns=['model_family', 'model_size'])
+        if NaN is not None:
+            df = df.fillna(NaN)
         return df
     else:
         return dics
