@@ -55,11 +55,12 @@ def check_correctness(problem: dict, completion: str, timeout: float,
         p.kill()
 
     if result.empty():
-        out = "passed out"
+        out = {"passed": False, 'result': 'passed out', 'exception': 'TimeoutException'}
     else:
         out = result.get_nowait()
 
-    output = {'task_id': problem['task_id'], 'completion': completion, 'passed': out == 'passed', 'result': out}
+    # output = {'task_id': problem['task_id'], 'completion': completion, 'passed': out == 'passed', 'result': out}
+    output = {'task_id': problem['task_id'], 'completion': completion, **out}
 
     if completion_id is None:
         return output

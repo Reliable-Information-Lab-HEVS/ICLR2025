@@ -45,12 +45,15 @@ def unsafe_execute(program_str: str, result: mp.Queue, timeout: float):
             with swallow_io():
                 with time_limit(timeout):
                     exec(program_str, exec_globals)
-            result.put_nowait("passed")
+            # result.put_nowait("passed")
+            result.put_nowait({'passed': True, 'result': 'passed', 'exception': None})
         except TimeoutException:
-            result.put_nowait("passed out")
+            # result.put_nowait("passed out")
+            result.put_nowait({'passed': False, 'result': 'passed out', 'exception': 'TimeoutException'})
         except BaseException as e:
-            result.put_nowait(f"failed: {repr(e)}")
-    
+            # result.put_nowait(f"failed with {type(e).__name__}: {e}")
+            result.put_nowait({'passed': False, 'result': e, 'exception': type(e).__name__})
+
         # Needed for cleaning up.
         shutil.rmtree = rmtree
         os.rmdir = rmdir
