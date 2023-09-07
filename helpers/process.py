@@ -3,9 +3,6 @@
 
 import os
 
-import pandas as pd
-
-from engine import loader
 from helpers import utils
 
 CATEGORIES = ['completions', 'results']

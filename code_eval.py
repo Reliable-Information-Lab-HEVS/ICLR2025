@@ -6,7 +6,7 @@ from helpers import utils
 from helpers import process
 
 
-files = process.extract_all_human_eval_filenames(category='completions', sort_on_results=True)
+files = process.extract_all_human_eval_filenames(category='completions', only_unprocessed=True)
 
 
 if __name__ == '__main__':
