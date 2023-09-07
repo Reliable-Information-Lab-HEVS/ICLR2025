@@ -24,10 +24,11 @@ def model_wise_pass_at_k(to_df: bool = True, NaN: str | None = None):
             full_name = benchmark
         model = attributes['model']
         model_size = loader.ALL_MODELS_PARAMS[model]
+        model_family = loader.ALL_MODELS_FAMILY[model]
 
         pass_at_k = evaluation.evaluate_pass_at_k(file)
         passes.append({'model': model, 'pass@1': pass_at_k['pass@1'], 'model_size': model_size, 'benchmark': full_name,
-                    'model_family': model.rsplit('-', 1)[0]})
+                    'model_family': model_family})
         
     # Swap to a "by model view"
     models = set([x['model'] for x in passes])
