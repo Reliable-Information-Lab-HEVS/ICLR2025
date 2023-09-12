@@ -49,7 +49,8 @@ from transformers import AutoModelForCausalLM
 
 model_name = 'bloom-560M'
 
-model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', low_cpu_mem_usage=True)
+# model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', low_cpu_mem_usage=True)
+model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m')
 
 # model = load_model(model_name)
 
