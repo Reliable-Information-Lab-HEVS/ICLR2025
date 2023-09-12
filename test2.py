@@ -46,6 +46,9 @@ model_name = 'bloom-560M'
 # print(model.get_gpu_memory_footprint())
 
 from transformers import AutoModelForCausalLM
+from engine import loader
 
 model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', device_map=None, load_in_8bit=False,
                                              load_in_4bit=False, low_cpu_mem_usage=True)
+
+foo = loader.estimate_model_gpu_footprint('bloom-560M')
