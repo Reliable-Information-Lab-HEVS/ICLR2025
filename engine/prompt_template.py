@@ -316,6 +316,11 @@ PROMPT_MAPPING = {
     'llama2-7B-chat': Llama2ChatPromptTemplate,
     'llama2-13B-chat': Llama2ChatPromptTemplate,
     'llama2-70B-chat': Llama2ChatPromptTemplate,
+
+    # Code-llama-instruct
+    'code-llama-7B-instruct': Llama2ChatPromptTemplate,
+    'code-llama-13B-instruct': Llama2ChatPromptTemplate,
+    'code-llama-34B-instruct': Llama2ChatPromptTemplate,
 }
 
 
