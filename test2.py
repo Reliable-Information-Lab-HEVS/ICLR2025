@@ -156,6 +156,9 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
 
     
     # # Load model
+    print(f'8bits: {quantization_8bits}')
+    print(f'4bits: {quantization_4bits}')
+    print(f'device_map: {device_map}')
     model = AutoModelForCausalLM.from_pretrained(loader.ALL_MODELS_MAPPING[model_name], device_map=device_map,
                                                 torch_dtype=dtype, load_in_8bit=quantization_8bits,
                                                 load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
