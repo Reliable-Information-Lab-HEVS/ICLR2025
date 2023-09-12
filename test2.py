@@ -42,5 +42,10 @@ from helpers import utils, datasets
 
 model_name = 'bloom-560M'
 
-model = engine.HFModel(model_name)
-print(model.get_gpu_memory_footprint())
+# model = engine.HFModel(model_name)
+# print(model.get_gpu_memory_footprint())
+
+from transformers import AutoModelForCausalLM
+
+model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', device_map=None, load_in_8bit=False,
+                                             load_in_4bit=False, low_cpu_mem_usage=True)
