@@ -155,30 +155,30 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
             device_map = 'balanced'
 
     
-    # Load model
-    model = AutoModelForCausalLM.from_pretrained(loader.ALL_MODELS_MAPPING[model_name], device_map=device_map,
-                                                torch_dtype=dtype, load_in_8bit=quantization_8bits,
-                                                load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
-                                                **additional_kwargs)
+    # # Load model
+    # model = AutoModelForCausalLM.from_pretrained(loader.ALL_MODELS_MAPPING[model_name], device_map=device_map,
+    #                                             torch_dtype=dtype, load_in_8bit=quantization_8bits,
+    #                                             load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
+    #                                             **additional_kwargs)
     
-    # If the flag is active we directly put our model on one gpu without using any device_map (this is 
-    # more efficient). But if the model is quantized, this is already done automatically because quantization
-    # happen only on gpu
-    if only_move_to_one_gpu and not quantization:
-        # This operation is in-place for nn.Module
-        model.cuda(gpu_rank)
+    # # If the flag is active we directly put our model on one gpu without using any device_map (this is 
+    # # more efficient). But if the model is quantized, this is already done automatically because quantization
+    # # happen only on gpu
+    # if only_move_to_one_gpu and not quantization:
+    #     # This operation is in-place for nn.Module
+    #     model.cuda(gpu_rank)
 
-    # For some reason bettertransformer is supported for codegen2 models but makes them crash during the forward
-    if not ('codegen2-' in model_name):
-        # Convert to better transformer to use Pytorch optimizations if supported by the model
-        try:
-            model = model.to_bettertransformer()
-        except:
-            pass
+    # # For some reason bettertransformer is supported for codegen2 models but makes them crash during the forward
+    # if not ('codegen2-' in model_name):
+    #     # Convert to better transformer to use Pytorch optimizations if supported by the model
+    #     try:
+    #         model = model.to_bettertransformer()
+    #     except:
+    #         pass
         
-    model.eval()
+    # model.eval()
 
-    return model
+    # return model
 
 
 
