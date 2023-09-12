@@ -88,7 +88,7 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
         dtype = loader.ALL_MODELS_DTYPES[model_name]
 
     if dtype not in loader.ALLOWED_DTYPES:
-        raise ValueError(f'The dtype must be one of {*ALLOWED_DTYPES,}.')
+        raise ValueError(f'The dtype must be one of {*loader.ALLOWED_DTYPES,}.')
     
     if quantization_8bits and quantization_4bits:
         raise ValueError(('You cannot load a model with both `quantization_8bits` and `quantization_4bits`. '
@@ -156,10 +156,10 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
 
     
     # # Load model
-    # model = AutoModelForCausalLM.from_pretrained(loader.ALL_MODELS_MAPPING[model_name], device_map=device_map,
-    #                                             torch_dtype=dtype, load_in_8bit=quantization_8bits,
-    #                                             load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
-    #                                             **additional_kwargs)
+    model = AutoModelForCausalLM.from_pretrained(loader.ALL_MODELS_MAPPING[model_name], device_map=device_map,
+                                                torch_dtype=dtype, load_in_8bit=quantization_8bits,
+                                                load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
+                                                **additional_kwargs)
     
     # # If the flag is active we directly put our model on one gpu without using any device_map (this is 
     # # more efficient). But if the model is quantized, this is already done automatically because quantization
