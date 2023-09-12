@@ -138,4 +138,4 @@ def estimate_model_gpu_footprint(model_name, quantization_8bits: bool = False, q
 
 
 
-foo = estimate_model_gpu_footprint('bloom-560M')
+foo = loader.estimate_model_gpu_footprint('bloom-560M')
