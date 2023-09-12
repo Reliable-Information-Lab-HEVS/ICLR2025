@@ -12,9 +12,9 @@ import warnings
 
 from transformers import AutoModelForCausalLM
 
-# import engine
-# from engine import loader
-# from helpers import utils, datasets
+import engine
+from engine import loader
+from helpers import utils, datasets
 
 # model_name = 'llama2-7B'
 
@@ -47,10 +47,10 @@ from transformers import AutoModelForCausalLM
 
 
 
-model_name = 'bloom-560M'
+# model_name = 'bloom-560M'
 
 # model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', low_cpu_mem_usage=True)
-model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m')
+# model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m')
 
 # model = load_model(model_name)
 
@@ -62,3 +62,25 @@ model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m')
 
 
 # foo = loader.estimate_model_gpu_footprint('bloom-560M')
+
+
+LARGE_MODELS = (
+    'gpt-neoX-20B',
+    'opt-30B',
+    'opt-66B',
+    'llama2-70B',
+    'llama2-70B-chat',
+    'bloom-176B',
+)
+
+model_footprints = []
+for model in LARGE_MODELS:
+    # Override quantization for bloom because it's too big
+    if model == 'bloom-176B':
+        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=True,
+                                                            quantization_4bits=False)
+    else:
+        gpu_needed, _ = loader.estimate_model_gpu_footprint(model)
+    model_footprints.append(gpu_needed)
+
+print(model_footprints)
