@@ -144,7 +144,7 @@ class GenericConversation(object):
         return [list(conv_turn) for conv_turn in self]
         
 
-
+# reference: https://huggingface.co/spaces/HuggingFaceH4/starchat-playground/blob/main/dialogues.py
 class StarChatConversation(GenericConversation):
 
     def __init__(self, eos_token: str):
@@ -178,7 +178,7 @@ class StarChatConversation(GenericConversation):
         return prompt
     
 
-
+# reference: https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#L334
 class VicunaConversation(GenericConversation):
 
     def __init__(self, eos_token: str):
@@ -261,6 +261,11 @@ CONVERSATION_MAPPING = {
     'llama2-7B-chat': Llama2ChatConversation,
     'llama2-13B-chat': Llama2ChatConversation,
     'llama2-70B-chat': Llama2ChatConversation,
+
+    # Code-llama-instruct
+    'code-llama-7B-instruct': Llama2ChatConversation,
+    'code-llama-13B-instruct': Llama2ChatConversation,
+    'code-llama-34B-instruct': Llama2ChatConversation,
 }
 
 
