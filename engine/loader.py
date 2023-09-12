@@ -101,11 +101,15 @@ def _register_model(model_name: str):
         Name (prefix in uppercase) of the model.
     """
 
+    # Protect against injections (any character except digits, uppercases and underscore are detected)
+    if re.search(r'[^A-Z0-9_]', model_name):
+        raise ValueError('Cannot register a model with a name containing special or lowercase characters.')
+
     required_suffixes = ('MODELS_MAPPING', 'MODELS_DTYPES', 'MODELS_PARAMS', 'MODELS_FAMILY')
     optional_suffixes = ('MODELS_ADDITIONAL_MODEL_KWARGS', 'MODELS_ADDITIONAL_TOKENIZER_KWARGS')
 
     # Template string to `exec` in order to merge the dictionaries
-    template = 'global ALL_{suffix}\nALL_{suffix} = {{**ALL_{suffix}, **{model_name}_{suffix}}}'
+    template = 'ALL_{suffix}.update({model_name}_{suffix})'
 
     for suffix in required_suffixes:
         code = template.format(suffix=suffix, model_name=model_name)
@@ -128,7 +132,6 @@ ALL_MODELS_PARAMS = {}
 ALL_MODELS_FAMILY = {}
 ALL_MODELS_ADDITIONAL_MODEL_KWARGS = {}
 ALL_MODELS_ADDITIONAL_TOKENIZER_KWARGS = {}
-
     
 
 # Pretrained bloom models
@@ -365,8 +368,19 @@ _register_model('LLAMA2')
 # Code-Llama models (based on llama2 models)
 CODE_LLAMA_MODELS_MAPPING = {
     'code-llama-7B': 'codellama/CodeLlama-7b-hf',
-
+    'code-llama-13B': 'codellama/CodeLlama-13b-hf',
+    'code-llama-34B': 'codellama/CodeLlama-34b-hf',
+    'code-llama-7B-python': 'codellama/CodeLlama-7b-Python-hf',
+    'code-llama-13B-python': 'codellama/CodeLlama-13b-Python-hf',
+    'code-llama-34B-python': 'codellama/CodeLlama-34b-Python-hf',
+    'code-llama-7B-instruct': 'codellama/CodeLlama-7b-Instruct-hf',
+    'code-llama-13B-instruct': 'codellama/CodeLlama-13b-Instruct-hf',
+    'code-llama-34B-instruct': 'codellama/CodeLlama-34b-Instruct-hf',
 }
+CODE_LLAMA_MODELS_DTYPES = _map_to_dtype(CODE_LLAMA_MODELS_MAPPING, torch.bfloat16)
+CODE_LLAMA_MODELS_PARAMS = _infer_model_sizes(CODE_LLAMA_MODELS_MAPPING)
+CODE_LLAMA_MODELS_FAMILY = _map_to_model_family(CODE_LLAMA_MODELS_MAPPING, 'code-llama')
+_register_model('CODE_LLAMA')
 
 
 
