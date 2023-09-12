@@ -67,6 +67,7 @@ def update_model(model_name: str, quantization_8bits: bool = False, quantization
 def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 50,
                     top_p: float = 0.90, temperature: float = 0.9, num_return_sequences: int = 1,
                     use_seed: bool = False, seed: int | None = None) -> str:
+    
     """Text generation using the model and tokenizer in the global scope, so that we can reuse them for multiple
     prompts.
 

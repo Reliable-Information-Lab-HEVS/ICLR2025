@@ -42,4 +42,4 @@ from helpers import utils, datasets
 
 model_name = 'llama2-7B'
 
-model = engine.HFModel(model_name)
+# model = engine.HFModel(model_name)
