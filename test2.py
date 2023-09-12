@@ -42,7 +42,7 @@ from helpers import utils, datasets
 
 model_name = 'bloom-560M'
 
-# model = engine.HFModel(model_name)
+model = engine.HFModel(model_name)
 # print(model.get_gpu_memory_footprint())
 
 from transformers import AutoModelForCausalLM
