@@ -10,6 +10,7 @@ import gc
 import math
 
 import engine
+from engine import loader
 from helpers import utils, datasets
 
 # model_name = 'llama2-7B'
@@ -42,12 +43,13 @@ from helpers import utils, datasets
 
 model_name = 'bloom-560M'
 
-model = engine.HFModel(model_name)
-print(model.dtype_category())
+model = loader.load_model(model_name)
+
+# model = engine.HFModel(model_name)
+# print(model.dtype_category())
 # print(model.get_gpu_memory_footprint())
 
 # from transformers import AutoModelForCausalLM
-# from engine import loader
 
 
 # foo = loader.estimate_model_gpu_footprint('bloom-560M')
