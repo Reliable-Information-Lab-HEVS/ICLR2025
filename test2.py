@@ -40,6 +40,6 @@ from helpers import utils, datasets
 # print(f'Time for 2 inferences: {dt:.2f} s')
 
 
-model_name = 'llama2-7B'
+model_name = 'bloom-560M'
 
 # model = engine.HFModel(model_name)
