@@ -42,4 +42,4 @@ from helpers import utils, datasets
 
 model_name = 'bloom-560M'
 
-# model = engine.HFModel(model_name)
+model = engine.HFModel(model_name)
