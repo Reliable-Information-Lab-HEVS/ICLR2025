@@ -270,32 +270,33 @@ class HFModel(object):
         if temperature == 0:
             do_sample = False
 
-        # Retrieve eos_token_id
-        if hasattr(self.model.generation_config, 'eos_token_id'):
+        # Retrieve eos_token_id (note that the attribute exists in all cases)
+        if self.model.generation_config.eos_token_id is not None:
             eos_token_id = self.model.generation_config.eos_token_id
-        elif hasattr(self.model.config, 'eos_token_id'):
+        elif self.model.config.eos_token_id is not None:
             eos_token_id = self.model.config.eos_token_id
-        elif hasattr(self.tokenizer, 'eos_token_id'):
+        elif self.tokenizer.eos_token_id is not None:
             eos_token_id = self.tokenizer.eos_token_id
         else:
             raise RuntimeError('Impossible to find the `eos_token_id`.')
 
-        # Retrieve bos_token_id
-        if hasattr(self.model.generation_config, 'bos_token_id'):
+        # Retrieve bos_token_id (note that the attribute exists in all cases)
+        if self.model.generation_config.bos_token_id is not None:
             bos_token_id = self.model.generation_config.bos_token_id
-        elif hasattr(self.model.config, 'bos_token_id'):
+        elif self.model.config.bos_token_id is not None:
             bos_token_id = self.model.config.bos_token_id
-        elif hasattr(self.tokenizer, 'bos_token_id'):
+        elif self.tokenizer.bos_token_id is not None:
             bos_token_id = self.tokenizer.bos_token_id
         else:
             raise RuntimeError('Impossible to find the `bos_token_id`.')
         
-        # Retrieve pad_token_id and set it to eos_token_id if it does not exist
-        if hasattr(self.model.generation_config, 'pad_token_id'):
+        # Retrieve pad_token_id and set it to eos_token_id if it does not exist (note that the attribute
+        # exists in all cases)
+        if self.model.generation_config.pad_token_id is not None:
             pad_token_id = self.model.generation_config.pad_token_id
-        elif hasattr(self.model.config, 'pad_token_id'):
+        elif self.model.config.pad_token_id is not None:
             pad_token_id = self.model.config.pad_token_id
-        elif hasattr(self.tokenizer, 'pad_token_id'):
+        elif self.tokenizer.pad_token_id is not None:
             pad_token_id = self.tokenizer.pad_token_id
         else:
             pad_token_id = eos_token_id
