@@ -189,7 +189,9 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
 
 model_name = 'bloom-560M'
 
-model = load_model(model_name)
+model = AutoModelForCausalLM.from_pretrained('bigscience/bloom-560m', low_cpu_mem_usage=True)
+
+# model = load_model(model_name)
 
 # model = engine.HFModel(model_name)
 # print(model.dtype_category())
