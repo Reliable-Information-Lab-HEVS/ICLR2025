@@ -43,7 +43,8 @@ from helpers import utils, datasets
 
 model_name = 'bloom-560M'
 
-model = loader.load_model(model_name)
+model = loader.estimate_model_gpu_footprint(model_name)
+# model = loader.load_model(model_name)
 
 # model = engine.HFModel(model_name)
 # print(model.dtype_category())
