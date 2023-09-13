@@ -103,11 +103,11 @@ SMALL_MODELS_SPECIAL_PROMPT = (
 )
 
 LARGE_MODELS = (
-    'gpt-neoX-20B',
-    'opt-30B',
-    'opt-66B',
-    'llama2-70B',
-    'llama2-70B-chat',
+    # 'gpt-neoX-20B',
+    # 'opt-30B',
+    # 'opt-66B',
+    # 'llama2-70B',
+    # 'llama2-70B-chat',
     'bloom-176B',
 )
 
@@ -259,7 +259,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
     else:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
-        
+
     stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}',
                           'completions', model_name, model.dtype_category())
