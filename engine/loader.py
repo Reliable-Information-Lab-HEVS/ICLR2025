@@ -331,11 +331,11 @@ VICUNA_MODELS_MAPPING = {
 VICUNA_MODELS_DTYPES = _map_to_dtype(VICUNA_MODELS_MAPPING, torch.float16)
 VICUNA_MODELS_PARAMS = _infer_model_sizes(VICUNA_MODELS_MAPPING)
 VICUNA_MODELS_FAMILY = _map_to_model_family(VICUNA_MODELS_MAPPING, 'vicuna1.3')
-# Fast tokenizers and non-legacy behaviour are bugged in current transformers and tokenizers versions
+# Fast llama tokenizers are buggy in current transformers versions
 # TODO: may need to be changed in future versions if they correct the bug
 VICUNA_MODELS_ADDITIONAL_TOKENIZER_KWARGS = {
-    'vicuna-7B': {'use_fast_tokenizer': False, 'legacy':True},
-    'vicuna-13B': {'use_fast_tokenizer': False, 'legacy':True},
+    'vicuna-7B': {'use_fast_tokenizer': False},
+    'vicuna-13B': {'use_fast_tokenizer': False},
 }
 _register_model('VICUNA')
 
@@ -352,15 +352,15 @@ LLAMA2_MODELS_MAPPING = {
 LLAMA2_MODELS_DTYPES = _map_to_dtype(LLAMA2_MODELS_MAPPING, torch.float16)
 LLAMA2_MODELS_PARAMS = _infer_model_sizes(LLAMA2_MODELS_MAPPING)
 LLAMA2_MODELS_FAMILY = _map_to_model_family(LLAMA2_MODELS_MAPPING, 'llama2')
-# Fast tokenizers and non-legacy behaviour are bugged in current transformers and tokenizers versions
+# Fast llama tokenizers are buggy in current transformers versions
 # TODO: may need to be changed in future versions if they correct the bug
 LLAMA2_MODELS_ADDITIONAL_TOKENIZER_KWARGS = {
-    'llama2-7B': {'use_fast_tokenizer': False, 'legacy':True},
-    'llama2-13B': {'use_fast_tokenizer': False, 'legacy':True},
-    'llama2-70B': {'use_fast_tokenizer': False, 'legacy':True},
-    'llama2-7B-chat': {'use_fast_tokenizer': False, 'legacy':True},
-    'llama2-13B-chat': {'use_fast_tokenizer': False, 'legacy':True},
-    'llama2-70B-chat': {'use_fast_tokenizer': False, 'legacy':True},
+    'llama2-7B': {'use_fast_tokenizer': False},
+    'llama2-13B': {'use_fast_tokenizer': False},
+    'llama2-70B': {'use_fast_tokenizer': False},
+    'llama2-7B-chat': {'use_fast_tokenizer': False},
+    'llama2-13B-chat': {'use_fast_tokenizer': False},
+    'llama2-70B-chat': {'use_fast_tokenizer': False},
 }
 _register_model('LLAMA2')
 
@@ -380,6 +380,19 @@ CODE_LLAMA_MODELS_MAPPING = {
 CODE_LLAMA_MODELS_DTYPES = _map_to_dtype(CODE_LLAMA_MODELS_MAPPING, torch.bfloat16)
 CODE_LLAMA_MODELS_PARAMS = _infer_model_sizes(CODE_LLAMA_MODELS_MAPPING)
 CODE_LLAMA_MODELS_FAMILY = _map_to_model_family(CODE_LLAMA_MODELS_MAPPING, 'code-llama')
+# Fast llama tokenizers are buggy in current transformers versions
+# TODO: may need to be changed in future versions if they correct the bug
+CODE_LLAMA_ADDITIONAL_TOKENIZER_KWARGS = {
+    'code-llama-7B': {'use_fast_tokenizer': False},
+    'code-llama-13B': {'use_fast_tokenizer': False},
+    'code-llama-34B': {'use_fast_tokenizer': False},
+    'code-llama-7B-python': {'use_fast_tokenizer': False},
+    'code-llama-13B-python': {'use_fast_tokenizer': False},
+    'code-llama-34B-python': {'use_fast_tokenizer': False},
+    'code-llama-7B-instruct': {'use_fast_tokenizer': False},
+    'code-llama-13B-instruct': {'use_fast_tokenizer': False},
+    'code-llama-34B-instruct': {'use_fast_tokenizer': False},
+}
 _register_model('CODE_LLAMA')
 
 
