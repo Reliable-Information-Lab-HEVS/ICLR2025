@@ -478,8 +478,8 @@ def estimate_model_gpu_footprint(model_name, quantization_8bits: bool = False, q
     if max_fraction_gpu_0 < 0 or max_fraction_gpus < 0:
         raise ValueError('The maximum fraction of gpu memory to use cannot be negative.')
     
-    if max_fraction_gpu_0 > 0.9 or max_fraction_gpus > 0.9:
-        raise ValueError(('The maximum fraction of gpu memory to use cannot be larger than 0.9 because some '
+    if max_fraction_gpu_0 > 0.95 or max_fraction_gpus > 0.95:
+        raise ValueError(('The maximum fraction of gpu memory to use cannot be larger than 0.95 because some '
                          'memory need to stay free for the forward pass and other computations.'))
     
     # Silently use 4bits when both are True
