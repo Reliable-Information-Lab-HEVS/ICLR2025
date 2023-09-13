@@ -47,5 +47,5 @@ import engine
 
 
 model_name = 'bloom-176B'
-model = engine.HFModel(model_name, quantization_8bits=True)
+model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
 print(model.get_gpu_memory_footprint())
