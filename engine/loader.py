@@ -150,6 +150,7 @@ BLOOM_MODELS_DTYPES = {
     'bloom-176B': torch.bfloat16,
 }
 BLOOM_MODELS_PARAMS = _infer_model_sizes(BLOOM_MODELS_MAPPING)
+BLOOM_MODELS_PARAMS['bloom-176B'] = 190
 BLOOM_MODELS_FAMILY = _map_to_model_family(BLOOM_MODELS_MAPPING, 'bloom')
 _register_model('BLOOM')
 
