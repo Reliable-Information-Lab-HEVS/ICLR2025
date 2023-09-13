@@ -170,9 +170,10 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
-        quantization_8bits = True
+        model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+    else:
+        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
     stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name,
                           model.dtype_category())
@@ -255,9 +256,10 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
-        quantization_8bits = True
-
-    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+    else:
+        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        
     stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}',
                           'completions', model_name, model.dtype_category())

@@ -99,9 +99,10 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
-        quantization_8bits = True
-
-    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+    else:
+        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        
     gpus = model.get_gpu_devices()
     large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
 
