@@ -52,7 +52,7 @@ from engine import loader
 # model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.5, max_fraction_gpus=0.9)
 # print(model.get_gpu_memory_footprint())
 
-max_memory = {i:'34GiB' for i in range(6)}
+max_memory = {i:'36GiB' for i in range(6)}
 model = AutoModelForCausalLM.from_pretrained('bigscience/bloom', device_map='balanced', load_in_8bit=True,
                                              max_memory=max_memory)
 # print(model.hf_device_map)
