@@ -105,18 +105,19 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     timeout = 10
 
     # To show text as it is being generated
-    streamer = TextIteratorStreamer(model.tokenizer, skip_prompt=False, timeout=timeout, skip_special_tokens=True)
+    streamer = TextIteratorStreamer(model.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
 
     # We need to launch a new thread to get text from the streamer in real-time as it is being generated. We
     # use an executor because it makes it easier to catch possible exceptions
     with ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(model.generate_text, prompt, max_new_tokens=max_new_tokens, do_sample=do_sample,
                                  top_k=top_k, top_p=top_p, temperature=temperature, seed=seed,
-                                 truncate_prompt_from_output=False, streamer=streamer)
+                                 truncate_prompt_from_output=True, streamer=streamer)
     
         # Get results from the streamer and yield it
         try:
-            generated_text = ''
+            # Ask the streamer to skip prompt and reattach it here to avoid showing special prompt formatting
+            generated_text = prompt
             for new_text in streamer:
                 generated_text += new_text
                 yield generated_text
@@ -132,7 +133,7 @@ def text_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = Tru
     
         # Get actual result and yield it (which may be slightly different due to postprocessing)
         generated_text = future.result()
-        yield generated_text
+        yield prompt + generated_text
 
 
 def chat_generation(prompt: str, max_new_tokens: int = 60, do_sample: bool = True, top_k: int = 40,
