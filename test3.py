@@ -45,10 +45,12 @@ import engine
 
 # print(model.hf_device_map)
 
-
+from engine import loader
 model_name = 'bloom-176B'
-model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.95, max_fraction_gpus=0.95)
-print(model.get_gpu_memory_footprint())
+print(loader.estimate_model_gpu_footprint(model_name, quantization_8bits=True, max_fraction_gpu_0=0.95,
+                                          max_fraction_gpus=0.95))
+# model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.95, max_fraction_gpus=0.95)
+# print(model.get_gpu_memory_footprint())
 
 # model = AutoModelForCausalLM.from_pretrained('bigscience/bloom', device_map='auto', load_in_8bit=True)
 # print(model.hf_device_map)
