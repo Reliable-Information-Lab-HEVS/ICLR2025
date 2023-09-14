@@ -296,7 +296,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
             # Add the newline character in case use_context is True but the model cannot actually handle context
             # correctly
-            if model.prompt_template.default_mode == 'generation':
+            if use_context and model.prompt_template.default_mode == 'generation':
                 prompt += '\n'
 
             # GPT2 has only a context size of 1024, which can sometimes overflow with large `max_new_tokens`.
