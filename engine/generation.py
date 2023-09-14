@@ -299,6 +299,9 @@ class HFModel(object):
         elif self.tokenizer.pad_token_id is not None:
             pad_token_id = self.tokenizer.pad_token_id
         else:
+            # We don't really need a padding token in our case as we never need to pad, we just make sure
+            # it is a known special token (eos token) that will be generated when the sequence is finished.
+            # This way it is automatically removed from the sequence when using `decode(..., skip_special_tokens=True)`
             pad_token_id = eos_token_id
 
         # create the config
