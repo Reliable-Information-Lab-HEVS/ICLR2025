@@ -82,6 +82,12 @@ SMALL_MODELS = (
     'llama2-7B-chat',
     'llama2-13B',
     'llama2-13B-chat',
+    'code-llama-7B',
+    'code-llama-13B',
+    'code-llama-7B-python',
+    'code-llama-13B-python',
+    'code-llama-7B-instruct',
+    'code-llama-13B-instruct',
 )
 
 SMALL_MODELS_SPECIAL_PROMPT = (
@@ -100,18 +106,24 @@ SMALL_MODELS_SPECIAL_PROMPT = (
     'vicuna-13B',
     'llama2-7B-chat',
     'llama2-13B-chat',
+    'code-llama-7B-instruct',
+    'code-llama-13B-instruct',
 )
 
 LARGE_MODELS = (
-    # 'gpt-neoX-20B',
-    # 'opt-30B',
-    # 'opt-66B',
-    # 'llama2-70B',
-    # 'llama2-70B-chat',
+    'gpt-neoX-20B',
+    'opt-30B',
+    'code-llama-34B',
+    'code-llama-34B-python',
+    'code-llama-34B-instruct',
+    'opt-66B',
+    'llama2-70B',
+    'llama2-70B-chat',
     'bloom-176B',
 )
 
 LARGE_MODELS_SPECIAL_PROMPT = (
+    'code-llama-34B-instruct',
     'llama2-70B-chat',
 )
 
@@ -120,12 +132,12 @@ LARGE_MODELS_SPECIAL_PROMPT = (
 def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = PythonParser(),
                         stopping_patterns: tuple[str] = stopping.EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
     
-    # code_outputs = stopping.parse_code_and_truncate(outputs, parser, stopping_patterns)
     code_outputs = [parser(sequence) for sequence in outputs]
 
     completions = []
     for output in code_outputs:
 
+        # Check if the model repeated the function definition
         regex = r'def ' + re.escape(sample['entry_point']) + r'[^\n]*\n(.*)$'
         code_after_func_def = re.search(regex, output, re.DOTALL)
 
@@ -174,7 +186,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
     else:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
+    stopping_patterns = None if model.is_chat_model() else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name,
                           model.dtype_category())
 
@@ -193,7 +205,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
         for sample in dataset:
 
             task_id = sample['task_id']
-            prompt = sample['prompt']
+            prompt = sample['prompt'].strip()
 
             # GPT2 has only a context size of 1024, which can sometimes overflow with large `max_new_tokens`.
             if 'gpt2' in model_name:
@@ -217,7 +229,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
                                     prompt_template_mode=prompt_template_mode, **generation_kwargs)
 
             # Save the model completions
-            if model.is_chat_model() and prompt_template_mode in ['default', 'chat']:
+            if model.is_chat_model():
                 true_completions = extract_completions(completions, sample)
                 results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
             else:
@@ -260,7 +272,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
     else:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    stopping_patterns = None if (model.is_chat_model() and prompt_template_mode in ['default', 'chat']) else stopping.CODE_STOP_PATTERNS
+    stopping_patterns = None if model.is_chat_model() else stopping.CODE_STOP_PATTERNS
     folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}',
                           'completions', model_name, model.dtype_category())
 
@@ -279,8 +291,13 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         for sample in dataset:
 
             task_id = sample['task_id']
-            prompt = sample['instruction'] if use_context else sample['instruction'] + sample['context']
-            context = sample['context'] if use_context else ''
+            prompt = sample['instruction'].strip() if use_context else sample['instruction'].strip() + '\n' + sample['context'].strip()
+            context = sample['context'].strip() if use_context else ''
+
+            # Add the newline character in case use_context is True but the model cannot actually handle context
+            # correctly
+            if model.prompt_template.default_mode == 'generation':
+                prompt += '\n'
 
             # GPT2 has only a context size of 1024, which can sometimes overflow with large `max_new_tokens`.
             if 'gpt2' in model_name:
@@ -304,7 +321,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
                                     prompt_template_mode=prompt_template_mode, **generation_kwargs)
 
             # Save the model completions
-            if model.is_chat_model() and prompt_template_mode in ['default', 'chat']:
+            if model.is_chat_model():
                 true_completions = extract_completions(completions, sample)
                 results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
             else:
