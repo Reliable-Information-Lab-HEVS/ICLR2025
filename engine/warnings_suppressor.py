@@ -54,7 +54,10 @@ def swallow_bitsandbytes_prints():
         # first line after the welcome is just a path
         lines_to_keep = [line for i, line in enumerate(lines[1:]) if not line.startswith(BITSANDBYTES_SETUPS[i])]
         
-        to_keep += '\n' + '\n'.join(lines_to_keep)
+        if to_keep == '':
+            to_keep = '\n'.join(lines_to_keep)
+        else:
+            to_keep += '\n' + '\n'.join(lines_to_keep)
         # reprint without the bitsandbytes block
         if to_keep != '':
             print(to_keep)
