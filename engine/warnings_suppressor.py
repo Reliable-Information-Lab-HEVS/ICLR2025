@@ -60,10 +60,8 @@ def swallow_bitsandbytes_prints():
             else:
                 lines_to_keep.append(line)
         
-        if to_keep == '':
-            to_keep = '\n'.join(lines_to_keep)
-        else:
-            to_keep += '\n' + '\n'.join(lines_to_keep)
+        to_keep += '\n'.join(lines_to_keep)
+
         # reprint without the bitsandbytes block
         if to_keep != '':
             print(to_keep)
