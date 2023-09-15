@@ -636,13 +636,13 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
             # Providing 'balanced' dispatch correctly with respect to the max_memory_map we provide
             device_map = 'balanced'
 
-    
+    # this with statement is not useful anymore since bitsandbytes v0.41.0
+    # with warnings_suppressor.swallow_bitsandbytes_prints():
     # Load model
-    with warnings_suppressor.swallow_bitsandbytes_prints():
-        model = AutoModelForCausalLM.from_pretrained(ALL_MODELS_MAPPING[model_name], device_map=device_map,
-                                                    torch_dtype=dtype, load_in_8bit=quantization_8bits,
-                                                    load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
-                                                    **additional_kwargs)
+    model = AutoModelForCausalLM.from_pretrained(ALL_MODELS_MAPPING[model_name], device_map=device_map,
+                                                 torch_dtype=dtype, load_in_8bit=quantization_8bits,
+                                                 load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
+                                                 **additional_kwargs)
     
     # If the flag is active we directly put our model on one gpu without using any device_map (this is 
     # more efficient). But if the model is quantized, this is already done automatically because quantization
