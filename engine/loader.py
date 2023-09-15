@@ -639,13 +639,10 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
     
     # Load model
     with warnings_suppressor.swallow_bitsandbytes_prints():
-        print('prout')
-        print('test')
         model = AutoModelForCausalLM.from_pretrained(ALL_MODELS_MAPPING[model_name], device_map=device_map,
                                                     torch_dtype=dtype, load_in_8bit=quantization_8bits,
                                                     load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
                                                     **additional_kwargs)
-        print('foo\nfoo')
     
     # If the flag is active we directly put our model on one gpu without using any device_map (this is 
     # more efficient). But if the model is quantized, this is already done automatically because quantization

@@ -68,6 +68,7 @@ def swallow_bitsandbytes_prints():
 
     else:
         if all_prints != '':
+            # The last newline is an artifact of print() adding newline thus remove it
             if all_prints.endswith('\n'):
                 print(all_prints.rsplit('\n', 1)[0])
             else:
