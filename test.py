@@ -47,33 +47,36 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 # model_name = 'star_coder'
 
 
-model_name = 'llama2-7B'
-# model_name = 'opt-66B'
-input_size = 400
-max_new_tokens = 100
+# model_name = 'llama2-7B'
+# # model_name = 'opt-66B'
+# input_size = 400
+# max_new_tokens = 100
 
-t0 = time.time()
-model = engine.HFModel(model_name)
-dt0 = time.time() - t0
-print(f'Time to load the model {dt0:.2f} s')
+# t0 = time.time()
+# model = engine.HFModel(model_name)
+# dt0 = time.time() - t0
+# print(f'Time to load the model {dt0:.2f} s')
 
-large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
-prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
+# large_tokens = model.tokenizer.encode(large_text, return_tensors='pt')
+# prompt = model.tokenizer.batch_decode(large_tokens[:, :input_size], skip_special_tokens=True)[0]
 
-memories = []
-for i in range(torch.cuda.device_count()):
-    torch.cuda.reset_peak_memory_stats(i)
-    memories.append(torch.cuda.max_memory_allocated(i) / 1024**3)
+# memories = []
+# for i in range(torch.cuda.device_count()):
+#     torch.cuda.reset_peak_memory_stats(i)
+#     memories.append(torch.cuda.max_memory_allocated(i) / 1024**3)
 
-t1 = time.time()
-foo = model(prompt, max_new_tokens=max_new_tokens, batch_size=1, num_return_sequences=1)
-dt1 = time.time() - t1
-print(f'Time for forward: {dt1:.2f} s')
+# t1 = time.time()
+# foo = model(prompt, max_new_tokens=max_new_tokens, batch_size=1, num_return_sequences=1)
+# dt1 = time.time() - t1
+# print(f'Time for forward: {dt1:.2f} s')
 
-consumptions = []
-for i in range(torch.cuda.device_count()):
-    consumptions.append(torch.cuda.max_memory_allocated(i) / 1024**3 - memories[i])
+# consumptions = []
+# for i in range(torch.cuda.device_count()):
+#     consumptions.append(torch.cuda.max_memory_allocated(i) / 1024**3 - memories[i])
 
-print(f'Max memory allocated of the gpus: {max(consumptions)} GiB')
+# print(f'Max memory allocated of the gpus: {max(consumptions)} GiB')
 
-print(f'All memories used: {*consumptions,}')
+# print(f'All memories used: {*consumptions,}')
+
+
+model = engine.HFModel('bloom-560M')
