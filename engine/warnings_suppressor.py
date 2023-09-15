@@ -46,8 +46,8 @@ def swallow_bitsandbytes_prints():
     with contextlib.redirect_stdout(io.StringIO()) as f:
         yield
     all_prints = f.getvalue()
-    print('HERE')
     # Remove the welcome
-    if BITSANDBYTES_WELCOME in all_prints:
+    if 'Welcome to bitsandbytes' in all_prints:
+        print('yes')
         all_prints.replace(BITSANDBYTES_WELCOME, '', 1)
     print(all_prints)
