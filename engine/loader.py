@@ -5,6 +5,12 @@ import math
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+better_transformer_warning = ('The BetterTransformer implementation does not support padding during training, ',
+                               'as the fused kernels do not support attention masks. Beware that passing padded ',
+                               'batched data during training may result in unexpected outputs.')
+
+warnings.filterwarnings('ignore', better_transformer_warning)
+
 
 def _infer_model_size(model_name: str) -> float:
     """Return the number of parameters a model has from its name if it can be inferred from it. Raise a 
