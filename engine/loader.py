@@ -9,7 +9,7 @@ better_transformer_warning = ('The BetterTransformer implementation does not sup
                               'as the fused kernels do not support attention masks. Beware that passing padded '
                               'batched data during training may result in unexpected outputs.')
 
-warnings.filterwarnings(action='ignore', message=better_transformer_warning)
+# warnings.filterwarnings(action='ignore', message=better_transformer_warning)
 
 
 def _infer_model_size(model_name: str) -> float:
