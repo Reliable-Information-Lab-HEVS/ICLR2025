@@ -68,7 +68,10 @@ def swallow_bitsandbytes_prints():
 
     else:
         if all_prints != '':
-            print(all_prints)
+            if all_prints.endswith('\n'):
+                print(all_prints.rsplit('\n', 1)[0])
+            else:
+                print(all_prints)
     
 
 
