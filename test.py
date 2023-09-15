@@ -82,5 +82,5 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 # import transformers
 model = engine.HFModel('bloom-560M')
-model2 = engine.HFModel('bloom-560M')
+# model2 = engine.HFModel('bloom-560M')
 print('Done loading')
