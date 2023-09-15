@@ -9,8 +9,7 @@ import torch
 import numpy as np
 from engine import warnings_suppressor
 
-with warnings_suppressor.swallow_bitsandbytes_prints():
-    from transformers import StoppingCriteriaList, GenerationConfig
+from transformers import StoppingCriteriaList, GenerationConfig
 
 from engine import loader
 from engine import stopping
