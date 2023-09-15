@@ -4,10 +4,9 @@ import re
 import math
 
 import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from engine import warnings_suppressor
-
-from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 def _infer_model_size(model_name: str) -> float:

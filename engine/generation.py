@@ -7,8 +7,6 @@ import copy
 
 import torch
 import numpy as np
-from engine import warnings_suppressor
-
 from transformers import StoppingCriteriaList, GenerationConfig
 
 from engine import loader
