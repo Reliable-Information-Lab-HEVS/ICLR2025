@@ -23,6 +23,7 @@ BETTER_TRANSFORMER_WARNING = ('The BetterTransformer implementation does not sup
 optimum_logger = logging.getLogger('optimum.bettertransformer.transformation')
 optimum_logger.addFilter(LoggingFilter(BETTER_TRANSFORMER_WARNING))
 
+
 # warnings.filterwarnings(action='ignore', message=better_transformer_warning)
 
 
