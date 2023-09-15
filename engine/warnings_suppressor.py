@@ -30,7 +30,7 @@ BITSANDBYTES_WELCOME = '\n' + '='*35 + 'BUG REPORT' + '='*35 + '\n' + \
                         ('Welcome to bitsandbytes. For bug reports, please run\n\npython -m bitsandbytes\n\n'
                         ' and submit this information together with your error trace to: '
                         'https://github.com/TimDettmers/bitsandbytes/issues') + \
-                        '\n' + '='*80
+                        '\n' + '='*80 + '\n'
 BITSANDBYTES_SETUPS = (
     'CUDA SETUP: CUDA runtime path found:',
     'CUDA SETUP: Highest compute capability among GPUs detected:',
@@ -46,10 +46,23 @@ def swallow_bitsandbytes_prints():
     with contextlib.redirect_stdout(io.StringIO()) as f:
         yield
     all_prints = f.getvalue()
-    # Remove the welcome
+    # Remove all bitsandbytes setup output
     if BITSANDBYTES_WELCOME in all_prints:
-        # print('yes')
-        all_prints = all_prints.replace(BITSANDBYTES_WELCOME, '', 1)
-    # print(all_prints)
-        print(repr(BITSANDBYTES_WELCOME))
-        print(repr(all_prints))
+        to_keep, after = all_prints.split(BITSANDBYTES_WELCOME, 1)
+        lines = after.splitlines()
+
+        # first line after the welcome is just a path
+        lines_to_keep = [line for i, line in enumerate(lines[1:]) if not line.startswith(BITSANDBYTES_SETUPS[i])]
+        
+        to_keep += '\n' + '\n'.join(lines_to_keep)
+        # reprint without the bitsandbytes block
+        if to_keep != '':
+            print(to_keep)
+
+    else:
+        if all_prints != '':
+            print(all_prints)
+    
+
+
+        
