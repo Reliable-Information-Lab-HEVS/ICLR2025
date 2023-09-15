@@ -80,5 +80,5 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 
 model = engine.HFModel('bloom-560M')
-model2 = engine.HFModel('bloom-560M')
+model2 = engine.HFModel('bloom-560M', quantization_8bits=True)
 print('Done loading')
