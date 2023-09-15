@@ -6,27 +6,7 @@ import math
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-class LoggingFilter(logging.Filter):
-    """Used to remove messages or warnings issued by the `logging` library.
-    """
-
-    def __init__(self, patterns: list[str] | str):
-
-        super().__init__()
-        self.patterns = [patterns] if type(patterns) == str else patterns
-
-    def filter(self, record):
-        return not any(pattern in record.getMessage() for pattern in self.patterns)
-    
-
-better_transformer_warning = ('The BetterTransformer implementation does not support padding during training, '
-                              'as the fused kernels do not support attention masks. Beware that passing padded '
-                              'batched data during training may result in unexpected outputs.')
-
-# warnings.filterwarnings(action='ignore', message=better_transformer_warning)
-
-logger = logging.getLogger('optimum.bettertransformer.transformation')
-logger.addFilter(LoggingFilter(better_transformer_warning))
+from engine import warnings_suppressor
 
 
 def _infer_model_size(model_name: str) -> float:
@@ -658,10 +638,11 @@ def load_model(model_name: str, quantization_8bits: bool = False, quantization_4
 
     
     # Load model
-    model = AutoModelForCausalLM.from_pretrained(ALL_MODELS_MAPPING[model_name], device_map=device_map,
-                                                torch_dtype=dtype, load_in_8bit=quantization_8bits,
-                                                load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
-                                                **additional_kwargs)
+    with warnings_suppressor.swallow_bitsandbytes_prints:
+        model = AutoModelForCausalLM.from_pretrained(ALL_MODELS_MAPPING[model_name], device_map=device_map,
+                                                    torch_dtype=dtype, load_in_8bit=quantization_8bits,
+                                                    load_in_4bit=quantization_4bits, low_cpu_mem_usage=True,
+                                                    **additional_kwargs)
     
     # If the flag is active we directly put our model on one gpu without using any device_map (this is 
     # more efficient). But if the model is quantized, this is already done automatically because quantization
