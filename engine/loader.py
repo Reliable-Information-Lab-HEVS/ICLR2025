@@ -1,15 +1,32 @@
 import warnings
+import logging
 import re
 import math
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+class LoggingFilter(logging.Filter):
+    """Used to remove messages or warnings issued by the `logging` library.
+    """
+
+    def __init__(self, patterns: list[str] | str):
+
+        super().__init__()
+        self.patterns = [patterns] if type(patterns) == str else patterns
+
+    def filter(self, record):
+        return not any(pattern in record.getMessage() for pattern in self.patterns)
+    
+
 better_transformer_warning = ('The BetterTransformer implementation does not support padding during training, '
                               'as the fused kernels do not support attention masks. Beware that passing padded '
                               'batched data during training may result in unexpected outputs.')
 
 # warnings.filterwarnings(action='ignore', message=better_transformer_warning)
+
+logger = logging.getLogger('optimum.bettertransformer.transformation')
+logger.addFilter(LoggingFilter(better_transformer_warning))
 
 
 def _infer_model_size(model_name: str) -> float:
