@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
+# from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
 
 import engine
 from engine import generation
@@ -10,7 +10,7 @@ import gc
 import math
 
 from typing import Optional, Tuple, Union
-from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
+# from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
 from torch.nn import CrossEntropyLoss
 import torch
 import warnings
@@ -78,7 +78,7 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 # print(f'All memories used: {*consumptions,}')
 
-import bitsandbytes
+# import bitsandbytes
 
 model = engine.HFModel('bloom-560M')
 model2 = engine.HFModel('bloom-560M')
