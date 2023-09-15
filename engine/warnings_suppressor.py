@@ -48,9 +48,9 @@ def swallow_bitsandbytes_prints():
     all_prints = f.getvalue()
     print(type(all_prints))
     # Remove the welcome
-    if 'Welcome to bitsandbytes' in all_prints:
+    if BITSANDBYTES_WELCOME in all_prints:
         # print('yes')
         all_prints.replace(BITSANDBYTES_WELCOME, '', 1)
     # print(all_prints)
-    print(repr(BITSANDBYTES_WELCOME))
-    print(repr(all_prints))
+        print(repr(BITSANDBYTES_WELCOME))
+        print(repr(all_prints))
