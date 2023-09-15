@@ -4,9 +4,11 @@ import re
 import math
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from engine import warnings_suppressor
+
+with warnings_suppressor.swallow_bitsandbytes_prints():
+    from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 def _infer_model_size(model_name: str) -> float:
