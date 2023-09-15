@@ -28,7 +28,7 @@ optimum_logger.addFilter(LoggingFilter(BETTER_TRANSFORMER_WARNING))
 
 BITSANDBYTES_WELCOME = '\n' + '='*35 + 'BUG REPORT' + '='*35 + '\n' + \
                         ('Welcome to bitsandbytes. For bug reports, please run\n\npython -m bitsandbytes\n\n'
-                        'and submit this information together with your error trace to: '
+                        ' and submit this information together with your error trace to: '
                         'https://github.com/TimDettmers/bitsandbytes/issues') + \
                         '\n' + '='*80
 BITSANDBYTES_SETUPS = (
@@ -46,9 +46,10 @@ def swallow_bitsandbytes_prints():
     with contextlib.redirect_stdout(io.StringIO()) as f:
         yield
     all_prints = f.getvalue()
+    print(type(all_prints))
     # Remove the welcome
     if 'Welcome to bitsandbytes' in all_prints:
-        print('yes')
+        # print('yes')
         all_prints.replace(BITSANDBYTES_WELCOME, '', 1)
     # print(all_prints)
     print(repr(all_prints))
