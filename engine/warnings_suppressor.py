@@ -28,7 +28,7 @@ optimum_logger.addFilter(LoggingFilter(BETTER_TRANSFORMER_WARNING))
 
 BITSANDBYTES_WELCOME = '\n' + '='*35 + 'BUG REPORT' + '='*35 + '\n' + \
                         ('Welcome to bitsandbytes. For bug reports, please run\n\npython -m bitsandbytes\n\n'
-                        'and submit this information together with your error trace to: '
+                        ' and submit this information together with your error trace to: '
                         'https://github.com/TimDettmers/bitsandbytes/issues') + \
                         '\n' + '='*80
 BITSANDBYTES_SETUPS = (
