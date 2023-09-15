@@ -51,3 +51,4 @@ def swallow_bitsandbytes_prints():
         print('yes')
         all_prints.replace(BITSANDBYTES_WELCOME, '', 1)
     # print(all_prints)
+    print(repr(all_prints))
