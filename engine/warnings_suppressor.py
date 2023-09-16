@@ -19,9 +19,14 @@ class LoggingFilter(logging.Filter):
 BETTER_TRANSFORMER_WARNING = ('The BetterTransformer implementation does not support padding during training, '
                               'as the fused kernels do not support attention masks. Beware that passing padded '
                               'batched data during training may result in unexpected outputs.')
+PADDING_SIDE_WARNING = ("A decoder-only architecture is being used, but right-padding was detected! For correct "
+                        "generation results, please set `padding_side='left'` when initializing the tokenizer.")
 
 optimum_logger = logging.getLogger('optimum.bettertransformer.transformation')
 optimum_logger.addFilter(LoggingFilter(BETTER_TRANSFORMER_WARNING))
+
+generation_logger = logging.getLogger('transformers.generation.utils')
+generation_logger.addFilter(LoggingFilter(PADDING_SIDE_WARNING))
 
 
 # warnings.filterwarnings(action='ignore', message=better_transformer_warning)
