@@ -17,14 +17,19 @@ def model_wise_pass_at_k(to_df: bool = True, NaN: str | None = None):
     for file in files:
         attributes = process.parse_human_eval_filename(file)
         benchmark = attributes['benchmark_name']
+        model = attributes['model']
         dtype = attributes['dtype']
-        if dtype == 'int4' or dtype == 'int8':
+
+        if (dtype == 'int4' or dtype == 'int8') and model != 'bloom-176B':
             full_name = benchmark + '_' + dtype
         else:
             full_name = benchmark
-        model = attributes['model']
+            
         model_size = loader.ALL_MODELS_PARAMS[model]
         model_family = loader.ALL_MODELS_FAMILY[model]
+
+        if model == 'bloom-176B':
+            model = model + ' (int8)'
 
         pass_at_k = evaluation.evaluate_pass_at_k(file)
         passes.append({'model': model, 'pass@1': pass_at_k['pass@1'], 'model_size': model_size, 'benchmark': full_name,

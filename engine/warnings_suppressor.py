@@ -63,7 +63,7 @@ def swallow_bitsandbytes_prints():
         lines_to_keep = []
         for i, line in enumerate(lines[1:]):
             if i < len(BITSANDBYTES_SETUPS):
-                assert line.startswith(BITSANDBYTES_SETUPS[i]), 'The bitsandbytes print format is not as exepected'
+                assert line.startswith(BITSANDBYTES_SETUPS[i]), 'The bitsandbytes print format is not as expected'
             else:
                 lines_to_keep.append(line)
         

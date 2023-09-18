@@ -103,7 +103,7 @@ def extract_all_human_eval_filenames(category: str = 'completions', only_unproce
     category : str, optional
         Whether to return filenames corresponding to the 'completions' or 'results' subfolders,
         by default 'completions'.
-    sort_on_results : bool, optional
+    only_unprocessed : bool, optional
         If `True` and `category='completions'`, will keep only files from benchmarks for which the 'results' 
         folder does not exist. By default True.
 
