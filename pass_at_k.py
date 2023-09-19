@@ -6,16 +6,16 @@ import pandas as pd
 from engine import loader
 from code_execution import evaluation
 from helpers import utils
-from helpers import process
+from helpers import humaneval
 
 def model_wise_pass_at_k(to_df: bool = True, NaN: str | None = None):
 
-    files = process.extract_all_human_eval_filenames(category='results')
+    files = humaneval.extract_all_filenames(category='results')
 
     # Compute the pass at k for every result file
     passes = []
     for file in files:
-        attributes = process.parse_human_eval_filename(file)
+        attributes = humaneval.parse_filename(file)
         benchmark = attributes['benchmark_name']
         model = attributes['model']
         dtype = attributes['dtype']
@@ -24,7 +24,7 @@ def model_wise_pass_at_k(to_df: bool = True, NaN: str | None = None):
             full_name = benchmark + '_' + dtype
         else:
             full_name = benchmark
-            
+
         model_size = loader.ALL_MODELS_PARAMS[model]
         model_family = loader.ALL_MODELS_FAMILY[model]
 

@@ -7,7 +7,41 @@ from helpers import utils
 
 CATEGORIES = ['completions', 'results']
 
-def parse_human_eval_filename(filename: str) -> dict:
+
+def get_folder(prompt_template_mode: str, model_name: str, dtype_category: str,
+                         instruct: bool = False, use_context: bool = False) -> str:
+    """Return the folder upon which to save the results of the given HumanEval benchmark.
+
+    Parameters
+    ----------
+    prompt_template_mode : str
+        The mode for the prompt template.
+    model_name : str
+        The model name.
+    dtype_category : str
+        Dtype used by the model.
+    instruct : bool, optional
+        Whether the benchmark is Instruct or not, by default False
+    use_context : bool, optional
+        Whether to use context or not (only if `instruct=True`), by default False
+
+    Returns
+    -------
+    str
+        Folder where we save the benchmark results.
+    """
+    
+    if instruct:
+        path = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}',
+                            'completions', model_name, dtype_category)
+    else:
+        path = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name,
+                            dtype_category)
+        
+    return path
+
+
+def parse_filename(filename: str) -> dict:
     """Parse a filename corresponding to a human eval result file, and return the attributes that were used
     to generate it.
 
@@ -55,7 +89,7 @@ def parse_human_eval_filename(filename: str) -> dict:
 
 
 
-def extract_human_eval_filenames(benchmark: str, category: str = 'completions') -> list[str]:
+def extract_filenames(benchmark: str, category: str = 'completions') -> list[str]:
     """Return all filenames corresponding to a HumanEval `benchmark`.
 
     Parameters
@@ -95,7 +129,7 @@ def extract_human_eval_filenames(benchmark: str, category: str = 'completions') 
 
 
 
-def extract_all_human_eval_filenames(category: str = 'completions', only_unprocessed: bool = True) -> list[str]:
+def extract_all_filenames(category: str = 'completions', only_unprocessed: bool = True) -> list[str]:
     """Return all filenames corresponding to all benchmarks of HumanEval.
 
     Parameters
@@ -132,6 +166,6 @@ def extract_all_human_eval_filenames(category: str = 'completions', only_unproce
         
     files = []
     for benchmark in human_eval_benchmarks:
-        files.extend(extract_human_eval_filenames(benchmark, category=category))
+        files.extend(extract_filenames(benchmark, category=category))
 
     return files

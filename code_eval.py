@@ -3,10 +3,10 @@ from tqdm import tqdm
 
 from code_execution import evaluation
 from helpers import utils
-from helpers import process
+from helpers import humaneval
 
 
-files = process.extract_all_human_eval_filenames(category='completions', only_unprocessed=True)
+files = humaneval.extract_all_filenames(category='completions', only_unprocessed=True)
 
 
 if __name__ == '__main__':
@@ -16,7 +16,7 @@ if __name__ == '__main__':
         result_files.append(out_file)
 
     # Extract the results folders we should copy
-    result_folders = set([process.parse_human_eval_filename(file)['associated_results_folder'] for file in result_files])
+    result_folders = set([humaneval.parse_filename(file)['associated_results_folder'] for file in result_files])
     # Extract the relative paths (relative to current dir, i.e. utils.ROOT_FOLDER)
     result_folders = [os.path.relpath(path) for path in result_folders]
     # This is used to determine which files we need to copy back to the host outside of the docker instance

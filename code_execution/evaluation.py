@@ -12,7 +12,7 @@ import os
 from code_execution.safeguards import unsafe_execute
 from helpers import datasets
 from helpers import utils
-from helpers.process import parse_human_eval_filename
+from helpers.humaneval import parse_filename
 
 
 def check_correctness(problem: dict, completion: str, timeout: float,
@@ -83,7 +83,7 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
     """
 
     # Compute name of the output file
-    out_file = parse_human_eval_filename(sample_file)['associated_results_file']
+    out_file = parse_filename(sample_file)['associated_results_file']
 
     problems = datasets.HumanEval().samples_by_id()
 

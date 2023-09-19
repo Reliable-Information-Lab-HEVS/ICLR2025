@@ -70,7 +70,7 @@ import human_eval
 #     utils.save_jsonl(new_dics, file)
 
 
-def extract_human_eval_filenames(benchmark: str, category: str = 'completions') -> list[str]:
+def extract_filenames(benchmark: str, category: str = 'completions') -> list[str]:
     """Return all filenames corresponding to a HumanEval `benchmark`.
 
     Parameters
@@ -104,7 +104,7 @@ def extract_human_eval_filenames(benchmark: str, category: str = 'completions') 
 
 
 
-def extract_all_human_eval_filenames(category: str = 'completions', only_unprocessed: bool = True) -> list[str]:
+def extract_all_filenames(category: str = 'completions', only_unprocessed: bool = True) -> list[str]:
     """Return all filenames corresponding to all benchmarks of HumanEval.
 
     Parameters
@@ -138,7 +138,7 @@ def extract_all_human_eval_filenames(category: str = 'completions', only_unproce
         
     files = []
     for benchmark in human_eval_benchmarks:
-        files.extend(extract_human_eval_filenames(benchmark, category=category))
+        files.extend(extract_filenames(benchmark, category=category))
 
     return files
 
@@ -157,7 +157,7 @@ if __name__ == '__main__':
 
     # The file format is: utils.RESULTS_FOLDER/benchmark/category/model/temperature.jsonl
 
-    files = extract_all_human_eval_filenames(category='completions', only_unprocessed=False)
+    files = extract_all_filenames(category='completions', only_unprocessed=False)
 
     for file in files:
 

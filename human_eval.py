@@ -16,6 +16,7 @@ from engine.prompt_template import PROMPT_MODES
 from engine.code_parser import CodeParser, PythonParser
 from helpers import datasets
 from helpers import utils
+from helpers import humaneval
 
 # TEMPERATURES = (0., 0.2, 0.4, 0.6, 0.8, 1.)
 TEMPERATURES = (0.,)
@@ -187,8 +188,8 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     stopping_patterns = None if model.is_chat_model() else stopping.CODE_STOP_PATTERNS
-    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name,
-                          model.dtype_category())
+    folder = humaneval.get_folder(prompt_template_mode, model_name, model.dtype_category(),
+                                          instruct=False)
 
     dataset = datasets.HumanEval()
 
@@ -273,8 +274,8 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     stopping_patterns = None if model.is_chat_model() else stopping.CODE_STOP_PATTERNS
-    folder = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}',
-                          'completions', model_name, model.dtype_category())
+    folder = humaneval.get_folder(prompt_template_mode, model_name, model.dtype_category(),
+                                          instruct=True, use_context=use_context)
 
     dataset = datasets.HumanEvalInstruct()
 
