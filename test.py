@@ -80,7 +80,9 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 # import bitsandbytes
 
+t0 = time.time()
 # import transformers
 model = engine.HFModel('bloom-560M')
 model2 = engine.HFModel('bloom-560M')
-print('Done loading')
+dt = time.time() - t0
+print(f'Done loading in {dt:.2f} s')
