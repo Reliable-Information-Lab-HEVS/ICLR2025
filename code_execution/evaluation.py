@@ -1,17 +1,13 @@
 
 # Acknowledgment: code adapted from https://github.com/openai/human-eval/blob/master/human_eval/evaluation.py
 
-from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import itertools
 import multiprocessing as mp
-import numpy as np
 from tqdm import tqdm
-import os
 
-from code_execution.safeguards import unsafe_execute
 from helpers import datasets
 from helpers import utils
+from code_execution.safeguards import unsafe_execute
 from helpers.humaneval import parse_filename
 
 
@@ -116,70 +112,3 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
 
     return out_file
 
-
-
-def estimator(n: int, c: int, k: int) -> float:
-    """
-    Calculates 1 - comb(n - c, k) / comb(n, k).
-    """
-    if n - c < k:
-        return 1.0
-    return 1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1))
-
-
-
-def pass_at_k(num_samples: int | list[int] | np.ndarray, num_correct: list[int] | np.ndarray,
-                       k: int) -> np.ndarray:
-    """Estimates pass@k of each problem and returns them in an array.
-
-    Parameters
-    ----------
-    num_samples : int | list[int] | np.ndarray
-        Number of sample solutions per problem.
-    num_correct : list[int] | np.ndarray
-        Number of correct programs per problem.
-    k : int
-        Value k.
-
-    Returns
-    -------
-    np.ndarray
-        pass@k for each problem.
-    """
-
-    if isinstance(num_samples, int):
-        num_samples_it = itertools.repeat(num_samples, len(num_correct))
-    else:
-        assert len(num_samples) == len(num_correct)
-        num_samples_it = iter(num_samples)
-
-    return np.array([estimator(int(n), int(c), k) for n, c in zip(num_samples_it, num_correct)])
-
-
-
-def evaluate_pass_at_k(result_file: str, k: list[int] = [1, 10, 100]):
-
-    results = defaultdict(list)
-
-    for sample in utils.load_jsonl(result_file):
-        results[sample["task_id"]].append(sample)
-
-    if len(results) != len(datasets.HumanEval()):
-        raise RuntimeError('Some problems are not attempted.')
-    first_value_length = len(next(iter(results.values())))
-    if not all(first_value_length == l for l in map(len, results.values())):
-        raise RuntimeError('Not all problems have been solved the same number of times.')
-
-    # Calculate pass@k.
-    total, correct = [], []
-    for result in results.values():
-        passed = [x["passed"] for x in result]
-        total.append(len(passed))
-        correct.append(sum(passed))
-    total = np.array(total)
-    correct = np.array(correct)
-
-    ks = k
-    out = {f"pass@{k}": pass_at_k(total, correct, k).mean() for k in ks if (total >= k).all()}
-
-    return out
