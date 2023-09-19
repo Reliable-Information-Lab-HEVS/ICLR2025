@@ -7,6 +7,8 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from engine import loader
 from helpers import utils
@@ -439,7 +441,7 @@ def benchmark_passes_at_k_and_error_causes(benchmark: str, dtype: str = 'default
 
 
 def all_passes_at_k_and_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = True,
-                                         to_df: bool = False) -> dict[str, list[dict] | pd.DataFrame]:
+                                     to_df: bool = False) -> dict[str, list[dict] | pd.DataFrame]:
     """Compute the pass@k and error causes (for the best temperature) for all models and all benchmarks
     corresponding to the given `dtype`. 
 
@@ -465,8 +467,9 @@ def all_passes_at_k_and_error_causes(dtype: str = 'default', k: int = 1, greedy:
             for bench in benchmarks}
 
 
+
 def model_wise_pass_at_k(dtype: str = 'default', k: int = 1, greedy: bool = True,
-                             nan_values: str | None = '-') -> pd.DataFrame:
+                         nan_values: str | None = '-') -> pd.DataFrame:
     """Comparison of the pass@k for all the models and benchmarks, and given `dtype`.
 
     Parameters
@@ -542,6 +545,38 @@ def latex(df: pd.DataFrame, **kwargs):
 
 
 
-def benchmark_error_causes(k: int = 1):
+def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = True):
 
-    results = all_passes_at_k_and_error_causes([k])
+    benchs = all_passes_at_k_and_error_causes(dtype=dtype, k=k, greedy=greedy, to_df=False)
+
+    for benchmark in benchs:
+
+        records = benchs[benchmark]
+        all_errors = []
+        for record in records:
+            all_errors.extend(record['error_causes'])
+
+        possible_errors = set(all_errors)
+        # Reorder
+        possible_errors.discard('passed')
+        possible_errors.discard('AssertionError')
+        possible_errors = ['passed', 'AssertionError'] + sorted(list(possible_errors))
+        # Convert to numpy
+        possible_errors = np.array(possible_errors)
+
+        error_matrix = np.zeros((len(records), len(possible_errors)))
+        models = []
+
+        for i, record in enumerate(records):
+            models.append(record['model'])
+            errors = record['error_causes']
+            proportions = record['error_proportions']
+            for error, proportion in zip(errors, proportions):
+                index = np.nonzero(error == possible_errors)[0][0]
+                error_matrix[i, index] = proportion
+
+        name = benchmark
+        size = (6.4, 4.8*2.5) if len(records) > 25 else (6.4, 4.8*1.4)
+        plt.figure(figsize=size)
+        plt.title(name)
+        sns.heatmap(error_matrix, annot=True, xticklabels=possible_errors, yticklabels=models, fmt='.2f', cbar=False)
