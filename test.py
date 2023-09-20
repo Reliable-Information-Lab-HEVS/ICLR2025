@@ -1,5 +1,5 @@
 import torch
-# from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSeq2SeqLM
 
 import engine
 from engine import generation
@@ -80,9 +80,21 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 # import bitsandbytes
 
-t0 = time.time()
-# import transformers
-model = engine.HFModel('bloom-560M')
-model2 = engine.HFModel('bloom-560M')
-dt = time.time() - t0
-print(f'Done loading in {dt:.2f} s')
+model = engine.HFModel('vicuna-7B')
+
+tokenizer1 = AutoTokenizer.from_pretrained('lmsys/vicuna-7b-v1.3', fast=False, legacy=True)
+tokenizer2 = AutoTokenizer.from_pretrained('lmsys/vicuna-7b-v1.3', fast=False, legacy=False)
+
+model.tokenizer = tokenizer1
+
+from helpers import datasets 
+data = datasets.HumanEval()[0]['prompt']
+
+out1 = model(data, prompt_template_mode='generation', do_sample=False, batch_size=1, stopping_patterns=True)
+
+model.tokenizer = tokenizer2
+
+out2 = model(data, prompt_template_mode='generation', do_sample=False, batch_size=1, stopping_patterns=True)
+
+print(f'legacy True:\n{out1}')
+print(f'legacy False:\n{out2}')

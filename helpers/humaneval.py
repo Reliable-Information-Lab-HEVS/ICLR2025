@@ -7,10 +7,7 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-from engine import loader
 from helpers import utils
 from helpers import datasets
 
@@ -340,6 +337,8 @@ def find_best_temperature_file(folder: str, k: int = 1, greedy: bool = False) ->
 def _get_default_dtype(model_name: str) -> str:
     """Return the default dtype used by a given model.
     """
+    from engine import loader
+
     if model_name == 'bloom-176B':
         return 'int8'
     else:
@@ -410,6 +409,8 @@ def benchmark_passes_at_k_and_error_causes(benchmark: str, dtype: str = 'default
     list[dict] | pd.DataFrame
         A list of dictionary or DataFrame containing all interesting attributes for each model in the benchmark.
     """
+
+    from engine import loader
     
     folders = find_folders_with_dtype(benchmark, dtype=dtype)
 
@@ -496,6 +497,8 @@ def model_wise_pass_at_k(dtype: str = 'default', k: int = 1, greedy: bool = True
     pd.DataFrame
         A multi-column dataframe with the results.
     """
+
+    from engine import loader
     
     benchs = all_passes_at_k_and_error_causes(dtype=dtype, k=k, greedy=greedy, to_df=True)
 
@@ -609,6 +612,9 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
     save : bool, optional
         Whether to save the plots or not, by default False
     """
+
+    import matplotlib.pyplot as plt
+    import seaborn as sns
 
     benchs = all_passes_at_k_and_error_causes(dtype=dtype, k=k, greedy=greedy, to_df=False)
 
