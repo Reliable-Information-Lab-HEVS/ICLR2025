@@ -545,7 +545,22 @@ def latex(df: pd.DataFrame, **kwargs):
 
 
 
-def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = True):
+def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = True, save: bool = False):
+    """Plot the model-wise error causes for each benchmark, for the given `dtype` and `k`. Note that `k` is only
+    used to select which temperature gave the best results if `greedy=False`.
+
+    Parameters
+    ----------
+    dtype : str, optional
+        A precise dtype to use for fetching the results, by default 'default'
+    k : int, optional
+        The `k` in pass@k, by default 1. Only used to select which temperature gave the best results for a given
+        model if `greedy=False`.
+    greedy : bool, optional
+        Whether we are computing pass@k for greedy decoding or not, by default True
+    save : bool, optional
+        Whether to save the plots or not, by default False
+    """
 
     benchs = all_passes_at_k_and_error_causes(dtype=dtype, k=k, greedy=greedy, to_df=False)
 
@@ -575,8 +590,19 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
                 index = np.nonzero(error == possible_errors)[0][0]
                 error_matrix[i, index] = proportion
 
-        name = benchmark
+
+        # Mask to avoid plotting cells with 0s
+        mask = np.where(error_matrix == 0, 1, 0)
         size = (6.4, 4.8*2.5) if len(records) > 25 else (6.4, 4.8*1.4)
+
         plt.figure(figsize=size)
-        plt.title(name)
-        sns.heatmap(error_matrix, annot=True, xticklabels=possible_errors, yticklabels=models, fmt='.2f', cbar=False)
+        plt.title(benchmark)
+        sns.heatmap(error_matrix, mask=mask, annot=True, annot_kws={'fontsize': 'x-small'}, fmt='.2f',
+                    xticklabels=possible_errors, yticklabels=models, cbar=True, cmap='Blues')
+        # Set background color for masked values
+        ax = plt.gca()
+        ax.set_facecolor('lightyellow')
+        # ax.set_facecolor('lightgoldenrodyellow')
+
+        if save:
+            plt.savefig(os.path.join(utils.ROOT_FOLDER, benchmark + '.pdf'), bbox_inches='tight')

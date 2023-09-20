@@ -513,7 +513,8 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
         for i, process in enumerate(processes):
             if not process.is_alive():
                 indices_to_remove.append(i)
-                process.close()
+                # NOTE: close() is not needed: the garbage collector will take care of it by itself: https://bugs.python.org/issue30596
+                # process.close()
 
         # Update gpu resources
         released_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i in indices_to_remove]
