@@ -21,12 +21,17 @@ BETTER_TRANSFORMER_WARNING = ('The BetterTransformer implementation does not sup
                               'batched data during training may result in unexpected outputs.')
 PADDING_SIDE_WARNING = ("A decoder-only architecture is being used, but right-padding was detected! For correct "
                         "generation results, please set `padding_side='left'` when initializing the tokenizer.")
+ADDED_TOKENS_WARNING = ("Special tokens have been added in the vocabulary, make sure the associated word "
+                        "embeddings are fine-tuned or trained.")
 
 optimum_logger = logging.getLogger('optimum.bettertransformer.transformation')
 optimum_logger.addFilter(LoggingFilter(BETTER_TRANSFORMER_WARNING))
 
 generation_logger = logging.getLogger('transformers.generation.utils')
 generation_logger.addFilter(LoggingFilter(PADDING_SIDE_WARNING))
+
+tokenization_logger = logging.getLogger('transformers.tokenization_utils_base')
+tokenization_logger.addFilter(LoggingFilter(ADDED_TOKENS_WARNING))
 
 
 # warnings.filterwarnings(action='ignore', message=better_transformer_warning)
