@@ -310,7 +310,7 @@ def find_best_temperature_file(folder: str, k: int = 1, greedy: bool = False) ->
     """
 
     if greedy and k != 1:
-        raise ValueError('We can only compute pass@1 for greedy decoding.')
+        raise ValueError('If you want to compute pass@k with `k != 1`, you must set `greedy=False`.')
     
     greedy_file = os.path.join(folder, 'temperature_0.0.jsonl')
     if greedy:
@@ -327,9 +327,12 @@ def find_best_temperature_file(folder: str, k: int = 1, greedy: bool = False) ->
         for file in temperature_files:
             try:
                 passes.append(evaluate_pass_at_k(file, [k])[f'pass@{k}'])
-            except IndexError:
-                raise RuntimeError(f'The k you provided is larger than the number of sequences generated in {file}')
-            
+            except KeyError:
+                pass
+        
+        if len(passes) == 0:
+            raise RuntimeError(f'The k you provided is larger than the number of sequences generated for any file in {folder}')
+        
         return temperature_files[np.argmax(passes)]
     
 
@@ -412,7 +415,12 @@ def benchmark_passes_at_k_and_error_causes(benchmark: str, dtype: str = 'default
 
     results = []
     for folder in folders:
-        file = find_best_temperature_file(folder, k=k, greedy=greedy)
+        # Try to find the best temperature file for given k
+        try:
+            file = find_best_temperature_file(folder, k=k, greedy=greedy)
+        # It is impossible to find for current model and dtype -> continue to next model
+        except RuntimeError:
+            continue
 
         attributes = parse_filename(file)
         # Discard unnecessary keys
@@ -495,6 +503,9 @@ def model_wise_pass_at_k(dtype: str = 'default', k: int = 1, greedy: bool = True
     new_dfs = []
     for df in benchs.values():
 
+        if df.empty:
+            continue
+
         dataset = df['dataset'][0]
         mode = df['mode'][0]
         context = str(df['use_context'][0])
@@ -509,10 +520,15 @@ def model_wise_pass_at_k(dtype: str = 'default', k: int = 1, greedy: bool = True
         new_df.rename(columns={f'pass@{k}': (dataset, subindex)}, inplace=True)
         new_dfs.append(new_df)
 
-    # Merge the dataframes together
-    final_df = new_dfs[0].merge(new_dfs[1], on='model', how='outer')
-    for df in new_dfs[2:]:
-        final_df = final_df.merge(df, on='model', how='outer')
+    # Merge dataframes depending on size
+    if len(new_dfs) == 0:
+        return pd.DataFrame()
+    elif len(new_dfs) == 1:
+        final_df = new_dfs[0]
+    else:
+        final_df = new_dfs[0]
+        for df in new_dfs[1:]:
+            final_df = final_df.merge(df, on='model', how='outer')
 
     # Add the family and size to be able to sort after all merging (cannot keep the entries during merging)
     final_df['model_family'] = [loader.ALL_MODELS_FAMILY[model] for model in final_df['model']]
@@ -545,6 +561,38 @@ def latex(df: pd.DataFrame, **kwargs):
 
 
 
+def model_wise_best_score(dtype: str = 'default', k: int = 1, greedy: bool = True) -> pd.DataFrame:
+    """Return the best pass@k for each model across all available benchmarks for the given `dtype` and `k`.
+
+    Parameters
+    ----------
+    dtype : str, optional
+        A precise dtype to use for fetching the results, by default 'default'
+    k : int, optional
+        The `k` in pass@k, by default 1
+    greedy : bool, optional
+        Whether we are computing pass@k for greedy decoding or not, by default True
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the best pass@k.
+    """
+
+    df = model_wise_pass_at_k(dtype=dtype, k=k, greedy=greedy, nan_values=None)
+
+    if df.empty:
+        return pd.DataFrame()
+    
+    # Initialize result
+    out = pd.DataFrame(index=df.index.copy())
+    out[f'best_pass@{k}'] = df.max(axis=1, skipna=True)
+    out['best_benchmark'] = df.idxmax(axis=1, skipna=True).map(lambda idx: '_'.join(idx))
+
+    return out
+
+
+
 def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = True, save: bool = False):
     """Plot the model-wise error causes for each benchmark, for the given `dtype` and `k`. Note that `k` is only
     used to select which temperature gave the best results if `greedy=False`.
@@ -567,6 +615,10 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
     for benchmark in benchs:
 
         records = benchs[benchmark]
+
+        if len(records) == 0:
+            continue
+
         all_errors = []
         for record in records:
             all_errors.extend(record['error_causes'])
