@@ -241,11 +241,11 @@ def evaluate_pass_at_k(result_file: str, k: list[int] = [1, 10, 100]) -> dict:
         results[sample["task_id"]].append(sample)
 
     if len(results) != len(datasets.HumanEval()):
-        raise RuntimeError('Some problems are not attempted.')
+        raise RuntimeError(f'Some problems are not attempted for file {result_file}.')
     
     first_value_length = len(next(iter(results.values())))
     if not all(first_value_length == l for l in map(len, results.values())):
-        raise RuntimeError('Not all problems have been solved the same number of times.')
+        raise RuntimeError(f'Not all problems have been solved the same number of times in file {result_file}.')
 
     # Calculate pass@k.
     total, correct = [], []
@@ -314,6 +314,8 @@ def find_best_temperature_file(folder: str, k: int = 1, greedy: bool = False) ->
         if not os.path.exists(greedy_file):
             raise RuntimeError('Looks like we never computed completions with temperature 0.')
         else:
+            # This is only used as a check to raise if somehow the file is not complete
+            _ = evaluate_pass_at_k(greedy_file, [k])
             return greedy_file
     
     else:
@@ -324,8 +326,10 @@ def find_best_temperature_file(folder: str, k: int = 1, greedy: bool = False) ->
         for file in temperature_files:
             try:
                 passes.append(evaluate_pass_at_k(file, [k])[f'pass@{k}'])
+            except RuntimeError:
+                continue
             except KeyError:
-                pass
+                continue
         
         if len(passes) == 0:
             raise RuntimeError(f'The k you provided is larger than the number of sequences generated for any file in {folder}')
@@ -664,3 +668,56 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
 
         if save:
             plt.savefig(os.path.join(utils.ROOT_FOLDER, benchmark + '.pdf'), bbox_inches='tight')
+
+
+
+def model_wise_pass_at_k_comparison(dtypes: list[str] = ['default', 'int8'], k: int = 1, greedy: bool = True,
+                                    nan_values: str | None = '-') -> pd.DataFrame:
+    """Compare the pass@k performances between different dtypes.
+
+    Parameters
+    ----------
+    dtypes : list[str], optional
+        The dtypes to compare, by default ['default', 'int8']
+    k : int, optional
+        The `k` in pass@k, by default 1
+    greedy : bool, optional
+        Whether we are computing pass@k for greedy decoding or not, by default True
+    nan_values : str | None, optional
+        Optional str to fill missing values, by default '-'
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the results.
+    """
+    
+    dfs = []
+    for dtype in dtypes:
+        dfs.append(model_wise_pass_at_k(dtype=dtype, k=k, greedy=greedy, nan_values=nan_values))
+
+    common_cols = set(dfs[0].columns.copy())
+    for df in dfs[1:]:
+        common_cols = common_cols.intersection(set(df.columns.copy()))
+
+    common_cols = list(common_cols)
+    final_df = dfs[0][common_cols]
+    i = 0
+    for df in dfs[1:]:
+        final_df = final_df.merge(df, how='inner', on='model', suffixes=[dtypes[i], dtypes[i+1]])
+        i += 1
+
+    columns = []
+    for column in final_df.columns.copy():
+        for dtype in dtypes:
+            if dtype in column[0]:
+                new_column = (column[0].replace(dtype, ''), column[1], dtype)
+                columns.append(new_column)
+                break
+
+    final_df.columns = columns
+    sorted_columns = sorted(columns, key=lambda x: (x[0], -len(x[1]), x[2]))
+    final_df = final_df[sorted_columns]
+    final_df.columns = pd.MultiIndex.from_tuples(final_df.columns)
+
+    return final_df
