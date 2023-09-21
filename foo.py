@@ -31,7 +31,7 @@ def target2(name: str, foo, bar = 3):
 
 
 @utils.duplicate_function_for_gpu_dispatch
-def sleep(name: str, dt: float = 2):
+def sleep(name: str, dt: float = 12):
     time.sleep(dt)
 
 
