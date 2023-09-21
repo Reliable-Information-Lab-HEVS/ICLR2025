@@ -1,6 +1,7 @@
 import multiprocessing as mp
 import time
 import os
+import warnings
 from concurrent.futures import ProcessPoolExecutor
 
 import torch
@@ -29,6 +30,11 @@ def target2(name: str, foo, bar = 3):
     print('target2')
 
 
+@utils.duplicate_function_for_gpu_dispatch
+def sleep(name: str, dt: float = 2):
+    time.sleep(dt)
+
+
 
 LARGE_MODELS = (
     'bloom-560M',
@@ -48,14 +54,24 @@ if __name__ == '__main__':
     #         _ = list(pool.map(target, LARGE_MODELS, (3,)*len(LARGE_MODELS), chunksize=1))
 
 
-    model_footprints = []
-    # Estimate number of gpus needed for each model
-    for model in LARGE_MODELS:
-        int8 = model == 'bloom-176B'
-        gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8)
-        model_footprints.append(gpu_needed)
+    # model_footprints = []
+    # # Estimate number of gpus needed for each model
+    # for model in LARGE_MODELS:
+    #     int8 = model == 'bloom-176B'
+    #     gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8)
+    #     model_footprints.append(gpu_needed)
 
 
-    args = ([1,2],)
-    utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
+    # args = ([1,2],)
+    # utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
+
+
+    with ProcessPoolExecutor(max_workers=5, mp_context=mp.get_context('spawn')) as pool:
+        _ = list(pool.map(time.sleep, [2]*10, chunksize=1))
+
+    print('Done with the pool')
+
+    utils.dispatch_jobs(['foo']*10, [1]*10, 5, sleep)
+
+    print('Done with the manual dispatch')
     
