@@ -508,7 +508,7 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
             processes.append(p)
             associated_gpus.append(allocated_gpus)
 
-        # Find the indices of the processes that are finished
+        # Find the indices of the processes that are finished if any
         indices_to_remove = []
         for i, process in enumerate(processes):
             if not process.is_alive():
@@ -516,12 +516,13 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
                 # NOTE: close() is not needed: the garbage collector will take care of it by itself: https://bugs.python.org/issue30596
                 # process.close()
 
-        # Update gpu resources
-        released_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i in indices_to_remove]
-        available_gpus += [gpu for gpus in released_gpus for gpu in gpus]
-        # Remove processes which are done
-        processes = [process for i, process in enumerate(processes) if i not in indices_to_remove]
-        associated_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i not in indices_to_remove]
+        if not len(indices_to_remove) == 0:
+            # Update gpu resources
+            released_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i in indices_to_remove]
+            available_gpus += [gpu for gpus in released_gpus for gpu in gpus]
+            # Remove processes which are done
+            processes = [process for i, process in enumerate(processes) if i not in indices_to_remove]
+            associated_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i not in indices_to_remove]
 
         # If we scheduled all jobs break from the infinite loop
         if len(model_names) == 0:
