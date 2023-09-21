@@ -658,7 +658,7 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
         size = (6.4, 4.8*2.5) if len(records) > 25 else (6.4, 4.8*1.4)
 
         plt.figure(figsize=size)
-        plt.title(benchmark)
+        plt.title(f'{benchmark}, dtype={dtype}, k={k}')
         sns.heatmap(error_matrix, mask=mask, annot=True, annot_kws={'fontsize': 'x-small'}, fmt='.2f',
                     xticklabels=possible_errors, yticklabels=models, cbar=True, cmap='Blues')
         # Set background color for masked values
@@ -667,7 +667,7 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
         # ax.set_facecolor('lightgoldenrodyellow')
 
         if save:
-            plt.savefig(os.path.join(utils.ROOT_FOLDER, benchmark + '.pdf'), bbox_inches='tight')
+            plt.savefig(os.path.join(utils.ROOT_FOLDER, 'plots', f'{benchmark}_{k}_{dtype}.pdf'), bbox_inches='tight')
 
 
 
