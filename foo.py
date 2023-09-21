@@ -35,13 +35,15 @@ def sleep(name: str, dt: float = 12):
     time.sleep(dt)
 
 
+@utils.duplicate_function_for_gpu_dispatch
+def random_test(name: str):
+    model = engine.HFModel(name)
+    out = model('This is a test of multiprocessing leaked resources')
 
-LARGE_MODELS = (
+
+MODELS = (
     'bloom-560M',
     'bloom-1.7B',
-    'gpt-neoX-20B',
-    'opt-30B',
-    # 'llama2-70B',
 )
 
 
@@ -66,12 +68,13 @@ if __name__ == '__main__':
     # utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
 
 
-    with ProcessPoolExecutor(max_workers=5, mp_context=mp.get_context('spawn')) as pool:
-        _ = list(pool.map(time.sleep, [2]*10, chunksize=1))
+    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
+                             initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
+        _ = list(pool.map(random_test, MODELS, chunksize=1))
 
     print('Done with the pool')
 
-    utils.dispatch_jobs(['foo']*10, [1]*10, 5, sleep)
+    utils.dispatch_jobs(MODELS, [1]*len(MODELS), num_gpus, random_test)
 
     print('Done with the manual dispatch')
     
