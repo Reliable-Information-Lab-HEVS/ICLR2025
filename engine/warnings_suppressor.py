@@ -16,13 +16,18 @@ class LoggingFilter(logging.Filter):
         return not any(pattern in record.getMessage() for pattern in self.patterns)
     
 
+# This is displayed whenever we convert to better-transformer -> we never train so useless
 BETTER_TRANSFORMER_WARNING = ('The BetterTransformer implementation does not support padding during training, '
                               'as the fused kernels do not support attention masks. Beware that passing padded '
                               'batched data during training may result in unexpected outputs.')
+# This is due to dialo-gpt -> we never pad inputs so useless
 PADDING_SIDE_WARNING = ("A decoder-only architecture is being used, but right-padding was detected! For correct "
                         "generation results, please set `padding_side='left'` when initializing the tokenizer.")
+# This is due to code-llama tokenizers for which they added special tokens for easy infilling mode
 ADDED_TOKENS_WARNING = ("Special tokens have been added in the vocabulary, make sure the associated word "
                         "embeddings are fine-tuned or trained.")
+# This is due to codegen25 tokenizers at load time
+UNK_TOKEN_WARNING = "Using unk_token, but it is not set yet."
 
 optimum_logger = logging.getLogger('optimum.bettertransformer.transformation')
 optimum_logger.addFilter(LoggingFilter(BETTER_TRANSFORMER_WARNING))
@@ -31,7 +36,7 @@ generation_logger = logging.getLogger('transformers.generation.utils')
 generation_logger.addFilter(LoggingFilter(PADDING_SIDE_WARNING))
 
 tokenization_logger = logging.getLogger('transformers.tokenization_utils_base')
-tokenization_logger.addFilter(LoggingFilter(ADDED_TOKENS_WARNING))
+tokenization_logger.addFilter(LoggingFilter([ADDED_TOKENS_WARNING, UNK_TOKEN_WARNING]))
 
 
 # warnings.filterwarnings(action='ignore', message=better_transformer_warning)
