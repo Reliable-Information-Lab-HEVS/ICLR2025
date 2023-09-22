@@ -20,7 +20,7 @@ import os
 from tqdm import tqdm
 
 import engine
-from helpers import utils
+from helpers import utils, datasets
 
 large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
 
@@ -80,21 +80,20 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 # import bitsandbytes
 
-model = engine.HFModel('vicuna-7B')
+model = engine.HFModel('code-llama-13B')
 
-tokenizer1 = AutoTokenizer.from_pretrained('lmsys/vicuna-7b-v1.3', fast=False, legacy=True)
-tokenizer2 = AutoTokenizer.from_pretrained('lmsys/vicuna-7b-v1.3', fast=False, legacy=False)
+prompt = datasets.HumanEval()[0]['prompt'].strip()
 
-model.tokenizer = tokenizer1
+print(f'Batch size: {model.infer_best_batch_size(12, 34, 23)}')
 
-from helpers import datasets 
-data = datasets.HumanEval()[0]['prompt']
+t0 = time.time()
+foo = model(prompt, do_sample=False, batch_size=1, stopping_patterns=True)
+dt0 = time.time() - t0
 
-out1 = model(data, prompt_template_mode='generation', do_sample=False, batch_size=1, stopping_patterns=True)
+print(f'Greedy : {dt0:.2f} s')
 
-model.tokenizer = tokenizer2
+t1 = time.time()
+foo = model(prompt, num_return_sequences=200, stopping_patterns=True)
+dt1 = time.time() - t1
 
-out2 = model(data, prompt_template_mode='generation', do_sample=False, batch_size=1, stopping_patterns=True)
-
-print(f'legacy True:\n{out1}')
-print(f'legacy False:\n{out2}')
+print(f'Sampling : {dt1:.2f} s')

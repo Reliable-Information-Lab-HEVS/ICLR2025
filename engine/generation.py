@@ -540,7 +540,7 @@ class HFModel(object):
         else:
             memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
 
-        available_memory = memory*0.9 - self.max_memory_footprint
+        available_memory = memory - self.get_max_device_memory_footprint()
 
         try:
             reference_file = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', self.model_name, f'{self.dtype_category()}.json')
