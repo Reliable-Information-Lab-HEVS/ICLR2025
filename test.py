@@ -93,7 +93,7 @@ dt0 = time.time() - t0
 print(f'Greedy : {dt0:.2f} s')
 
 t1 = time.time()
-foo = model(prompt, num_return_sequences=200, stopping_patterns=True)
+foo = model(prompt, num_return_sequences=200, batch_size=20, stopping_patterns=True)
 dt1 = time.time() - t1
 
 print(f'Sampling : {dt1:.2f} s')
