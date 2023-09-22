@@ -104,7 +104,7 @@ class TextPatternStopping(StoppingCriteria):
         if self.parser is None:
             done_sequences = self.check_patterns(generated_sequences, self.all_patterns)
             return all(done_sequences)
-        # Else first check the eos is the full sequences, then parse and check for the other patterns
+        # Else first check the eos in the full sequences, then parse and check for the other patterns
         else:
             done_with_eos = self.check_patterns(generated_sequences, self.extra_eos_tokens)
             parsed_sequences = [self.parser(sequence) for sequence in generated_sequences]
@@ -142,8 +142,8 @@ class OutOfIndentationStopping(StoppingCriteria):
             done_eos = any([pattern in sequence for pattern in self.extra_eos_tokens])
             
             # Check if we find a new line (or start of string) immediately followed by a non-space character
-            # (thus no indentation)
-            done_indentation = re.search(r'^\S|\n\S', sequence) is not None
+            # (thus no indentation). However, we allow code commentary character
+            done_indentation = re.search(r'^[^#\s]|\n[^#\s]', sequence) is not None
 
             done_sequences.append(any([done_eos, done_indentation]))
 
