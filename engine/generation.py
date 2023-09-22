@@ -550,14 +550,15 @@ class HFModel(object):
         # If no precise estimate exist, fall back to simple heuristics
         except FileNotFoundError:
             parameters = self.parameters_count()
-            if parameters < 5:
-                batch = int(available_memory // 0.5)
-            elif parameters < 10:
-                batch = int(available_memory // 1)
-            elif parameters < 20:
-                batch = int(available_memory // 2)
-            else:
-                batch = int(available_memory // 3)
+            # if parameters < 5:
+            #     batch = int(available_memory // 0.5)
+            # elif parameters < 10:
+            #     batch = int(available_memory // 1)
+            # elif parameters < 20:
+            #     batch = int(available_memory // 2)
+            # else:
+            #     batch = int(available_memory // 3)
+            batch = int(available_memory - parameters)
             
             return max(batch, 1)
 
