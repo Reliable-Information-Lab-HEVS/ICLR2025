@@ -60,12 +60,13 @@ import engine
 
 import numpy as np
 import time
+import torch
 
 np.random.seed(1)
 
 N = 20
 
-a = np.random.rand(1000000, 3000)
+a = torch.rand(1000000, 3000000, device=0)
 b = np.random.rand(3000, 7000)
 
 t0 = time.time()
