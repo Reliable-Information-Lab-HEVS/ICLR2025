@@ -45,15 +45,32 @@ import engine
 
 # print(model.hf_device_map)
 
-from engine import loader
-model_name = 'bloom-176B'
-# print(loader.estimate_model_gpu_footprint(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9,
-                                        #   max_fraction_gpus=0.9))
-model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
-print(model.get_gpu_memory_footprint())
+# from engine import loader
+# model_name = 'bloom-176B'
+# # print(loader.estimate_model_gpu_footprint(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9,
+#                                         #   max_fraction_gpus=0.9))
+# model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+# print(model.get_gpu_memory_footprint())
 
 # max_memory = {i:'36GiB' for i in range(6)}
 # model = AutoModelForCausalLM.from_pretrained('bigscience/bloom', device_map='balanced', load_in_8bit=True,
                                             #  max_memory=max_memory)
 # print(model.hf_device_map)
 # print(model.get_memory_footprint() / 1024**3)
+
+import numpy as np
+import time
+
+N = 20
+
+a = np.random.rand(10000, 3000)
+b = np.random.rand(3000, 7000)
+
+t0 = time.time()
+for i in range(N):
+    foo = a@b
+    max_ = np.max(foo, axis=1)
+    ojnwoq = np.exp(foo)
+
+dt = time.time() - t0
+print(f'Time: {dt:.2f} s')
