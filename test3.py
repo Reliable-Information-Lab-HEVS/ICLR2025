@@ -65,7 +65,7 @@ np.random.seed(1)
 
 N = 20
 
-a = np.random.rand(10000, 3000)
+a = np.random.rand(1000000, 3000)
 b = np.random.rand(3000, 7000)
 
 t0 = time.time()
