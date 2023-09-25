@@ -61,6 +61,8 @@ import engine
 import numpy as np
 import time
 
+np.random.seed(1)
+
 N = 20
 
 a = np.random.rand(10000, 3000)
