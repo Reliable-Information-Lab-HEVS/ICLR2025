@@ -80,20 +80,20 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 # import bitsandbytes
 
-model = engine.HFModel('code-llama-13B')
+model = engine.HFModel('star-chat-beta')
 
-prompt = datasets.HumanEval()[0]['prompt'].strip()
+prompt = ' '.join(large_text.split(' ')[0:100])
 
-print(f'Batch size: {model.infer_best_batch_size(12, 34, 23)}')
+torch.cuda.reset_peak_memory_stats(0)
+actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
+foo = model(prompt, batch_size=1, max_new_tokens=2, min_new_tokens=0)
+mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
 
-t0 = time.time()
-foo = model(prompt, do_sample=False, batch_size=1, stopping_patterns=True)
-dt0 = time.time() - t0
+print(f'Mem : {mem} GiB')
 
-print(f'Greedy : {dt0:.2f} s')
+torch.cuda.reset_peak_memory_stats(0)
+actual_peak2 = torch.cuda.max_memory_allocated(0) / 1024**3
+foo = model(prompt, batch_size=1, max_new_tokens=100, min_new_tokens=0)
+mem2 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak2
 
-t1 = time.time()
-foo = model(prompt, num_return_sequences=200, stopping_patterns=True)
-dt1 = time.time() - t1
-
-print(f'Sampling : {dt1:.2f} s')
+print(f'Mem : {mem2} GiB')
