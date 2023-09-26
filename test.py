@@ -86,16 +86,22 @@ prompt = ' '.join(large_text.split(' ')[0:100])
 
 torch.cuda.empty_cache()
 
-actual_peak = torch.cuda.memory_allocated(0)
+actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
+print(actual_peak)
 torch.cuda.reset_peak_memory_stats(0)
+print(torch.cuda.max_memory_allocated(0) / 1024**3)
 foo = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0)
-mem = (torch.cuda.max_memory_allocated(0) - actual_peak) / 1024**3
+torch.cuda.max_memory_allocated(0) / 1024**3
+mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
 
 print(f'Mem : {mem} GiB')
 
-actual_peak2 = torch.cuda.memory_allocated(0) 
+actual_peak2 = torch.cuda.memory_allocated(0) / 1024**3
+print(actual_peak2)
 torch.cuda.reset_peak_memory_stats(0)
+print(torch.cuda.max_memory_allocated(0) / 1024**3)
 foo2 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0)
-mem2 = (torch.cuda.max_memory_allocated(0) - actual_peak2) / 1024**3
+print(torch.cuda.max_memory_allocated(0) / 1024**3)
+mem2 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak2
 
 print(f'Mem with large max new tokens : {mem2} GiB')
