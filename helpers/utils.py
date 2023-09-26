@@ -411,7 +411,7 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     return func
 
 
-def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, sleep_time, target_func: Callable[..., None],
+def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callable[..., None],
                   *func_args, **func_kwargs):
     """Dispatch all jobs requiring gpus to different devices in order to run in parallel. Since the number of gpus
     needed by the models is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or
@@ -540,59 +540,14 @@ def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, sleep_time, target_f
         if len(gpu_footprints) == 0:
             break
 
-        # Sleep for 10 seconds before restarting the loop and check if we have enough resources to launch
+        # Sleep for 3 seconds before restarting the loop and check if we have enough resources to launch
         # a new job
         if not no_sleep:
-            time.sleep(sleep_time)
+            time.sleep(3)
 
     # Sleep until all processes are finished (they have all been scheduled at this point)
     for process in processes:
         process.join()
 
-
-
-
-def dispatch_jobs_pool(gpu_footprints: list[int], num_gpus: int, sleep_time, target_func: Callable[..., None],
-                  *func_args, **func_kwargs):
-    
-    N = len(gpu_footprints)
-    # Each argument which does not have a len() of size N is cast as a list of repeating elements of size N
-    iterable_args = []
-    for arg in func_args:
-        try:
-            if len(arg) == N:
-                iterable_args.append(arg)
-            else:
-                iterable_args.append([arg]*N)
-        except TypeError:
-            iterable_args.append([arg]*N)
-
-    # Sort all iterables according to number of gpus needed
-    sorting = sorted(zip(gpu_footprints, *iterable_args), key=lambda x: x[0])
-    # Collect back the iterables
-    gpu_footprints = [x[0] for x in sorting]
-    func_args = []
-    for i in range(len(sorting[0]) - 1):
-        func_args.append([x[i+1] for x in sorting])
-    func_args = tuple(func_args)
-
-    assert not any([len(arg) != N for arg in func_args]), 'Some `func_args` were not automatically cast to the correct length'
-
-    cutoff = np.searchsorted(gpu_footprints, 1.5)
-
-    single_gpu_args = [arg[0:cutoff] for arg in func_args]
-    multiple_gpu_args = [arg[cutoff:] for arg in func_args]
-    multiple_gpu_footprints = gpu_footprints[cutoff:]
-
-    print(f'{time.strftime("%H:%M:%S", time.localtime())}: start the pool')
-
-    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
-                            initializer=set_cuda_visible_device_of_subprocess) as pool:
-        
-        _ = list(pool.map(target_func, *single_gpu_args, chunksize=1))
-
-    print(f'{time.strftime("%H:%M:%S", time.localtime())}: start the manual dispatch')
-
-    dispatch_jobs(multiple_gpu_footprints, num_gpus, sleep_time, target_func, *multiple_gpu_args)
 
     

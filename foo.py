@@ -35,20 +35,9 @@ if __name__ == '__main__':
     # num_gpus = torch.cuda.device_count()
     num_gpus = 3
     gpu_footprints = [1,1,1,2,2,1,3]
-    dt = [4]*len(gpu_footprints)
-
-
-    t0 = time.time()
-    utils.dispatch_jobs_pool(gpu_footprints, num_gpus, 0.01, sleep, dt)
-    # utils.dispatch_jobs_pool(gpu_footprints, num_gpus, 0.01, sleep)
-    dt0 = time.time() - t0
-
-    print(f'Time with a pool: {dt0:.2f} s')
 
     t1 = time.time()
-    utils.dispatch_jobs(gpu_footprints, num_gpus, 0.01, sleep, dt)
-    # utils.dispatch_jobs(gpu_footprints, num_gpus, 0.01, sleep)
+    utils.dispatch_jobs(gpu_footprints, num_gpus, 0.01, sleep)
     dt1 = time.time() - t1
 
-    print(f'Time without a pool: {dt1:.2f} s')
     
