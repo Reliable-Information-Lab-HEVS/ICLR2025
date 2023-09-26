@@ -84,6 +84,8 @@ model = engine.HFModel('star-chat-beta')
 
 prompt = ' '.join(large_text.split(' ')[0:100])
 
+torch.cuda.empty_cache()
+
 actual_peak = torch.cuda.memory_allocated(0)
 torch.cuda.reset_peak_memory_stats(0)
 foo = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0)
