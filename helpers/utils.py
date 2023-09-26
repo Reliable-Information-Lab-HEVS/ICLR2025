@@ -4,6 +4,7 @@ import time
 import random
 import textwrap
 import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, TypeVar, ParamSpec
 
 import numpy as np
@@ -410,21 +411,20 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     return func
 
 
-def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus: int,
-                  target_func: Callable[..., None], func_args: tuple | None = None,
-                  func_kwargs: dict | None = None):
-    """Run all jobs that need more than one gpu in parallel. Since the number of gpus needed by the models
-    is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or create processes and
-    then ".join" them. To overcome this limitation, we use an infinite while loop that is refreshed by the main
-    process every 10s. The dispatch of models to gpus is very naive: as soon as enough gpus are available to
-    run the job that requires the less gpu, we launch it. Thus the gpu efficiency may not be the best possible.
-    However, this would be extremely hard to improve on this simple strategy, especially since we do not know
-    the runtime of each job.
+def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callable[..., None],
+                  *func_args, **func_kwargs):
+    """Dispatch all jobs requiring gpus to different devices in order to run in parallel. Since the number of gpus
+    needed by the models is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or
+    create processes and then ".join" them. To overcome this limitation, we use an infinite while loop that is
+    refreshed by the main process every 10s. The dispatch of models to gpus is very naive: as soon as enough gpus
+    are available to run the job that requires the less gpu, we launch it. Thus the gpu efficiency may not be the
+    best possible. However, this would be extremely hard to improve on this simple strategy, especially since we do
+    not know the runtime of each job.
 
     ## Caution - Insidious issues
     Some imports on the launching script (the script in which this function is called) may somehow cause 
     `torch.cuda` to be initialized before seeing the `CUDA_VISIBLE_DEVICES` that were set in the child processes.
-    This is especially the case of the following: `from transformers import PreTrainedModel`. Even doing
+    In particular this is the case of the following: `from transformers import PreTrainedModel`. Even doing
     ```python
     import transformers
     def test(a: transformers.PreTrainedModel):
@@ -438,45 +438,55 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
 
     Parameters
     ----------
-    model_names : list[str]
-        The list of model names to map to the `target_func`. This should be the first argument of `target_func`.
-    model_footprints : list[int]
-        The number of gpus required for each call to `target_func` (corresponding to each `model_names`). 
+    gpu_footprints : list[int]
+        The number of gpus required for each call to `target_func`. 
     num_gpus : int
         The total number of gpus available to dispatch the jobs.
     target_func : Callable[..., None]
-        The function to call with each `model_names`. The first argument of the function should be a str
-        representing the model name. The function should also be decorated with `@duplicate_function_for_gpu_dispatch`.
+        The function to call. It should always be decorated with `@duplicate_function_for_gpu_dispatch`.
         If it returns a value, this value will be ignored.
-    func_args : tuple | None, optional
-        A tuple of additional arguments to pass to `target_func`. Calls for each `model_names` will be made with
-        the same `func_args`. By default None.
-    func_kwargs : dict | None, optional
-        A dict of additional keyword arguments to pass to `target_func`. Calls for each `model_names` will be
-        made with the same `func_kwargs`. By default None.
+    *func_args : Any
+        Arguments to pass to `target_func`. These should usually be iterables of the same length as `gpu_footprints`.
+        In case of a non-iterable value, or an iterable of size different than `gpu_footprints`, the value will be
+        replicated `gpu_footprints`-times, and each function call will be made with the given value. Note that
+        `func_args` will be passed to `target_func` in the order they are provided.
+    **func_kwargs : Any
+        Keyword arguments to pass to `target_func`. Each function call will be made with the same `func_kwargs`,
+        i.e. you cannot provide keyword arguments with different values for each call (as opposed to positional
+        `func_args`).
     """
 
-    if len(model_names) != len(model_footprints):
-        raise ValueError('The `model_names` and `model_footprints` arguments should have the same length.')
-    
-    if any([x > num_gpus for x in model_footprints]):
+    if any([x > num_gpus for x in gpu_footprints]):
         raise ValueError('One of the function calls needs more gpus than the total number available `num_gpus`.')
     
-    func_kwargs = {} if func_kwargs is None else func_kwargs
+    N = len(gpu_footprints)
+    # Each argument which does not have a len() of size N is cast as a list of repeating elements of size N
+    iterable_args = []
+    for arg in func_args:
+        try:
+            if len(arg) == N:
+                iterable_args.append(arg)
+            else:
+                iterable_args.append([arg]*N)
+        except TypeError:
+            iterable_args.append([arg]*N)
+
+    # Sort all iterables according to number of gpus needed
+    sorting = sorted(zip(gpu_footprints, *iterable_args), key=lambda x: x[0])
+    # Collect back the iterables
+    gpu_footprints = [x[0] for x in sorting]
+    func_args = []
+    for i in range(len(sorting[0]) - 1):
+        func_args.append([x[i+1] for x in sorting])
+    func_args = tuple(func_args)
+
+    assert not any([len(arg) != N for arg in func_args]), 'Some `func_args` were not automatically cast to the correct length'
 
     # Need to use spawn to create subprocesses in order to set correctly the CUDA_VISIBLE_DEVICES env variable
     ctx = mp.get_context('spawn')
 
     # Retrieve the function that will be used (the function created by the decorator)
     target_func_gpu_dispatch = globals()[f'{target_func.__name__}_gpu_dispatch']
-
-    model_names = list(model_names)
-    model_footprints = list(model_footprints)
-
-    # Sort both lists according to gpu footprint
-    sorting = sorted(zip(model_names, model_footprints), key=lambda x: x[1])
-    model_names = [x for x, _ in sorting]
-    model_footprints = [x for _, x in sorting]
 
     # Initialize the lists we will maintain
     available_gpus = [i for i in range(num_gpus)]
@@ -488,19 +498,21 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
         no_sleep = False
 
         # In this case we have enough gpus available to launch the job that needs the less gpus
-        if len(available_gpus) >= model_footprints[0]:
+        if len(available_gpus) >= gpu_footprints[0]:
 
             no_sleep = True
 
             # Remove them from the list of models to process
-            name = model_names.pop(0)
-            footprint = model_footprints.pop(0)
+            footprint = gpu_footprints.pop(0)
+            args = []
+            for arg in func_args:
+                args.append(arg.pop(0))
 
             # Update gpu resources
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            args = (allocated_gpus, name) if func_args is None else (allocated_gpus, name, *func_args)
+            args = (allocated_gpus, *args)
             p = ctx.Process(target=target_func_gpu_dispatch, args=args, kwargs=func_kwargs)
             p.start()
 
@@ -524,8 +536,8 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
             processes = [process for i, process in enumerate(processes) if i not in indices_to_remove]
             associated_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i not in indices_to_remove]
 
-        # If we scheduled all jobs break from the infinite loop
-        if len(model_names) == 0:
+        # If we scheduled all jobs, break from the infinite loop
+        if len(gpu_footprints) == 0:
             break
 
         # Sleep for 10 seconds before restarting the loop and check if we have enough resources to launch
@@ -536,3 +548,47 @@ def dispatch_jobs(model_names: list[str], model_footprints: list[int], num_gpus:
     # Sleep until all processes are finished (they have all been scheduled at this point)
     for process in processes:
         process.join()
+
+
+
+
+def dispatch_jobs_pool(gpu_footprints: list[int], num_gpus: int, target_func: Callable[..., None],
+                  *func_args, **func_kwargs):
+    
+    N = len(gpu_footprints)
+    # Each argument which does not have a len() of size N is cast as a list of repeating elements of size N
+    iterable_args = []
+    for arg in func_args:
+        try:
+            if len(arg) == N:
+                iterable_args.append(arg)
+            else:
+                iterable_args.append([arg]*N)
+        except TypeError:
+            iterable_args.append([arg]*N)
+
+    # Sort all iterables according to number of gpus needed
+    sorting = sorted(zip(gpu_footprints, *iterable_args), key=lambda x: x[0])
+    # Collect back the iterables
+    gpu_footprints = [x[0] for x in sorting]
+    func_args = []
+    for i in range(len(sorting[0]) - 1):
+        func_args.append([x[i+1] for x in sorting])
+    func_args = tuple(func_args)
+
+    assert not any([len(arg) != N for arg in func_args]), 'Some `func_args` were not automatically cast to the correct length'
+
+    cutoff = np.searchsorted(gpu_footprints, 1.5)
+
+    single_gpu_args = (arg[0:cutoff] for arg in func_args)
+    multiple_gpu_args = (arg[cutoff:] for arg in func_args)
+    multiple_gpu_footprints = gpu_footprints[cutoff:]
+
+    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
+                            initializer=set_cuda_visible_device_of_subprocess) as pool:
+        
+        _ = list(pool.map(target_func, *single_gpu_args, chunksize=1))
+
+    dispatch_jobs(multiple_gpu_footprints, num_gpus, target_func, multiple_gpu_args)
+
+    
