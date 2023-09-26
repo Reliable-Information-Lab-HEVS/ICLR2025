@@ -93,7 +93,7 @@ print(f'Mem : {mem} GiB')
 
 actual_peak2 = torch.cuda.memory_allocated(0) 
 torch.cuda.reset_peak_memory_stats(0)
-foo2 = model(prompt, batch_size=1, max_new_tokens=200, min_new_tokens=0)
+foo2 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0)
 mem2 = (torch.cuda.max_memory_allocated(0) - actual_peak2) / 1024**3
 
 print(f'Mem with large max new tokens : {mem2} GiB')
