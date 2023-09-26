@@ -25,56 +25,30 @@ def target(name: str, foo, bar = 3):
 
 
 @utils.duplicate_function_for_gpu_dispatch
-def target2(name: str, foo, bar = 3):
-    time.sleep(5)
-    print('target2')
-
-
-@utils.duplicate_function_for_gpu_dispatch
-def sleep(name: str, dt: float = 12):
+def sleep(dt: float = 4):
     time.sleep(dt)
-
-
-@utils.duplicate_function_for_gpu_dispatch
-def random_test(name: str):
-    model = engine.HFModel(name)
-    out = model('This is a test of multiprocessing leaked resources')
-
-
-MODELS = (
-    'bloom-560M',
-    'bloom-1.7B',
-)
+    print(f'Number of gpus seen by torch: {torch.cuda.device_count()}')
 
 
 if __name__ == '__main__':
-    num_gpus = torch.cuda.device_count()
 
-    # with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
-    #                                     initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-            
-    #         _ = list(pool.map(target, LARGE_MODELS, (3,)*len(LARGE_MODELS), chunksize=1))
-
-
-    # model_footprints = []
-    # # Estimate number of gpus needed for each model
-    # for model in LARGE_MODELS:
-    #     int8 = model == 'bloom-176B'
-    #     gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8)
-    #     model_footprints.append(gpu_needed)
+    # num_gpus = torch.cuda.device_count()
+    num_gpus = 3
+    gpu_footprints = [1,1,1,2,2,1,3]
+    # dt = [4]*len(gpu_footprints)
 
 
-    # args = ([1,2],)
-    # utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, target, args)
+    t0 = time.time()
+    utils.dispatch_jobs_pool(gpu_footprints, num_gpus, 0.01, sleep, dt)
+    # utils.dispatch_jobs_pool(gpu_footprints, num_gpus, 0.01, sleep)
+    dt0 = time.time() - t0
 
+    print(f'Time with a pool: {dt0:.2f} s')
 
-    with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
-                             initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-        _ = list(pool.map(random_test, MODELS, chunksize=1))
+    t1 = time.time()
+    utils.dispatch_jobs(gpu_footprints, num_gpus, 0.01, sleep, dt)
+    # utils.dispatch_jobs(gpu_footprints, num_gpus, 0.01, sleep)
+    dt1 = time.time() - t1
 
-    print('Done with the pool')
-
-    utils.dispatch_jobs(MODELS, [1]*len(MODELS), num_gpus, random_test)
-
-    print('Done with the manual dispatch')
+    print(f'Time without a pool: {dt1:.2f} s')
     

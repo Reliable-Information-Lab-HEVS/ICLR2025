@@ -411,7 +411,7 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
     return func
 
 
-def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callable[..., None],
+def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, sleep_time, target_func: Callable[..., None],
                   *func_args, **func_kwargs):
     """Dispatch all jobs requiring gpus to different devices in order to run in parallel. Since the number of gpus
     needed by the models is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or
@@ -543,7 +543,7 @@ def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callabl
         # Sleep for 10 seconds before restarting the loop and check if we have enough resources to launch
         # a new job
         if not no_sleep:
-            time.sleep(10)
+            time.sleep(sleep_time)
 
     # Sleep until all processes are finished (they have all been scheduled at this point)
     for process in processes:
@@ -552,7 +552,7 @@ def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callabl
 
 
 
-def dispatch_jobs_pool(gpu_footprints: list[int], num_gpus: int, target_func: Callable[..., None],
+def dispatch_jobs_pool(gpu_footprints: list[int], num_gpus: int, sleep_time, target_func: Callable[..., None],
                   *func_args, **func_kwargs):
     
     N = len(gpu_footprints)
@@ -580,15 +580,19 @@ def dispatch_jobs_pool(gpu_footprints: list[int], num_gpus: int, target_func: Ca
 
     cutoff = np.searchsorted(gpu_footprints, 1.5)
 
-    single_gpu_args = (arg[0:cutoff] for arg in func_args)
-    multiple_gpu_args = (arg[cutoff:] for arg in func_args)
+    single_gpu_args = [arg[0:cutoff] for arg in func_args]
+    multiple_gpu_args = [arg[cutoff:] for arg in func_args]
     multiple_gpu_footprints = gpu_footprints[cutoff:]
+
+    print(f'{time.strftime("%H:%M:%S", time.localtime())}: start the pool')
 
     with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
                             initializer=set_cuda_visible_device_of_subprocess) as pool:
         
         _ = list(pool.map(target_func, *single_gpu_args, chunksize=1))
 
-    dispatch_jobs(multiple_gpu_footprints, num_gpus, target_func, multiple_gpu_args)
+    print(f'{time.strftime("%H:%M:%S", time.localtime())}: start the manual dispatch')
+
+    dispatch_jobs(multiple_gpu_footprints, num_gpus, sleep_time, target_func, *multiple_gpu_args)
 
     
