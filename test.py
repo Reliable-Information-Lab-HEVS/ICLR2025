@@ -83,6 +83,7 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 import gc
 
 model = engine.HFModel('star-chat-beta')
+model.extra_eos_tokens = []
 
 prompt = ' '.join(large_text.split(' ')[0:100])
 
