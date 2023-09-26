@@ -91,7 +91,6 @@ torch.cuda.empty_cache()
 torch.cuda.reset_peak_memory_stats(0)
 actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
 print(actual_peak)
-print(torch.cuda.max_memory_allocated(0) / 1024**3)
 foo = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0, seed=12)
 print(torch.cuda.max_memory_allocated(0) / 1024**3)
 mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
@@ -103,7 +102,6 @@ gc.collect()
 torch.cuda.reset_peak_memory_stats(0)
 actual_peak2 = torch.cuda.max_memory_allocated(0) / 1024**3
 print(actual_peak2)
-print(torch.cuda.max_memory_allocated(0) / 1024**3)
 foo2 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0, seed=12)
 print(torch.cuda.max_memory_allocated(0) / 1024**3)
 mem2 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak2
@@ -114,9 +112,18 @@ print(f'Mem with large max new tokens : {mem2} GiB')
 torch.cuda.reset_peak_memory_stats(0)
 actual_peak3 = torch.cuda.max_memory_allocated(0) / 1024**3
 print(actual_peak3)
-print(torch.cuda.max_memory_allocated(0) / 1024**3)
 foo3 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0, seed=12)
 print(torch.cuda.max_memory_allocated(0) / 1024**3)
 mem3 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak3
 
 print(f'Mem with large max new tokens : {mem3} GiB')
+
+
+torch.cuda.reset_peak_memory_stats(0)
+actual_peak4 = torch.cuda.max_memory_allocated(0) / 1024**3
+print(actual_peak4)
+foo4 = model(prompt, batch_size=1, max_new_tokens=200, min_new_tokens=0, seed=12)
+print(torch.cuda.max_memory_allocated(0) / 1024**3)
+mem4 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak4
+
+print(f'Mem with large max new tokens : {mem4} GiB')
