@@ -495,7 +495,7 @@ class HFModel(object):
                 generated_batch = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_patterns,
                                                                   self.extra_eos_tokens, parser)
             else:
-                generated_batch = self.tokenizer.batch_decode(truncated_outputs, skip_special_tokens=True)
+                generated_batch = self.tokenizer.batch_decode(truncated_outputs, skip_special_tokens=False)
             
             # reattach the prompt if needed
             if not truncate_prompt_from_output:
