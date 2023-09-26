@@ -48,7 +48,7 @@ SMALL_MODELS = (
     # 'star-chat-alpha',
     # 'star-chat-beta',
     # 'gpt2-medium',
-    'gpt2-large',
+    # 'gpt2-large',
     # 'gpt2-xl',
     # 'gpt-j-6B',
     # 'gpt-neo-125M',
@@ -176,41 +176,31 @@ if __name__ == '__main__':
                         help='If given, also run on large models that do not fit on a single gpu.')
     parser.add_argument('--big_models_only', action='store_true',
                         help='If given, only run on large models that do not fit on a single gpu.')
+    parser.add_argument('--N', type=int, default=10,
+                        help='The number of time to repeat each computation for accurate estimation. By default 10.')
     
     args = parser.parse_args()
     int8 = args.int8
     int4 = args.int4
     big_models = args.big_models
     big_models_only = args.big_models_only
+    N = args.N
 
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
 
     num_gpus = torch.cuda.device_count()
 
-    if not big_models_only:
+    if big_models_only:
+        models = LARGE_MODELS
+    elif big_models:
+        models = SMALL_MODELS + LARGE_MODELS
+    else:
+        models = SMALL_MODELS
 
-        if num_gpus > 1:
-            int8_iter = (int8,)*len(SMALL_MODELS)
-            int4_iter = (int4,)*len(SMALL_MODELS)
-            with ProcessPoolExecutor(max_workers=num_gpus, mp_context=mp.get_context('spawn'),
-                                        initializer=utils.set_cuda_visible_device_of_subprocess) as pool:
-                _ = list(pool.map(memory_estimation, SMALL_MODELS, int8_iter, int4_iter, chunksize=1))
-        else:
-            for model in SMALL_MODELS:
-                memory_estimation(model, int8, int4)
-
-    if big_models or big_models_only:
-
-        model_footprints = []
-        for model in LARGE_MODELS:
-            # Override quantization for bloom because it's too big
-            if model == 'bloom-176B' and not (int8 or int4):
-                gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=True,
-                                                                    quantization_4bits=False)
-            else:
-                gpu_needed, _ = loader.estimate_model_gpu_footprint(model, quantization_8bits=int8,
-                                                                    quantization_4bits=int4)
-            model_footprints.append(gpu_needed)
-
-        utils.dispatch_jobs(LARGE_MODELS, model_footprints, num_gpus, memory_estimation, func_args=(int8, int4))
+    if num_gpus > 1:
+        gpu_footprints = engine.estimate_number_of_gpus(models, int8, int4)
+        utils.dispatch_jobs(gpu_footprints, num_gpus, memory_estimation, models, int8, int4, N)
+    else:
+        for model in models:
+            memory_estimation(model, int8, int4, N)
