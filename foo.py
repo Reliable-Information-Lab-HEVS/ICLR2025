@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # num_gpus = torch.cuda.device_count()
     num_gpus = 3
     gpu_footprints = [1,1,1,2,2,1,3]
-    # dt = [4]*len(gpu_footprints)
+    dt = [4]*len(gpu_footprints)
 
 
     t0 = time.time()
