@@ -92,6 +92,7 @@ torch.cuda.reset_peak_memory_stats(0)
 actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
 print(actual_peak)
 foo = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0, seed=12)
+print(foo)
 print(torch.cuda.max_memory_allocated(0) / 1024**3)
 mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
 
@@ -103,6 +104,7 @@ torch.cuda.reset_peak_memory_stats(0)
 actual_peak2 = torch.cuda.max_memory_allocated(0) / 1024**3
 print(actual_peak2)
 foo2 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=5, seed=12)
+print(foo2)
 print(torch.cuda.max_memory_allocated(0) / 1024**3)
 mem2 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak2
 
@@ -113,6 +115,7 @@ torch.cuda.reset_peak_memory_stats(0)
 actual_peak3 = torch.cuda.max_memory_allocated(0) / 1024**3
 print(actual_peak3)
 foo3 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=5, seed=12)
+print(foo3)
 print(torch.cuda.max_memory_allocated(0) / 1024**3)
 mem3 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak3
 
@@ -123,6 +126,7 @@ torch.cuda.reset_peak_memory_stats(0)
 actual_peak4 = torch.cuda.max_memory_allocated(0) / 1024**3
 print(actual_peak4)
 foo4 = model(prompt, batch_size=1, max_new_tokens=200, min_new_tokens=200, seed=12)
+print(foo4)
 print(torch.cuda.max_memory_allocated(0) / 1024**3)
 mem4 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak4
 
