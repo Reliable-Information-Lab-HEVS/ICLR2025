@@ -80,6 +80,8 @@ In conclusion, monkeys are extraordinary creatures that captivate us with their 
 
 # import bitsandbytes
 
+import gc
+
 model = engine.HFModel('star-chat-beta')
 
 prompt = ' '.join(large_text.split(' ')[0:100])
@@ -96,6 +98,7 @@ mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
 
 print(f'Mem : {mem} GiB')
 torch.cuda.empty_cache()
+gc.collect()
 
 actual_peak2 = torch.cuda.memory_allocated(0) / 1024**3
 print(actual_peak2)
