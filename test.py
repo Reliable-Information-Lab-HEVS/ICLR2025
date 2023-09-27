@@ -300,13 +300,13 @@ def sample(
 
        
 
-# model = engine.HFModel('star-chat-beta')
-model = engine.HFModel('llama2-13B')
+model = engine.HFModel('star-chat-beta')
+# model = engine.HFModel('llama2-13B')
 model.extra_eos_tokens = []
 model.model.__class__.sample = sample
 
 prompt = ' '.join(large_text.split(' ')[0:100])
-use_cache = True
+use_cache = False
 output_attentions = False
 output_hidden_states = False
 
