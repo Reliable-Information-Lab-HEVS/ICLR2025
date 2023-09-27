@@ -178,8 +178,11 @@ def sample(
             # prepare model inputs
             model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)
             if 'past_key_values' in model_inputs.keys() and model_inputs['past_key_values'] is not None:
-                print([x.shape for x in model_inputs['past_key_values']])
-                # print(model_inputs['past_key_values'])
+                s = model_inputs['past_key_values'][0].shape
+                assert all([x.shape == s for x in model_inputs['past_key_values']]), 'Missed'
+                tot = torch.stack(model_inputs['past_key_values'])
+                mem = tot.nelement()*tot.element_size() / 1024**3
+                print(f'Shape: {tot.shape}      memory: {mem:.3f} GiB')
 
             # forward pass to get next token
             outputs = self(
