@@ -198,7 +198,7 @@ def sample(
                 output_hidden_states=output_hidden_states,
             )
 
-            return
+            return input_ids
 
             if synced_gpus and this_peer_finished:
                 continue  # don't waste resources running the code we don't need
