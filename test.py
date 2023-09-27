@@ -183,7 +183,12 @@ def sample(
                 # tot = torch.stack(model_inputs['past_key_values'])
                 # mem = tot.nelement()*tot.element_size() / 1024**3
                 # print(f'Shape: {tot.shape}      memory: {mem:.3f} GiB')
-                print(model_inputs['past_key_values'])
+                
+                tot = [torch.stack(x) for x in model_inputs['past_key_values']]
+                tot = torch.stack(tot)
+                mem = tot.nelement()*tot.element_size() / 1024**3
+                print(f'Shape: {tot.shape}      memory: {mem:.3f} GiB')
+                
 
             # forward pass to get next token
             outputs = self(
