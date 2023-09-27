@@ -303,7 +303,7 @@ model.extra_eos_tokens = []
 model.model.__class__.sample = sample
 
 prompt = ' '.join(large_text.split(' ')[0:100])
-use_cache = True
+use_cache = False
 
 
 t0 = time.time()
