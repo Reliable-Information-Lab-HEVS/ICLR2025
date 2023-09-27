@@ -198,6 +198,8 @@ def sample(
                 output_hidden_states=output_hidden_states,
             )
 
+            return
+
             if synced_gpus and this_peer_finished:
                 continue  # don't waste resources running the code we don't need
 
@@ -312,9 +314,9 @@ output_hidden_states = False
 t0 = time.time()
 torch.cuda.reset_peak_memory_stats(0)
 actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
-# foo = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0, seed=12, post_process_output=False,
-#             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
-foo = model.model(model.tokenizer.encode(prompt, return_tensors='pt').cuda(), use_cache=False)
+foo = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=0, seed=12, post_process_output=False,
+            use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
+# foo = model.model(model.tokenizer.encode(prompt, return_tensors='pt').cuda(), use_cache=False)
 mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
 dt0 = time.time() - t0
 
@@ -325,9 +327,9 @@ print(f'Time first time: {dt0:.2f} s')
 t1 = time.time()
 torch.cuda.reset_peak_memory_stats(0)
 actual_peak2 = torch.cuda.max_memory_allocated(0) / 1024**3
-# foo2 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=5, seed=12, post_process_output=False,
-#              use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
-foo2 = model.model(model.tokenizer.encode(prompt, return_tensors='pt').cuda(), use_cache=False)
+foo2 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=5, seed=12, post_process_output=False,
+             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
+# foo2 = model.model(model.tokenizer.encode(prompt, return_tensors='pt').cuda(), use_cache=False)
 mem2 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak2
 dt1 = time.time() - t1
 
@@ -338,9 +340,9 @@ print(f'Time second time: {dt1:.2f} s')
 t2 = time.time()
 torch.cuda.reset_peak_memory_stats(0)
 actual_peak4 = torch.cuda.max_memory_allocated(0) / 1024**3
-# foo4 = model(prompt, batch_size=1, max_new_tokens=200, min_new_tokens=200, seed=12, post_process_output=False,
-#              use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
-foo4 = model.model(model.tokenizer.encode(prompt, return_tensors='pt').cuda(), use_cache=False)
+foo4 = model(prompt, batch_size=1, max_new_tokens=200, min_new_tokens=200, seed=12, post_process_output=False,
+             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
+# foo4 = model.model(model.tokenizer.encode(prompt, return_tensors='pt').cuda(), use_cache=False)
 mem4 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak4
 dt2 = time.time() - t2
 
@@ -363,9 +365,9 @@ Ava had always been a quiet and shy girl, but her love for anime had given her a
 t3 = time.time()
 torch.cuda.reset_peak_memory_stats(0)
 actual_peak5 = torch.cuda.max_memory_allocated(0) / 1024**3
-# foo5 = model(new_prompt, batch_size=1, max_new_tokens=2, min_new_tokens=1, seed=12, post_process_output=False,
-#              use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
-foo5 = model.model(model.tokenizer.encode(new_prompt, return_tensors='pt').cuda(), use_cache=False)
+foo5 = model(new_prompt, batch_size=1, max_new_tokens=2, min_new_tokens=1, seed=12, post_process_output=False,
+             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
+# foo5 = model.model(model.tokenizer.encode(new_prompt, return_tensors='pt').cuda(), use_cache=False)
 mem5 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak5
 dt3 = time.time() - t3
 
