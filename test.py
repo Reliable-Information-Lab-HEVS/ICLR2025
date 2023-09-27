@@ -177,7 +177,8 @@ def sample(
 
             # prepare model inputs
             model_inputs = self.prepare_inputs_for_generation(input_ids, **model_kwargs)
-            print(model_inputs['past_key_values'].shape)
+            if 'past_key_values' in model_inputs.keys():
+                print(model_inputs['past_key_values'].shape)
 
             # forward pass to get next token
             outputs = self(
