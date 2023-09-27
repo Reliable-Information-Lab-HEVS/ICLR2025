@@ -164,7 +164,9 @@ def sample(
 
         this_peer_finished = False  # used by synced_gpus only
         # auto-regressive generation
+        i = 0
         while True:
+            i += 1
             if synced_gpus:
                 # Under synced_gpus the `forward` call must continue until all gpus complete their sequence.
                 # The following logic allows an early break if all peers finished generating their sequence
@@ -261,7 +263,8 @@ def sample(
             if this_peer_finished and not synced_gpus:
                 break
 
-            return input_ids
+            if i == 3:
+                return input_ids
 
         if streamer is not None:
             streamer.end()
