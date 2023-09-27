@@ -201,7 +201,7 @@ def sample(
                 output_hidden_states=output_hidden_states,
             )
 
-            return input_ids
+            # return input_ids
 
             if synced_gpus and this_peer_finished:
                 continue  # don't waste resources running the code we don't need
@@ -265,8 +265,8 @@ def sample(
             if this_peer_finished and not synced_gpus:
                 break
 
-            # if i == 3:
-            #     return input_ids
+            if i == 3:
+                return input_ids
 
         if streamer is not None:
             streamer.end()
