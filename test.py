@@ -189,6 +189,7 @@ def sample(
                 mem = tot.nelement()*tot.element_size() / 1024**3
                 print(f'Shape: {tot.shape}      memory: {mem:.3f} GiB')
                 
+            print(model_inputs)
 
             # forward pass to get next token
             outputs = self(
