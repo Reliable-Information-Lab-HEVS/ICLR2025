@@ -263,8 +263,8 @@ def sample(
             if this_peer_finished and not synced_gpus:
                 break
 
-            if i == 3:
-                return input_ids
+            # if i == 3:
+            #     return input_ids
 
         if streamer is not None:
             streamer.end()
