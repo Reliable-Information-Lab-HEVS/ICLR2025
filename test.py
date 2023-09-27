@@ -199,7 +199,7 @@ def sample(
                 output_hidden_states=output_hidden_states,
             )
 
-            # return input_ids
+            return input_ids
 
             if synced_gpus and this_peer_finished:
                 continue  # don't waste resources running the code we don't need
@@ -306,7 +306,7 @@ model.extra_eos_tokens = []
 model.model.__class__.sample = sample
 
 prompt = ' '.join(large_text.split(' ')[0:100])
-use_cache = True
+use_cache = False
 output_attentions = False
 output_hidden_states = False
 
