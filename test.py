@@ -132,3 +132,26 @@ print(torch.cuda.max_memory_allocated(0) / 1024**3)
 mem4 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak4
 
 print(f'Mem with large max new tokens : {mem4} GiB')
+
+
+new_prompt = prompt + """
+What is the main point of this paragraph?<|end|>
+<|system|>
+<|end|>
+<|user|>
+Can you help me write a story? It should be about a teenage girl who is obsessed with anime, but has a very normal life.<|end|>
+<|assistant|>
+Sure! Here's a short story about a teenage girl named Ava who is obsessed with anime and has a pretty normal life:
+
+Ava had always been a quiet and shy girl, but her love for anime had given her a sense of belonging. She spent hours watching her favorite shows and movies, imagining that she was one of the characters in the story."""
+
+
+torch.cuda.reset_peak_memory_stats(0)
+actual_peak5 = torch.cuda.max_memory_allocated(0) / 1024**3
+print(actual_peak5)
+foo5 = model(new_prompt, batch_size=1, max_new_tokens=2, min_new_tokens=1, seed=12, post_process_output=False)
+print(foo5)
+print(torch.cuda.max_memory_allocated(0) / 1024**3)
+mem5 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak5
+
+print(f'Mem with new prompt : {mem5} GiB')
