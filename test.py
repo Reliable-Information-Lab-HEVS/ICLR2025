@@ -348,7 +348,7 @@ with torch.no_grad():
     t2 = time.time()
     torch.cuda.reset_peak_memory_stats(0)
     actual_peak4 = torch.cuda.max_memory_allocated(0) / 1024**3
-    foo4 = model(prompt, batch_size=1, max_new_tokens=200, min_new_tokens=200, seed=12, post_process_output=False,
+    foo4 = model(prompt, batch_size=1, max_new_tokens=500, min_new_tokens=500, seed=12, post_process_output=False,
                 use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
     # foo4 = model.model(model.tokenizer.encode(prompt, return_tensors='pt').cuda(), use_cache=False)
     mem4 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak4
