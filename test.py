@@ -329,10 +329,10 @@ with torch.no_grad():
     concat_new_ids = torch.cat([new_prompt_ids, bar], dim=-1).cuda()
 
 
-output1 = model.model(prompt_ids, use_cache=True)
-output2 = model.model(new_prompt_ids, use_cache=True)
-past_keys1 = output1.past_key_values
-past_keys2 = output2.past_key_values
+# output1 = model.model(prompt_ids, use_cache=True)
+# output2 = model.model(new_prompt_ids, use_cache=True)
+# past_keys1 = output1.past_key_values
+# past_keys2 = output2.past_key_values
 
 
 with torch.no_grad():
