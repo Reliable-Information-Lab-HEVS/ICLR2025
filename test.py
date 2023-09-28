@@ -364,7 +364,7 @@ model.model.__class__.sample = sample
 ids = model.tokenizer.encode(large_text)
 print(len(ids))
 prompt = model.tokenizer.decode(ids[0:600], skip_special_tokens=True)
-new_prompt = model.tokenizer.decode(ids[0:623], skip_special_tokens=True)
+new_prompt = model.tokenizer.decode(ids[0:1098], skip_special_tokens=True)
 
 
 
@@ -403,7 +403,7 @@ with torch.no_grad():
     t0 = time.time()
     torch.cuda.reset_peak_memory_stats(0)
     actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
-    foo = model(prompt, batch_size=1, max_new_tokens=25, min_new_tokens=25, seed=12, post_process_output=False,
+    foo = model(prompt, batch_size=1, max_new_tokens=500, min_new_tokens=500, seed=12, post_process_output=False,
                 use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
     # foo = model.model(ids, use_cache=use_cache)
     # inputs = model.model.prepare_inputs_for_generation(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
@@ -419,7 +419,7 @@ with torch.no_grad():
     t1 = time.time()
     torch.cuda.reset_peak_memory_stats(0)
     actual_peak2 = torch.cuda.max_memory_allocated(0) / 1024**3
-    foo2 = model(prompt, batch_size=1, max_new_tokens=25, min_new_tokens=25, seed=12, post_process_output=False,
+    foo2 = model(prompt, batch_size=1, max_new_tokens=500, min_new_tokens=500, seed=12, post_process_output=False,
                 use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
     # foo2 = model.model(ids, use_cache=use_cache)
     # inputs = model.model.prepare_inputs_for_generation(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
