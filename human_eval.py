@@ -4,14 +4,11 @@ import argparse
 import time
 import copy
 import re
-import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor
 
 import torch
 
 import engine
 from engine import stopping
-from engine import loader
 from engine.prompt_template import PROMPT_MODES
 from engine.code_parser import CodeParser, PythonParser
 from helpers import datasets
@@ -43,91 +40,6 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
     'truncate_prompt_from_output': True,
 }
 
-SMALL_MODELS = (
-    # 'bloom-560M',
-    # 'bloom-1.7B',
-    # 'bloom-3B',
-    # 'bloom-7.1B',
-    # 'stable-lm-3B',
-    # 'stable-lm-7B',
-    'star-coder-base',
-    'star-coder',
-    # 'star-coder-plus',
-    'star-chat-alpha',
-    # 'star-chat-beta',
-    # 'gpt2-medium',
-    # 'gpt2-large',
-    # 'gpt2-xl',
-    # 'gpt-j-6B',
-    # 'gpt-neo-125M',
-    # 'gpt-neo-1.3B',
-    # 'gpt-neo-2.7B',
-    # 'opt-125M',
-    # 'opt-350M',
-    # 'opt-1.3B',
-    # 'opt-2.7B',
-    # 'opt-6.7B',
-    # 'opt-13B',
-    # 'codegen-350M',
-    # 'codegen-2B',
-    # 'codegen-6B',
-    'codegen-16B',
-    # 'codegen2-1B',
-    # 'codegen2-3.7B',
-    # 'codegen2-7B',
-    # 'codegen2-16B',
-    'codegen25-7B',
-    'codegen25-7B-instruct',
-    # 'vicuna-7B',
-    # 'vicuna-13B',
-    # 'llama2-7B',
-    # 'llama2-7B-chat',
-    # 'llama2-13B',
-    # 'llama2-13B-chat',
-    # 'code-llama-7B',
-    # 'code-llama-13B',
-    # 'code-llama-7B-python',
-    # 'code-llama-13B-python',
-    # 'code-llama-7B-instruct',
-    # 'code-llama-13B-instruct',
-)
-
-SMALL_MODELS_SPECIAL_PROMPT = (
-    'star-coder-base',
-    'star-coder',
-    # 'star-coder-plus',
-    'star-chat-alpha',
-    # 'star-chat-beta',
-    # 'codegen2-1B',
-    # 'codegen2-3.7B',
-    # 'codegen2-7B',
-    # 'codegen2-16B',
-    'codegen25-7B',
-    'codegen25-7B-instruct',
-    # 'vicuna-7B',
-    # 'vicuna-13B',
-    # 'llama2-7B-chat',
-    # 'llama2-13B-chat',
-    # 'code-llama-7B-instruct',
-    # 'code-llama-13B-instruct',
-)
-
-LARGE_MODELS = (
-    # 'gpt-neoX-20B',
-    # 'opt-30B',
-    'code-llama-34B',
-    'code-llama-34B-python',
-    'code-llama-34B-instruct',
-    # 'opt-66B',
-    'llama2-70B',
-    'llama2-70B-chat',
-    # 'bloom-176B',
-)
-
-LARGE_MODELS_SPECIAL_PROMPT = (
-    'code-llama-34B-instruct',
-    'llama2-70B-chat',
-)
 
 
 
@@ -376,9 +288,9 @@ if __name__ == '__main__':
     
     num_gpus = torch.cuda.device_count()
 
-    # Select models
-    small_models = SMALL_MODELS_SPECIAL_PROMPT if special_only else SMALL_MODELS
-    large_models = LARGE_MODELS_SPECIAL_PROMPT if special_only else LARGE_MODELS
+    # Select models (only keep the good coders)
+    small_models = engine.SMALL_MODELS_GOOD_CODER_SPECIAL_PROMPT if special_only else engine.SMALL_MODELS_GOOD_CODER
+    large_models = engine.LARGE_MODELS_GOOD_CODER_SPECIAL_PROMPT if special_only else engine.LARGE_MODELS_GOOD_CODER
     if big_models_only:
         models = large_models
     elif big_models:

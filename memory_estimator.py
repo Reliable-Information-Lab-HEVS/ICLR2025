@@ -17,7 +17,7 @@ logger.addFilter(warnings_suppressor.LoggingFilter("Token indices sequence lengt
 
 
 # Random long text about monkeys (thanks ChatGPT!!)
-large_text = """Title: Monkeys: Nature's Pranksters, Social Geniuses, and Ecological Wonders
+LARGE_TEXT = """Title: Monkeys: Nature's Pranksters, Social Geniuses, and Ecological Wonders
 
 Introduction
 
@@ -165,72 +165,6 @@ Monkeys are not merely subjects of fascination; they are ambassadors of the wild
 """
 
 
-SMALL_MODELS = (
-    'bloom-560M',
-    'bloom-1.7B',
-    'bloom-3B',
-    'bloom-7.1B',
-    'dialo-gpt-small',
-    'dialo-gpt-medium',
-    'dialo-gpt-large',
-    'stable-lm-3B',
-    'stable-lm-7B',
-    'star-coder-base',
-    'star-coder',
-    'star-coder-plus',
-    'star-chat-alpha',
-    'star-chat-beta',
-    'gpt2-medium',
-    'gpt2-large',
-    'gpt2-xl',
-    'gpt-j-6B',
-    'gpt-neo-125M',
-    'gpt-neo-1.3B',
-    'gpt-neo-2.7B',
-    'opt-125M',
-    'opt-350M',
-    'opt-1.3B',
-    'opt-2.7B',
-    'opt-6.7B',
-    'opt-13B',
-    'codegen-350M',
-    'codegen-2B',
-    'codegen-6B',
-    'codegen-16B',
-    'codegen2-1B',
-    'codegen2-3.7B',
-    'codegen2-7B',
-    'codegen2-16B',
-    'codegen25-7B',
-    'codegen25-7B-instruct',
-    'vicuna-7B',
-    'vicuna-13B',
-    'llama2-7B',
-    'llama2-7B-chat',
-    'llama2-13B',
-    'llama2-13B-chat',
-    'code-llama-7B',
-    'code-llama-13B',
-    'code-llama-7B-python',
-    'code-llama-13B-python',
-    'code-llama-7B-instruct',
-    'code-llama-13B-instruct',
-)
-
-
-LARGE_MODELS = (
-    'gpt-neoX-20B',
-    'opt-30B',
-    'code-llama-34B',
-    'code-llama-34B-python',
-    'code-llama-34B-instruct',
-    'opt-66B',
-    'llama2-70B',
-    'llama2-70B-chat',
-    'bloom-176B',
-)
-
-
 # For models with max context size of 1024 (e.g. GPT2)
 SMALL_CONTEXT_SIZES = [25*i for i in range(1, 41)]
 # For other models (we only estimate memory usage up to context size of 2048 as we are almost never gonna use more)
@@ -282,7 +216,7 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
     model.extra_eos_tokens = []
         
     gpus = model.get_gpu_devices()
-    large_tokens = model.tokenizer.encode(large_text)
+    large_tokens = model.tokenizer.encode(LARGE_TEXT)
 
     # Initialize dict (this key will be overwritten, but we want it in first for visibility in output file)
     model_memory_consumption = {'only_scale_with_input_size': False}
@@ -403,11 +337,11 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
     if big_models_only:
-        models = LARGE_MODELS
+        models = engine.LARGE_MODELS
     elif big_models:
-        models = SMALL_MODELS + LARGE_MODELS
+        models = engine.SMALL_MODELS + engine.LARGE_MODELS
     else:
-        models = SMALL_MODELS
+        models = engine.SMALL_MODELS
 
     if num_gpus > 1:
         gpu_footprints = engine.estimate_number_of_gpus(models, int8, int4)
