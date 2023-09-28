@@ -107,7 +107,7 @@ with torch.no_grad():
     prompt_ids = tokenizer.encode(prompt, return_tensors='pt').cuda()
     
     actual_peaks = {}
-    for gpu_rank in torch.cuda.device_count():
+    for gpu_rank in range(torch.cuda.device_count()):
         torch.cuda.reset_peak_memory_stats(gpu_rank)
         actual_peaks[gpu_rank] = torch.cuda.max_memory_allocated(gpu_rank) / 1024**3
 
@@ -115,7 +115,7 @@ with torch.no_grad():
     output = model(prompt_ids, use_cache=True)
 
     memory_used = {}
-    for gpu_rank in torch.cuda.device_count():
+    for gpu_rank in range(torch.cuda.device_count()):
         memory_used[gpu_rank] = (torch.cuda.max_memory_allocated(gpu_rank) / 1024**3) - actual_peaks[gpu_rank]
     
 # Actual largest memory usage peak accross gpus
