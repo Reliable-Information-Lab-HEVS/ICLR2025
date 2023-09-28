@@ -356,8 +356,8 @@ def mem_usage(past_key_values):
 
        
 
-# model = engine.HFModel('star-chat-beta')
-model = engine.HFModel('llama2-13B')
+model = engine.HFModel('star-chat-beta')
+# model = engine.HFModel('llama2-13B')
 model.extra_eos_tokens = []
 model.model.__class__.sample = sample
 
