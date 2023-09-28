@@ -232,7 +232,7 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
 
     scale_mode = []
 
-    for input_size in enumerate(input_sizes):
+    for input_size in input_sizes:
 
         prompt = model.tokenizer.decode(large_tokens[:input_size], skip_special_tokens=True)
 
