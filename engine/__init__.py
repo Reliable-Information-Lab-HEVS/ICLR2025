@@ -4,6 +4,8 @@ from engine import prompt_template
 # import it here so that the warnings are suppressed when doing `import engine`
 from engine import warnings_suppressor
 
+import torch
+
 
 def estimate_number_of_gpus(models: list[str], quantization_8bits: bool = False, quantization_4bits: bool = False,
                             max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8) -> list[int]:
@@ -46,33 +48,17 @@ def estimate_number_of_gpus(models: list[str], quantization_8bits: bool = False,
 
 
 
-
+# All supported models
 ALL_MODELS = loader.ALLOWED_MODELS
 
-# Models working on single GPU
-SMALL_MODELS = tuple(model for model, gpus in zip(ALL_MODELS, estimate_number_of_gpus(ALL_MODELS)) if gpus == 1)
-
-# Models needing more than 1 GPU
-LARGE_MODELS = tuple(model for model, gpus in zip(ALL_MODELS, estimate_number_of_gpus(ALL_MODELS)) if gpus > 1)
-
-
-# Model with non-default prompt template
-SMALL_MODELS_SPECIAL_PROMPT = tuple(model for model in SMALL_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
-LARGE_MODELS_SPECIAL_PROMPT = tuple(model for model in LARGE_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
-
-
-# Small models that we decided to keep for further code benchmarks
-SMALL_MODELS_GOOD_CODER = (
+# Models that we decided to keep for further code benchmarks
+GOOD_CODERS = (
     'star-coder-base',
     'star-coder',
     'star-chat-alpha',
     'codegen-16B',
     'codegen25-7B',
     'codegen25-7B-instruct',
-)
-
-# Large models that we decided to keep for further code benchmarks
-LARGE_MODELS_GOOD_CODER = (
     'code-llama-34B',
     'code-llama-34B-python',
     'code-llama-34B-instruct',
@@ -81,6 +67,32 @@ LARGE_MODELS_GOOD_CODER = (
 )
 
 
+if torch.cuda.is_available():
+    # Models working on a single GPU
+    SMALL_MODELS = tuple(model for model, gpus in zip(ALL_MODELS, estimate_number_of_gpus(ALL_MODELS)) if gpus == 1)
+    SMALL_GOOD_CODERS = tuple(model for model, gpus in zip(GOOD_CODERS, estimate_number_of_gpus(GOOD_CODERS)) if gpus == 1)
+    # Models needing more than 1 GPU
+    LARGE_MODELS = tuple(model for model, gpus in zip(ALL_MODELS, estimate_number_of_gpus(ALL_MODELS)) if gpus > 1)
+    LARGE_GOOD_CODERS = tuple(model for model, gpus in zip(GOOD_CODERS, estimate_number_of_gpus(GOOD_CODERS)) if gpus > 1)
+
+else:
+    # Models working on single GPU
+    SMALL_MODELS = tuple(model for model, params in loader.ALL_MODELS_PARAMS.items() if params < 20)
+    SMALL_GOOD_CODERS = tuple(model for model, params in loader.ALL_MODELS_PARAMS.items() if params < 20 and model in GOOD_CODERS)
+    # Models needing more than 1 GPU
+    LARGE_MODELS = tuple(model for model, params in loader.ALL_MODELS_PARAMS.items() if params >= 20)
+    LARGE_GOOD_CODERS = tuple(model for model, params in loader.ALL_MODELS_PARAMS.items() if params >= 20 and model in GOOD_CODERS)
+
+
+assert set(ALL_MODELS) == set(SMALL_MODELS + LARGE_MODELS), 'We are somehow missing some models...'
+assert set(GOOD_CODERS) == set(SMALL_GOOD_CODERS + LARGE_GOOD_CODERS), 'We are somehow missing some good coder models...'
+
+
+# Model with non-default prompt template
+SMALL_MODELS_SPECIAL_PROMPT = tuple(model for model in SMALL_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
+LARGE_MODELS_SPECIAL_PROMPT = tuple(model for model in LARGE_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
+
+
 # Model that we decided to keep for further code benchmarks with non-default prompt template
-SMALL_MODELS_GOOD_CODER_SPECIAL_PROMPT = tuple(model for model in SMALL_MODELS_GOOD_CODER if model in prompt_template.PROMPT_MAPPING.keys())
-LARGE_MODELS_GOOD_CODER_SPECIAL_PROMPT = tuple(model for model in LARGE_MODELS_GOOD_CODER if model in prompt_template.PROMPT_MAPPING.keys())
+SMALL_GOOD_CODERS_SPECIAL_PROMPT = tuple(model for model in SMALL_GOOD_CODERS if model in prompt_template.PROMPT_MAPPING.keys())
+LARGE_GOOD_CODERS_SPECIAL_PROMPT = tuple(model for model in LARGE_GOOD_CODERS if model in prompt_template.PROMPT_MAPPING.keys())

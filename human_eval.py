@@ -289,8 +289,8 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
     # Select models (only keep the good coders)
-    small_models = engine.SMALL_MODELS_GOOD_CODER_SPECIAL_PROMPT if special_only else engine.SMALL_MODELS_GOOD_CODER
-    large_models = engine.LARGE_MODELS_GOOD_CODER_SPECIAL_PROMPT if special_only else engine.LARGE_MODELS_GOOD_CODER
+    small_models = engine.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.SMALL_GOOD_CODERS
+    large_models = engine.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.LARGE_GOOD_CODERS
     if big_models_only:
         models = large_models
     elif big_models:
