@@ -280,7 +280,7 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
     large_tokens = model.tokenizer.encode(large_text)
 
     # Initialize dict
-    model_memory_consumption = {'only_scale_with_input_size': False}
+    model_memory_consumption = {}
 
     # Initialize filenames and return if files already exist
     dtype_name = model.dtype_category()
@@ -339,11 +339,12 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
             
         # Actual largest memory usage peak accross gpus
         max_peak = max(memory_used.values())
-        
+        # Compute size of past K-V
         past_key_values_memory = memory_usage(output.past_key_values) / 1024**3
 
         # Our heuristic to estimate if the past_key_values memory size is actually negligible compared to
-        # the memory needed for their first computation
+        # the memory needed for their first computation (an order of magnitude larger means that the first
+        # computation of past K-V is actually the memory bottleneck, independently of max_new_tokens)
         if max_peak / past_key_values_memory > 10:
             only_scale_with_input_size = True
         else:
