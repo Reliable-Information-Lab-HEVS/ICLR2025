@@ -229,9 +229,9 @@ LARGE_MODELS = (
 
 
 # For models with max context size of 1024 (e.g. GPT2)
-SMALL_CONTEXT_SIZES = [25*i for i in range(1, 41)] + [1024]
+SMALL_CONTEXT_SIZES = [25*i for i in range(1, 41)]
 # For other models (we only estimate memory usage up to context size of 2048 as we are almost never gonna use more)
-CONTEXT_SIZES = [25*i for i in range(1, 82)] + [2048]
+CONTEXT_SIZES = [25*i for i in range(1, 82)]
 
 
 def memory_usage(past_key_values):
@@ -267,6 +267,8 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
         _description_, by default 10
     """
 
+    t0 = time.time()
+
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
         model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
@@ -279,8 +281,8 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
     gpus = model.get_gpu_devices()
     large_tokens = model.tokenizer.encode(large_text)
 
-    # Initialize dict
-    model_memory_consumption = {}
+    # Initialize dict (this key will be overwritten, but we want it in first for visibility in output file)
+    model_memory_consumption = {'only_scale_with_input_size': False}
 
     # Initialize filenames and return if files already exist
     dtype_name = model.dtype_category()
@@ -359,7 +361,9 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
     # Save results
     utils.save_json(model_memory_consumption, filename_memory)
 
-    print(f'Done with {model_name}!')
+    dt = time.time() - t0
+
+    print(f'Done with {model_name} in {dt/3600:.2f} h!')
 
     del model
     gc.collect()
