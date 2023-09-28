@@ -162,8 +162,8 @@ def memory_usage(past_key_values):
 model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/starchat-alpha', device_map='auto', torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained('HuggingFaceH4/starchat-alpha')
 
-ids = model.tokenizer.encode(large_text)
-prompt = model.tokenizer.decode(ids[0:600], skip_special_tokens=True)
+ids = tokenizer.encode(large_text)
+prompt = tokenizer.decode(ids[0:600], skip_special_tokens=True)
 
 
 with torch.no_grad():
