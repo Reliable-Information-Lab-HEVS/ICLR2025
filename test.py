@@ -379,13 +379,13 @@ with torch.no_grad():
     actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
     prompt_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda()
     mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
-    print('Memory to compute small past key values: {mem}')
+    print(f'Memory to compute small past key values: {mem}')
 
     torch.cuda.reset_peak_memory_stats(0)
     actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
     new_prompt_ids = model.tokenizer.encode(new_prompt, return_tensors='pt').cuda()
     mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
-    print('Memory to compute large past key values: {mem}')
+    print(f'Memory to compute large past key values: {mem}')
 
     bar = torch.tensor([[6483]]).cuda()
     concat_ids = torch.cat([prompt_ids, bar], dim=-1).cuda()
