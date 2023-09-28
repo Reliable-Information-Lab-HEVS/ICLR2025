@@ -322,7 +322,7 @@ past_keys = foo.past_key_values
 with torch.no_grad():
     ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda()
     bar = torch.tensor([[6483]]).cuda()
-    new_ids = torch.cat([ids, bar]).cuda()
+    new_ids = torch.cat([ids, bar], dim=-1).cuda()
 
 
 with torch.no_grad():
