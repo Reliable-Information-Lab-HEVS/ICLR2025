@@ -163,7 +163,7 @@ model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/starchat-alpha', dev
 tokenizer = AutoTokenizer.from_pretrained('HuggingFaceH4/starchat-alpha')
 
 ids = tokenizer.encode(large_text)
-prompt = tokenizer.decode(ids[0:600], skip_special_tokens=True)
+prompt = tokenizer.decode(ids[0:1500], skip_special_tokens=True)
 
 
 with torch.no_grad():
