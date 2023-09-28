@@ -375,25 +375,24 @@ output_hidden_states = False
 
 
 with torch.no_grad():
+    prompt_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda()
+    new_prompt_ids = model.tokenizer.encode(new_prompt, return_tensors='pt').cuda()
+    bar = torch.tensor([[6483]]).cuda()
+    concat_ids = torch.cat([prompt_ids, bar], dim=-1).cuda()
+    concat_new_ids = torch.cat([new_prompt_ids, bar], dim=-1).cuda()
+
     torch.cuda.reset_peak_memory_stats(0)
     actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
-    prompt_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda()
+    output1 = model.model(prompt_ids, use_cache=True)
     mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
     print(f'Memory to compute small past key values: {mem}')
 
     torch.cuda.reset_peak_memory_stats(0)
     actual_peak = torch.cuda.max_memory_allocated(0) / 1024**3
-    new_prompt_ids = model.tokenizer.encode(new_prompt, return_tensors='pt').cuda()
+    output2 = model.model(new_prompt_ids, use_cache=True)
     mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
     print(f'Memory to compute large past key values: {mem}')
 
-    bar = torch.tensor([[6483]]).cuda()
-    concat_ids = torch.cat([prompt_ids, bar], dim=-1).cuda()
-    concat_new_ids = torch.cat([new_prompt_ids, bar], dim=-1).cuda()
-
-
-    output1 = model.model(prompt_ids, use_cache=True)
-    output2 = model.model(new_prompt_ids, use_cache=True)
     past_keys1 = output1.past_key_values
     past_keys2 = output2.past_key_values
     print(f'Small past key values: {mem_usage(past_keys1) / 1024**3} GiB')
