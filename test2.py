@@ -98,7 +98,7 @@ def memory_usage(past_key_values):
         return sum([memory_usage(x) for x in past_key_values])
 
 
-model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/starchat-alpha', device_map='auto', dtype=torch.float16)
+model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/starchat-alpha', device_map='auto', torch_dtype=torch.float16)
 tokenizer = AutoTokenizer.from_pretrained('HuggingFaceH4/starchat-alpha')
 
 prompt = 'Hello my dear child'
