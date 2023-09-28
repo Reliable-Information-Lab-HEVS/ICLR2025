@@ -2,15 +2,18 @@ import os
 import gc
 import argparse
 import time
-import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor
+import logging
 
 import torch
 import numpy as np
 
 import engine
-from engine import loader
+from engine import warnings_suppressor
 from helpers import utils
+
+# Remove warning when tokenizing sequences longer than expected: we know we are doing it!
+logger = logging.getLogger('transformers.tokenization_utils_base')
+logger.addFilter(warnings_suppressor.LoggingFilter("Token indices sequence length is longer than the specified maximum sequence length for this model"))
 
 
 # Random long text about monkeys (thanks ChatGPT!!)
