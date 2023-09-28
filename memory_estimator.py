@@ -388,6 +388,10 @@ if __name__ == '__main__':
 
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
+    
+    # Do not even attempt to run the script without access to gpus
+    if not torch.cuda.is_available():
+        raise RuntimeError("I'm begging you, run this benchmark with some GPUs...")
 
     num_gpus = torch.cuda.device_count()
 
