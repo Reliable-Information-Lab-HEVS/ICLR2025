@@ -22,21 +22,65 @@ from tqdm import tqdm
 import engine
 from helpers import utils, datasets
 
-large_text = """Monkeys are captivating creatures that have long intrigued humans with their playful antics, social structures, and remarkable adaptations.
+large_text = """Monkeys: Nature's Pranksters, Social Geniuses, and Ecological Wonders
 
-One of the defining features of monkeys is their incredible diversity. There are over 260 known species of monkeys, each with its own distinct traits and adaptations. They come in a wide range of sizes, from the tiny pygmy marmoset, which can fit in the palm of your hand, to the large and powerful mandrill, known for its strikingly colorful face. This diversity allows monkeys to occupy various ecological niches and adapt to different habitats and diets.
+Introduction
 
-Monkeys are highly social animals, living in complex social structures. They form troops or bands that can range in size from a few individuals to several hundred members, depending on the species. Within these groups, monkeys establish hierarchies through social interactions, with dominant individuals enjoying certain privileges and responsibilities. Social bonds are crucial for their survival, as they provide protection from predators and facilitate cooperative behaviors, such as foraging and caring for young ones.
+Monkeys, the enchanting inhabitants of our planet's diverse ecosystems, have long been subjects of fascination and study for scientists, wildlife enthusiasts, and the curious at heart. Their intriguing behaviors, remarkable adaptations, and complex social structures invite us into a world that is both astonishing and deeply entwined with our understanding of life on Earth. In this essay, we will embark on a journey through the realms of monkeys, exploring their evolutionary history, the rich tapestry of their classifications, the ecological significance they hold, the intricate dynamics of their societies, their modes of communication, and the critical importance of their conservation.
 
-Another remarkable aspect of monkeys is their exceptional cognitive abilities. They exhibit problem-solving skills, tool usage, and the ability to learn from each other. For instance, certain species of monkeys have been observed using rocks to crack open nuts or sticks to fish for termites. They demonstrate an understanding of cause-and-effect relationships and exhibit a sense of self-awareness. Researchers have conducted numerous studies to explore the cognitive abilities of monkeys, revealing their impressive intellectual capacities.
+Evolutionary History
 
-Monkeys are primarily herbivorous but have a diverse diet that includes fruits, leaves, seeds, and insects. Some species, like the howler monkey, are specialized folivores, consuming mainly leaves to meet their nutritional needs. Others, such as the capuchin monkey, are known for their omnivorous diet, which includes fruits, nuts, insects, and even small vertebrates. Their varied diet contributes to the dispersal of seeds, making monkeys important agents in forest regeneration and maintaining biodiversity.
+The tale of monkeys begins in the annals of evolutionary history, stretching back millions of years to a time when Earth was teeming with diverse life forms. Monkeys belong to the grand order of Primates, a lineage that emerged around 60 million years ago. This group shared common traits that set them apart from other mammals: agile grasping hands and feet, forward-facing eyes for depth perception, and increasingly enlarged brains, which laid the foundation for their remarkable cognitive abilities.
 
-Monkeys play a crucial role in their ecosystems. As both predators and prey, they contribute to the balance of their habitats. They aid in seed dispersal, pollination, and nutrient cycling, thereby influencing the structure and dynamics of plant communities. Additionally, monkeys are indicators of ecosystem health, as their presence or absence can reflect the overall well-being of an ecosystem.
+Around 35 million years ago, a pivotal moment occurred in the primate story - the division of the evolutionary tree. This division led to the emergence of two significant lineages: New World monkeys (Platyrrhini) and Old World monkeys (Catarrhini). The geographical separation between these groups set the stage for a diversity of adaptations and characteristics unique to each.
 
-Despite their significance, monkeys face numerous challenges and threats. Habitat loss due to deforestation, fragmentation, and human encroachment is one of the primary concerns. Additionally, illegal wildlife trade and hunting pose significant risks to monkey populations. Conservation efforts, including protected areas and education campaigns, are vital to ensure the survival of these remarkable creatures.
+Classification and Diversity
 
-In conclusion, monkeys are extraordinary creatures that captivate us with their diversity, social structures, cognitive abilities, and ecological importance. Their lives are intricately woven into the tapestry of their respective habitats, and understanding and protecting them is crucial for maintaining the balance of our planet's ecosystems. By appreciating and conserving these fascinating animals, we can continue to learn from them and be inspired by their remarkable qualities.
+Monkeys are a diverse family, representing over 260 species and encompassing a remarkable range of shapes, sizes, and behaviors. These fascinating creatures are categorized into two major families: Cebidae, encompassing New World monkeys, and Cercopithecidae, home to the Old World monkeys. The distinction between these two families extends beyond mere taxonomy; it shapes their ecology, behavior, and evolutionary pathways.
+
+New World Monkeys (Family: Cebidae)
+
+Within the New World monkeys, we encounter an astonishing array of life. These monkeys have mastered the art of adaptation to their specific environments in the Americas. Some swing effortlessly through the treetops, while others are known for their resonant vocalizations that echo through the forests. The capuchin monkeys exhibit remarkable intelligence, utilizing tools to extract food from hard-to-reach places. In contrast, tamarins and marmosets have evolved unique cooperative breeding systems that govern their social structures.
+
+Old World Monkeys (Family: Cercopithecidae)
+
+The Old World monkeys, found in Africa, Asia, and parts of Gibraltar, have charted their own evolutionary course. Here, we encounter the imposing baboons, known for their dog-like faces and robust physiques. Macaques, on the other hand, are exemplars of adaptability, thriving in diverse habitats, from snow-clad mountains to lush tropical forests. Mandrills, with their striking facial colors and imposing canines, claim the title of the world's largest monkeys, inhabiting the lush rainforests of Central Africa.
+
+Ecological Significance
+
+Beyond their aesthetic appeal and charismatic behaviors, monkeys play a pivotal role in the delicate balance of the ecosystems they call home. They are often referred to as "keystone species" because their presence or absence can trigger cascading effects throughout their habitats.
+
+One of the most significant contributions of monkeys to their ecosystems is seed dispersal. As avid fruit consumers, they play a vital role in the regeneration of plant populations by spreading seeds as they move through forests. This not only helps maintain forest diversity but also contributes to the health and stability of these ecosystems.
+
+Moreover, monkeys' selective feeding habits, such as leaf consumption by howler monkeys and colobus monkeys, shape the structure of forests by influencing the composition and density of vegetation. Their predation on insects, small mammals, and bird eggs helps regulate prey populations, ensuring the intricate balance of food webs within their habitats.
+
+Monkeys, as indicator species, offer valuable insights into the health of their ecosystems. Their population trends can serve as early warnings of environmental disturbances, including habitat loss, deforestation, and climate change. As such, preserving monkey populations is not merely an act of conservation but also a means of safeguarding the well-being of entire ecosystems.
+
+Social Structures and Behavior
+
+Monkeys are renowned for their complex social structures and behaviors, which vary widely among species and are shaped by a multitude of ecological and environmental factors. These social dynamics are essential for their survival and reproduction, shedding light on the intricacies of primate evolution and behavior.
+
+In the world of monkeys, social life revolves around the concept of the "troop." These groups, varying greatly in size and composition, are the core units of monkey society. Within these troops, a dominance hierarchy often emerges, dictating access to valuable resources such as food and mates. Dominant individuals assert their authority through various displays of dominance, including vocalizations and physical posturing.
+
+The intricacies of monkey societies extend to mating strategies, parenting, and cooperation. Some species, like capuchin monkeys, display impressive problem-solving abilities and tool use, revealing the depths of their intelligence. Others, such as tamarins and marmosets, engage in cooperative breeding systems, with non-breeding individuals helping to care for the offspring of dominant breeding pairs.
+
+Communication and Language
+
+Monkeys communicate through a diverse array of vocalizations, gestures, and behaviors, revealing a rich tapestry of interaction within their social groups. Vocalizations range from the booming howls of howler monkeys to the more subtle chirps and calls of capuchins. Each species has developed its unique repertoire of sounds to convey information about food, danger, and social dynamics.
+
+Beyond vocalizations, monkeys employ body language and facial expressions to convey emotions, assert dominance, or establish social bonds. The intricate dance of gestures and postures within monkey societies is a testament to their highly evolved communication systems.
+
+Conservation Challenges
+
+Despite their resilience and adaptability, monkeys face a host of challenges in the modern world. Habitat loss due to deforestation, logging, and urban expansion is a severe threat to their survival. The fragmentation of their habitats isolates populations, limiting genetic diversity and making them more vulnerable to diseases and other environmental pressures.
+
+Illegal wildlife trade also poses a grave danger to monkeys. Poaching for the pet trade and traditional medicine markets, as well as the loss of individuals to captivity, disrupts natural populations and can have devastating consequences.
+
+Moreover, monkeys often come into conflict with humans due to habitat encroachment. This can lead to retaliation killings, further endangering their populations. Climate change, with its unpredictable effects on ecosystems, adds another layer of uncertainty to their future.
+
+Conclusion
+
+Monkeys, these captivating creatures of the wild, offer us a glimpse into the wonders of the natural world. Their evolutionary journey, intricate social structures, communication methods, and ecological significance remind us of the interconnectedness of all life on Earth. As we strive to conserve these remarkable beings and their habitats, we not only safeguard the diversity of our planet but also enrich our understanding of the delicate tapestry of life that surrounds us. Monkeys are not merely subjects of fascination; they are ambassadors of the wild, beckoning us to protect and preserve the ecosystems they call home. In doing so, we honor our shared heritage and ensure a brighter future for all living creatures.
 """
 
 from dataclasses import dataclass
@@ -310,8 +354,10 @@ model = engine.HFModel('star-chat-beta')
 model.extra_eos_tokens = []
 model.model.__class__.sample = sample
 
-prompt = ' '.join(large_text.split(' ')[0:600])
-new_prompt = ' '.join(large_text.split(' ')[0:800])
+ids = model.tokenizer.encode(large_text)
+print(len(ids))
+prompt = model.tokenizer.decode(ids[0:600], skip_special_tokens=True)
+new_prompt = model.tokenizer.decode(ids[0:800], skip_special_tokens=True)
 
 
 
@@ -329,10 +375,10 @@ with torch.no_grad():
     concat_new_ids = torch.cat([new_prompt_ids, bar], dim=-1).cuda()
 
 
-# output1 = model.model(prompt_ids, use_cache=True)
-# output2 = model.model(new_prompt_ids, use_cache=True)
-# past_keys1 = output1.past_key_values
-# past_keys2 = output2.past_key_values
+    output1 = model.model(prompt_ids, use_cache=True)
+    output2 = model.model(new_prompt_ids, use_cache=True)
+    past_keys1 = output1.past_key_values
+    past_keys2 = output2.past_key_values
 
 
 with torch.no_grad():
