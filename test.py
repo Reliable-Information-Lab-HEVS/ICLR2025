@@ -340,7 +340,14 @@ def sample(
        
 
 
+def mem_usage(past_key_values):
 
+    if isinstance(past_key_values, torch.tensor):
+        return past_key_values.nelement() * past_key_values.element_size()
+    elif isinstance(past_key_values[0], torch.tensor):
+        return sum([x.nelement() * x.element_size() for x in past_key_values])
+    else:
+        return sum([mem_usage(x) for x in past_key_values])
 
 
 
@@ -379,6 +386,8 @@ with torch.no_grad():
     output2 = model.model(new_prompt_ids, use_cache=True)
     past_keys1 = output1.past_key_values
     past_keys2 = output2.past_key_values
+    print(f'Small past key values: {mem_usage(past_keys1) / 1024**3} GiB')
+    print(f'Large past key values: {mem_usage(past_keys2) / 1024**3} GiB')
 
 
 with torch.no_grad():
