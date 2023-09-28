@@ -195,13 +195,14 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
     Parameters
     ----------
     model_name : str
-        _description_
+        The name of the model.
     quantization_8bits : bool
-        _description_
+        Whether the model will be loaded in 8 bits mode, by default False.
     quantization_4bits : bool
-        _description_
+        Whether the model will be loaded in 4 bits mode, by default False.
     N_repeat : int, optional
-        _description_, by default 10
+        How many times to measure the memory footprint, for more precise estimation. We take the mean value of the
+        `N_repeat` runs. By default 10
     """
 
     t0 = time.time()
