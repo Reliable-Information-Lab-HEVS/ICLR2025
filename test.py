@@ -418,7 +418,7 @@ with torch.no_grad():
     # foo4 = model(prompt, batch_size=1, max_new_tokens=500, min_new_tokens=500, seed=12, post_process_output=False,
     #             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
     # foo4 = model.model(ids, use_cache=use_cache)
-    foo4 = model.model(concat_ids, use_cache=use_cache,1 past_key_values=past_keys1)
+    foo4 = model.model(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
     mem4 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak4
     dt2 = time.time() - t2
 
