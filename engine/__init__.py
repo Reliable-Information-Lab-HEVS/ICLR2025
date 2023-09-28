@@ -60,6 +60,7 @@ LARGE_MODELS = tuple(model for model, gpus in zip(ALL_MODELS, estimate_number_of
 SMALL_MODELS_SPECIAL_PROMPT = tuple(model for model in SMALL_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
 LARGE_MODELS_SPECIAL_PROMPT = tuple(model for model in LARGE_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
 
+
 # Small models that we decided to keep for further code benchmarks
 SMALL_MODELS_GOOD_CODER = (
     'star-coder-base',
