@@ -388,7 +388,8 @@ with torch.no_grad():
     # foo = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=5, seed=12, post_process_output=False,
     #             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
     # foo = model.model(ids, use_cache=use_cache)
-    foo = model.model(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
+    inputs = model.model.prepare_inputs_for_generation(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
+    foo = model.model(**inputs)
     mem = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak
     dt0 = time.time() - t0
 
@@ -403,7 +404,8 @@ with torch.no_grad():
     # foo2 = model(prompt, batch_size=1, max_new_tokens=5, min_new_tokens=5, seed=12, post_process_output=False,
     #             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
     # foo2 = model.model(ids, use_cache=use_cache)
-    foo2 = model.model(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
+    inputs = model.model.prepare_inputs_for_generation(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
+    foo2 = model.model(**inputs)
     mem2 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak2
     dt1 = time.time() - t1
 
@@ -418,7 +420,8 @@ with torch.no_grad():
     # foo4 = model(prompt, batch_size=1, max_new_tokens=500, min_new_tokens=500, seed=12, post_process_output=False,
     #             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
     # foo4 = model.model(ids, use_cache=use_cache)
-    foo4 = model.model(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
+    inputs = model.model.prepare_inputs_for_generation(concat_ids, use_cache=use_cache, past_key_values=past_keys1)
+    foo4 = model.model(**inputs)
     mem4 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak4
     dt2 = time.time() - t2
 
@@ -433,7 +436,8 @@ with torch.no_grad():
     # foo5 = model(new_prompt, batch_size=1, max_new_tokens=2, min_new_tokens=1, seed=12, post_process_output=False,
     #             use_cache=use_cache, output_attentions=output_attentions, output_hidden_states=output_hidden_states)
     # foo5 = model.model(ids, use_cache=use_cache)
-    foo5 = model.model(concat_new_ids, use_cache=use_cache, past_key_values=past_keys2)
+    inputs = model.model.prepare_inputs_for_generation(concat_new_ids, use_cache=use_cache, past_key_values=past_keys2)
+    foo5 = model.model(**inputs)
     mem5 = torch.cuda.max_memory_allocated(0) / 1024**3 - actual_peak5
     dt3 = time.time() - t3
 
