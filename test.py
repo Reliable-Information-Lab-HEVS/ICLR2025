@@ -342,9 +342,9 @@ def sample(
 
 def mem_usage(past_key_values):
 
-    if isinstance(past_key_values, torch.tensor):
+    if isinstance(past_key_values, torch.Tensor):
         return past_key_values.nelement() * past_key_values.element_size()
-    elif isinstance(past_key_values[0], torch.tensor):
+    elif isinstance(past_key_values[0], torch.Tensor):
         return sum([x.nelement() * x.element_size() for x in past_key_values])
     else:
         return sum([mem_usage(x) for x in past_key_values])
