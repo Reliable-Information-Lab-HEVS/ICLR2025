@@ -552,18 +552,7 @@ class HFModel(object):
             batch_footprint = {int(k): v for k, v in batch_footprint.items()}
         # If no precise estimate exist, fall back to simple heuristics
         except FileNotFoundError:
-            parameters = self.parameters_count()
-            # if parameters < 5:
-            #     batch = int(available_memory // 0.5)
-            # elif parameters < 10:
-            #     batch = int(available_memory // 1)
-            # elif parameters < 20:
-            #     batch = int(available_memory // 2)
-            # else:
-            #     batch = int(available_memory // 3)
-            batch = int(available_memory - parameters)
-            
-            return max(batch, 1)
+            return self.infer_best_batch_size_by_heuristics(available_memory)
 
         sequence_length = input_size if only_scale_with_input_size else input_size + max_new_tokens
         x = list(batch_footprint.keys())
@@ -584,20 +573,38 @@ class HFModel(object):
             memory_needed = intercept + slope * sequence_length
         # In this case, fall back to simple heuristics
         else:
-            parameters = self.parameters_count()
-            # if parameters < 5:
-            #     batch = int(available_memory // 0.5)
-            # elif parameters < 10:
-            #     batch = int(available_memory // 1)
-            # elif parameters < 20:
-            #     batch = int(available_memory // 2)
-            # else:
-            #     batch = int(available_memory // 3)
-            batch = int(available_memory - parameters)
-            
-            return max(batch, 1)
+            return self.infer_best_batch_size_by_heuristics(available_memory)
 
         return int(available_memory // memory_needed)
+    
+
+    def infer_best_batch_size_by_heuristics(self, available_memory: float) -> int:
+        """Infer the largest possible batch size using very simple and raw heuristics. It only uses the number
+        of parameters of the model, which is not a very good indicator. 
+
+        Parameters
+        ----------
+        available_memory : float
+            The memory available for the forward pass.
+
+        Returns
+        -------
+        int
+            A very raw estimate of the best batch size.
+        """
+
+        parameters = self.parameters_count()
+        # if parameters < 5:
+        #     batch = int(available_memory // 0.5)
+        # elif parameters < 10:
+        #     batch = int(available_memory // 1)
+        # elif parameters < 20:
+        #     batch = int(available_memory // 2)
+        # else:
+        #     batch = int(available_memory // 3)
+        batch = int(available_memory - parameters)
+        
+        return max(batch, 1)
 
 
     def oom_safe_batch_generation(self, input: torch.Tensor, generation_config: GenerationConfig,
