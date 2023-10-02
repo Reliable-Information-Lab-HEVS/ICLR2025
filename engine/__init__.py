@@ -4,8 +4,6 @@ from engine import prompt_template
 # import it here so that the warnings are suppressed when doing `import engine`
 from engine import warnings_suppressor
 
-import torch
-
 
 def estimate_number_of_gpus(models: list[str], quantization_8bits: bool = False, quantization_4bits: bool = False,
                             max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8) -> list[int]:
@@ -48,8 +46,19 @@ def estimate_number_of_gpus(models: list[str], quantization_8bits: bool = False,
 
 
 
-# All supported models
-ALL_MODELS = loader.ALLOWED_MODELS
+# Relatively small models (they should fit on a single A100 GPU)
+SMALL_MODELS = tuple(model for model in loader.ALLOWED_MODELS if loader.ALL_MODELS_PARAMS[model] <= 16)
+# Large models (they require more than 1 A100 GPU)
+LARGE_MODELS = tuple(model for model in loader.ALLOWED_MODELS if loader.ALL_MODELS_PARAMS[model] > 16)
+
+assert set(loader.ALLOWED_MODELS) == set(SMALL_MODELS + LARGE_MODELS), 'We are somehow missing some models...'
+
+
+# Model with non-default prompt template
+SMALL_MODELS_SPECIAL_PROMPT = tuple(model for model in SMALL_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
+LARGE_MODELS_SPECIAL_PROMPT = tuple(model for model in LARGE_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
+
+
 
 # Models that we decided to keep for further code benchmarks
 GOOD_CODERS = (
@@ -67,30 +76,11 @@ GOOD_CODERS = (
 )
 
 
-if torch.cuda.is_available():
-    # Models working on a single GPU
-    SMALL_MODELS = tuple(model for model, gpus in zip(ALL_MODELS, estimate_number_of_gpus(ALL_MODELS)) if gpus == 1)
-    SMALL_GOOD_CODERS = tuple(model for model, gpus in zip(GOOD_CODERS, estimate_number_of_gpus(GOOD_CODERS)) if gpus == 1)
-    # Models needing more than 1 GPU
-    LARGE_MODELS = tuple(model for model, gpus in zip(ALL_MODELS, estimate_number_of_gpus(ALL_MODELS)) if gpus > 1)
-    LARGE_GOOD_CODERS = tuple(model for model, gpus in zip(GOOD_CODERS, estimate_number_of_gpus(GOOD_CODERS)) if gpus > 1)
-
-else:
-    # Models working on single GPU
-    SMALL_MODELS = tuple(model for model, params in loader.ALL_MODELS_PARAMS.items() if params < 20)
-    SMALL_GOOD_CODERS = tuple(model for model, params in loader.ALL_MODELS_PARAMS.items() if params < 20 and model in GOOD_CODERS)
-    # Models needing more than 1 GPU
-    LARGE_MODELS = tuple(model for model, params in loader.ALL_MODELS_PARAMS.items() if params >= 20)
-    LARGE_GOOD_CODERS = tuple(model for model, params in loader.ALL_MODELS_PARAMS.items() if params >= 20 and model in GOOD_CODERS)
+SMALL_GOOD_CODERS = tuple(model for model in GOOD_CODERS if model in SMALL_MODELS)
+LARGE_GOOD_CODERS = tuple(model for model in GOOD_CODERS if model in LARGE_MODELS)
 
 
-assert set(ALL_MODELS) == set(SMALL_MODELS + LARGE_MODELS), 'We are somehow missing some models...'
 assert set(GOOD_CODERS) == set(SMALL_GOOD_CODERS + LARGE_GOOD_CODERS), 'We are somehow missing some good coder models...'
-
-
-# Model with non-default prompt template
-SMALL_MODELS_SPECIAL_PROMPT = tuple(model for model in SMALL_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
-LARGE_MODELS_SPECIAL_PROMPT = tuple(model for model in LARGE_MODELS if model in prompt_template.PROMPT_MAPPING.keys())
 
 
 # Model that we decided to keep for further code benchmarks with non-default prompt template

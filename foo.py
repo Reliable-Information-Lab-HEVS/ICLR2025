@@ -6,7 +6,7 @@ from concurrent.futures import ProcessPoolExecutor
 
 import torch
 
-# import engine
+import engine
 # from engine import stopping
 # from engine import loader
 # from engine.prompt_template import PROMPT_MODES
