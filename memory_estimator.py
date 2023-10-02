@@ -8,6 +8,7 @@ import torch
 import numpy as np
 
 import engine
+from engine import loader
 from engine import warnings_suppressor
 from helpers import utils
 
@@ -181,6 +182,16 @@ def memory_usage(past_key_values):
         return sum([x.nelement() * x.element_size() for x in past_key_values])
     else:
         return sum([memory_usage(x) for x in past_key_values])
+    
+
+def dtype_category(model, quantization_4bits: bool, quantization_8bits: bool) -> str:
+    """Return a string representation of the model dtype."""
+    if quantization_4bits:
+        return 'int4'
+    elif quantization_8bits:
+        return 'int8'
+    else:
+        return str(loader.ALL_MODELS_DTYPES[model]).split('.', 1)[1]
 
 
 
@@ -207,6 +218,12 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
 
     t0 = time.time()
 
+    # Initialize filenames and return if files already exist
+    dtype_name = dtype_category(model, quantization_4bits=quantization_4bits, quantization_8bits=quantization_8bits)
+    filename_memory = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', model_name, f'{dtype_name}.json')
+    if os.path.exists(filename_memory):
+        return
+
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
         model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
@@ -221,12 +238,6 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
 
     # Initialize dict (this key will be overwritten, but we want it in first for visibility in output file)
     model_memory_consumption = {'only_scale_with_input_size': False}
-
-    # Initialize filenames and return if files already exist
-    dtype_name = model.dtype_category()
-    filename_memory = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', model_name, f'{dtype_name}.json')
-    if os.path.exists(filename_memory):
-        return
     
     # select context sizes to use depending on model max context
     input_sizes = SMALL_CONTEXT_SIZES if model.tokenizer.model_max_length == 1024 else CONTEXT_SIZES
