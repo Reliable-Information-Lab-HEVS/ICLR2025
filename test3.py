@@ -15,7 +15,8 @@ def test(model):
         print(f'Issue with {model}: {type(e).__name__}: {str(e)}')
         pass
 
-models = engine.SMALL_MODELS
-gpu_footprints = engine.estimate_number_of_gpus(models, False, False)
-utils.dispatch_jobs(gpu_footprints, torch.cuda.device_count(), test, models)
+if __name__ == '__main__':
+    models = engine.SMALL_MODELS
+    gpu_footprints = engine.estimate_number_of_gpus(models, False, False)
+    utils.dispatch_jobs(gpu_footprints, torch.cuda.device_count(), test, models)
 
