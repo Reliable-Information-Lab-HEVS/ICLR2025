@@ -5,7 +5,6 @@ import warnings
 from concurrent.futures import ProcessPoolExecutor
 
 import torch
-from transformers import GenerationConfig
 
 import engine
 from engine import stopping
