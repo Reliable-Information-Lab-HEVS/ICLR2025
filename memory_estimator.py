@@ -219,7 +219,7 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
     t0 = time.time()
 
     # Initialize filenames and return if files already exist
-    dtype_name = dtype_category(model, quantization_4bits=quantization_4bits, quantization_8bits=quantization_8bits)
+    dtype_name = dtype_category(model_name, quantization_4bits=quantization_4bits, quantization_8bits=quantization_8bits)
     filename_memory = os.path.join(utils.ROOT_FOLDER, 'memory_estimator', model_name, f'{dtype_name}.json')
     if os.path.exists(filename_memory):
         return
