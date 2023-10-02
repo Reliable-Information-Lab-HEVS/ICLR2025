@@ -404,7 +404,7 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
                     import torch
                     if torch.cuda.device_count() != len(gpus):
                         raise RuntimeError(('It seems that cuda was already initialized when setting the visible devices.'
-                                            'For this reason, the child process was not started.'))
+                                            ' For this reason, the child process was not started.'))
                     return {name}(*args, **kwargs)
                 """
     # remove indentation before each new line (triple quotes don't respect indentation level)
