@@ -37,7 +37,7 @@ if __name__ == '__main__':
     gpu_footprints = [1,1,1,2,2,1,3]
 
     t1 = time.time()
-    utils.dispatch_jobs(gpu_footprints, num_gpus, 0.01, sleep)
+    utils.dispatch_jobs(gpu_footprints, num_gpus, sleep)
     dt1 = time.time() - t1
 
     
