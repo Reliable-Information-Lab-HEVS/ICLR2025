@@ -594,15 +594,14 @@ class HFModel(object):
         """
 
         parameters = self.parameters_count()
-        # if parameters < 5:
-        #     batch = int(available_memory // 0.5)
-        # elif parameters < 10:
-        #     batch = int(available_memory // 1)
-        # elif parameters < 20:
-        #     batch = int(available_memory // 2)
-        # else:
-        #     batch = int(available_memory // 3)
-        batch = int(available_memory - parameters)
+        if parameters < 5:
+            batch = int(available_memory // 0.5)
+        elif parameters < 10:
+            batch = int(available_memory // 1)
+        elif parameters < 20:
+            batch = int(available_memory // 2)
+        else:
+            batch = int(available_memory // 3)
         
         return max(batch, 1)
 

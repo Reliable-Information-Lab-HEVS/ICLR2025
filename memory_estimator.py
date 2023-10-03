@@ -259,7 +259,7 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
             # Generate 2 new tokens to take into account that we need to estimate the memory of the 
             # computation of past_key_values, and a second forward pass using them (which usually is more costly
             # since the past K-V is large). Subsequent passes will scale linearly with the number of new tokens
-            foo = model(prompt, num_return_sequences=2, max_new_tokens=2, min_new_tokens=1, batch_size=1)
+            foo = model(prompt, num_return_sequences=2, max_new_tokens=2, min_new_tokens=2, batch_size=1)
             
             memory_used = {}
             for gpu_rank in gpus:
