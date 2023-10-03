@@ -554,7 +554,7 @@ class HFModel(object):
         except FileNotFoundError:
             return self.infer_best_batch_size_by_heuristics(available_memory)
 
-        sequence_length = input_size if only_scale_with_input_size else input_size + max_new_tokens
+
         x = list(batch_footprint.keys())
         y = list(batch_footprint.values())
         # sort according to increasing sequence
@@ -567,6 +567,10 @@ class HFModel(object):
         intercept = fit.intercept
         slope = fit.slope
         r2 = fit.rvalue**2
+
+        # If the flag `only_scale_with_input_size` is active, the memory needed for subsequent forward passes
+        # is negligible compared to the memory needed to compute the K-V cache the first time
+        sequence_length = input_size if only_scale_with_input_size else input_size + max_new_tokens
 
         # This should always be the case, but check it if for some reason the behavior is not sufficiently linear
         if r2 >= 0.95:
