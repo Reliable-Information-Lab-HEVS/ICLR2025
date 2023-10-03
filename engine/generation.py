@@ -24,7 +24,7 @@ class HFModel(object):
 
     def __init__(self, model_name: str, quantization_8bits: bool = False, quantization_4bits: bool = False,
                  dtype: torch.dtype | None = None, max_fraction_gpu_0: float = 0.8, max_fraction_gpus: float = 0.8,
-                 device_map: dict | None = None, gpu_rank: int = 0):
+                 device_map: dict | str | None = None, gpu_rank: int = 0):
         
         # Save the current allocated memory on each gpu to estimate model size after loading
         if torch.cuda.is_available():

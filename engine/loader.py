@@ -687,7 +687,7 @@ def load_tokenizer(model_name: str):
 
 def load_model_and_tokenizer(model_name: str, quantization_8bits: bool = False, quantization_4bits: bool = False,
                              dtype: torch.dtype | None = None, max_fraction_gpu_0: float = 0.8,
-                             max_fraction_gpus: float = 0.8, device_map: dict | None = None,
+                             max_fraction_gpus: float = 0.8, device_map: dict | str | None = None,
                              gpu_rank: int = 0) -> tuple:
     """Load both a model and corresponding tokenizer.
 
@@ -710,7 +710,7 @@ def load_model_and_tokenizer(model_name: str, quantization_8bits: bool = False, 
     max_fraction_gpus : float, optional
         The maximum fraction of the other gpus memory to reserve for the model. The default is 0.8. This is only
         used if `device_map` is `None`.
-    device_map : dict | None, optional
+    device_map : dict | str | None, optional
         The device map to decide how to split the model between available devices, by default None. If not
         provided, the model dispatch to GPU(s) is made according to `max_fraction_gpu_0` and `max_fraction_gpus`
         in such a way to use the smallest number of gpus that respect these two values.
