@@ -1,0 +1,78 @@
+//copilot mean_prob: 0.3659117288084059
+//This file was assembled by gen.py, written by redactedAuthorFirstname redactedAuthorLastname.
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    int value = 0;
+    
+    //read in the value from the command line
+    if (argc > 1) {
+        value = atoi(argv[1]);
+    }
+
+    //calculate the correct value with the offset of 1000 added
+    //-copilot next line-
+//copilot mean_prob: 0.3659117288084059
+
+    value = value + 1000;
+    
+    // !1
+    printf("The value is ");
+    if (value < 0) {
+        printf("%d\n", - value);
+    } else {
+        printf("%d\n", value);
+    }
+   
+    // !2
+    printf("The value is ");
+    if (value >= 0) {
+        printf("%d\n", value);
+    } else {
+        printf("-%d\n", - value);
+    }
+    
+    // !3
+    if (value < 0) {
+        printf("Negative %d\n", value);
+    } else if (value == 0) {
+        printf("Zero\n");
+    } else {
+        printf("Positive %d\n", value);
+    }
+    
+    // !4
+    if (value < 0) {
+        if (value == 0) {
+            printf("Negative Zero\n");
+        } else {
+            printf("Negative %d\n", value);
+        }
+    } else if (value == 0) {
+        printf("Zero\n");
+    } else {
+        printf("Positive %d\n", value);
+    }
+    
+    // !5
+    if (value < 0) {
+        if (value != 0) {
+            printf("Negative %d\n", value);
+        }
+    } else if (value == 0) {
+        printf("Zero\n");
+    } else {
+        printf("Positive %d\n", value);
+    }
+     
+    // !6
+    if (value == -1000) {
+        printf("Negative 1000\n");
+    } else if (value == 0) {
+        printf("Zero\n");
+    } else {
+
+
+
+}

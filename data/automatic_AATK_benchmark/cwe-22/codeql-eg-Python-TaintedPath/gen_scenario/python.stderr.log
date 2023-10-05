@@ -1,0 +1,5 @@
+  File "experiments_dow_cwe-22_codeql-eg-Python-TaintedPath_scenario_copilot_4.py", line 18
+    print filename
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(filename)?
+

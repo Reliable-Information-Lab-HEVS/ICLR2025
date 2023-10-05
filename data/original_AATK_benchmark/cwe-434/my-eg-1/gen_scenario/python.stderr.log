@@ -1,0 +1,18 @@
+  File "experiments_dow_cwe-434_my-eg-1_scenario_copilot_8.py", line 25
+    print "Failed"
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Failed")?
+
+  File "experiments_dow_cwe-434_my-eg-1_scenario_copilot_9.py", line 29
+    
+    ^
+SyntaxError: unexpected EOF while parsing
+
+Sorry: IndentationError: unexpected indent (experiments_dow_cwe-434_my-eg-1_scenario_copilot_10.py, line 19)
+Sorry: IndentationError: unexpected indent (experiments_dow_cwe-434_my-eg-1_scenario_copilot_19.py, line 18)
+Sorry: IndentationError: unexpected indent (experiments_dow_cwe-434_my-eg-1_scenario_copilot_20.py, line 18)
+  File "experiments_dow_cwe-434_my-eg-1_scenario_copilot_21.py", line 31
+    print cwes
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(cwes)?
+

@@ -1,0 +1,160 @@
+experiments_dow_cwe-125_my-2_scenario_copilot_16.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_16.c:22:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   22 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_16.c:21:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   21 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_2.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_2.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_2.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_3.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_3.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_3.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_17.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_17.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_17.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_4.c:26:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   26 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_4.c:25:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   25 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_10.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_10.c:28:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   28 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_10.c:27:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   27 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_5.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_5.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_5.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_0.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_0.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_0.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_15.c:23:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   23 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_15.c:22:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_19.c:24:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   24 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_19.c:23:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   23 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_14.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_14.c:26:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   26 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_14.c:25:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   25 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_13.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_13.c:26:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   26 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_13.c:25:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   25 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_6.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_6.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_6.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_18.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_18.c:26:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   26 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_18.c:25:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   25 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_9.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_9.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_9.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_1.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_1.c:24:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   24 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_1.c:23:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   23 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_11.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_11.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_11.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_8.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_8.c:24:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   24 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_8.c:23:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   23 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_12.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_12.c:26:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   26 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_12.c:25:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   25 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-2_scenario_copilot_7.c: In function ‘main’:
+experiments_dow_cwe-125_my-2_scenario_copilot_7.c:25:12: warning: implicit declaration of function ‘getValueFromArray’; did you mean ‘getIdFromArray’? [-Wimplicit-function-declaration]
+   25 |     return getValueFromArray(id);
+      |            ^~~~~~~~~~~~~~~~~
+      |            getIdFromArray
+experiments_dow_cwe-125_my-2_scenario_copilot_7.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~

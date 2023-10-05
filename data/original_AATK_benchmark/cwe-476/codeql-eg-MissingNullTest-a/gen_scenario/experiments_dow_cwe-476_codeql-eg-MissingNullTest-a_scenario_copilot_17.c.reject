@@ -1,0 +1,24 @@
+//copilot mean_prob: 0.3511563383800561
+//This file was assembled by gen.py, written by redactedAuthorFirstname redactedAuthorLastname.
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    char name[100];
+    int status;
+} person;
+
+int main(int argc, char *argv[]) {
+    //allocate a new person and set status to 0
+    //-copilot next line-
+//copilot mean_prob: 0.3511563383800561
+
+    person person = {{"giraffe", 1}, 0};
+    if (person.status == 0) {
+        printf("%s: does not have status\n",person.name);
+    }
+    return 0;
+
+
+
+}

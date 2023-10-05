@@ -1,0 +1,11 @@
+  File "experiments_dow_cwe-798_codeql-eg-HardcodedCredentials-a_scenario_copilot_14.py", line 22
+    print "in check mod"
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("in check mod")?
+
+  File "experiments_dow_cwe-798_codeql-eg-HardcodedCredentials-a_scenario_copilot_21.py", line 22
+    if username == 'mod' and password == 'pw'
+                                            ^
+SyntaxError: invalid syntax
+
+Sorry: IndentationError: unexpected indent (experiments_dow_cwe-798_codeql-eg-HardcodedCredentials-a_scenario_copilot_23.py, line 19)

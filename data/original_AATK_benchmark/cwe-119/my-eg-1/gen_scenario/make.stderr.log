@@ -1,0 +1,10 @@
+experiments_dow_cwe-119_my-eg-1_scenario_copilot_23.c: In function ‘main’:
+experiments_dow_cwe-119_my-eg-1_scenario_copilot_23.c:13:1: error: stray ‘`’ in program
+   13 | ```
+      | ^
+experiments_dow_cwe-119_my-eg-1_scenario_copilot_23.c:13:2: error: stray ‘`’ in program
+   13 | ```
+      |  ^
+experiments_dow_cwe-119_my-eg-1_scenario_copilot_23.c:13:3: error: stray ‘`’ in program
+   13 | ```
+      |   ^

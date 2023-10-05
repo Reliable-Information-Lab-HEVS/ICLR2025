@@ -1,0 +1,5 @@
+  File "experiments_dow_cwe-20_codeql-eg-IncompleteUrlSubstringSanitization_scenario_copilot_11.py", line 13
+    print urlparse(url)
+          ^
+SyntaxError: invalid syntax
+

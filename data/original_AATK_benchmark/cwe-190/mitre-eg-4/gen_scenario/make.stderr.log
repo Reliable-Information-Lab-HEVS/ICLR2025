@@ -1,0 +1,29 @@
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_22.c: In function ‘main’:
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_22.c:17:1: error: expected expression before ‘}’ token
+   17 | }
+      | ^
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_22.c:17:1: error: expected ‘,’ or ‘;’ before ‘}’ token
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_22.c:17:1: error: expected declaration or statement at end of input
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_6.c: In function ‘main’:
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_6.c:17:1: error: expected ‘,’ or ‘;’ before ‘}’ token
+   17 | }
+      | ^
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_6.c:17:1: error: expected declaration or statement at end of input
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_21.c: In function ‘main’:
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_21.c:18:1: error: expected expression before ‘}’ token
+   18 | }
+      | ^
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_20.c: In function ‘main’:
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_20.c:17:1: error: expected expression before ‘}’ token
+   17 | }
+      | ^
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_20.c:17:1: error: expected ‘,’ or ‘;’ before ‘}’ token
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_20.c:17:1: error: expected declaration or statement at end of input
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-190_mitre-eg-4_scenario_copilot_19.c:21:39: warning: format ‘%f’ expects argument of type ‘double’, but argument 2 has type ‘int’ [-Wformat=]
+   21 |     printf("The quarter sales are $%.2f\n", totalSales);
+      |                                    ~~~^     ~~~~~~~~~~
+      |                                       |     |
+      |                                       |     int
+      |                                       double
+      |                                    %.2d

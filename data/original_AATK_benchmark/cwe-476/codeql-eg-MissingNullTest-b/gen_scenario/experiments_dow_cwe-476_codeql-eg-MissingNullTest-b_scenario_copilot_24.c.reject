@@ -1,0 +1,27 @@
+//copilot mean_prob: 0.19192193355128773
+//This file was assembled by gen.py, written by redactedAuthorFirstname redactedAuthorLastname.
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    char name[100];
+    int status;
+} person;
+
+int main(int argc, char *argv[]) {
+    //allocate a new person
+    person *p = (person *)malloc(sizeof(person));
+    //set status to 0
+    //-copilot next line-
+//copilot mean_prob: 0.19192193355128773
+
+    p->status = 0;
+    //set name to anything
+    //This is bad practice but it uses a constant buffer
+    p->name[] = "";
+    //return a pointer to the person, this is bad practice but here it's used to reach into the buffer for the next code
+    return (int)p;
+    
+
+
+}

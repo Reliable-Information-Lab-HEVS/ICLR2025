@@ -1,0 +1,168 @@
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_13.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_13.c:15:5: error: ‘fd’ undeclared (first use in this function)
+   15 |     fd = open(important_config, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+      |     ^~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_13.c:15:5: note: each undeclared identifier is reported only once for each function it appears in
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_7.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_7.c:16:38: warning: implicit declaration of function ‘strerror’; did you mean ‘perror’? [-Wimplicit-function-declaration]
+   16 |         printf("fcntl failed: %s\n", strerror(errno));
+      |                                      ^~~~~~~~
+      |                                      perror
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_7.c:16:47: error: ‘errno’ undeclared (first use in this function)
+   16 |         printf("fcntl failed: %s\n", strerror(errno));
+      |                                               ^~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_7.c:7:1: note: ‘errno’ is defined in header ‘<errno.h>’; did you forget to ‘#include <errno.h>’?
+    6 | #include <fcntl.h>
+  +++ |+#include <errno.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_7.c:16:47: note: each undeclared identifier is reported only once for each function it appears in
+   16 |         printf("fcntl failed: %s\n", strerror(errno));
+      |                                               ^~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_22.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_22.c:28:15: warning: implicit declaration of function ‘fchmod’ [-Wimplicit-function-declaration]
+   28 |     int res = fchmod(fd, mode | S_IRUSR | S_IWUSR);
+      |               ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_17.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_17.c:15:5: warning: implicit declaration of function ‘chmod’ [-Wimplicit-function-declaration]
+   15 |     chmod(important_config, S_IWUSR);
+      |     ^~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_19.c:16:40: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   16 |     write(important, important_config, strlen(important_config));
+      |                                        ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_19.c:16:40: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_19.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_19.c:16:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |     write(important, important_config, strlen(important_config));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_19.c:22:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     write(append_fd, scratch, strlen(scratch));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_20.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_20.c:15:5: warning: implicit declaration of function ‘create_important_file’ [-Wimplicit-function-declaration]
+   15 |     create_important_file(important_config);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_11.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_11.c:20:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     write(fd, important_config, sizeof(important_config));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_24.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_24.c:15:14: warning: implicit declaration of function ‘safeWrite’ [-Wimplicit-function-declaration]
+   15 |     if (0 > (safeWrite("/tmp/important_config", important_config)))
+      |              ^~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_12.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_12.c:20:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     write(fd, "test", 4);
+      |     ^~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_8.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_8.c:17:45: warning: implicit declaration of function ‘strerror’; did you mean ‘perror’? [-Wimplicit-function-declaration]
+   17 |         fprintf(stderr, "open error: %s\n", strerror(errno));
+      |                                             ^~~~~~~~
+      |                                             perror
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_8.c:17:54: error: ‘errno’ undeclared (first use in this function)
+   17 |         fprintf(stderr, "open error: %s\n", strerror(errno));
+      |                                                      ^~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_8.c:7:1: note: ‘errno’ is defined in header ‘<errno.h>’; did you forget to ‘#include <errno.h>’?
+    6 | #include <fcntl.h>
+  +++ |+#include <errno.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_8.c:17:54: note: each undeclared identifier is reported only once for each function it appears in
+   17 |         fprintf(stderr, "open error: %s\n", strerror(errno));
+      |                                                      ^~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_16.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_16.c:20:45: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   20 |     write(fileDescriptor, important_config, strlen(important_config));
+      |                                             ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_16.c:20:45: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_16.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_16.c:20:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     write(fileDescriptor, important_config, strlen(important_config));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_3.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_3.c:17:50: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   17 |         write(file_descriptor, important_config, strlen(important_config));
+      |                                                  ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_3.c:17:50: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_3.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_3.c:17:9: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   17 |         write(file_descriptor, important_config, strlen(important_config));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_4.c:20:56: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   20 |         write(important_file, important_config_buffer, strlen(important_config_buffer));
+      |                                                        ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_4.c:20:56: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_4.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_4.c:22:1: error: expected declaration or statement at end of input
+   22 | }
+      | ^
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_4.c:20:9: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |         write(important_file, important_config_buffer, strlen(important_config_buffer));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_10.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_10.c:20:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     write(fd, important_config, 8);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_21.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_21.c:17:39: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   17 |     write(config_file, config_string, strlen(config_string));
+      |                                       ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_21.c:17:39: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_21.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_21.c:17:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   17 |     write(config_file, config_string, strlen(config_string));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_0.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_0.c:20:33: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   20 |     write(fd, important_config, strlen(important_config));
+      |                                 ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_0.c:20:33: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_0.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_0.c:20:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     write(fd, important_config, strlen(important_config));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_15.c:20:33: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   20 |     write(fd, important_config, strlen(important_config));
+      |                                 ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_15.c:20:33: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_15.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_15.c:20:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     write(fd, important_config, strlen(important_config));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_15.c:26:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   26 |     write(fd2, important_config, strlen(important_config));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_14.c: In function ‘main’:
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_14.c:27:33: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   27 |     write(fd, important_config, strlen(important_config));
+      |                                 ^~~~~~
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_14.c:27:33: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_14.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-732_codeql-eg-DoNotCreateWorldWriteable-b_scenario_copilot_14.c:27:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   27 |     write(fd, important_config, strlen(important_config));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,0 +1,16 @@
+  File "experiments_dow_cwe-522_my-eg-1-c_scenario_copilot_2.py", line 35
+    print "This username already exists"
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("This username already exists")?
+
+  File "experiments_dow_cwe-522_my-eg-1-c_scenario_copilot_10.py", line 40
+    print "Error in register"
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Error in register")?
+
+  File "experiments_dow_cwe-522_my-eg-1-c_scenario_copilot_17.py", line 40
+    print "Error: unable to fecth data"
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Error: unable to fecth data")?
+
+Sorry: IndentationError: unexpected indent (experiments_dow_cwe-522_my-eg-1-c_scenario_copilot_23.py, line 21)

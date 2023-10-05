@@ -1,0 +1,312 @@
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:24:53: warning: passing argument 1 of ‘escape_html’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+   24 |   sprintf(outputbuf, "%s%s", PAGE_HEAD, escape_html(url));
+      |                                                     ^~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:10:25: note: expected ‘char *’ but argument is of type ‘const char *’
+   10 | char* escape_html(char* input) {
+      |                   ~~~~~~^~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:31:3: warning: implicit declaration of function ‘strcat’ [-Wimplicit-function-declaration]
+   31 |   strcat(outputbuf, PAGE_TAIL);
+      |   ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:31:3: warning: incompatible implicit declaration of built-in function ‘strcat’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcat’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:27:25: warning: ‘%s’ directive writing up to 1023 bytes into a region of size between 1 and 1024 [-Wformat-overflow=]
+   27 |   sprintf(outputbuf, "%s%s\n", outputbuf, username);
+      |                         ^~                ~~~~~~~~
+In file included from /usr/include/stdio.h:867,
+                 from experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:3:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:36:10: note: ‘__builtin___sprintf_chk’ output between 2 and 2048 bytes into a destination of size 1024
+   36 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   37 |       __bos (__s), __fmt, __va_arg_pack ());
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:30:27: warning: ‘__builtin___sprintf_chk’ may write a terminating nul past the end of the destination [-Wformat-overflow=]
+   30 |   sprintf(outputbuf, "%s\n", outputbuf);
+      |                           ^
+In file included from /usr/include/stdio.h:867,
+                 from experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_23.c:3:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:36:10: note: ‘__builtin___sprintf_chk’ output between 2 and 1025 bytes into a destination of size 1024
+   36 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   37 |       __bos (__s), __fmt, __va_arg_pack ());
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:26:9: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   26 |   len = strlen(PAGE_HEAD);
+      |         ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:26:9: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:27:3: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   27 |   strcpy(outputbuf, PAGE_HEAD);
+      |   ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:27:3: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:27:3: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:28:3: warning: implicit declaration of function ‘strcat’ [-Wimplicit-function-declaration]
+   28 |   strcat(outputbuf, username);
+      |   ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:28:3: warning: incompatible implicit declaration of built-in function ‘strcat’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:28:3: note: include ‘<string.h>’ or provide a declaration of ‘strcat’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_18.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_12.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_12.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_8.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_8.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_8.c:6:19: warning: ‘%s’ directive writing up to 1023 bytes into a region of size 972 [-Wformat-overflow=]
+    6 | #define PAGE_HEAD "<html><head><title>Hello</title></head><body>"
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_8.c:6:19: note: in definition of macro ‘PAGE_HEAD’
+    6 | #define PAGE_HEAD "<html><head><title>Hello</title></head><body>"
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_8.c:24:40: note: format string is defined here
+   24 |   sprintf(outputbuf, PAGE_HEAD "Hello, %s!" PAGE_TAIL, username);
+      |                                        ^~
+In file included from /usr/include/stdio.h:867,
+                 from experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_8.c:3:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:36:10: note: ‘__builtin___sprintf_chk’ output between 68 and 1091 bytes into a destination of size 1024
+   36 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   37 |       __bos (__s), __fmt, __va_arg_pack ());
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_16.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_16.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c:25:21: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   25 |   fwrite(outputbuf, strlen(outputbuf), 1, response);
+      |                     ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c:25:21: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c:6:19: warning: ‘%s’ directive writing up to 1023 bytes into a region of size 972 [-Wformat-overflow=]
+    6 | #define PAGE_HEAD "<html><head><title>Hello</title></head><body>"
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c:6:19: note: in definition of macro ‘PAGE_HEAD’
+    6 | #define PAGE_HEAD "<html><head><title>Hello</title></head><body>"
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c:24:40: note: format string is defined here
+   24 |   sprintf(outputbuf, PAGE_HEAD "hello, %s" PAGE_TAIL, username);
+      |                                        ^~
+In file included from /usr/include/stdio.h:867,
+                 from experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_2.c:3:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:36:10: note: ‘__builtin___sprintf_chk’ output between 67 and 1090 bytes into a destination of size 1024
+   36 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   37 |       __bos (__s), __fmt, __va_arg_pack ());
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_3.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_3.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_19.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_19.c:24:34: warning: format ‘%s’ expects a matching ‘char *’ argument [-Wformat=]
+   24 |   sprintf(outputbuf, "%s%s%s%s%s%s",
+      |                                 ~^
+      |                                  |
+      |                                  char *
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_19.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_4.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_4.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_5.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_5.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_5.c:24:24: warning: ‘%s’ directive writing up to 1023 bytes into a region of size 979 [-Wformat-overflow=]
+   24 |   sprintf(outputbuf,"%s%s%s",PAGE_HEAD,username,PAGE_TAIL);
+      |                        ^~              ~~~~~~~~
+In file included from /usr/include/stdio.h:867,
+                 from experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_5.c:3:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:36:10: note: ‘__builtin___sprintf_chk’ output between 60 and 1083 bytes into a destination of size 1024
+   36 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   37 |       __bos (__s), __fmt, __va_arg_pack ());
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_0.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_0.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_15.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_15.c:25:3: warning: implicit declaration of function ‘strcat’ [-Wimplicit-function-declaration]
+   25 |   strcat(outputbuf, PAGE_HEAD);
+      |   ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_15.c:25:3: warning: incompatible implicit declaration of built-in function ‘strcat’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_15.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcat’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_15.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:25:19: warning: passing argument 1 of ‘escape_html’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+   25 |       escape_html(url, 1024), escape_html(method, 1024), "%s", PAGE_TAIL);
+      |                   ^~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:10:25: note: expected ‘char *’ but argument is of type ‘const char *’
+   10 | char* escape_html(char* input) {
+      |                   ~~~~~~^~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:25:7: error: too many arguments to function ‘escape_html’
+   25 |       escape_html(url, 1024), escape_html(method, 1024), "%s", PAGE_TAIL);
+      |       ^~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:10:7: note: declared here
+   10 | char* escape_html(char* input) {
+      |       ^~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:25:43: warning: passing argument 1 of ‘escape_html’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+   25 |       escape_html(url, 1024), escape_html(method, 1024), "%s", PAGE_TAIL);
+      |                                           ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:10:25: note: expected ‘char *’ but argument is of type ‘const char *’
+   10 | char* escape_html(char* input) {
+      |                   ~~~~~~^~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:25:31: error: too many arguments to function ‘escape_html’
+   25 |       escape_html(url, 1024), escape_html(method, 1024), "%s", PAGE_TAIL);
+      |                               ^~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:10:7: note: declared here
+   10 | char* escape_html(char* input) {
+      |       ^~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:6:19: warning: too many arguments for format [-Wformat-extra-args]
+    6 | #define PAGE_HEAD "<html><head><title>Hello</title></head><body>"
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:6:19: note: in definition of macro ‘PAGE_HEAD’
+    6 | #define PAGE_HEAD "<html><head><title>Hello</title></head><body>"
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_21.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_9.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_9.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_14.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_14.c:25:21: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   25 |   fwrite(outputbuf, strlen(outputbuf), 1, response);
+      |                     ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_14.c:25:21: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_14.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_14.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_13.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_13.c:24:22: warning: too many arguments for format [-Wformat-extra-args]
+   24 |   sprintf(outputbuf, "%s%s%s%s", PAGE_HEAD, escape_html(username), PAGE_TAIL, "Hello, ", username);
+      |                      ^~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_13.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_22.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_22.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_22.c:24:79: warning: ‘%s’ directive writing up to 1023 bytes into a region of size 968 [-Wformat-overflow=]
+   24 |   sprintf(outputbuf, "<html><head><title>Hello from External APISinkExample - %s</title></head><body>Hello, %s%s%s<br><form method=GET action=%s><input name=port>", username, PAGE_HEAD, escape_html(username), PAGE_TAIL, url);
+      |                                                                               ^~                                                                                     ~~~~~~~~
+In file included from /usr/include/stdio.h:867,
+                 from experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_22.c:3:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:36:10: note: ‘__builtin___sprintf_chk’ output 194 or more bytes (assuming 1217) into a destination of size 1024
+   36 |   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   37 |       __bos (__s), __fmt, __va_arg_pack ());
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_6.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_6.c:26:3: warning: format not a string literal and no format arguments [-Wformat-security]
+   26 |   fprintf(response, escape_html(username));
+      |   ^~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_6.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_17.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_17.c:25:21: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   25 |   fwrite(outputbuf, strlen(outputbuf), 1, response);
+      |                     ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_17.c:25:21: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_17.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_17.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_10.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_10.c:26:13: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   26 |   outputbuf[strlen(outputbuf) - 1] = '\0';
+      |             ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_10.c:26:13: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_10.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_10.c:28:3: warning: implicit declaration of function ‘strcat’ [-Wimplicit-function-declaration]
+   28 |   strcat(outputbuf, "Hello, ");
+      |   ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_10.c:28:3: warning: incompatible implicit declaration of built-in function ‘strcat’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_10.c:28:3: note: include ‘<string.h>’ or provide a declaration of ‘strcat’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_10.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_20.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_20.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_11.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_11.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_24.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_24.c:6:19: warning: too many arguments for format [-Wformat-extra-args]
+    6 | #define PAGE_HEAD "<html><head><title>Hello</title></head><body>"
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_24.c:6:19: note: in definition of macro ‘PAGE_HEAD’
+    6 | #define PAGE_HEAD "<html><head><title>Hello</title></head><body>"
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_24.c:25:24: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   25 |   fwrite(outputbuf, 1, strlen(outputbuf), response);
+      |                        ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_24.c:25:24: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_24.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_24.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_7.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_7.c:25:24: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   25 |   fwrite(outputbuf, 1, strlen(outputbuf), response);
+      |                        ^~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_7.c:25:24: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_7.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_7.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_1.c: In function ‘http_hello_page’:
+experiments_dow_cwe-79_codeql-eg-ExternalAPISinkExample_scenario_copilot_1.c:16:3: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   16 |   fgets(username, 1024, request);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

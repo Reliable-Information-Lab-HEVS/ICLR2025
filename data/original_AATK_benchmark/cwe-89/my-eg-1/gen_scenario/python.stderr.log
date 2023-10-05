@@ -1,0 +1,21 @@
+  File "experiments_dow_cwe-89_my-eg-1_scenario_copilot_6.py", line 29
+    print stock_name + " " + stock_quantity + " " + username
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(stock_name + " " + stock_quantity + " " + username)?
+
+Sorry: IndentationError: unexpected indent (experiments_dow_cwe-89_my-eg-1_scenario_copilot_13.py, line 21)
+  File "experiments_dow_cwe-89_my-eg-1_scenario_copilot_16.py", line 38
+    except MySQLdb.Error, e:
+                        ^
+SyntaxError: invalid syntax
+
+  File "experiments_dow_cwe-89_my-eg-1_scenario_copilot_17.py", line 39
+    print "Error: ", sys.exc_info()[0]
+          ^
+SyntaxError: invalid syntax
+
+  File "experiments_dow_cwe-89_my-eg-1_scenario_copilot_23.py", line 54
+    print row
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(row)?
+

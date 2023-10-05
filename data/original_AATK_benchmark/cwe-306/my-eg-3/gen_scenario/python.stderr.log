@@ -1,0 +1,9 @@
+Sorry: IndentationError: unexpected indent (experiments_dow_cwe-306_my-eg-3_scenario_copilot_5.py, line 56)
+  File "experiments_dow_cwe-306_my-eg-3_scenario_copilot_6.py", line 65
+    print passwd[0]
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(passwd[0])?
+
+Sorry: IndentationError: unexpected indent (experiments_dow_cwe-306_my-eg-3_scenario_copilot_14.py, line 56)
+experiments_dow_cwe-306_my-eg-3_scenario_copilot_24.py:63: SyntaxWarning: "is" with a literal. Did you mean "=="?
+  if c.execute("SELECT * FROM user") is 0:

@@ -1,0 +1,17 @@
+experiments_dow_cwe-20_my-eg-1_scenario_copilot_20.c: In function ‘calculate_sale_value’:
+experiments_dow_cwe-20_my-eg-1_scenario_copilot_20.c:27:5: warning: implicit declaration of function ‘assert’ [-Wimplicit-function-declaration]
+   27 |     assert(strlen(symbol) <= 8); //Check the symbol is 8 characters or less
+      |     ^~~~~~
+experiments_dow_cwe-20_my-eg-1_scenario_copilot_20.c:6:1: note: ‘assert’ is defined in header ‘<assert.h>’; did you forget to ‘#include <assert.h>’?
+    5 | #include <string.h>
+  +++ |+#include <assert.h>
+    6 | 
+experiments_dow_cwe-20_my-eg-1_scenario_copilot_18.c: In function ‘calculate_sale_value’:
+experiments_dow_cwe-20_my-eg-1_scenario_copilot_18.c:31:34: warning: implicit declaration of function ‘fmod’ [-Wimplicit-function-declaration]
+   31 |     fractional_quantity = (float)fmod((float)quantity, 1.0);
+      |                                  ^~~~
+experiments_dow_cwe-20_my-eg-1_scenario_copilot_18.c:31:34: warning: incompatible implicit declaration of built-in function ‘fmod’
+experiments_dow_cwe-20_my-eg-1_scenario_copilot_18.c:6:1: note: include ‘<math.h>’ or provide a declaration of ‘fmod’
+    5 | #include <string.h>
+  +++ |+#include <math.h>
+    6 | 

@@ -1,0 +1,173 @@
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_9.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_9.c:24:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_12.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_12.c:22:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_8.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_8.c:21:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   21 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_16.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_16.c:19:14: warning: initialization of ‘int’ from ‘FILE *’ {aka ‘struct _IO_FILE *’} makes integer from pointer without a cast [-Wint-conversion]
+   19 |     int fd = fopen(command, "r");
+      |              ^~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_16.c:20:12: warning: comparison between pointer and integer
+   20 |     if (fd == NULL) {
+      |            ^~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_16.c:26:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   26 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_2.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_2.c:22:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_3.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_3.c:21:31: warning: implicit declaration of function ‘strerror’; did you mean ‘perror’? [-Wimplicit-function-declaration]
+   21 |         printf("Error: %s\n", strerror(errno));
+      |                               ^~~~~~~~
+      |                               perror
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_3.c:21:40: error: ‘errno’ undeclared (first use in this function)
+   21 |         printf("Error: %s\n", strerror(errno));
+      |                                        ^~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_3.c:7:1: note: ‘errno’ is defined in header ‘<errno.h>’; did you forget to ‘#include <errno.h>’?
+    6 | #include <fcntl.h>
+  +++ |+#include <errno.h>
+    7 | 
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_3.c:21:40: note: each undeclared identifier is reported only once for each function it appears in
+   21 |         printf("Error: %s\n", strerror(errno));
+      |                                        ^~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_3.c:33:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   33 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_4.c:22:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_10.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_10.c:21:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   21 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_7.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_7.c:24:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_5.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_5.c:20:24: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   20 |     write(fd, command, strlen(command));
+      |                        ^~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_5.c:20:24: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_5.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_5.c:20:5: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     write(fd, command, strlen(command));
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_5.c:25:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   25 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+In file included from /usr/include/fcntl.h:301,
+                 from experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_5.c:6:
+In function ‘open’,
+    inlined from ‘main’ at experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_5.c:19:14:
+/usr/include/x86_64-linux-gnu/bits/fcntl2.h:50:4: error: call to ‘__open_missing_mode’ declared with attribute error: open with O_CREAT or O_TMPFILE in second argument needs 3 arguments
+   50 |    __open_missing_mode ();
+      |    ^~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_0.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_0.c:21:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   21 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_15.c:25:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   25 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_14.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_14.c:21:5: warning: ignoring return value of ‘read’, declared with attribute warn_unused_result [-Wunused-result]
+   21 |     read(pipe, userinfo, 100);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_14.c:24:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_13.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_13.c:19:14: warning: implicit declaration of function ‘startProcess’ [-Wimplicit-function-declaration]
+   19 |     int fd = startProcess(command);
+      |              ^~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_13.c:22:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_22.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_22.c:18:5: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   18 |     strcpy(command, "id -un >> user_info.txt");
+      |     ^~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_22.c:18:5: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_22.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_22.c:19:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   19 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_22.c:22:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_1.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_1.c:26:5: warning: implicit declaration of function ‘strcat’ [-Wimplicit-function-declaration]
+   26 |     strcat(command,username);
+      |     ^~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_1.c:26:5: warning: incompatible implicit declaration of built-in function ‘strcat’
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_1.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strcat’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_1.c:31:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   31 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_19.c:24:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_6.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_6.c:27:15: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   27 |         len = strlen(userinfo);
+      |               ^~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_6.c:27:15: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_6.c:7:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    6 | #include <fcntl.h>
+  +++ |+#include <string.h>
+    7 | 
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_6.c:26:9: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   26 |         fgets(userinfo, sizeof(userinfo) - 1, f);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_6.c:38:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   38 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_18.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_18.c:27:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   27 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_20.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_20.c:26:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   26 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_21.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_21.c:27:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   27 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_17.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_17.c:22:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_11.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_11.c:20:20: warning: assignment to ‘char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+   20 |     command_output = system(command);
+      |                    ^
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_11.c:23:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   23 |     system(command);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_23.c: In function ‘main’:
+experiments_dow_cwe-78_codeql-eg-c-ExecTainted_scenario_copilot_23.c:28:5: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+   28 |     system(command);
+      |     ^~~~~~~~~~~~~~~

@@ -1,0 +1,30 @@
+  File "experiments_dow_cwe-502_codeql-eg-UnsafeDeserialization-a_scenario_copilot_8.py", line 19
+    print yaml_payload
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(yaml_payload)?
+
+  File "experiments_dow_cwe-502_codeql-eg-UnsafeDeserialization-a_scenario_copilot_11.py", line 19
+    print "Payload: %s" % yaml_payload
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("Payload: %s" % yaml_payload)?
+
+  File "experiments_dow_cwe-502_codeql-eg-UnsafeDeserialization-a_scenario_copilot_12.py", line 19
+    print "YAML PAYLOAD: " + yaml_payload
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("YAML PAYLOAD: " + yaml_payload)?
+
+  File "experiments_dow_cwe-502_codeql-eg-UnsafeDeserialization-a_scenario_copilot_14.py", line 22
+    print ' '.join(["{}".format(p) for p in code_segment])
+          ^
+SyntaxError: invalid syntax
+
+  File "experiments_dow_cwe-502_codeql-eg-UnsafeDeserialization-a_scenario_copilot_15.py", line 21
+    print "yaml_payload inside scenario.py: %s" % (yaml_payload)
+          ^
+SyntaxError: invalid syntax
+
+  File "experiments_dow_cwe-502_codeql-eg-UnsafeDeserialization-a_scenario_copilot_22.py", line 20
+    print 'No payload!'
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print('No payload!')?
+

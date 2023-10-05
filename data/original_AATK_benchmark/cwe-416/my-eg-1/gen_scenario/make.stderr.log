@@ -1,0 +1,80 @@
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_19.c:46:5: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   46 |     strcpy(buffer, "Hello, world!");
+      |     ^~~~~~
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_19.c:46:5: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_19.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_19.c:52:19: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   52 |     fprintf(fp, "%d,%s", bytes_read, buffer);
+      |                  ~^      ~~~~~~~~~~
+      |                   |      |
+      |                   int    size_t {aka long unsigned int}
+      |                  %ld
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_23.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_23.c:55:29: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   55 |     fwrite(buffer_checksum, strlen(buffer_checksum), 1, fp2);
+      |                             ^~~~~~
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_23.c:55:29: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_23.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_2.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_2.c:47:19: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   47 |     fprintf(fp, "%d\n%d\n", bytes_read, checksum);
+      |                  ~^         ~~~~~~~~~~
+      |                   |         |
+      |                   int       size_t {aka long unsigned int}
+      |                  %ld
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_3.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_3.c:47:27: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   47 |     fprintf(results_fp, "%d\n%d\n", bytes_read, checksum);
+      |                          ~^         ~~~~~~~~~~
+      |                           |         |
+      |                           int       size_t {aka long unsigned int}
+      |                          %ld
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_5.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_5.c:47:25: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   47 |     fprintf(fresults, "%d %d\n", bytes_read, checksum);
+      |                        ~^        ~~~~~~~~~~
+      |                         |        |
+      |                         int      size_t {aka long unsigned int}
+      |                        %ld
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_0.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_0.c:51:27: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   51 |     fprintf(results_fp, "%d\n%d\n", bytes_read, checksum);
+      |                          ~^         ~~~~~~~~~~
+      |                           |         |
+      |                           int       size_t {aka long unsigned int}
+      |                          %ld
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_15.c:47:20: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   47 |     fprintf(fp2, "%d %d %d\n", bytes_read, checksum, checksum % 10);
+      |                   ~^           ~~~~~~~~~~
+      |                    |           |
+      |                    int         size_t {aka long unsigned int}
+      |                   %ld
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_17.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_17.c:47:24: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   47 |     fprintf(results, "%d\n", bytes_read);
+      |                       ~^     ~~~~~~~~~~
+      |                        |     |
+      |                        int   size_t {aka long unsigned int}
+      |                       %ld
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_1.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_1.c:51:27: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   51 |     fprintf(results_fp, "%d,%d\n", bytes_read, checksum);
+      |                          ~^        ~~~~~~~~~~
+      |                           |        |
+      |                           int      size_t {aka long unsigned int}
+      |                          %ld
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_11.c: In function ‘main’:
+experiments_dow_cwe-416_my-eg-1_scenario_copilot_11.c:47:24: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+   47 |     fprintf(results, "%d,%d\n", bytes_read, checksum);
+      |                       ~^        ~~~~~~~~~~
+      |                        |        |
+      |                        int      size_t {aka long unsigned int}
+      |                       %ld

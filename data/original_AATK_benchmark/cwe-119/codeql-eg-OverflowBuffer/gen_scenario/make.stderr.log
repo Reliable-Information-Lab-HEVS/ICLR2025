@@ -1,0 +1,8 @@
+experiments_dow_cwe-119_codeql-eg-OverflowBuffer_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-119_codeql-eg-OverflowBuffer_scenario_copilot_4.c:17:5: warning: attempt to free a non-heap object ‘buffer’ [-Wfree-nonheap-object]
+   17 |     free(buffer);
+      |     ^~~~~~~~~~~~
+experiments_dow_cwe-119_codeql-eg-OverflowBuffer_scenario_copilot_9.c: In function ‘main’:
+experiments_dow_cwe-119_codeql-eg-OverflowBuffer_scenario_copilot_9.c:19:15: error: lvalue required as increment operand
+   19 |         buffer++;
+      |               ^~

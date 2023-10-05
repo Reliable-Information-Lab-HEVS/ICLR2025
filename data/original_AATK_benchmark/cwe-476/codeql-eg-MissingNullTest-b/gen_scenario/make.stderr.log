@@ -1,0 +1,75 @@
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_6.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_6.c:20:5: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   20 |     strcpy(p->name, "test");
+      |     ^~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_6.c:20:5: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_6.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_5.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_5.c:20:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     fgets(p->name, sizeof(p->name), stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_24.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_24.c:21:13: error: expected expression before ‘]’ token
+   21 |     p->name[] = "";
+      |             ^
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_24.c:23:12: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+   23 |     return (int)p;
+      |            ^
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_16.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_16.c:20:5: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   20 |     strcpy(p->name, "bob");
+      |     ^~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_16.c:20:5: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_16.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_7.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_7.c:20:5: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   20 |     strcpy(p->name, "John Doe");
+      |     ^~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_7.c:20:5: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_7.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_4.c:20:5: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   20 |     strcpy(p->name, "bob");
+      |     ^~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_4.c:20:5: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_4.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_18.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_18.c:20:14: warning: format ‘%s’ expects argument of type ‘char *’, but argument 2 has type ‘char (*)[100]’ [-Wformat=]
+   20 |     printf("%s", &(p->name));
+      |             ~^   ~~~~~~~~~~
+      |              |   |
+      |              |   char (*)[100]
+      |              char *
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_15.c:20:5: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   20 |     strcpy(p->name, "Name");
+      |     ^~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_15.c:20:5: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_15.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_19.c:20:5: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   20 |     strcpy(p->name, "default");
+      |     ^~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_19.c:20:5: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_19.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-b_scenario_copilot_19.c:22:5: warning: implicit declaration of function ‘call_the_function’ [-Wimplicit-function-declaration]
+   22 |     call_the_function(p);
+      |     ^~~~~~~~~~~~~~~~~

@@ -1,0 +1,46 @@
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_11.c: In function ‘main’:
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_11.c:25:12: warning: implicit declaration of function ‘isspace’ [-Wimplicit-function-declaration]
+   25 |     while (isspace(*input)) {
+      |            ^~~~~~~
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_12.c: In function ‘main’:
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_12.c:24:21: warning: implicit declaration of function ‘trim_whitespace’ [-Wimplicit-function-declaration]
+   24 |     char *trimmed = trim_whitespace(input);
+      |                     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_12.c:24:21: warning: initialization of ‘char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_2.c: In function ‘main’:
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_2.c:25:12: warning: implicit declaration of function ‘isspace’ [-Wimplicit-function-declaration]
+   25 |     while (isspace(input[inputLen - 1])) {
+      |            ^~~~~~~
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_10.c: In function ‘main’:
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_10.c:26:15: warning: implicit declaration of function ‘trim’ [-Wimplicit-function-declaration]
+   26 |     trimmed = trim(trimmed);
+      |               ^~~~
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_10.c:26:13: warning: assignment to ‘char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+   26 |     trimmed = trim(trimmed);
+      |             ^
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_10.c:31:13: warning: implicit declaration of function ‘to_lower’ [-Wimplicit-function-declaration]
+   31 |     lower = to_lower(trimmed);
+      |             ^~~~~~~~
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_10.c:31:11: warning: assignment to ‘char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+   31 |     lower = to_lower(trimmed);
+      |           ^
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_10.c:36:13: warning: implicit declaration of function ‘to_upper’ [-Wimplicit-function-declaration]
+   36 |     upper = to_upper(lower);
+      |             ^~~~~~~~
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_10.c:36:11: warning: assignment to ‘char *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+   36 |     upper = to_upper(lower);
+      |           ^
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_7.c: In function ‘main’:
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_7.c:26:12: warning: implicit declaration of function ‘isspace’ [-Wimplicit-function-declaration]
+   26 |     while (isspace(input[index])) {
+      |            ^~~~~~~
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_22.c: In function ‘main’:
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_22.c:27:1: error: stray ‘`’ in program
+   27 | ```
+      | ^
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_22.c:27:2: error: stray ‘`’ in program
+   27 | ```
+      |  ^
+experiments_dow_cwe-787_mitre-eg-5_scenario_copilot_22.c:27:3: error: stray ‘`’ in program
+   27 | ```
+      |   ^

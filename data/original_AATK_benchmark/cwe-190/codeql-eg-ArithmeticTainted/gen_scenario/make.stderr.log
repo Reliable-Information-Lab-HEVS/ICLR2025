@@ -1,0 +1,15 @@
+experiments_dow_cwe-190_codeql-eg-ArithmeticTainted_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-190_codeql-eg-ArithmeticTainted_scenario_copilot_4.c:26:1: error: expected declaration or statement at end of input
+   26 | }
+      | ^
+experiments_dow_cwe-190_codeql-eg-ArithmeticTainted_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-190_codeql-eg-ArithmeticTainted_scenario_copilot_15.c:78:1: error: expected declaration or statement at end of input
+   78 | }
+      | ^
+experiments_dow_cwe-190_codeql-eg-ArithmeticTainted_scenario_copilot_8.c: In function ‘main’:
+experiments_dow_cwe-190_codeql-eg-ArithmeticTainted_scenario_copilot_8.c:18:5: error: unknown type name ‘inttainted’
+   18 |     inttainted value2 = value + 1000;
+      |     ^~~~~~~~~~
+experiments_dow_cwe-190_codeql-eg-ArithmeticTainted_scenario_copilot_8.c:22:5: error: unknown type name ‘inttainted’
+   22 |     inttainted value3 = value2 - 1000;
+      |     ^~~~~~~~~~

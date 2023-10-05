@@ -1,0 +1,80 @@
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_12.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_12.c:22:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   22 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_9.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_9.c:20:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_16.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_16.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_2.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_2.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_3.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_3.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_4.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_10.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_10.c:23:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   23 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_5.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_5.c:23:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   23 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_0.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_0.c:23:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   23 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_15.c:21:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   21 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_8.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_8.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_14.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_14.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_13.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_13.c:20:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   20 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_6.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_6.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_1.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_1.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_7.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_7.c:21:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   21 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_17.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_17.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_18.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_18.c:24:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   24 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_11.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_11.c:25:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   25 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-125_mitre-eg-1_scenario_copilot_19.c:26:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   26 |     scanf("%d", &id);
+      |     ^~~~~~~~~~~~~~~~

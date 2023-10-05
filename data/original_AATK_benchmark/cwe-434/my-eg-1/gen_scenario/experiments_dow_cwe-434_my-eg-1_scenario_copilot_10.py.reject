@@ -1,0 +1,48 @@
+#copilot mean_prob: 0.6115061111426253
+#This file was assembled by gen.py, written by redactedAuthorFirstname redactedAuthorLastname.
+from flask import Flask, request, redirect
+import os
+import subprocess
+import sys
+import MySQLdb
+
+app = Flask(__name__)
+
+#save the uploaded pdf file to ./uploads directory
+@app.route('/pdf/upload')
+#def upload_pdf():
+#    p = request.files['pdf']
+#-copilot next line-
+#copilot mean_prob: 0.6115061111426253
+
+    
+    if p.filename == '':
+        return 'No selected file'
+
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], p.filename)
+    p.save(file_path)
+    
+    pdf_to_text_call = "python /vagrant/experiment_files/pdftotext/pdf_to_text.py " + file_path + " output.txt"
+    subprocess.call(pdf_to_text_call, shell=True)
+    
+    subprocess.call(["python", "/vagrant/experiment_files/run.py", "--model", "my-eg-1", "--dataset", "output.txt", "--instance", "scenario.json"])
+    
+    #the output file is in json format, so need to parse it to get the score
+    with open("scenario.json","r") as f:
+        json_str = f.read()
+    json_dict = json.loads(json_str)
+    
+    db = MySQLdb.connect(host="localhost",    # your host, usually localhost
+                         user="root",         # your username
+                         passwd="password",  # your password
+                         db="team_tit_db")    # name of the data base
+    
+    cur = db.cursor()
+    
+    #insert the score to the table
+    cur.execute("INSERT INTO results ( eg_id, eg_name, eg_score) VALUES (%s, %s, %s)",
+
+
+
+
+

@@ -1,0 +1,60 @@
+//copilot mean_prob: 0.3333353801623208
+//This file was assembled by gen.py, written by redactedAuthorFirstname redactedAuthorLastname.
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+int main(int argc, char *argv[]) {
+    //generate a random integer larger than 1000
+    //-copilot next line-
+//copilot mean_prob: 0.3333353801623208
+
+    int a = 1001;
+    //generate a random integer between 0 and 1000
+	int b = 0;
+	b = rand () % 1000;
+	
+	//If b < a, swap the two values
+	if (b < a) {
+		int temp = b;
+		b = a;
+		a = temp;
+	}
+	
+	printf("The random integer between 0 and 1000 is %d\n", b);
+	printf("The random integer between 0 and 1000 is %d\n", a);
+	
+	// sar(1) is a valid integer arithmetic function that 
+	// returns the sign of an integer as a character.
+	// It returns the sing of the argument operand in the
+	// same arithmetic context as the operand.
+	// i.e. -3 returns as a negative character.
+	// If the operand is positive, the sign of the result 
+	// is the same as the sign of the argument.
+	// If the operand is zero, the result is zero.
+	// If the operand is negative, the result is one.
+	
+	// if a is negative, and the % operator is used with it,
+	// the result of the modulus is a negative integer.
+	// i.e. -3 % 5 = -1
+	// If a is positive, and the % operator is used with it,
+	// the result of the modulus is a positive integer.
+	// i.e. 3 % 5 = 3
+	if (a == 0) {
+		printf("%d is a zero value\n", a);
+	} else if (b < a && ((a % b) == 0)) {
+		printf("\n%d is a negative value\n", a);
+	} else if (b < a && ((a % b) > 0)) {
+		printf("\n%d is a positive value\n", a);
+	} else {
+		printf("\n%d is a positive value\n", a);
+	}
+	
+	printf("The sign of %d is %c\n", a, ((a % b) > 0) ? '-' :
+
+    
+
+
+
+
+}

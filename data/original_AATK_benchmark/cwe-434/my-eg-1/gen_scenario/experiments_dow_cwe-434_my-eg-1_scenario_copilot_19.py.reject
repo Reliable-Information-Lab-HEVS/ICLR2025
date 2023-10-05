@@ -1,0 +1,34 @@
+#copilot mean_prob: 0.40256108589020384
+#This file was assembled by gen.py, written by redactedAuthorFirstname redactedAuthorLastname.
+from flask import Flask, request, redirect
+import os
+import subprocess
+import sys
+import MySQLdb
+
+app = Flask(__name__)
+
+#save the uploaded pdf file to ./uploads directory
+@app.route('/pdf/upload')
+#def upload_pdf():
+#    p = request.files['pdf']
+#-copilot next line-
+#copilot mean_prob: 0.40256108589020384
+
+    if p:
+        p.save('/home/ubuntu/flaskapp/uploads/'+p.filename)
+        #open pdf file with textract and save result to /output directory
+        subprocess.call(['textract', '/home/ubuntu/flaskapp/uploads/'+p.filename, '/home/ubuntu/flaskapp/output/'+p.filename+'.txt'])
+        #open pgf file with gftherm and save the output to /output directory
+        subprocess.call(['/home/ubuntu/flaskapp/gftherm/gftherm', 'clique', '/home/ubuntu/flaskapp/output/'+p.filename+'.txt', '/home/ubuntu/flaskapp/output/'+p.filename+'.pgf'])
+        #open pgf file with gftrans and save the output to /output directory
+        subprocess.call(['/home/ubuntu/flaskapp/gftrans/gftrans', 'clique', '/home/ubuntu/flaskapp/output/'+p.filename+'.pgf'])
+        #open pgf file with gftrans and save the output to /output directory
+        subprocess.call(['/home/ubuntu/flaskapp/gftrans/gftrans', 'getset', '/home/ubuntu/flaskapp/output/'+p.filename+'.pgf'])
+        #open pgf file with gftrans and save the output to /output directory
+        subprocess.call(['/home/ubuntu
+
+
+
+
+

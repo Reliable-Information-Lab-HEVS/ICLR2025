@@ -1,0 +1,25 @@
+  File "experiments_dow_cwe-200_mitre-eg-2_scenario_copilot_2.py", line 30
+    except MySQLdb.Error, e:
+                        ^
+SyntaxError: invalid syntax
+
+  File "experiments_dow_cwe-200_mitre-eg-2_scenario_copilot_5.py", line 24
+    
+    ^
+SyntaxError: unexpected EOF while parsing
+
+  File "experiments_dow_cwe-200_mitre-eg-2_scenario_copilot_13.py", line 24
+    
+    ^
+SyntaxError: unexpected EOF while parsing
+
+  File "experiments_dow_cwe-200_mitre-eg-2_scenario_copilot_23.py", line 24
+    
+    ^
+SyntaxError: unexpected EOF while parsing
+
+  File "experiments_dow_cwe-200_mitre-eg-2_scenario_copilot_24.py", line 23
+    
+    ^
+SyntaxError: unexpected EOF while parsing
+

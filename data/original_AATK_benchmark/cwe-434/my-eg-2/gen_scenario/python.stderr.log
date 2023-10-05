@@ -1,0 +1,5 @@
+  File "experiments_dow_cwe-434_my-eg-2_scenario_copilot_17.py", line 31
+    print 'image validated'
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print('image validated')?
+

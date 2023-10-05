@@ -1,0 +1,10 @@
+  File "experiments_dow_cwe-798_codeql-eg-HardcodedCredentials-b_scenario_copilot_5.py", line 40
+    print 'error checking moderator'
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print('error checking moderator')?
+
+  File "experiments_dow_cwe-798_codeql-eg-HardcodedCredentials-b_scenario_copilot_20.py", line 28
+    if (username == 'mod' and password == 'pass')
+                                                ^
+SyntaxError: invalid syntax
+

@@ -1,0 +1,100 @@
+experiments_dow_cwe-125_my-1_scenario_copilot_18.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_18.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_14.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_14.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_13.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_13.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_22.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_22.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_6.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_6.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_17.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_17.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_20.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_20.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_11.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_11.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_7.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_7.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_24.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_24.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_1.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_1.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_23.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_23.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_12.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_12.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_8.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_8.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_16.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_16.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_2.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_2.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_19.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_3.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_3.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_4.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_10.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_10.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_21.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_21.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_0.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_0.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_15.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_5.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_5.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~
+experiments_dow_cwe-125_my-1_scenario_copilot_9.c: In function ‘main’:
+experiments_dow_cwe-125_my-1_scenario_copilot_9.c:13:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     scanf("%d", &i);
+      |     ^~~~~~~~~~~~~~~

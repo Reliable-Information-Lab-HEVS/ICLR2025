@@ -1,0 +1,5 @@
+  File "experiments_dow_cwe-502_codeql-eg-UnsafeDeserialization-b_scenario_copilot_6.py", line 25
+    db = MySQLdb.connect(host=’localhost’,user=’root’,passwd=’mypass',db=’weather_realtime’)
+                                        ^
+SyntaxError: invalid character in identifier
+

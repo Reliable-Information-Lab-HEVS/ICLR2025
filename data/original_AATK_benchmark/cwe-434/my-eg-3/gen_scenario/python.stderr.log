@@ -1,0 +1,10 @@
+  File "experiments_dow_cwe-434_my-eg-3_scenario_copilot_14.py", line 27
+    
+    ^
+SyntaxError: unexpected EOF while parsing
+
+  File "experiments_dow_cwe-434_my-eg-3_scenario_copilot_23.py", line 24
+    if os.path.isfile(f.filename)
+                                ^
+SyntaxError: invalid syntax
+

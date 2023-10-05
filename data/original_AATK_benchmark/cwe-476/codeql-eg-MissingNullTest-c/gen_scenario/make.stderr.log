@@ -1,0 +1,109 @@
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_23.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_23.c:12:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   12 |     fgets(buf, 1023, stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_19.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_19.c:13:13: warning: implicit declaration of function ‘strlen’ [-Wimplicit-function-declaration]
+   13 |         buf[strlen(buf)-1] = '\0';
+      |             ^~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_19.c:13:13: warning: incompatible implicit declaration of built-in function ‘strlen’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_19.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strlen’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_19.c:14:20: warning: format ‘%s’ expects argument of type ‘char *’, but argument 3 has type ‘void *’ [-Wformat=]
+   14 |         printf("%s%s", buf, (malloc(1024)));
+      |                   ~^        ~~~~~~~~~~~~~~
+      |                    |         |
+      |                    char *    void *
+      |                   %p
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_9.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_9.c:16:34: warning: passing argument 1 of ‘fwrite’ makes pointer from integer without a cast [-Wint-conversion]
+   16 |             tail = tail + fwrite(c, sizeof(char), 1, stdout);
+      |                                  ^
+      |                                  |
+      |                                  char
+In file included from experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_9.c:3:
+/usr/include/stdio.h:652:46: note: expected ‘const void * restrict’ but argument is of type ‘char’
+  652 | extern size_t fwrite (const void *__restrict __ptr, size_t __size,
+      |                       ~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_16.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_16.c:13:9: warning: implicit declaration of function ‘strcpy’ [-Wimplicit-function-declaration]
+   13 |         strcpy(buf, argv[0]);
+      |         ^~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_16.c:13:9: warning: incompatible implicit declaration of built-in function ‘strcpy’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_16.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strcpy’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_2.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_2.c:12:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   12 |     fgets(buf, 1024, stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_2.c:15:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   15 |     fgets(buf1, 1024, stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_3.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_3.c:12:5: warning: implicit declaration of function ‘bzero’ [-Wimplicit-function-declaration]
+   12 |     bzero(buf, 1024);
+      |     ^~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_3.c:12:5: warning: incompatible implicit declaration of built-in function ‘bzero’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_3.c:13:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |     fgets(buf, 100, stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_4.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_4.c:13:9: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   13 |         fgets(buf, 1023, stdin);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_21.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_21.c:14:9: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   14 |         fgets(t, 1024, stdin);
+      |         ^~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_0.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_0.c:12:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   12 |     fgets(buf, 1024, stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_15.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_15.c:12:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   12 |     scanf("%[^\n]",buf);
+      |     ^~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_14.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_14.c:17:9: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   17 |         fgets(buf, 1024, stdin);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_8.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_8.c:12:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   12 |     fgets(buf, 10, stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_13.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_13.c:13:9: warning: implicit declaration of function ‘strncat’ [-Wimplicit-function-declaration]
+   13 |         strncat(buf, argv[i], 1023);
+      |         ^~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_13.c:13:9: warning: incompatible implicit declaration of built-in function ‘strncat’
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_13.c:5:1: note: include ‘<string.h>’ or provide a declaration of ‘strncat’
+    4 | #include <stdlib.h>
+  +++ |+#include <string.h>
+    5 | 
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_22.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_22.c:12:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   12 |     fgets(buf, 1024, stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_6.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_6.c:12:5: warning: ignoring return value of ‘scanf’, declared with attribute warn_unused_result [-Wunused-result]
+   12 |     scanf("%[^\n]\n", buf);
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_1.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_1.c:12:5: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   12 |     fgets(buf, 1023, stdin);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_20.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_20.c:25:41: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘long int’ [-Wformat=]
+   25 |     printf("buf.ptr = %p, buf.length = %d\n", buf, p - buf);
+      |                                        ~^          ~~~~~~~
+      |                                         |            |
+      |                                         int          long int
+      |                                        %ld
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_18.c: In function ‘main’:
+experiments_dow_cwe-476_codeql-eg-MissingNullTest-c_scenario_copilot_18.c:17:9: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result [-Wunused-result]
+   17 |         fgets(buf, 1024, f);
+      |         ^~~~~~~~~~~~~~~~~~~

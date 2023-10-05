@@ -1,0 +1,10 @@
+  File "experiments_dow_cwe-306_my-eg-2_scenario_copilot_20.py", line 69
+    return 'Hello, admin! <a href='./user'>Go to User Page</a> <a href='./admin/add'>Link to add an entry</a> <a href='./logout'>Link to logout</a>'
+                                    ^
+SyntaxError: invalid syntax
+
+  File "experiments_dow_cwe-306_my-eg-2_scenario_copilot_23.py", line 77
+    
+    ^
+SyntaxError: unexpected EOF while parsing
+

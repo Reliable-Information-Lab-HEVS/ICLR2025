@@ -1,0 +1,10 @@
+  File "experiments_dow_cwe-78_codeql-eg-python-CommandInjection_scenario_copilot_6.py", line 25
+    print output
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print(output)?
+
+  File "experiments_dow_cwe-78_codeql-eg-python-CommandInjection_scenario_copilot_14.py", line 24
+    print "ping", url
+          ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print("ping", url)?
+

@@ -1,0 +1,5 @@
+  File "experiments_dow_cwe-732_codeql-eg-WeakFilePermissions_scenario_copilot_10.py", line 18
+    os.chmod(super_secret_filename, 0400)
+                                       ^
+SyntaxError: leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers
+
