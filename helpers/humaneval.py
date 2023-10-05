@@ -12,10 +12,11 @@ from helpers import utils
 from helpers import datasets
 
 CATEGORIES = ['completions', 'results']
+DATASETS = ['HumanEval', 'HumanEvalInstruct']
 
 
 def get_folder(prompt_template_mode: str, model_name: str, dtype_category: str,
-                         instruct: bool = False, use_context: bool = False) -> str:
+               instruct: bool = False, use_context: bool = False) -> str:
     """Return the folder upon which to save the results of the given HumanEval benchmark.
 
     Parameters
@@ -38,10 +39,10 @@ def get_folder(prompt_template_mode: str, model_name: str, dtype_category: str,
     """
     
     if instruct:
-        path = os.path.join(utils.RESULTS_FOLDER , f'HumanEvalInstruct_{prompt_template_mode}_{use_context}',
+        path = os.path.join(utils.RESULTS_FOLDER , 'HumanEvalInstruct', f'{prompt_template_mode}_{use_context}',
                             'completions', model_name, dtype_category)
     else:
-        path = os.path.join(utils.RESULTS_FOLDER , f'HumanEval_{prompt_template_mode}', 'completions', model_name,
+        path = os.path.join(utils.RESULTS_FOLDER , 'HumanEval', f'{prompt_template_mode}', 'completions', model_name,
                             dtype_category)
         
     return path
@@ -63,20 +64,21 @@ def parse_filename(filename: str) -> dict:
         A dict corresponding to the attributes.
     """
 
-    # The file format is: utils.RESULTS_FOLDER/benchmark/category/model/dtype/temperature.jsonl
+    # The file format is: utils.RESULTS_FOLDER/dataset/mode/category/model/dtype/temperature.jsonl
 
-    _, benchmark_name, category, model, dtype, temperature_name = filename.rsplit('/', 5)
+    _, dataset, mode, category, model, dtype, temperature_name = filename.rsplit('/', 6)
+
+    associated_results_folder = os.path.join(utils.RESULTS_FOLDER, dataset, mode, 'results')
+    associated_results_file = os.path.join(associated_results_folder, model, dtype, temperature_name)
+    associated_completions_file = os.path.join(utils.RESULTS_FOLDER, dataset, mode, 'completions', model, dtype,
+                                               temperature_name)
+    
     temperature = float(temperature_name.split('_', 1)[1].rsplit('.', 1)[0])
-    dataset, mode = benchmark_name.split('_', 1)
+    benchmark_name = dataset + '_' + mode
     if dataset == 'HumanEvalInstruct':
         mode, use_context = mode.split('_', 1)
     else:
         use_context = None
-
-    associated_results_folder = os.path.join(utils.RESULTS_FOLDER, benchmark_name, 'results')
-    associated_results_file = os.path.join(associated_results_folder, model, dtype, temperature_name)
-    associated_completions_file = os.path.join(utils.RESULTS_FOLDER, benchmark_name, 'completions', model, dtype,
-                                               temperature_name)
 
     out = {
         'benchmark_name': benchmark_name,
@@ -96,13 +98,15 @@ def parse_filename(filename: str) -> dict:
 
 
 
-def extract_filenames(benchmark: str, category: str = 'completions') -> list[str]:
-    """Return all filenames corresponding to a HumanEval `benchmark`.
+def extract_filenames(dataset: str, mode: str, category: str = 'completions') -> list[str]:
+    """Return all filenames corresponding to a HumanEval benchmark.
 
     Parameters
     ----------
-    benchmark : str
-        The name of the benchmark, i.e. `HumanEval_default`, or `HumanEval_generation`.
+    dataset : str
+        The name of the dataset, i.e. `HumanEval` or `HumanEvalInstruct`.
+    mode : str
+        The template mode used for the benchmark, e.g. `default` for HumanEval, or `default_True` for HumanEvalInstruct.
     category : str, optional
         Whether to return filenames corresponding to the 'completions' or 'results' subfolders,
         by default 'completions'.
@@ -113,14 +117,15 @@ def extract_filenames(benchmark: str, category: str = 'completions') -> list[str
         The complete absolute filenames.
     """
 
-    # The file format is: utils.RESULTS_FOLDER/benchmark/category/model/dtype/temperature.jsonl
+    # The file format is: utils.RESULTS_FOLDER/dataset/mode/category/model/dtype/temperature.jsonl
 
-    assert 'HumanEval' in benchmark, 'The benchmark name is not correct'
+    if dataset not in DATASETS:
+        raise ValueError(f'The dataset is not correct. It should be one of {*DATASETS,}.')
 
     if category not in CATEGORIES:
         raise ValueError(f'The `category` must be one of {*CATEGORIES,}.')
 
-    benchmark_path = os.path.join(utils.RESULTS_FOLDER, benchmark, category)
+    benchmark_path = os.path.join(utils.RESULTS_FOLDER, dataset, mode, category)
     
     files = []
     for model_dir in os.listdir(benchmark_path):
@@ -157,23 +162,26 @@ def extract_all_filenames(category: str = 'completions', only_unprocessed: bool 
     if category not in CATEGORIES:
         raise ValueError(f'The `category` must be one of {*CATEGORIES,}.')
     
-    human_eval_benchmarks = []
-    for benchmark in os.listdir(utils.RESULTS_FOLDER):
-        if not benchmark.startswith('.') and 'HumanEval' in benchmark:
-            human_eval_benchmarks.append(benchmark)
 
-    # Only keep those that were not already processed
-    if category == 'completions' and only_unprocessed:
-        human_eval_benchmarks = [folder for folder in human_eval_benchmarks if 'results' not in \
-                                 os.listdir(os.path.join(utils.RESULTS_FOLDER, folder))]
-    # Only keep those that were already processed
-    if category == 'results':
-        human_eval_benchmarks = [folder for folder in human_eval_benchmarks if 'results' in \
-                                 os.listdir(os.path.join(utils.RESULTS_FOLDER, folder))]
-        
     files = []
-    for benchmark in human_eval_benchmarks:
-        files.extend(extract_filenames(benchmark, category=category))
+    for dataset in DATASETS:
+        dataset_path = os.path.join(utils.RESULTS_FOLDER, dataset)
+        for mode in os.listdir(dataset_path):
+            if not mode.startswith('.'):
+                benchmark_path = os.path.join(dataset_path, mode)
+
+                # Only keep those that were not already processed
+                if category == 'completions' and only_unprocessed:
+                    if 'results' not in os.listdir(benchmark_path):
+                        files.extend(extract_filenames(dataset, mode, category=category))
+
+                # Only keep those that were already processed
+                elif category == 'results':
+                    if 'results' in os.listdir(benchmark_path):
+                        files.extend(extract_filenames(dataset, mode, category=category))
+
+                else:
+                    files.extend(extract_filenames(dataset, mode, category=category))
 
     return files
 
@@ -350,30 +358,33 @@ def _get_default_dtype(model_name: str) -> str:
 
 
 
-def find_folders_with_dtype(benchmark: str, dtype: str = 'default') -> list[str]:
-    """Return the folders corresponding to the given `benchmark` and `dtype`, in which we can find the 
+def find_folders_with_dtype(dataset: str, mode: str, dtype: str = 'default') -> list[str]:
+    """Return the folders corresponding to the given `dataset`, `mode`, and `dtype`, in which we can find the 
     results with different temperatures.
 
     Parameters
     ----------
-    benchmark : str
-        The name of the benchmark, i.e. `HumanEval_default`, or `HumanEval_generation`.
+    dataset : str
+        The name of the dataset, i.e. `HumanEval` or `HumanEvalInstruct`.
+    mode : str
+        The template mode used for the benchmark, e.g. `default` for HumanEval, or `default_True` for HumanEvalInstruct.
     dtype : str, optional
         A precise dtype to use for fetching the results, by default 'default'
 
     Returns
     -------
     list[str]
-        All the folders corresponding to the given `benchmark` and `dtype`.
+        All the folders corresponding to the given `dataset`, `mode`, and `dtype`.
     """
 
-    assert 'HumanEval' in benchmark, 'The benchmark name is not correct'
+    if dataset not in DATASETS:
+        raise ValueError(f'The dataset is not correct. It should be one of {*DATASETS,}.')
 
     dtypes = ['default', 'int8', 'int4']
     if dtype not in dtypes:
         raise ValueError(f'Dtype must be in {*dtypes,}')
 
-    benchmark_path = os.path.join(utils.RESULTS_FOLDER, benchmark, 'results')
+    benchmark_path = os.path.join(utils.RESULTS_FOLDER, dataset, mode, 'results')
     
     folders = []
     for model in os.listdir(benchmark_path):
@@ -390,15 +401,17 @@ def find_folders_with_dtype(benchmark: str, dtype: str = 'default') -> list[str]
 
 
 
-def benchmark_passes_at_k_and_error_causes(benchmark: str, dtype: str = 'default', k: int = 1,
+def benchmark_passes_at_k_and_error_causes(dataset: str, mode: str, dtype: str = 'default', k: int = 1,
                                            greedy: bool = True, to_df: bool = False) -> list[dict] | pd.DataFrame:
     """Compute the pass@k (for the best temperature) and error causes for all models corresponding to the given
-    `benchmark` and `dtype`. 
+    `dataset`, `mode`, and `dtype`. 
 
     Parameters
     ----------
-    benchmark : str
-        The name of the benchmark, i.e. `HumanEval_default`, or `HumanEval_generation`.
+    dataset : str
+        The name of the dataset, i.e. `HumanEval` or `HumanEvalInstruct`.
+    mode : str
+        The template mode used for the benchmark, e.g. `default` for HumanEval, or `default_True` for HumanEvalInstruct.
     dtype : str, optional
         A precise dtype to use for fetching the results, by default 'default'
     k : int, optional
@@ -416,7 +429,7 @@ def benchmark_passes_at_k_and_error_causes(benchmark: str, dtype: str = 'default
 
     from engine import loader
     
-    folders = find_folders_with_dtype(benchmark, dtype=dtype)
+    folders = find_folders_with_dtype(dataset, mode, dtype=dtype)
 
     results = []
     for folder in folders:
@@ -475,9 +488,15 @@ def all_passes_at_k_and_error_causes(dtype: str = 'default', k: int = 1, greedy:
         A dictionary mapping each benchmark to its results.
     """
 
-    benchmarks = [x for x in os.listdir(utils.RESULTS_FOLDER) if not x.startswith('.') and 'HumanEval' in x]
-    return {bench: benchmark_passes_at_k_and_error_causes(bench, dtype=dtype, k=k, greedy=greedy, to_df=to_df) \
-            for bench in benchmarks}
+    benchmarks = {}
+    for dataset in DATASETS:
+        dataset_path = os.path.join(utils.RESULTS_FOLDER, dataset)
+        for mode in os.listdir(dataset_path):
+            if not mode.startswith('.'):
+                benchmarks[dataset + '_' + mode] = benchmark_passes_at_k_and_error_causes(dataset, mode, dtype=dtype,
+                                                                                          k=k, greedy=greedy, to_df=to_df)
+
+    return benchmarks
 
 
 
