@@ -280,7 +280,7 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
     folder = humaneval.get_folder('HumanEvalPHP', 'generation', model_name, model.dtype_category(),
                                   use_context=use_context)
 
-    dataset = datasets.HumanEvalInstruct()
+    dataset = datasets.HumanEvalPHP()
 
     t0 = time.time()
 
