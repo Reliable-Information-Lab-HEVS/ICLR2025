@@ -16,8 +16,8 @@ from helpers import utils
 from helpers import humaneval
 
 # TEMPERATURES = (0., 0.2, 0.4, 0.6, 0.8, 1.)
-# TEMPERATURES = (0.,)
-TEMPERATURES = (0.8,)
+TEMPERATURES = (0.,)
+# TEMPERATURES = (0.8,)
 
 # We need to set top_k to 0 to deactivate top-k sampling
 HUMAN_EVAL_GENERATION_KWARGS = {
