@@ -37,9 +37,14 @@ def update_model(model_name: str, quantization_8bits: bool = False, quantization
     quantization : bool, optional
         Whether to load the model in 8 bits mode.
     """
-    
+
     global model
     global conversation
+
+    # If we ask for the same setup, do nothing
+    if model_name == model.model_name and quantization_8bits == model.quantization_8bits and \
+        quantization_4bits == model.quantization_4bits:
+        return '', '', '', [[None, None]]
 
     if quantization_8bits and quantization_4bits:
         raise gr.Error('You cannot use both int8 and int4 quantization. Choose either one and try reloading.')
@@ -253,7 +258,7 @@ def clear_chatbot():
 
 
 # Define general elements of the UI (generation parameters)
-model_name = gr.Dropdown(loader.ALLOWED_MODELS, value=model.model_name, label='Model name',
+model_name = gr.Dropdown(loader.ALLOWED_MODELS, value=DEFAULT, label='Model name',
                          info='Choose the model you want to use.', multiselect=False)
 quantization_8bits = gr.Checkbox(value=False, label='int8 quantization', visible=torch.cuda.is_available())
 quantization_4bits = gr.Checkbox(value=False, label='int4 quantization', visible=torch.cuda.is_available())
@@ -380,8 +385,7 @@ with demo:
     # Perform chat generation when clicking the button
     generate_event2 = generate_button_chat.click(chat_generation, inputs=inputs_to_chatbot,
                                                  outputs=[prompt_chat, output_chat])
-    # generate_event2 = generate_button_chat.click(chat_generation, inputs=inputs_to_chatbot,
-                                                #  outputs=output_chat)
+
     # Add automatic callback on success
     generate_event2.success(lambda *args: automatic_logging_chat.flag(args), inputs=inputs_to_chat_callback,
                             preprocess=False)
@@ -400,9 +404,15 @@ with demo:
     automatic_logging_chat.setup(inputs_to_chat_callback, flagging_dir='chatbot_logs')
 
     # Change visibility of generation parameters if we perform greedy search
-    do_sample.input(lambda value: [gr.update(visible=value) for _ in range(6)], inputs=do_sample,
+    do_sample.input(lambda value: [gr.update(visible=value) for _ in range(5)], inputs=do_sample,
                     outputs=[top_k, top_p, temperature, use_seed, seed])
     
+    # Correctly display the model and quantization currently on memory if we refresh the page (instead of default value for the elements)
+    # and correctly reset the chat output
+    demo.load(lambda: [gr.update(value=model.model_name), gr.update(value=conversation.to_gradio_format()),
+                       gr.update(value=model.quantization_8bits), gr.update(value=model.quantization_4bits)],
+              outputs=[model_name, output_chat, quantization_8bits, quantization_4bits])
+
 
 if __name__ == '__main__':
     demo.queue().launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])
