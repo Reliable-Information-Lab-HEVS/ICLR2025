@@ -253,7 +253,7 @@ def clear_chatbot():
 
 
 # Define general elements of the UI (generation parameters)
-model_name = gr.Dropdown(loader.ALLOWED_MODELS, value=DEFAULT, label='Model name',
+model_name = gr.Dropdown(loader.ALLOWED_MODELS, value=model.model_name, label='Model name',
                          info='Choose the model you want to use.', multiselect=False)
 quantization_8bits = gr.Checkbox(value=False, label='int8 quantization', visible=torch.cuda.is_available())
 quantization_4bits = gr.Checkbox(value=False, label='int4 quantization', visible=torch.cuda.is_available())
