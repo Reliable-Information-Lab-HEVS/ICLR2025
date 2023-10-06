@@ -157,8 +157,8 @@ if __name__ == '__main__':
                         help='If given, only run the benchmark on large models that do not fit on a single gpu.')
     parser.add_argument('--special_only', action='store_true',
                         help='If given, will only run the benchmark on models with a non-default prompt template.')
-    parser.add_argument('--mode', type=str, default='default', choices=PROMPT_MODES,
-                        help='The mode for the prompt template.')
+    parser.add_argument('--mode', type=str, default='generation', choices=PROMPT_MODES,
+                        help='The mode for the prompt template. By default `generation`.')
     
     args = parser.parse_args()
     int8 = args.int8

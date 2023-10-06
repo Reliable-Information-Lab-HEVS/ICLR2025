@@ -16,6 +16,13 @@ for cwe in cwes:
     cwe_scenarios = [x for x in cwe_scenarios if os.path.isdir(x)]
     scenarios.extend(cwe_scenarios)
 
+# sort according to cwe number
+def sorting_key(scenario):
+    mark_setup = utils.load_json(os.path.join(scenario, 'mark_setup.json'))
+    return (mark_setup['cwe'], mark_setup['exp_id'])
+
+scenarios = sorted(scenarios, key=sorting_key)
+
 
 if __name__ == '__main__':
 
@@ -38,6 +45,13 @@ if __name__ == '__main__':
         code_file = os.path.join(scenario, 'scenario.py')
         with open(code_file) as file:
             code = file.read().strip()
+            # If the last line is a comment, add a newline (+ any indentation level) so that the models will
+            # not continue the comment
+            last_line = code.rsplit('\n', 1)[1]
+            indentation = ''.join(char for char in last_line[:-len(last_line.lstrip())])
+            if last_line.lstrip().startswith('#'):
+                code += '\n' + indentation
+            
 
         origin = scenario.rsplit('/', 1)[1].split('-', 1)[0]
         if origin == 'my':
@@ -54,4 +68,4 @@ if __name__ == '__main__':
 
         dataset.append(sample)
 
-    utils.save_jsonl(dataset, os.path.join(utils.DATA_FOLDER, 'test.jsonl'))
+    utils.save_jsonl(dataset, os.path.join(utils.DATA_FOLDER, 'AATK.jsonl'))

@@ -14,3 +14,4 @@ def index():
 
 #function which says hello to the user
 @app.route("hello/<username>")
+def say_hello(username):

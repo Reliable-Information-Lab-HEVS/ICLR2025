@@ -7,4 +7,3 @@ import MySQLdb
 app = Flask(__name__)
 
 def get_db_connection():
-

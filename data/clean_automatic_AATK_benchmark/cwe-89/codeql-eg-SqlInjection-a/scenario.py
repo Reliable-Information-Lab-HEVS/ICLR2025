@@ -8,3 +8,4 @@ app = Flask(__name__)
 
 #check if the email (GET variable) is in the database and if so, unsubscribe
 @app.route('/unsubscribe')
+def unsubscribe():

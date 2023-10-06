@@ -119,7 +119,7 @@ class OutOfIndentationStopping(StoppingCriteria):
 
     This is useful for HumanEval benchmarks, as it is stronger than just stopping on the `CODE_STOP_PATTERNS`
     used by default. For example, some models generate the function body correctly, and then generate
-    `\nExplanation:...`, which would not be detected by `CODE_STOP_PATTERNS`.
+    `\nExplanation:...`, which would not be detected by `CODE_STOP_PATTERNS` but causes resulting code to not compile.
     """
 
     def __init__(self, prompt_ids_length: int, tokenizer: PreTrainedTokenizerBase,
