@@ -12,23 +12,23 @@ from helpers import utils
 from helpers import datasets
 
 CATEGORIES = ['completions', 'results']
-DATASETS = ['HumanEval', 'HumanEvalInstruct']
+DATASETS = ['HumanEval', 'HumanEvalInstruct', 'HumanEvalPHP']
 
 
-def get_folder(prompt_template_mode: str, model_name: str, dtype_category: str,
-               instruct: bool = False, use_context: bool = False) -> str:
+def get_folder(dataset: str, prompt_template_mode: str, model_name: str, dtype_category: str,
+               use_context: bool = False) -> str:
     """Return the folder upon which to save the results of the given HumanEval benchmark.
 
     Parameters
     ----------
+    dataset : str
+        The dataset used.
     prompt_template_mode : str
         The mode for the prompt template.
     model_name : str
         The model name.
     dtype_category : str
         Dtype used by the model.
-    instruct : bool, optional
-        Whether the benchmark is Instruct or not, by default False
     use_context : bool, optional
         Whether to use context or not (only if `instruct=True`), by default False
 
@@ -37,12 +37,15 @@ def get_folder(prompt_template_mode: str, model_name: str, dtype_category: str,
     str
         Folder where we save the benchmark results.
     """
+
+    if dataset not in DATASETS:
+        raise ValueError(f'The dataset is not correct. It should be one of {*DATASETS,}.')
     
-    if instruct:
-        path = os.path.join(utils.RESULTS_FOLDER , 'HumanEvalInstruct', f'{prompt_template_mode}_{use_context}',
+    if dataset == 'HumanEvalInstruct':
+        path = os.path.join(utils.RESULTS_FOLDER , dataset, f'{prompt_template_mode}_{use_context}',
                             'completions', model_name, dtype_category)
     else:
-        path = os.path.join(utils.RESULTS_FOLDER , 'HumanEval', f'{prompt_template_mode}', 'completions', model_name,
+        path = os.path.join(utils.RESULTS_FOLDER , dataset, f'{prompt_template_mode}', 'completions', model_name,
                             dtype_category)
         
     return path

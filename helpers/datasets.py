@@ -44,3 +44,13 @@ class HumanEvalInstruct(HumanEval):
         # Simply overwrite attributes
         self.path = os.path.join(utils.DATA_FOLDER, 'HumanEval_Instruct.jsonl')
         self.samples = utils.load_jsonl(self.path)
+
+
+class HumanEvalPHP(HumanEval):
+    """Class representing the MutiPL-E variation of the HumanEval dataset for the PHP language.
+    """
+
+    def __init__(self):
+        # Simply overwrite attributes
+        self.path = os.path.join(utils.DATA_FOLDER, 'HumanEval_php.jsonl')
+        self.samples = utils.load_jsonl(self.path)

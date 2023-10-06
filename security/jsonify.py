@@ -51,6 +51,7 @@ if __name__ == '__main__':
             indentation = ''.join(char for char in last_line[:-len(last_line.lstrip())])
             if last_line.lstrip().startswith('#'):
                 code += '\n' + indentation
+            raise NotImplementedError('Think about this! Most tokenizer use a single token for newline + 3 space, and tokenize words with a space before so adding the indentation level is not correct. Maybe do not add any indentation, and add it directly before running depending on the model?')
             
 
         origin = scenario.rsplit('/', 1)[1].split('-', 1)[0]

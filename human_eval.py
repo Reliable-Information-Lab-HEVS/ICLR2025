@@ -101,8 +101,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     stopping_patterns = None if model.is_chat_model() else stopping.CODE_STOP_PATTERNS
-    folder = humaneval.get_folder(prompt_template_mode, model_name, model.dtype_category(),
-                                          instruct=False)
+    folder = humaneval.get_folder('HumanEval', prompt_template_mode, model_name, model.dtype_category())
 
     dataset = datasets.HumanEval()
 
@@ -187,8 +186,8 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     stopping_patterns = None if model.is_chat_model() else stopping.CODE_STOP_PATTERNS
-    folder = humaneval.get_folder(prompt_template_mode, model_name, model.dtype_category(),
-                                          instruct=True, use_context=use_context)
+    folder = humaneval.get_folder('HumanEvalInstruct', prompt_template_mode, model_name, model.dtype_category(),
+                                  use_context=use_context)
 
     dataset = datasets.HumanEvalInstruct()
 
@@ -249,6 +248,77 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
     gc.collect()
 
 
+
+@utils.duplicate_function_for_gpu_dispatch
+def human_eval_php(model_name: str, quantization_8bits: bool = False,
+                   quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
+                   generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
+                   greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
+    """Generate the HumanEvalPHP completions for different temperatures with the model `model_name` and
+    save the results.
+
+    Parameters
+    ----------
+    model_name : str
+        The model name.
+    temperatures : tuple[int], optional
+        The different temperaturs to use to generate the completions, by default TEMPERATURES
+    generation_kwargs : dict, optional
+        The argument for generation used in the HumanEval benchmark, by default HUMAN_EVAL_GENERATION_KWARGS
+    greedy_generation_kwargs : dict, optional
+        The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
+    """
+
+    print(f'Starting with model {model_name}')
+
+    # Override quantization for bloom because it's too big
+    if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
+        model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+    else:
+        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+
+    folder = humaneval.get_folder('HumanEvalPHP', 'generation', model_name, model.dtype_category(),
+                                  use_context=use_context)
+
+    dataset = datasets.HumanEvalInstruct()
+
+    t0 = time.time()
+
+    for temperature in temperatures:
+
+        filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
+        # Delete the file if it already exist for some reason (e.g. a previous run that dit not end correctly)
+        # because in this case we do not want to append to the file
+        if os.path.exists(filename):
+            os.remove(filename)
+
+        for sample in dataset:
+
+            task_id = sample['task_id']
+            prompt = sample['prompt'].strip() 
+            stopping_patterns = sample['stop_tokens']
+
+            # In this case we use greedy decoding (the temperature parameters does not matter anymore
+            # so we set it to the default which is 1)
+            if temperature == 0:
+                completions = [model(prompt, temperature=1., batch_size=1, stopping_patterns=stopping_patterns,
+                                     prompt_template_mode='generation', **greedy_generation_kwargs)]
+            # In this case we use top-p sampling
+            else:
+                completions = model(prompt, temperature=temperature, stopping_patterns=stopping_patterns,
+                                    prompt_template_mode='generation', **generation_kwargs)
+
+            # Save the model completions
+            results = [{'task_id': task_id, 'completion': completion} for completion in completions]
+            utils.save_jsonl(results, filename, append=True)
+
+    dt = time.time() - t0
+
+    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    del model
+    gc.collect()
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='HumanEval benchmark')
@@ -268,6 +338,8 @@ if __name__ == '__main__':
                         help='If given, run the HumanEvalInstruct benchmark.')
     parser.add_argument('--no_context', action='store_false',
                         help='If given, do NOT use the context in the HumanEvalInstruct benchmark.')
+    parser.add_argument('--php', action='store_true',
+                        help='If given, run the HumanEvalPHP benchmark.')
     
     args = parser.parse_args()
     int8 = args.int8
@@ -278,9 +350,13 @@ if __name__ == '__main__':
     instruct = args.instruct
     mode = args.mode
     use_context = args.no_context
+    php = args.php
 
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
+    
+    if instruct and php:
+        raise ValueError('instruct and php options are mutually exclusive.')
 
     # Do not even attempt to run the script without access to gpus
     if not torch.cuda.is_available():
@@ -299,10 +375,15 @@ if __name__ == '__main__':
         models = small_models
 
     # target function
-    target_func = human_eval_instruct if instruct else human_eval
-
-    # arguments depending on target function
-    args = (models, mode, use_context, int8, int4) if instruct else (models, mode, int8, int4)
+    if instruct:
+        target_func = human_eval_instruct
+        args = (models, mode, use_context, int8, int4)
+    elif php:
+        target_func = human_eval_php
+        args = (models, int8, int4)
+    else:
+        target_func = human_eval
+        args = (models, mode, int8, int4)
 
     print(f'Launching computations with {num_gpus} gpus available.')
 
