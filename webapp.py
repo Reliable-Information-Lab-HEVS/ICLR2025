@@ -23,6 +23,7 @@ CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
 # Initialize global model (necessary not to reload the model for each new inference)
 model = engine.HFModel(DEFAULT)
 
+# TODO: make conversation a session state variable instead of global state variable
 # Initialize a global conversation object for chatting with the models
 conversation = model.get_empty_conversation()
 
