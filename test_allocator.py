@@ -5,7 +5,7 @@ import os
 from helpers import utils
 print(os.getcwd())
 
-command = 'srun -ntasks 1 --gpus 1 --cpus-per-task 2 --mem 20G python3 test_srun.py'
+command = 'srun --ntasks 1 --gpus 1 --cpus-per-task 2 --mem 20G python3 test_srun.py'
 
 t0 = time.time()
 for i in range(3):
