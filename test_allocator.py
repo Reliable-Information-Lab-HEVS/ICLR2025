@@ -21,7 +21,7 @@ for i in range(5):
 
 
 for p in processes:
-    if p.poll() is None:
+    while p.poll() is None:
         time.sleep(1)
 
 dt = time.time() - t0
