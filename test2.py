@@ -147,44 +147,50 @@ Monkeys, these captivating creatures of the wild, offer us a glimpse into the wo
 
 # print(model_footprints)
 
-def memory_usage(past_key_values):
-    """Recursively compute the memory footprint of past key values (in bytes).
-    """
+# def memory_usage(past_key_values):
+#     """Recursively compute the memory footprint of past key values (in bytes).
+#     """
 
-    if isinstance(past_key_values, torch.Tensor):
-        return past_key_values.nelement() * past_key_values.element_size()
-    elif isinstance(past_key_values[0], torch.Tensor):
-        return sum([x.nelement() * x.element_size() for x in past_key_values])
-    else:
-        return sum([memory_usage(x) for x in past_key_values])
-
-
-model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/starchat-alpha', device_map='auto', torch_dtype=torch.float16)
-tokenizer = AutoTokenizer.from_pretrained('HuggingFaceH4/starchat-alpha')
-
-ids = tokenizer.encode(large_text)
-prompt = tokenizer.decode(ids[0:1500], skip_special_tokens=True)
+#     if isinstance(past_key_values, torch.Tensor):
+#         return past_key_values.nelement() * past_key_values.element_size()
+#     elif isinstance(past_key_values[0], torch.Tensor):
+#         return sum([x.nelement() * x.element_size() for x in past_key_values])
+#     else:
+#         return sum([memory_usage(x) for x in past_key_values])
 
 
-with torch.no_grad():
-    prompt_ids = tokenizer.encode(prompt, return_tensors='pt').cuda()
+# model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/starchat-alpha', device_map='auto', torch_dtype=torch.float16)
+# tokenizer = AutoTokenizer.from_pretrained('HuggingFaceH4/starchat-alpha')
+
+# ids = tokenizer.encode(large_text)
+# prompt = tokenizer.decode(ids[0:1500], skip_special_tokens=True)
+
+
+# with torch.no_grad():
+#     prompt_ids = tokenizer.encode(prompt, return_tensors='pt').cuda()
     
-    actual_peaks = {}
-    for gpu_rank in range(torch.cuda.device_count()):
-        torch.cuda.reset_peak_memory_stats(gpu_rank)
-        actual_peaks[gpu_rank] = torch.cuda.max_memory_allocated(gpu_rank) / 1024**3
+#     actual_peaks = {}
+#     for gpu_rank in range(torch.cuda.device_count()):
+#         torch.cuda.reset_peak_memory_stats(gpu_rank)
+#         actual_peaks[gpu_rank] = torch.cuda.max_memory_allocated(gpu_rank) / 1024**3
 
-    # Single forward pass, caching past key values
-    output = model(prompt_ids, use_cache=True)
+#     # Single forward pass, caching past key values
+#     output = model(prompt_ids, use_cache=True)
 
-    memory_used = {}
-    for gpu_rank in range(torch.cuda.device_count()):
-        memory_used[gpu_rank] = (torch.cuda.max_memory_allocated(gpu_rank) / 1024**3) - actual_peaks[gpu_rank]
+#     memory_used = {}
+#     for gpu_rank in range(torch.cuda.device_count()):
+#         memory_used[gpu_rank] = (torch.cuda.max_memory_allocated(gpu_rank) / 1024**3) - actual_peaks[gpu_rank]
     
-# Actual largest memory usage peak accross gpus
-max_peak = max(memory_used.values())
-# Compute size of past K-V
-past_key_values_memory = memory_usage(output.past_key_values) / 1024**3
+# # Actual largest memory usage peak accross gpus
+# max_peak = max(memory_used.values())
+# # Compute size of past K-V
+# past_key_values_memory = memory_usage(output.past_key_values) / 1024**3
 
-print(f'max peak: {max_peak}')
-print(f'KV: {past_key_values_memory}')
+# print(f'max peak: {max_peak}')
+# print(f'KV: {past_key_values_memory}')
+
+
+t0 = time.time()
+model = engine.HFModel('star-coder')
+dt = time.time() - t0
+print(f'Loading time: {dt:.2f} s')
