@@ -33,6 +33,9 @@ def test():
 
 if __name__ == '__main__':
 
+    t0 = time.time()
     utils.dispatch_jobs([1]*5, 3, test)
+    dt = time.time() - t0
+    print(f'Everything done in {dt:.2f} s')
 
 # test()
