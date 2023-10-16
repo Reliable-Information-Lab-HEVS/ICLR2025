@@ -18,14 +18,19 @@ from engine import loader
 from helpers import utils, datasets
 
 
-model_name = 'llama2-7B'
-model = engine.HFModel(model_name)
+@utils.duplicate_function_for_gpu_dispatch
+def test():
+    model_name = 'llama2-7B'
+    model = engine.HFModel(model_name)
 
-dataset = datasets.HumanEval()
+    dataset = datasets.HumanEval()
 
-t0 = time.time()
-for sample in dataset[0:10]:
-    out = model(sample['prompt'], prompt_template_mode='generation')
-dt = time.time() - t0
-print(f'Done in {dt:.2f} s, with visible devices : {os.environ["CUDA_VISIBLE_DEVICES"]}')
+    t0 = time.time()
+    for sample in dataset[0:10]:
+        out = model(sample['prompt'], prompt_template_mode='generation')
+    dt = time.time() - t0
+    print(f'Done in {dt:.2f} s, with visible devices : {os.environ["CUDA_VISIBLE_DEVICES"]}')
 
+if __name__ == '__main__':
+
+    utils.dispatch_jobs([1]*5, 3, test)

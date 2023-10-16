@@ -16,6 +16,7 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
-python3 test_allocator.py
+# python3 test_allocator.py
+python3 test_srun.py
 
 conda deactivate
