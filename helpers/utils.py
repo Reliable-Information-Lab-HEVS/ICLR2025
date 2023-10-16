@@ -559,7 +559,8 @@ def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callabl
 
 
 
-def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[str]):
+def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[str], cpus_per_task: int = 2,
+                       memory: float = 20):
 
     if any([x > num_gpus for x in gpu_footprints]):
         raise ValueError('One of the function calls needs more gpus than the total number available `num_gpus`.')
@@ -587,7 +588,8 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            full_command = f'srun --ntasks=1 --gpus-per-task={footprint} --cpus-per-task=2 --mem=20G ' + commands.pop(0)
+            full_command = f'srun --ntasks=1 --gpus-per-task={footprint} --cpus-per-task={cpus_per_task} --mem={memory}G ' + \
+                commands.pop(0)
             p = subprocess.Popen(full_command.split(' '), stdout=sys.stdout, stderr=sys.stderr)
 
             # Add them to the list of running processes
