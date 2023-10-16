@@ -20,7 +20,7 @@ from helpers import utils, datasets
 
 @utils.duplicate_function_for_gpu_dispatch
 def test():
-    model_name = 'llama2-7B'
+    model_name = 'bloom-560M'
     model = engine.HFModel(model_name)
 
     dataset = datasets.HumanEval()
