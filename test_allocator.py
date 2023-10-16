@@ -29,6 +29,6 @@ command = 'srun --ntasks=1 --gpus-per-task={gpus} --cpus-per-task=2 --mem=20G py
 
 
 t0 = time.time()
-utils.dispatch_jobs_srun([1]*5, ['python3 test_srun.py']*5)
+utils.dispatch_jobs_srun([1]*5, 3, ['python3 test_srun.py']*5)
 dt = time.time() - t0
 print(f'Everything done in {dt:.2f} s')
