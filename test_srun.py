@@ -38,4 +38,5 @@ def test():
 #     dt = time.time() - t0
 #     print(f'Everything done in {dt:.2f} s')
 
-test()
+if __name__ == '__main__': 
+    test()
