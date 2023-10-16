@@ -21,6 +21,7 @@ from helpers import utils, datasets
 @utils.duplicate_function_for_gpu_dispatch
 def test():
     model_name = 'star-coder'
+    print(f'Starting with {model_name}')
     model = engine.HFModel(model_name)
 
     dataset = datasets.HumanEval()

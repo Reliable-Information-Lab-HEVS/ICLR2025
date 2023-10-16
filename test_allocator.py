@@ -7,7 +7,7 @@ from helpers import utils
 
 print(os.environ['CUDA_VISIBLE_DEVICES'])
 
-command = 'srun --ntasks=1 --gpus-per-task={gpus} --cpus-per-task=2 --mem=20G python3 test_srun.py'
+command = 'srun --ntasks=1 --gpus-per-task={gpus} --cpus-per-task=2 --mem=60G python3 test_srun.py'
 
 # t0 = time.time()
 # processes = []
