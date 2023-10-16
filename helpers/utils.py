@@ -597,7 +597,8 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
         # Find the indices of the processes that are finished if any
         indices_to_remove = []
         for i, process in enumerate(processes):
-            if not process.poll() is None:
+            if process.poll() is not None:
+                process.terminate()
                 indices_to_remove.append(i)
 
         if not len(indices_to_remove) == 0:
