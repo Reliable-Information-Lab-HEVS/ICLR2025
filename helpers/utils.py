@@ -587,7 +587,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            full_command = f'srun --ntasks=1 --gpus-per_task={footprint} --cpus-per-task=2 --mem=20G ' + commands.pop(0)
+            full_command = f'srun --ntasks=1 --gpus-per-task={footprint} --cpus-per-task=2 --mem=20G ' + commands.pop(0)
             p = subprocess.Popen(full_command.split(' '), stdout=sys.stdout, stderr=sys.stderr)
 
             # Add them to the list of running processes
