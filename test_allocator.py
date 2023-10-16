@@ -3,7 +3,8 @@ import time
 import os
 
 from helpers import utils
-print(os.getcwd())
+
+print(os.environ['CUDA_VISIBLE_DEVICES'])
 
 command = 'srun --ntasks 1 --gpus 1 --cpus-per-task 2 --mem 20G python3 test_srun.py'
 
