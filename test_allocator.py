@@ -15,6 +15,9 @@ for i in range(3):
     # p = subprocess.Popen([os.path.join(utils.ROOT_FOLDER, 'wrapper.sh'), f'{i}'])
     p = subprocess.Popen(command.format(gpus=1).split(' '), stdout=subprocess.PIPE)
     processes.append(p)
+
+for p in processes:
     p.wait()
+    
 dt = time.time() - t0
 print(f'Everything done in {dt:.2f} s')
