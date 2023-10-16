@@ -560,12 +560,17 @@ def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callabl
 
 
 def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[str], cpus_per_task: int = 2,
-                       memory: float = 20):
+                       memory: float = 30):
 
     if any([x > num_gpus for x in gpu_footprints]):
         raise ValueError('One of the function calls needs more gpus than the total number available `num_gpus`.')
     
     N = len(gpu_footprints)
+
+    sorting = sorted(zip(gpu_footprints, commands), key=lambda x: x[0])
+    # Collect back the iterables
+    gpu_footprints = [x[0] for x in sorting]
+    commands = [x[1] for x in sorting]
 
     # Initialize the lists we will maintain
     available_gpus = [i for i in range(num_gpus)]
