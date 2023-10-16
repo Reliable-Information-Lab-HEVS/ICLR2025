@@ -14,13 +14,14 @@ processes = []
 for i in range(5):
     # subprocess.run(command.format(gpus=1).split(' '))
     # p = subprocess.Popen([os.path.join(utils.ROOT_FOLDER, 'wrapper.sh'), f'{i}'])
-    p = subprocess.Popen(command.format(gpus=1).split(' '), stdout=sys.stdout, stderr=sys.stderr)
+    # p = subprocess.Popen(command.format(gpus=1).split(' '), stdout=sys.stdout, stderr=sys.stderr)
+    p = subprocess.Popen(['ls'], stdout=sys.stdout, stderr=sys.stderr)
     print(f'Is running') if p.poll() is None else print('Is not running')
     processes.append(p)
 
 
 for p in processes:
-    if not p.poll() is None:
+    if p.poll() is None:
         time.sleep(1)
 
 dt = time.time() - t0
