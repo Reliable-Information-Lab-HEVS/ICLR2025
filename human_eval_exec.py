@@ -5,8 +5,6 @@ import time
 import copy
 import re
 
-import torch
-
 import engine
 from engine import stopping
 from engine.prompt_template import PROMPT_MODES
