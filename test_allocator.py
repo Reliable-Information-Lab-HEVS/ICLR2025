@@ -6,7 +6,7 @@ from helpers import utils
 
 print(os.environ['CUDA_VISIBLE_DEVICES'])
 
-command = 'srun --ntasks 1 --gpus 1 --gpu-bind per_task:{gpus} --cpus-per-task 2 --mem 20G python3 test_srun.py'
+command = 'srun --ntasks=1 --gpus=1 --gpu-bind=per_task:{gpus} --cpus-per-task=2 --mem=20G python3 test_srun.py'
 
 t0 = time.time()
 for i in range(3):
