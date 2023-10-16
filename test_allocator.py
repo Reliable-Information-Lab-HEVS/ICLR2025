@@ -18,7 +18,8 @@ for i in range(5):
     processes.append(p)
 
 for p in processes:
-    p.wait()
+    if not p.poll() is None:
+        time.sleep(1)
 
 dt = time.time() - t0
 print(f'Everything done in {dt:.2f} s')

@@ -31,6 +31,8 @@ def test():
     dt = time.time() - t0
     print(f'Done in {dt:.2f} s, with visible devices : {os.environ["CUDA_VISIBLE_DEVICES"]}')
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-    utils.dispatch_jobs([1]*5, 3, test)
+    # utils.dispatch_jobs([1]*5, 3, test)
+
+test()

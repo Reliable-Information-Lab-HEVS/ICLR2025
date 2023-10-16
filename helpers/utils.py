@@ -555,4 +555,69 @@ def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callabl
         process.join()
 
 
+
+
+def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[str]):
+
+    if any([x > num_gpus for x in gpu_footprints]):
+        raise ValueError('One of the function calls needs more gpus than the total number available `num_gpus`.')
+    
+    N = len(gpu_footprints)
+
+    # Initialize the lists we will maintain
+    available_gpus = [i for i in range(num_gpus)]
+    processes = []
+    associated_gpus = []
+
+    while True:
+
+        no_sleep = False
+
+        # In this case we have enough gpus available to launch the job that needs the less gpus
+        if len(available_gpus) >= gpu_footprints[0]:
+
+            no_sleep = True
+
+            # Remove them from the list of models to process
+            footprint = gpu_footprints.pop(0)
+
+            # Update gpu resources
+            allocated_gpus = available_gpus[0:footprint]
+            available_gpus = available_gpus[footprint:]
+
+            full_command = f'srun --ntasks=1 --gpus-per_task={footprint} --cpus-per-task=2 --mem=20G ' + commands.pop(0)
+            p = subprocess.Popen(full_command.split(' '))
+
+            # Add them to the list of running processes
+            processes.append(p)
+            associated_gpus.append(allocated_gpus)
+
+        # Find the indices of the processes that are finished if any
+        indices_to_remove = []
+        for i, process in enumerate(processes):
+            if not process.poll() is None:
+                indices_to_remove.append(i)
+
+        if not len(indices_to_remove) == 0:
+            # Update gpu resources
+            released_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i in indices_to_remove]
+            available_gpus += [gpu for gpus in released_gpus for gpu in gpus]
+            # Remove processes which are done
+            processes = [process for i, process in enumerate(processes) if i not in indices_to_remove]
+            associated_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i not in indices_to_remove]
+
+        # If we scheduled all jobs, break from the infinite loop
+        if len(gpu_footprints) == 0:
+            break
+
+        # Sleep for 3 seconds before restarting the loop and check if we have enough resources to launch
+        # a new job
+        if not no_sleep:
+            time.sleep(3)
+
+    # Sleep until all processes are finished (they have all been scheduled at this point)
+    for process in processes:
+        process.join()
+
+
     
