@@ -40,7 +40,7 @@ models = small_models + large_models
 print(f'Launching computations with {num_gpus} gpus available.')
 
 gpu_footprints = engine.estimate_number_of_gpus(models, False, False)
-commands = [f'sleep 30' for _ in models]
+commands = [f'echo "starting" & sleep 30' for _ in models]
 utils.dispatch_jobs_srun(gpu_footprints, num_gpus, commands)
 dt = time.time() - t0
 print(f'Everything done in {dt:.2f} s')
