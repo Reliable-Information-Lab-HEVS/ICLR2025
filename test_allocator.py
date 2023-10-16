@@ -1,6 +1,7 @@
 import subprocess
 import time
 import os
+import sys
 
 from helpers import utils
 
@@ -13,7 +14,7 @@ processes = []
 for i in range(5):
     # subprocess.run(command.format(gpus=1).split(' '))
     # p = subprocess.Popen([os.path.join(utils.ROOT_FOLDER, 'wrapper.sh'), f'{i}'])
-    p = subprocess.Popen(command.format(gpus=1).split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(command.format(gpus=1).split(' '), stdout=sys.stdout, stderr=sys.stderr)
     processes.append(p)
 
 for p in processes:
