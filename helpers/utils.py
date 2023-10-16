@@ -1,8 +1,10 @@
 import os
+import sys
 import json
 import time
 import random
 import textwrap
+import subprocess
 import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, TypeVar, ParamSpec
@@ -586,7 +588,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
             available_gpus = available_gpus[footprint:]
 
             full_command = f'srun --ntasks=1 --gpus-per_task={footprint} --cpus-per-task=2 --mem=20G ' + commands.pop(0)
-            p = subprocess.Popen(full_command.split(' '))
+            p = subprocess.Popen(full_command.split(' '), stdout=sys.stdout, stderr=sys.stderr)
 
             # Add them to the list of running processes
             processes.append(p)
@@ -617,7 +619,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
 
     # Sleep until all processes are finished (they have all been scheduled at this point)
     for process in processes:
-        process.join()
+        process.wait()
 
 
     
