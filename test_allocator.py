@@ -12,6 +12,7 @@ t0 = time.time()
 for i in range(3):
     # subprocess.run(command.format(gpus=1).split(' '))
     # p = subprocess.Popen([os.path.join(utils.ROOT_FOLDER, 'wrapper.sh'), f'{i}'])
-    p = subprocess.Popen(command.format(gpus=1).split(' '))
+    p = subprocess.Popen(command.format(gpus=1).split(' '), stdout=subprocess.PIPE)
+    p.wait()
 dt = time.time() - t0
 print(f'Everything done in {dt:.2f} s')
