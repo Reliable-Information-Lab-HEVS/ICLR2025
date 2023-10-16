@@ -26,7 +26,7 @@ def test():
     dataset = datasets.HumanEval()
 
     t0 = time.time()
-    for sample in dataset[0:10]:
+    for sample in dataset[0:50]:
         out = model(sample['prompt'], prompt_template_mode='generation')
     dt = time.time() - t0
     print(f'Done in {dt:.2f} s, with visible devices : {os.environ["CUDA_VISIBLE_DEVICES"]}')
