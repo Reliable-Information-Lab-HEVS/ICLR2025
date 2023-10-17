@@ -90,7 +90,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'Starting with model {model_name}')
+    print(f'{utils.get_time()}  Starting with model {model_name}')
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):

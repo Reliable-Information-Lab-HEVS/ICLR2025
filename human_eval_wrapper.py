@@ -1,4 +1,5 @@
 import argparse
+import time
 
 import torch
 
@@ -55,17 +56,19 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
     # Select models (only keep the good coders)
-    small_models = engine.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.SMALL_GOOD_CODERS
-    large_models = engine.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.LARGE_GOOD_CODERS
-    if big_models_only:
-        models = large_models
-    elif big_models:
-        models = small_models + large_models
-    else:
-        models = small_models
+    # small_models = engine.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.SMALL_GOOD_CODERS
+    # large_models = engine.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.LARGE_GOOD_CODERS
+    # if big_models_only:
+    #     models = large_models
+    # elif big_models:
+    #     models = small_models + large_models
+    # else:
+    #     models = small_models
+    models = ['star-code-base']
 
     print(f'Launching computations with {num_gpus} gpus available.')
 
+    # Create the commands to run
     gpu_footprints = engine.estimate_number_of_gpus(models, int8, int4)
     commands = [f'python3 -u human_eval_exec.py {model} --mode {mode}' for model in models]
     if int8:
@@ -79,5 +82,10 @@ if __name__ == '__main__':
     if php:
         commands = [c + ' --php' for c in commands]
         
+    t0 = time.time()
+
     utils.dispatch_jobs_srun(gpu_footprints, num_gpus, commands)
+
+    dt = time.time() - t0
+    print(f'Overall it took {dt/3600:.2f}h !')
 

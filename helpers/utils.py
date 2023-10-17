@@ -2,9 +2,11 @@ import os
 import sys
 import json
 import time
+import datetime
 import random
 import textwrap
 import subprocess
+import shlex
 import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, TypeVar, ParamSpec
@@ -78,6 +80,32 @@ def get_hf_token(token_file: str = '.hf_token.txt') -> str:
         raise ValueError('The file you provided for your token does not exist.')
 
     return token
+
+
+def get_datetime() -> str:
+    """Return current date and time as a string.
+
+    Returns
+    -------
+    str
+        Date and time.
+    """
+
+    now = datetime.datetime.now()
+    return now.strftime('%d/%m/%y %H:%M:%S')
+
+
+def get_time() -> str:
+    """Return current time as a string.
+
+    Returns
+    -------
+    str
+        Time.
+    """
+
+    now = datetime.datetime.now()
+    return now.strftime('%H:%M:%S')
 
 
 def validate_filename(filename: str, extension: str = 'json') -> str:
@@ -420,7 +448,13 @@ def duplicate_function_for_gpu_dispatch(func: Callable[P, T]) -> Callable[P, T]:
 
 def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callable[..., None],
                   *func_args, **func_kwargs):
-    """Dispatch all jobs requiring gpus to different devices in order to run in parallel. Since the number of gpus
+    """
+    ## Disclaimer
+    Consider using function `dispatch_jobs_srun` instead on a slrum cluster, as multiprocessing does not seem
+    to work as it should on the cluster (large overhead, and bunch of subprocess memory not cleaned up sometimes).
+
+    ## Description
+    Dispatch all jobs requiring gpus to different devices in order to run concurrently. Since the number of gpus
     needed by the models is variable, we cannot simply use a Pool of workers and map `target_func` to the Pool, or
     create processes and then ".join" them. To overcome this limitation, we use an infinite while loop that is
     refreshed by the main process every 10s. The dispatch of models to gpus is very naive: as soon as enough gpus
@@ -558,19 +592,59 @@ def dispatch_jobs(gpu_footprints: list[int], num_gpus: int, target_func: Callabl
 
 
 
+def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[str], cpus_per_task: int | list[int] = 2,
+                       memory: float | list[float] = 35):
+    """Dispatch and run all `commands` using `srun` (https://slurm.schedmd.com/srun.html), using the number of
+    gpus contained in `gpu_footprints`. The dispatch of models to gpus is very naive: as soon as enough gpus
+    are available to run the job that requires the less gpu, we launch it. Thus the gpu efficiency may not be the
+    best possible. However, this would be extremely hard to improve on this simple strategy, especially since we do
+    not know the runtime of each job.
 
-def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[str], cpus_per_task: int = 2,
-                       memory: float = 30):
+    This function is a bit more tedious to use compared to `dispatch_jobs` (which uses multiprocessing), because it
+    needs an additional wrapper script around a python executable actually running the function we want. However,
+    it is way more robust and efficient.
+
+    Parameters
+    ----------
+    gpu_footprints : list[int]
+        List containing the number of gpus necessary for each `commands`.
+    num_gpus : int
+        The total number of gpus we have at our disposal.
+    commands : list[str]
+        The executables to run on the slrum cluster using `srun`.
+    cpus_per_task : int | list[int], optional
+        An int describing the number of cpus to use for all task, or a list of ints describing the number of cpus
+        to use for each `commands`, by default 2.
+    memory : float | list[float], optional
+        A float describing the amount of RAM (GB) to use for all task, or a list of floats describing the the
+        amount of RAM (GB) to use for each `commands`, by default 35.
+    """
 
     if any([x > num_gpus for x in gpu_footprints]):
         raise ValueError('One of the function calls needs more gpus than the total number available `num_gpus`.')
     
+    if len(gpu_footprints) != len(commands):
+        raise ValueError('You need to specify the number of gpus for exactly each command to run.')
+    
+    args = (cpus_per_task, memory)
     N = len(gpu_footprints)
+    # Each argument which does not have a len() of size N is cast as a list of repeating elements of size N
+    iterable_args = []
+    for arg in args:
+        try:
+            if len(arg) == N:
+                iterable_args.append(arg)
+            else:
+                iterable_args.append([arg]*N)
+        except TypeError:
+            iterable_args.append([arg]*N)
 
-    sorting = sorted(zip(gpu_footprints, commands), key=lambda x: x[0])
+    sorting = sorted(zip(gpu_footprints, commands, *iterable_args), key=lambda x: x[0])
     # Collect back the iterables
     gpu_footprints = [x[0] for x in sorting]
     commands = [x[1] for x in sorting]
+    cpus_per_task = [x[2] for x in sorting]
+    memory = [x[3] for x in sorting]
 
     # Initialize the lists we will maintain
     available_gpus = [i for i in range(num_gpus)]
@@ -588,14 +662,16 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
 
             # Remove them from the list of models to process
             footprint = gpu_footprints.pop(0)
+            cpus = cpus_per_task.pop(0)
+            mem = memory.pop(0)
+            executable = commands.pop(0)
 
             # Update gpu resources
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            full_command = f'srun --ntasks=1 --gpus-per-task={footprint} --cpus-per-task={cpus_per_task} --mem={memory}G ' + \
-                commands.pop(0)
-            p = subprocess.Popen(full_command.split(' '), stdout=sys.stdout, stderr=sys.stderr)
+            full_command = f'srun --ntasks=1 --gpus-per-task={footprint} --cpus-per-task={cpus} --mem={mem}G {executable}'
+            p = subprocess.Popen(shlex.split(full_command), stdout=sys.stdout, stderr=sys.stderr)
 
             # Add them to the list of running processes
             processes.append(p)
@@ -605,7 +681,8 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
         indices_to_remove = []
         for i, process in enumerate(processes):
             if process.poll() is not None:
-                process.terminate()
+                # the wait() is only used to clean the subprocess (avoid zombies), as it is already done at this point
+                process.wait()
                 indices_to_remove.append(i)
 
         if not len(indices_to_remove) == 0:
