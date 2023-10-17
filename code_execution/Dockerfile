@@ -1,9 +1,12 @@
 FROM python:3.11.3
+RUN apt-get update
+RUN apt-get install php -y
+# RUN echo $(php --version)
 
 WORKDIR /LLMs
 
 COPY results results
-COPY data/HumanEval.jsonl data/HumanEval.jsonl
+COPY data data
 COPY code_execution code_execution
 COPY helpers helpers
 COPY code_eval.py code_eval.py

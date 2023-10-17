@@ -248,10 +248,12 @@ def evaluate_pass_at_k(result_file: str, k: list[int] = [1, 10, 100]) -> dict:
 
     results = defaultdict(list)
 
+    dataset = parse_filename(result_file)['dataset']
+
     for sample in utils.load_jsonl(result_file):
         results[sample["task_id"]].append(sample)
 
-    if len(results) != len(datasets.HumanEval()):
+    if len(results) != len(datasets.DATASETS_MAPPING[dataset]()):
         raise RuntimeError(f'Some problems are not attempted for file {result_file}.')
     
     first_value_length = len(next(iter(results.values())))
