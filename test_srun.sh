@@ -16,7 +16,7 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
-python3 -u test_allocator.py
-# srun --exclusive --exact -v --ntasks=1 --gpus-per-task=0 --cpus-per-task=1 --mem=5G python3 -u test_allocator.py
+# python3 -u test_allocator.py
+srun --exclusive --exact -v --ntasks=1 --cpus-per-task=1 --mem=5G python3 -u test_allocator.py
 
 conda deactivate

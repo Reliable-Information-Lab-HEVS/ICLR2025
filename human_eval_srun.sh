@@ -18,7 +18,7 @@ conda activate llm
 
 # make sure the job scheduler is using very few resources that are not the same as the subprocesses
 # that will be launched
-srun --ntasks=1 --gpus-per-task=0 --cpus-per-task=1 --mem=5G python3 -u human_eval_wrapper.py "$@"
-# python3 -u human_eval_wrapper.py "$@"
+# srun --ntasks=1 --gpus-per-task=0 --cpus-per-task=1 --mem=5G python3 -u human_eval_wrapper.py "$@"
+python3 -u human_eval_wrapper.py "$@"
 
 conda deactivate
