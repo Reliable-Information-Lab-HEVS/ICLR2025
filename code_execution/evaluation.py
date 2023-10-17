@@ -68,7 +68,7 @@ def check_correctness_python(problem: dict, completion: str, timeout: float,
 def check_correctness_php(problem: dict, completion: str, timeout: float,
                           completion_id: int | None = None) -> dict:
     """Evaluates the functional correctness of a php completion by running the test
-    suite provided in the problem. 
+    suite provided in the problem. There are no safeguards as in `check_correctness_python`.
 
     Parameters
     ----------
