@@ -42,10 +42,13 @@ def update_model(model_name: str, quantization_8bits: bool = False, quantization
     global model
     global conversation
 
-    # If we ask for the same setup, do nothing
-    if model_name == model.model_name and quantization_8bits == model.quantization_8bits and \
-        quantization_4bits == model.quantization_4bits:
-        return '', '', '', [[None, None]]
+    try:
+        # If we ask for the same setup, do nothing
+        if model_name == model.model_name and quantization_8bits == model.quantization_8bits and \
+            quantization_4bits == model.quantization_4bits:
+            return '', '', '', [[None, None]]
+    except NameError:
+        pass
 
     if quantization_8bits and quantization_4bits:
         raise gr.Error('You cannot use both int8 and int4 quantization. Choose either one and try reloading.')
