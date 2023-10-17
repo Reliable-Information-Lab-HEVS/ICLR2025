@@ -670,7 +670,10 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
             allocated_gpus = available_gpus[0:footprint]
             available_gpus = available_gpus[footprint:]
 
-            full_command = f'srun --ntasks=1 --gpus-per-task={footprint} --cpus-per-task={cpus} --mem={mem}G {executable}'
+            # exclusive option is on by default for step allocations, and exact is implicitly set by --cpus-per-task,
+            # but we still set them explicitly for completeness
+            full_command = (f'srun --exclusive --exact --ntasks=1 --gpus-per-task={footprint} --cpus-per-task={cpus} '
+                            '--mem={mem}G {executable}')
             p = subprocess.Popen(shlex.split(full_command), stdout=sys.stdout, stderr=sys.stderr)
 
             # Add them to the list of running processes
