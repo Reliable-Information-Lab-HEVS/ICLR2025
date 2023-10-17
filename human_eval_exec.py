@@ -154,7 +154,6 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
 
 
 
-@utils.duplicate_function_for_gpu_dispatch
 def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context: bool, quantization_8bits: bool = False,
                         quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
                         generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
@@ -246,7 +245,6 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
 
 
-@utils.duplicate_function_for_gpu_dispatch
 def human_eval_php(model_name: str, quantization_8bits: bool = False,
                    quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
                    generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
