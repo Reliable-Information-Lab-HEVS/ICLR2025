@@ -54,3 +54,12 @@ class HumanEvalPHP(HumanEval):
         # Simply overwrite attributes
         self.path = os.path.join(utils.DATA_FOLDER, 'HumanEval_php.jsonl')
         self.samples = utils.load_jsonl(self.path)
+
+
+
+# Dataset mapping from dataset name to actual dataset to use for evaluation
+DATASETS_MAPPING = {
+    'HumanEval': HumanEval,
+    'HumanEvalInstruct': HumanEvalInstruct,
+    'HumanEvalPHP': HumanEvalPHP,
+}

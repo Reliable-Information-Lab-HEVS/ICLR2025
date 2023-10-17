@@ -1,6 +1,8 @@
 
 # Acknowledgment: code adapted from https://github.com/openai/human-eval/blob/master/human_eval/evaluation.py
 
+import tempfile
+import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing as mp
 from tqdm import tqdm
@@ -10,9 +12,8 @@ from helpers import utils
 from code_execution.safeguards import unsafe_execute
 from helpers.humaneval import parse_filename
 
-
-def check_correctness(problem: dict, completion: str, timeout: float,
-                      completion_id: int | None = None) -> dict:
+def check_correctness_python(problem: dict, completion: str, timeout: float,
+                             completion_id: int | None = None) -> dict:
     """Evaluates the functional correctness of a completion by running the test
     suite provided in the problem. 
 
@@ -62,6 +63,79 @@ def check_correctness(problem: dict, completion: str, timeout: float,
         return output
     else:
         return output, completion_id
+    
+
+def check_correctness_php(problem: dict, completion: str, timeout: float,
+                          completion_id: int | None = None) -> dict:
+    """Evaluates the functional correctness of a php completion by running the test
+    suite provided in the problem. 
+
+    Parameters
+    ----------
+    problem : dict
+        A sample of the HumanEvalPHP dataset corresponding to a problem.
+    completion : str
+        The completion of the program as given by a model.
+    timeout : float
+        The time after which to stop the program execution.
+    completion_id : int | None, optional
+        An optional completion ID so we can match the results later even if execution finishes asynchronously,
+        by default None.
+
+    Returns
+    -------
+    dict
+        A dict with the result of the test suite.
+    """
+
+    # Construct the check program 
+    program = (
+        problem["prompt"] + completion + "\n" +
+        problem["tests"] 
+    )
+
+    with tempfile.NamedTemporaryFile(suffix='.php', delete=True) as f:
+        f.write(program.encode("utf-8"))
+        f.flush()
+
+        p = subprocess.Popen(['php', f.name], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT, start_new_session=True)
+        
+        try:
+            outs, _ = p.communicate(timeout=timeout)
+            expired = False
+        except subprocess.TimeoutExpired:
+            p.kill()
+            outs, _ = p.communicate()
+            expired = True
+
+        outs = outs.decode('utf-8', errors='ignore')
+
+        if expired:
+            out = {"passed": False, 'result': 'passed out', 'exception': 'TimeoutException'}
+        else:
+            code = p.returncode
+            if code == 0:
+                out = {"passed": True, 'result': 'passed', 'exception': None}
+            else:
+                exception = 'SyntaxError' if "PHP Parse error" in outs else 'Exception'
+                out = {"passed": False, 'result': outs, 'exception': exception}
+
+        output = {'task_id': problem['task_id'], 'completion': completion, **out}
+    
+
+    if completion_id is None:
+        return output
+    else:
+        return output, completion_id
+    
+
+# Mapping from dataset name to check function for evaluation
+CHECK_FUNCTION_MAPPING = {
+    'HumanEval': check_correctness_python,
+    'HumanEvalInstruct': check_correctness_python,
+    'HumanEvalPHP': check_correctness_php,
+}
 
 
 def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeout: float = 3.0):
@@ -79,9 +153,12 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
     """
 
     # Compute name of the output file
-    out_file = parse_filename(sample_file)['associated_results_file']
+    attributes = parse_filename(sample_file)
+    out_file = attributes['associated_results_file']
+    dataset = attributes['dataset']
 
-    problems = datasets.HumanEval().samples_by_id()
+    problems = datasets.DATASETS_MAPPING[dataset]().samples_by_id()
+    check_function = CHECK_FUNCTION_MAPPING[dataset]
 
     # Check the generated samples against test suites.
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
@@ -93,7 +170,7 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
             task_id = sample['task_id']
             completion = sample['completion']
             args = (problems[task_id], completion, timeout, sample_id)
-            future = executor.submit(check_correctness, *args)
+            future = executor.submit(check_function, *args)
             futures.append(future)
             sample_id += 1
 
