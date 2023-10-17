@@ -64,7 +64,7 @@ if __name__ == '__main__':
     #     models = small_models + large_models
     # else:
     #     models = small_models
-    models = ['star-code-base']
+    models = ['star-coder-base']
 
     print(f'Launching computations with {num_gpus} gpus available.')
 
