@@ -4,10 +4,10 @@
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
-#SBATCH --cpus-per-task=12
-#SBATCH --mem=150G
+#SBATCH --cpus-per-task=6
+#SBATCH --mem=21G
 #SBATCH --partition=nodes
-#SBATCH --gres=gpu:a100:5
+#SBATCH --gres=gpu:titanv:5
 #SBATCH --chdir=/cluster/raid/home/vacy/LLMs
 
 # Initialize the shell to use local conda
@@ -16,7 +16,7 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
-python3 -u test_allocator.py
-# python3 test_srun.py
+# python3 -u test_allocator.py
+srun --ntasks=1 --gpus-per-task=0 --cpus-per-task=1 --mem=5G python3 -u test_allocator.py
 
 conda deactivate
