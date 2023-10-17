@@ -56,15 +56,14 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
     # Select models (only keep the good coders)
-    # small_models = engine.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.SMALL_GOOD_CODERS
-    # large_models = engine.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.LARGE_GOOD_CODERS
-    # if big_models_only:
-    #     models = large_models
-    # elif big_models:
-    #     models = small_models + large_models
-    # else:
-    #     models = small_models
-    models = ['star-coder-base']
+    small_models = engine.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.SMALL_GOOD_CODERS
+    large_models = engine.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.LARGE_GOOD_CODERS
+    if big_models_only:
+        models = large_models
+    elif big_models:
+        models = small_models + large_models
+    else:
+        models = small_models
 
     print(f'Launching computations with {num_gpus} gpus available.')
 
