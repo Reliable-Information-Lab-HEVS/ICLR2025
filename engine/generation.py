@@ -541,7 +541,8 @@ class HFModel(object):
         else:
             memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
 
-        available_memory = memory*0.95 - self.get_max_device_memory_footprint()
+        # Only take 0.85 of the gpu memory into account in order to not completely clutter the memory
+        available_memory = memory*0.85 - self.get_max_device_memory_footprint()
 
         # Try loading estimator file
         try:
