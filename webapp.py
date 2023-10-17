@@ -70,8 +70,8 @@ def update_model(model_name: str, quantization_8bits: bool = False, quantization
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits,
                                quantization_4bits=quantization_4bits)
         conversation = model.get_empty_conversation()
-    except:
-        raise gr.Error('There was an error loading this model. Please retry or choose another one.')
+    except Exception as e:
+        raise gr.Error(f'The following error happened during loading: {repr(e)}. Please retry or choose another one.')
     
     # Return values to clear the input and output textboxes, and input and output chatbot boxes
     return '', '', '', [[None, None]]
