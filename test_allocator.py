@@ -10,7 +10,8 @@ command = 'srun --ntasks=1 --gpus-per-task={gpus} --cpus-per-task=2 --mem=60G py
 
 
 t0 = time.time()
-num_gpus = torch.cuda.device_count()
+# num_gpus = torch.cuda.device_count()
+num_gpus = 5
 
 models = ['bloom-560M']*5
 
