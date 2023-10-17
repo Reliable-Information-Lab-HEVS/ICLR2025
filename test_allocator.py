@@ -6,8 +6,6 @@ import torch
 import engine
 from helpers import utils
 
-command = 'srun --ntasks=1 --gpus-per-task={gpus} --cpus-per-task=2 --mem=60G python3 test_srun.py'
-
 # print(os.environ['CUDA_VISIBLE_DEVICES'])
 
 
