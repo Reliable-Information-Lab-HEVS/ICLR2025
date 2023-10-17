@@ -14,8 +14,8 @@ from helpers import utils
 from helpers import humaneval
 
 # TEMPERATURES = (0., 0.2, 0.4, 0.6, 0.8, 1.)
-TEMPERATURES = (0.,)
-# TEMPERATURES = (0.8,)
+# TEMPERATURES = (0.,)
+TEMPERATURES = (0.8,)
 
 # We need to set top_k to 0 to deactivate top-k sampling
 HUMAN_EVAL_GENERATION_KWARGS = {
@@ -70,7 +70,6 @@ def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = P
 
 
 
-@utils.duplicate_function_for_gpu_dispatch
 def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: bool = False,
                quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
                generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
@@ -149,7 +148,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
 
     dt = time.time() - t0
 
-    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    print(f'{utils.get_time()}  Done with model {model_name} in {dt/3600:.2f}h!')
     del model
     gc.collect()
 
@@ -175,7 +174,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'Starting with model {model_name}')
+    print(f'{utils.get_time()}  Starting with model {model_name}')
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
@@ -241,7 +240,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
     dt = time.time() - t0
 
-    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    print(f'{utils.get_time()}  Done with model {model_name} in {dt/3600:.2f}h!')
     del model
     gc.collect()
 
@@ -267,7 +266,7 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'Starting with model {model_name}')
+    print(f'{utils.get_time()}  Starting with model {model_name}')
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
@@ -311,7 +310,7 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
 
     dt = time.time() - t0
 
-    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    print(f'{utils.get_time()}  Done with model {model_name} in {dt/3600:.2f}h!')
     del model
     gc.collect()
 
