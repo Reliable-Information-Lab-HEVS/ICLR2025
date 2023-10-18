@@ -50,7 +50,7 @@ if __name__ == '__main__':
         if origin == 'my':
             origin = 'authors'
 
-        # Create new folder where we save the custom ql queries
+        # Create new folder where we save the custom ql queries for easier access
         folder = os.path.join(utils.DATA_FOLDER, 'custom_ql_queries')
         os.makedirs(folder, exist_ok=True)
 
@@ -58,12 +58,21 @@ if __name__ == '__main__':
         query_path = mark_setup['check_ql']
         if not query_path.startswith('$CODEQL_HOME'):
             actual_path = query_path.replace('./experiments_dow', clean_folder)
+            cwe_path = os.path.dirname(os.path.dirname(actual_path))
+            qlpack = os.path.join(cwe_path, 'qlpack.yml')
+
+            # need to create an intermediary directory to add the qlpack.yml files
             filename = actual_path.rsplit('/', 1)[1]
-            new_path = os.path.join(folder, filename)
-            shutil.copyfile(actual_path, new_path)
+            intermediate_folder = filename.rsplit('.', 1)[0]
+            new_folder = os.path.join(folder, intermediate_folder)
+            os.makedirs(new_folder, exist_ok=True)
+
+            # copy the needed files
+            shutil.copyfile(actual_path, os.path.join(new_folder, filename))
+            shutil.copyfile(qlpack, os.path.join(new_folder, 'qlpack.yml'))
 
             # add the query path as a relative path (containing '.' at the start) to the sample
-            query_path = os.path.join('.', os.path.relpath(new_path, utils.ROOT_FOLDER))
+            query_path = os.path.join('.', os.path.relpath(os.path.join(new_folder, filename), utils.ROOT_FOLDER))
 
 
         sample = {
