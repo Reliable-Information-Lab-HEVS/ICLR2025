@@ -1,15 +1,20 @@
 import os
+from abc import ABC
 
 from helpers import utils
 
 # TODO: Maybe inherit from a torch Dataset, but for now no need
-class HumanEval(object):
-    """Class representing the HumanEval dataset.
+class SampleDataset(ABC):
+    """Base class for dataset consisting of a serie of samples (dictionaries) with an id. We define it as
+    an ABC because it cannot be instantiated (path attribute does not exist and is needed for __init__).
     """
+
+    # Should always be overriden in subclasses
+    path: str
+    id_key: str
 
     def __init__(self):
 
-        self.path = os.path.join(utils.DATA_FOLDER, 'HumanEval.jsonl')
         # Load all dataset in memory since it is small
         self.samples = utils.load_jsonl(self.path)
 
@@ -29,32 +34,34 @@ class HumanEval(object):
             yield self[i]
 
     def samples_by_id(self) -> dict[str, dict]:
-        """Maps the task_ids to the tasks themselves.
+        """Maps the task ids to the tasks themselves.
         """
 
-        return {task['task_id']: task for task in self}
-    
+        return {task[self.id_key]: task for task in self}
 
 
-class HumanEvalInstruct(HumanEval):
+class HumanEval(SampleDataset):
+    """Class representing the HumanEval dataset.
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval.jsonl')
+    id_key: str = 'task_id'
+
+
+class HumanEvalInstruct(SampleDataset):
     """Class representing the HumanEval_Instruct dataset.
     """
 
-    def __init__(self):
-        # Simply overwrite attributes
-        self.path = os.path.join(utils.DATA_FOLDER, 'HumanEval_Instruct.jsonl')
-        self.samples = utils.load_jsonl(self.path)
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval_Instruct.jsonl')
+    id_key: str = 'task_id'
 
 
-class HumanEvalPHP(HumanEval):
+class HumanEvalPHP(SampleDataset):
     """Class representing the MutiPL-E variation of the HumanEval dataset for the PHP language.
     """
 
-    def __init__(self):
-        # Simply overwrite attributes
-        self.path = os.path.join(utils.DATA_FOLDER, 'HumanEval_php.jsonl')
-        self.samples = utils.load_jsonl(self.path)
-
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval_php.jsonl')
+    id_key: str = 'task_id'
 
 
 # Dataset mapping from dataset name to actual dataset to use for evaluation
@@ -63,3 +70,13 @@ DATASETS_MAPPING = {
     'HumanEvalInstruct': HumanEvalInstruct,
     'HumanEvalPHP': HumanEvalPHP,
 }
+
+
+class AATK(SampleDataset):
+    """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_with_stopping.jsonl')
+    id_key: str = 'id'
+
+
