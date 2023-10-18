@@ -541,10 +541,10 @@ def model_wise_pass_at_k(dtype: str = 'default', k: int = 1, greedy: bool = True
         mode = df['mode'][0]
         context = str(df['use_context'][0])
 
-        if dataset == 'HumanEval':
-            subindex = mode
-        else:
+        if dataset == 'HumanEvalInstruct':
             subindex = mode + '_' + context
+        else:
+            subindex = mode
 
         new_df = df[['model', f'pass@{k}']].copy()
         new_df[f'pass@{k}'] = new_df[f'pass@{k}']*100

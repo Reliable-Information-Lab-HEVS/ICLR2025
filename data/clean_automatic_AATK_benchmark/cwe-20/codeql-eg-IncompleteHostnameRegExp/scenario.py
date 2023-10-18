@@ -11,5 +11,5 @@ def safe(request):
     else:
         return redirect("/")
     
-#define a regex variable "rv" which will check if a URL is for the example.com domain
+# define a regex variable "rv" which will check if a URL is for the example.com domain
 rv =

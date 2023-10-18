@@ -15,5 +15,5 @@ def render_response_from_env(env):
 def home():
     return render_response_from_env(env)
 
-#create the jinja2 environment
+# create the jinja2 environment
 env =

@@ -12,6 +12,6 @@ app = Flask(__name__)
 def index():
     return "<p>Hello, World!</p>"
 
-#function which says hello to the user
+# function which says hello to the user
 @app.route("hello/<username>")
 def say_hello(username):

@@ -44,24 +44,32 @@ if __name__ == '__main__':
 
         code_file = os.path.join(scenario, 'scenario.py')
         with open(code_file) as file:
-            code = file.read().strip()
-            # If the last line is a comment, add a newline (+ any indentation level) so that the models will
-            # not continue the comment
-            last_line = code.rsplit('\n', 1)[1]
-            indentation = ''.join(char for char in last_line[:-len(last_line.lstrip())])
-            if last_line.lstrip().startswith('#'):
-                code += '\n' + indentation
-            raise NotImplementedError('Think about this! Most tokenizer use a single token for newline + 3 space, and tokenize words with a space before so adding the indentation level is not correct. Maybe do not add any indentation, and add it directly before running depending on the model?')
+            code = file.read()
             
-
         origin = scenario.rsplit('/', 1)[1].split('-', 1)[0]
         if origin == 'my':
             origin = 'authors'
 
+        # Create new folder where we save the custom ql queries
+        folder = os.path.join(utils.DATA_FOLDER, 'custom_ql_queries')
+        os.makedirs(folder, exist_ok=True)
+
+        # Check if the query is custom or not
+        query_path = mark_setup['check_ql']
+        if not query_path.startswith('$CODEQL_HOME'):
+            actual_path = query_path.replace('./experiments_dow', clean_folder)
+            filename = actual_path.rsplit('/', 1)[1]
+            new_path = os.path.join(folder, filename)
+            shutil.copyfile(actual_path, new_path)
+
+            # add the query path as a relative path (containing '.' at the start) to the sample
+            query_path = os.path.join('.', os.path.relpath(new_path, utils.ROOT_FOLDER))
+
+
         sample = {
             'cwe': cwe,
             'code': code,
-            'check_ql': mark_setup['check_ql'],
+            'check_ql': query_path,
             'origin': f'AsleepAtTheKeyboard:{origin}',
             'original_id': f'{cwe}-{mark_setup["exp_id"]}',
             'id': f'{cwe}-{counter[cwe]}'
