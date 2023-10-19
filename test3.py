@@ -16,7 +16,7 @@ HUMAN_EVAL_GENERATION_KWARGS = {
     'truncate_prompt_from_output': True,
 }
 
-model_name = 'codegen-16B'
+model_name = 'llama2-7B'
 
 model = engine.HFModel(model_name)
 data = datasets.HumanEval()
