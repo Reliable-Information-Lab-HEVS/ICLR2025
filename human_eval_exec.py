@@ -289,7 +289,7 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
         for sample in dataset:
 
             task_id = sample['task_id']
-            prompt = sample['prompt'].strip() 
+            prompt = sample['prompt'].strip()
             stopping_patterns = sample['stop_tokens']
 
             # In this case we use greedy decoding (the temperature parameters does not matter anymore
