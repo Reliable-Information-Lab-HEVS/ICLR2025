@@ -185,54 +185,6 @@ class HFModel(object):
         return formatted_prompt
     
 
-    def create_stopping_criteria(self,
-                                 input_length: int,
-                                 stopping_patterns: list[str] | tuple[str] | bool | None = None,
-                                 parser: CodeParser | None = None
-        ) -> tuple[StoppingCriteriaList | None, tuple[str] | list[str] | None]:
-        """Create the stopping criteria to use from the `stopping_patterns`.
-
-        Parameters
-        ----------
-        input_length : int
-            Length of the input prompt.
-        stopping_patterns : list[str] | tuple[str] | bool | None, optional
-            List of words/patterns to stop the generation. Pass `True` to use the default 
-            `EXTENDED_CODE_STOP_PATTERNS` patterns. If `None`, no early stopping is performed, by default None.
-        parser: CodeParser | None, optional
-            A parser to extract code from generated sequences. The `stopping_patterns` will be applied on the
-            parsed sequences. This should be used with caution, as it was designed only for chat models that
-            embed code in their output in natural language. The default is None, i.e. no parsing.
-
-        Returns
-        -------
-        tuple[StoppingCriteriaList | None, tuple[str] | list[str] | None]
-            Tuple containing the stopping criteria to use in the model forward, and the stopping patterns
-            to use if we post-process the outputs.
-        """
-
-        # Possible early stopping
-        if isinstance(stopping_patterns, list) or isinstance(stopping_patterns, tuple):
-            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
-                                                             self.extra_eos_tokens, parser)
-            stopping_criteria = StoppingCriteriaList([stopping_criteria])
-        elif isinstance(stopping_patterns, bool) and stopping_patterns:
-            stopping_patterns = stopping.EXTENDED_CODE_STOP_PATTERNS
-            stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
-                                                             self.extra_eos_tokens, parser)
-            stopping_criteria = StoppingCriteriaList([stopping_criteria])
-        else:
-            stopping_patterns = None
-            if len(self.extra_eos_tokens) == 0:
-                stopping_criteria = None
-            else:
-                stopping_criteria = stopping.TextPatternStopping(input_length, self.tokenizer, stopping_patterns,
-                                                                 self.extra_eos_tokens, parser)
-                stopping_criteria = StoppingCriteriaList([stopping_criteria])
-
-        return stopping_criteria, stopping_patterns
-    
-
     def create_generation_config(self, max_new_tokens: int, min_new_tokens: int, do_sample: bool,
                                  top_k: int | None, top_p: float | None, temperature: float) -> GenerationConfig:
         """Create a new `GenerationConfig` object to pass to `model.generate()` to control the generation strategy.
@@ -334,7 +286,7 @@ class HFModel(object):
             num_return_sequences: int = 1,
             batch_size: int | None = None,
             seed: int | None = None,
-            stopping_patterns: tuple[str] | bool | None = None,
+            stopping_pattern: stopping.StoppingType | list[str] | tuple[str] | str | None = None,
             parser: CodeParser | None = None,
             truncate_prompt_from_output: bool = True,
             post_process_output: bool = True,
@@ -390,9 +342,11 @@ class HFModel(object):
             try to determine the largest possible batch size that does not result in memory error. By default None.
         seed : int | None, optional
             An optional seed to force the generation to be reproducible.
-        stopping_patterns: tuple[str] | bool | None, optional
-            List of words/patterns to stop the generation. Pass `True` to use the default `EXTENDED_CODE_STOP_PATTERNS` patterns.
-            If `None`, no early stopping is performed, by default None.
+        stopping_pattern : StoppingType | list[str] | tuple[str] | str | None = None
+            The type of early stopping to use. This should be an instance of the `StoppingType` enum, or eventually
+            a list or tuple of str, in which case the iterable will be passed to a `TextPatternStopping` instance. It can
+            also be a str, which is interpreted as a regex and is passed to a `RegexPatternStopping` instance. If
+            `None`, only the `extra_eos_tokens` will be used for early stopping. By default `None`.
         parser: CodeParser | None, optional
             A parser to extract code from generated sequences. The final outputs will only consist of the parsed
             sequences if `post_process_output` is True. Also, the `stopping_patterns` will be applied on the
@@ -447,9 +401,8 @@ class HFModel(object):
             input = input.to(device=self.input_device)
 
         # Create the stopping criteria
-        stopping_criteria, stopping_patterns = self.create_stopping_criteria(input_length,
-                                                                             stopping_patterns=stopping_patterns,
-                                                                             parser=parser)
+        stopping_criteria = stopping.create_stopping_criteria(input_length, self.tokenizer, stopping_pattern,
+                                                              self.extra_eos_tokens, parser)
 
         # Infer batch size if not given
         if batch_size is None:
@@ -493,10 +446,10 @@ class HFModel(object):
 
             # Post-process the sequences according to stopping patterns and extra eos
             if post_process_output:
-                generated_batch = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_patterns,
+                generated_batch = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_pattern,
                                                                   self.extra_eos_tokens, parser)
             else:
-                generated_batch = self.tokenizer.batch_decode(truncated_outputs, skip_special_tokens=False)
+                generated_batch = self.tokenizer.batch_decode(truncated_outputs, skip_special_tokens=True)
             
             # reattach the prompt if needed
             if not truncate_prompt_from_output:
@@ -750,7 +703,8 @@ class HFModel(object):
             input = input.to(device=self.input_device)
 
         # Create the stopping criteria in case the model has some extra eos tokens to process
-        stopping_criteria, _ = self.create_stopping_criteria(input_length)
+        stopping_criteria  = stopping.create_stopping_criteria(input_length, self.tokenizer, None,
+                                                               self.extra_eos_tokens, None)
 
         outputs = self.model.generate(input, generation_config=generation_config, stopping_criteria=stopping_criteria,
                                       num_return_sequences=1, **kwargs)
