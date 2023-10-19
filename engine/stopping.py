@@ -37,10 +37,10 @@ OUT_OF_ASSIGNMENT_REGEX = r'(?<!^)(?<!\n)\n[^#\s]'
 
 class StoppingType(Enum):
 
-    PYTHON_HUMAN_EVAL = CODE_STOP_PATTERNS,
-    PYTHON_HUMAN_EVAL_EXTENDED = EXTENDED_CODE_STOP_PATTERNS,
-    OUT_OF_INDENTATION = OUT_OF_INDENTATION_REGEX,
-    OUT_OF_ASSIGNMENT = OUT_OF_ASSIGNMENT_REGEX,
+    PYTHON_HUMAN_EVAL = CODE_STOP_PATTERNS
+    PYTHON_HUMAN_EVAL_EXTENDED = EXTENDED_CODE_STOP_PATTERNS
+    OUT_OF_INDENTATION = OUT_OF_INDENTATION_REGEX
+    OUT_OF_ASSIGNMENT = OUT_OF_ASSIGNMENT_REGEX
 
     def create_stopping_criteria(self, prompt_ids_length: int, tokenizer: PreTrainedTokenizerBase,
                                  extra_eos_tokens: list[str] | None,
