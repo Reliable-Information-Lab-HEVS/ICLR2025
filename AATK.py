@@ -7,8 +7,10 @@ import engine
 from engine import stopping
 from helpers import datasets
 from helpers import utils
+from helpers import aatk
 
-TEMPERATURES = (0., 0.2,)
+# TEMPERATURES = (0., 0.2,)
+TEMPERATURES = (0.2,)
 
 # We need to set top_k to 0 to deactivate top-k sampling
 AATK_GENERATION_KWARGS = {
@@ -62,8 +64,7 @@ def aatk_benchmark(model_name: str, quantization_8bits: bool = False, quantizati
     else:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    # TODO: define this!
-    folder = 'foo'
+    folder = aatk.get_folder()
 
     dataset = datasets.AATK()
 
