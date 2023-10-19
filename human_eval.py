@@ -100,7 +100,12 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
     else:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    stopping_patterns = None if model.is_chat_model() else stopping.CODE_STOP_PATTERNS
+    # Define stopping type
+    if model.is_chat_model() and (prompt_template_mode == 'default' or prompt_template_mode == 'chat'):
+        stopping_patterns = None
+    else:
+        stopping_patterns = stopping.StoppingType.PYTHON_HUMAN_EVAL
+
     folder = humaneval.get_folder('HumanEval', prompt_template_mode, model_name, model.dtype_category())
 
     dataset = datasets.HumanEval()
@@ -142,7 +147,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
                                     prompt_template_mode=prompt_template_mode, **generation_kwargs)
 
             # Save the model completions
-            if model.is_chat_model():
+            if model.is_chat_model() and (prompt_template_mode == 'default' or prompt_template_mode == 'chat'):
                 true_completions = extract_completions(completions, sample)
                 results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
             else:
@@ -185,7 +190,12 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
     else:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    stopping_patterns = None if model.is_chat_model() else stopping.CODE_STOP_PATTERNS
+    # Define stopping type
+    if model.is_chat_model():
+        stopping_patterns = None
+    else:
+        stopping_patterns = stopping.StoppingType.PYTHON_HUMAN_EVAL
+        
     folder = humaneval.get_folder('HumanEvalInstruct', prompt_template_mode, model_name, model.dtype_category(),
                                   use_context=use_context)
 

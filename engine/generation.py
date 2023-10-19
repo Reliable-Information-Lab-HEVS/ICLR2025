@@ -286,7 +286,7 @@ class HFModel(object):
             num_return_sequences: int = 1,
             batch_size: int | None = None,
             seed: int | None = None,
-            stopping_pattern: stopping.StoppingType | list[str] | tuple[str] | str | None = None,
+            stopping_patterns: stopping.StoppingType | list[str] | tuple[str] | str | None = None,
             parser: CodeParser | None = None,
             truncate_prompt_from_output: bool = True,
             post_process_output: bool = True,
@@ -342,7 +342,7 @@ class HFModel(object):
             try to determine the largest possible batch size that does not result in memory error. By default None.
         seed : int | None, optional
             An optional seed to force the generation to be reproducible.
-        stopping_pattern : StoppingType | list[str] | tuple[str] | str | None = None
+        stopping_patterns : StoppingType | list[str] | tuple[str] | str | None = None
             The type of early stopping to use. This should be an instance of the `StoppingType` enum, or eventually
             a list or tuple of str, in which case the iterable will be passed to a `TextPatternStopping` instance. It can
             also be a str, which is interpreted as a regex and is passed to a `RegexPatternStopping` instance. If
@@ -401,7 +401,7 @@ class HFModel(object):
             input = input.to(device=self.input_device)
 
         # Create the stopping criteria
-        stopping_criteria = stopping.create_stopping_criteria(input_length, self.tokenizer, stopping_pattern,
+        stopping_criteria = stopping.create_stopping_criteria(input_length, self.tokenizer, stopping_patterns,
                                                               self.extra_eos_tokens, parser)
 
         # Infer batch size if not given
@@ -446,7 +446,7 @@ class HFModel(object):
 
             # Post-process the sequences according to stopping patterns and extra eos
             if post_process_output:
-                generated_batch = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_pattern,
+                generated_batch = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_patterns,
                                                                   self.extra_eos_tokens, parser)
             else:
                 generated_batch = self.tokenizer.batch_decode(truncated_outputs, skip_special_tokens=True)

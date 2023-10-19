@@ -215,7 +215,7 @@ class RegexPatternStopping(StoppingCriteria):
 
 
 def create_stopping_criteria(prompt_ids_length: int, tokenizer: PreTrainedTokenizerBase,
-                             stopping_pattern: StoppingType | list[str] | tuple[str] | str | None,
+                             stopping_patterns: StoppingType | list[str] | tuple[str] | str | None,
                              extra_eos_tokens: list[str] | None,
                              parser: CodeParser | None = None) -> StoppingCriteriaList | None:
     """Create the correct stopping criteria depending on the value and type of `stopping_patterns`.
@@ -226,7 +226,7 @@ def create_stopping_criteria(prompt_ids_length: int, tokenizer: PreTrainedTokeni
         Length of the input ids prompt.
     tokenizer : PreTrainedTokenizerBase
         The tokenizer to use to decode the sequences.
-    stopping_pattern : StoppingType | list[str] | tuple[str] | str | None
+    stopping_patterns : StoppingType | list[str] | tuple[str] | str | None
         The type of early stopping to use. This should be an instance of the `StoppingType` enum, or eventually
         a list or tuple of str, in which case the iterable will be passed to a `TextPatternStopping` instance. It can
         also be a str, which is interpreted as a regex and is passed to a `RegexPatternStopping` instance. If
@@ -244,16 +244,16 @@ def create_stopping_criteria(prompt_ids_length: int, tokenizer: PreTrainedTokeni
         The stopping criteria.
     """
     
-    if isinstance(stopping_pattern, StoppingType):
-        criteria = stopping_pattern.create_stopping_criteria(prompt_ids_length, tokenizer, extra_eos_tokens, parser)
+    if isinstance(stopping_patterns, StoppingType):
+        criteria = stopping_patterns.create_stopping_criteria(prompt_ids_length, tokenizer, extra_eos_tokens, parser)
         
-    elif isinstance(stopping_pattern, list) or isinstance(stopping_pattern, tuple):
-        criteria = TextPatternStopping(prompt_ids_length, tokenizer, stopping_pattern, extra_eos_tokens, parser)
+    elif isinstance(stopping_patterns, list) or isinstance(stopping_patterns, tuple):
+        criteria = TextPatternStopping(prompt_ids_length, tokenizer, stopping_patterns, extra_eos_tokens, parser)
 
-    elif isinstance(stopping_pattern, str):
-        criteria = RegexPatternStopping(prompt_ids_length, tokenizer, stopping_pattern, extra_eos_tokens, parser)
+    elif isinstance(stopping_patterns, str):
+        criteria = RegexPatternStopping(prompt_ids_length, tokenizer, stopping_patterns, extra_eos_tokens, parser)
 
-    elif stopping_pattern is None:
+    elif stopping_patterns is None:
         if len(extra_eos_tokens) == 0:
             criteria = None
         else:
@@ -396,7 +396,7 @@ def post_process_extra_eos_tokens(prompt_truncated_outputs: torch.Tensor, pad_to
 
 
 def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: PreTrainedTokenizerBase,
-                           stopping_pattern: StoppingType | list[str] | tuple[str] | str | None,
+                           stopping_patterns: StoppingType | list[str] | tuple[str] | str | None,
                            extra_eos_tokens: list[str] | None, parser: CodeParser | None = None) -> list[str]:
     """Apply all steps of post-processing to the prompt-truncated outputs of a model.
 
@@ -406,7 +406,7 @@ def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: Pr
         The PROMPT-TRUNCATED output of a model. Passing the full outputs may induce errors in the logic.
     tokenizer : PreTrainedTokenizerBase
         The tokenizer used by the model.
-    stopping_pattern : StoppingType | list[str] | tuple[str] | str | None
+    stopping_patterns : StoppingType | list[str] | tuple[str] | str | None
         The type of early stopping to use. This should be an instance of the `StoppingType` enum, or eventually
         a list or tuple of str, in which case the iterable will be passed to a `TextPatternStopping` instance. It can
         also be a str, which is interpreted as a regex and is passed to a `RegexPatternStopping` instance. If
@@ -441,13 +441,13 @@ def post_process_sequences(prompt_truncated_outputs: torch.Tensor, tokenizer: Pr
         prompt_truncated_sequences = [parser(sequence) for sequence in prompt_truncated_sequences]
 
     # Truncate according to stopping pattern
-    if isinstance(stopping_pattern, StoppingType):
-        final_sequences = stopping_pattern.post_process_sequences(prompt_truncated_sequences)
-    elif isinstance(stopping_pattern, list) or isinstance(stopping_pattern, tuple):
-        final_sequences = post_process_stopping_patterns(prompt_truncated_sequences, stopping_pattern)
-    elif isinstance(stopping_pattern, str):
-        final_sequences = post_process_regex_pattern(prompt_truncated_sequences, stopping_pattern)
-    elif stopping_pattern is None:
+    if isinstance(stopping_patterns, StoppingType):
+        final_sequences = stopping_patterns.post_process_sequences(prompt_truncated_sequences)
+    elif isinstance(stopping_patterns, list) or isinstance(stopping_patterns, tuple):
+        final_sequences = post_process_stopping_patterns(prompt_truncated_sequences, stopping_patterns)
+    elif isinstance(stopping_patterns, str):
+        final_sequences = post_process_regex_pattern(prompt_truncated_sequences, stopping_patterns)
+    elif stopping_patterns is None:
         final_sequences = prompt_truncated_sequences
     else:
         raise TypeError('Cannot post process outputs based on the type of stopping patterns.')
