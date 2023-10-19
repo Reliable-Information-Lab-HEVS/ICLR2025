@@ -64,7 +64,7 @@ def aatk_benchmark(model_name: str, quantization_8bits: bool = False, quantizati
     else:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    folder = aatk.get_folder()
+    folder = aatk.get_folder('AATK', model_name, model.dtype_category())
 
     dataset = datasets.AATK()
 
