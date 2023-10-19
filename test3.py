@@ -2,7 +2,7 @@ import torch
 import time
 
 import engine
-from engine import loader
+from engine import loader, stopping
 from helpers import utils, datasets
 
 HUMAN_EVAL_GENERATION_KWARGS = {
@@ -11,7 +11,7 @@ HUMAN_EVAL_GENERATION_KWARGS = {
     'do_sample': True,
     'top_k': None,
     'top_p': 0.95,
-    'num_return_sequences': 200,
+    'num_return_sequences': 10,
     'seed': 1234,
     'truncate_prompt_from_output': True,
 }
@@ -19,9 +19,9 @@ HUMAN_EVAL_GENERATION_KWARGS = {
 model_name = 'codegen-16B'
 
 model = engine.HFModel(model_name)
-data = datasets.HumanEvalPHP()
+data = datasets.HumanEval()
 prompt = data[0]['prompt']
-stop = data[0]['stop_tokens']
+stop = stopping.StoppingType.PYTHON_HUMAN_EVAL
 
 t0 = time.time()
 completions = model(prompt, temperature=0.8, stopping_patterns=stop, prompt_template_mode='generation',
