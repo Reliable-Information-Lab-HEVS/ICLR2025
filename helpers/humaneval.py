@@ -129,6 +129,9 @@ def extract_filenames(dataset: str, mode: str, category: str = 'completions') ->
         raise ValueError(f'The `category` must be one of {*CATEGORIES,}.')
 
     benchmark_path = os.path.join(utils.RESULTS_FOLDER, dataset, mode, category)
+
+    if not os.path.isdir(benchmark_path):
+        raise ValueError('The path to the current benchmark does not exist.')
     
     files = []
     for model_dir in os.listdir(benchmark_path):
