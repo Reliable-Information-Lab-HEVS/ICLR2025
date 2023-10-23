@@ -102,7 +102,7 @@ def extract_filenames(dataset: str = 'AATK', category: str = 'completions') -> l
     benchmark_path = os.path.join(utils.RESULTS_FOLDER, dataset, category)
 
     if not os.path.isdir(benchmark_path):
-        raise ValueError('The path to the current benchmark does not exist.')
+        raise RuntimeError('The path to the current benchmark does not exist.')
     
     files = []
     for model_dir in os.listdir(benchmark_path):
@@ -141,9 +141,11 @@ def extract_all_filenames(category: str = 'completions', only_unprocessed: bool 
 
     files = []
     for dataset in DATASETS:
-        # dataset_path = os.path.join(utils.RESULTS_FOLDER, dataset)
 
-        existing_files = extract_filenames(dataset, category=category)
+        try:
+            existing_files = extract_filenames(dataset, category=category)
+        except RuntimeError:
+            continue
 
         # Only keep those that were not already processed
         if category == 'completions' and only_unprocessed:
