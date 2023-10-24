@@ -808,13 +808,23 @@ class HFModel(object):
                 
         # Truncate the prompt from the output
         truncated_outputs = outputs[:, input_length:]
+        print(truncated_outputs)
+
+        # TODO: find better way to make up for the spaces
+        if self.tokenizer.convert_ids_to_tokens(int(truncated_outputs[0, 0])).startswith(b'\xe2\x96\x81'.decode()):
+            add_space = True
+        else:
+            add_space = False
 
         # Post-process the sequences according to potential extra eos tokens
         response = stopping.post_process_sequences(truncated_outputs, self.tokenizer, stopping_patterns=None,
                                                    extra_eos_tokens=self.extra_eos_tokens)
         
         # Append output to the conv
-        conv_history.append_to_last_model_message(response[0])
+        if add_space:
+            conv_history.append_to_last_model_message(' ' + response[0])
+        else:
+            conv_history.append_to_last_model_message(response[0])
 
         return conv_history
 
