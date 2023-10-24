@@ -264,8 +264,9 @@ def clear_chatbot():
     """Erase the conversation history and reinitialize the elements.
     """
 
-    # Erase the conversation history before
-    conversation.erase_conversation()
+    # Create new global conv object (we need a new unique id)
+    global conversation
+    conversation = model.get_empty_conversation()
     return '', conversation.to_gradio_format()
     
 
