@@ -808,7 +808,6 @@ class HFModel(object):
                 
         # Truncate the prompt from the output
         truncated_outputs = outputs[:, input_length:]
-        print(truncated_outputs)
 
         # TODO: find better way to make up for the spaces
         if self.tokenizer.convert_ids_to_tokens(int(truncated_outputs[0, 0])).startswith(b'\xe2\x96\x81'.decode()):
