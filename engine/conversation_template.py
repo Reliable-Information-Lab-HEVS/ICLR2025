@@ -1,6 +1,7 @@
 """
 This file contains the conversation templates for the models we use.
 """
+import uuid
 
 from engine import loader
 
@@ -21,6 +22,9 @@ class GenericConversation(object):
 
         # Extra eos tokens
         self.extra_eos_tokens = []
+
+        # create unique identifier (used in gradio flagging)
+        self.id = str(uuid.uuid4())
 
 
     def __len__(self) -> int:
@@ -129,6 +133,27 @@ class GenericConversation(object):
 
         return prompt
     
+
+    def get_last_turn_continuation_prompt(self) -> str:
+        """Format the prompt to feed to the model in order to continue the last turn model output, in case
+        `max_new_tokens` was set to a low value and the model did not finish its output.
+        """
+    
+        prompt = ''
+
+        N = len(self) - 1
+        if self.model_history_text[-1] is None:
+            raise RuntimeError('Cannot continue an empty last turn')
+
+        for i, (user_message, model_response) in enumerate(self):
+
+            prompt += user_message + self.eos_token
+            if i < N:
+                prompt += model_response + self.eos_token
+            else:
+                prompt += model_response
+
+        return prompt
 
     def get_extra_eos(self) -> list[str]:
         return self.extra_eos_tokens
@@ -270,6 +295,39 @@ class Llama2ChatConversation(GenericConversation):
                 prompt += self.assistant_token + ' ' + model_response.strip() + ' ' + self.eos_token
             else:
                 prompt += self.assistant_token
+
+        return prompt
+    
+
+    def get_last_turn_continuation_prompt(self) -> str:
+        """Format the prompt to feed to the model in order to continue the last turn model output, in case
+        `max_new_tokens` was set to a low value and the model did not finish its output.
+        """
+
+        # If we are not using system prompt, do not add the template formatting with empty prompt
+        if self.system_prompt.strip() != '':
+            system_prompt = self.system_template.format(system_prompt=self.system_prompt.strip())
+        else:
+            system_prompt = ''
+        prompt = ''
+
+        N = len(self) - 1
+        if self.model_history_text[-1] is None:
+            raise RuntimeError('Cannot continue an empty last turn')
+
+        for i, (user_message, model_response) in enumerate(self):
+
+            if i == 0:
+                # Do not add bos_token here as it will be added automatically at the start of the prompt by 
+                # the tokenizer 
+                prompt += self.user_token + ' ' + system_prompt + user_message.strip() + ' '
+            else:
+                prompt += self.bos_token + self.user_token + ' ' + user_message.strip() + ' '
+
+            if i < N:
+                prompt += self.assistant_token + ' ' + model_response.strip() + ' ' + self.eos_token
+            else:
+                prompt += self.assistant_token + ' ' + model_response
 
         return prompt
     
