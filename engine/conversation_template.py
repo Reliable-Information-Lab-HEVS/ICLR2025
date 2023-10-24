@@ -218,12 +218,12 @@ class Llama2ChatConversation(GenericConversation):
 
         self.bos_token = '<s>'
 
-        self.system_prompt = ("You are a helpful, respectful and honest assistant. Always answer as helpfully ",
-                              "as possible, while being safe. Your answers should not include any harmful, ",
-                              "unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that ",
-                              "your responses are socially unbiased and positive in nature.\n\n",
-                              "If a question does not make any sense, or is not factually coherent, explain why ",
-                              "instead of answering something not correct. If you don't know the answer to a ",
+        self.system_prompt = ("You are a helpful, respectful and honest assistant. Always answer as helpfully "
+                              "as possible, while being safe. Your answers should not include any harmful, "
+                              "unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that "
+                              "your responses are socially unbiased and positive in nature.\n\n"
+                              "If a question does not make any sense, or is not factually coherent, explain why "
+                              "instead of answering something not correct. If you don't know the answer to a "
                               "question, please don't share false information.")
         self.system_template = '<<SYS>>\n{system_prompt}\n<</SYS>>\n\n'
 
@@ -235,7 +235,11 @@ class Llama2ChatConversation(GenericConversation):
         """Format the prompt representing the conversation that we will feed to the tokenizer.
         """
 
-        system_prompt = self.system_template.format(system_prompt=self.system_prompt.strip())
+        # If we are not using system prompt, do not add the template formatting with empty prompt
+        if self.system_prompt.strip() != '':
+            system_prompt = self.system_template.format(system_prompt=self.system_prompt.strip())
+        else:
+            system_prompt = ''
         prompt = ''
 
         for i, (user_message, model_response) in enumerate(self):
