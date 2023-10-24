@@ -696,7 +696,10 @@ class HFModel(object):
         conv_history.append_user_message(prompt)
 
         # Generate and tokenize the full prompt
-        full_prompt = conv_history.get_prompt()
+        if truncate_if_conv_too_long:
+            full_prompt = self.truncate_conversation(conv_history, max_new_tokens)
+        else:
+            full_prompt = conv_history.get_prompt()
         input = self.tokenizer.encode(full_prompt, return_tensors='pt')
         input_length = input.shape[-1]
         if torch.cuda.is_available():
@@ -725,7 +728,54 @@ class HFModel(object):
     def get_empty_conversation(self) -> GenericConversation:
         """Return a new empty conversation with the template of the current model."""
         return get_conversation_template(self.model_name)
+    
+
+    def get_context_size(self) -> int:
+        """Return the maximum context size for the current model."""
+        return loader.get_model_context_size(self.model_name)
    
+
+    def truncate_conversation(self, conversation: GenericConversation, max_new_tokens: int) -> str:
+        """Truncate the current conversation by removing the oldest messages so that the length of the prompt
+        + the `max_new_tokens` fit the maximum context length that the model can handle.
+
+        Parameters
+        ----------
+        conversation : GenericConversation
+            The current conversation.
+        max_new_tokens : int
+            How many new tokens to generate.
+
+        Returns
+        -------
+        str
+            Truncated prompt.
+        """
+
+        if len(conversation) == 0:
+            raise ValueError('Cannot truncate an empty conversation.')
+        
+        context_size = self.get_context_size()
+
+        new_conv = copy.deepcopy(conversation)
+        full_prompt = new_conv.get_prompt()
+        input = self.tokenizer.encode(full_prompt, return_tensors='pt')
+        input_length = input.shape[-1]
+
+        while input_length + max_new_tokens >= context_size:
+            del new_conv.user_history_text[0]
+            del new_conv.model_history_text[0]
+
+            if len(new_conv) == 0:
+                raise RuntimeError('The entire conversation got truncated to fit the context size.')
+
+            full_prompt = new_conv.get_prompt()
+            input = self.tokenizer.encode(full_prompt, return_tensors='pt')
+            input_length = input.shape[-1]
+
+        return full_prompt
+
+
 
 
 

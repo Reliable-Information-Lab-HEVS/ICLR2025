@@ -95,6 +95,22 @@ class GenericConversation(object):
             raise ValueError('It looks like the last user message was already answered by the model.')
         
 
+    def append_to_last_model_message(self, model_output: str):
+        """Append text to the last model message, in case the `max_new_tokens` was set to a value too low
+        to finish the model answer.
+
+        Parameters
+        ----------
+        model_output : str
+            The model message.
+        """
+
+        if self.model_history_text[-1] is None:
+            raise ValueError('The last user message was never answered. You should use `append_model_message`.')
+        else:
+            self.model_history_text[-1] += model_output
+        
+
     def get_prompt(self) -> str:
         """Format the prompt representing the conversation that we will feed to the tokenizer.
         """
@@ -311,3 +327,6 @@ def get_conversation_template(model_name: str) -> GenericConversation:
         conversation = GenericConversation(eos_token=eos_token)
 
     return conversation
+
+
+
