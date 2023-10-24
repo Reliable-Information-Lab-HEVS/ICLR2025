@@ -20,6 +20,9 @@ DEFAULT = 'llama2-7B-chat' if torch.cuda.is_available() else 'bloom-560M'
 # File where the valid credentials are stored
 CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
 
+# This will be setup by the authentication method
+USERNAME = None
+
 # Initialize global model (necessary not to reload the model for each new inference)
 model = engine.HFModel(DEFAULT)
 
@@ -234,21 +237,27 @@ def authentication(username: str, password: str) -> bool:
     Returns
     -------
     bool
-        Return True if both the username and password match the credentials stored in `CREDENTIALS_FILE`. 
+        Return True if both the username and password match some credentials stored in `CREDENTIALS_FILE`. 
         False otherwise.
     """
 
     with open(CREDENTIALS_FILE, 'r') as file:
         # Read lines and remove whitespaces
-        lines = [line.strip() for line in file.readlines()]
+        lines = [line.strip() for line in file.readlines() if line.strip() != '']
 
-    valid_username = lines[0]
-    valid_password = lines[1]
+    valid_usernames = lines[0::2]
+    valid_passwords = lines[1::2]
 
-    if (username == valid_username) & (password == valid_password):
-        return True
-    else:
-        return False
+    if username in valid_usernames:
+        index = valid_usernames.index(username)
+        # Check that the password also matches at the corresponding index
+        if password == valid_passwords[index]:
+            # Save the username in a global variable for later access
+            global USERNAME
+            USERNAME = username
+            return True
+    
+    return False
     
 
 def clear_chatbot():
@@ -266,7 +275,7 @@ model_name = gr.Dropdown(loader.ALLOWED_MODELS, value=DEFAULT, label='Model name
                          info='Choose the model you want to use.', multiselect=False)
 quantization_8bits = gr.Checkbox(value=False, label='int8 quantization', visible=torch.cuda.is_available())
 quantization_4bits = gr.Checkbox(value=False, label='int4 quantization', visible=torch.cuda.is_available())
-max_new_tokens = gr.Slider(10, 1000, value=250, step=10, label='Max new tokens',
+max_new_tokens = gr.Slider(10, 4000, value=500, step=10, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
 do_sample = gr.Checkbox(value=True, label='Sampling', info=('Whether to incorporate randomness in generation. '
                                                             'If not selected, perform greedy search.'))
@@ -403,19 +412,19 @@ with demo:
     clear_button_text.click(lambda: ['', ''], outputs=[prompt_text, output_text])
     clear_button_chat.click(clear_chatbot, outputs=[prompt_chat, output_chat])
 
-    # Setup the flagging callbacks
-    automatic_logging_text.setup(inputs_to_text_callback, flagging_dir='text_logs')
-    automatic_logging_chat.setup(inputs_to_chat_callback, flagging_dir='chatbot_logs')
-
     # Change visibility of generation parameters if we perform greedy search
     do_sample.input(lambda value: [gr.update(visible=value) for _ in range(5)], inputs=do_sample,
                     outputs=[top_k, top_p, temperature, use_seed, seed])
     
-    # Correctly display the model and quantization currently on memory if we refresh the page (instead of default value for the elements)
-    # and correctly reset the chat output
-    demo.load(lambda: [gr.update(value=model.model_name), gr.update(value=conversation.to_gradio_format()),
-                       gr.update(value=model.quantization_8bits), gr.update(value=model.quantization_4bits)],
-              outputs=[model_name, output_chat, quantization_8bits, quantization_4bits])
+    # Correctly display the model and quantization currently on memory if we refresh the page (instead of default
+    # value for the elements) and correctly reset the chat output
+    loading_events = demo.load(lambda: [gr.update(value=model.model_name), gr.update(value=conversation.to_gradio_format()),
+                                        gr.update(value=model.quantization_8bits), gr.update(value=model.quantization_4bits)],
+                                outputs=[model_name, output_chat, quantization_8bits, quantization_4bits])
+    
+    # Set-up the flagging callbacks with updated USERNAME at loading time (in case of user change in the same session)
+    loading_events.then(lambda: [automatic_logging_text.setup(inputs_to_text_callback, flagging_dir=f'text_logs_{USERNAME}'),
+                                 automatic_logging_chat.setup(inputs_to_chat_callback, flagging_dir=f'chatbot_logs_{USERNAME}')])
 
 
 if __name__ == '__main__':
