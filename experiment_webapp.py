@@ -1,6 +1,4 @@
-import gc
 import os
-import time
 import queue
 import copy
 from concurrent.futures import ThreadPoolExecutor
@@ -15,16 +13,13 @@ from helpers import utils
 # Default model to load at start-up
 DEFAULT = 'model1'
 
-# Mapping to mask actual model name
-# MAPPING = {
-#     'model1': 'llama2-70B-chat',
-#     'model2': 'llama2-13B-chat',
-# }
+# Load both models at the beginning for fast switch between them later on
+MODELS = [engine.HFModel('llama2-70B-chat'), engine.HFModel('llama2-13B-chat', gpu_rank=5)]
 
-MAPPING = {
-    'model1': 'bloom-560M',
-    'model2': 'dialo-gpt-small',
-}
+# Mapping to mask actual model name
+MAPPING = {f'model{i+1}': MODELS[i].model_name for i in range(len(MODELS))}
+
+MAPPING_TO_INDICES = {f'model{i+1}': i for i in range(len(MODELS))}
 
 # Reverse mapping
 REVERSE_MAPPING = {value: key for key, value in MAPPING.items()}
@@ -36,7 +31,7 @@ CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
 USERNAME = None
 
 # Initialize global model (necessary not to reload the model for each new inference)
-model = engine.HFModel(MAPPING[DEFAULT])
+model = MODELS[MAPPING_TO_INDICES[DEFAULT]]
 
 # TODO: make conversation a session state variable instead of global state variable
 # Initialize a global conversation object for chatting with the models
@@ -66,21 +61,9 @@ def update_model(masked_model_name: str):
     except NameError:
         pass
 
-    # Delete the variables if they exist (they should except if there was an error when loading a model at some point)
-    # to save memory before loading the new one
-    try:
-        del model
-        del conversation
-        gc.collect()
-    except NameError:
-        pass
-
-    # Try loading the model
-    try:
-        model = engine.HFModel(model_name, quantization_8bits=False, quantization_4bits=False)
-        conversation = model.get_empty_conversation()
-    except Exception as e:
-        raise gr.Error(f'The following error happened during loading: {repr(e)}. Please retry or choose another one.')
+    index = MAPPING_TO_INDICES[masked_model_name]
+    model = MODELS[index]
+    conversation = model.get_empty_conversation()
     
     # Return values to clear the input and output textboxes, and input and output chatbot boxes
     # return '', '', '', [[None, None]]
