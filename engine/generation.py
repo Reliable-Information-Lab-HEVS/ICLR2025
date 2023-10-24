@@ -620,7 +620,7 @@ class HFModel(object):
     def generate_conversation(
             self,
             prompt: str,
-            system_prompt: str = '',
+            system_prompt: str | None = None,
             conv_history: GenericConversation | None = None,
             max_new_tokens: int = 60,
             min_new_tokens: int = 5,
@@ -638,8 +638,9 @@ class HFModel(object):
         ----------------
         prompt : str
             The new prompt of the user to the model.
-        system_prompt : str
-            An optional system prompt to guide the style of the model answers.
+        system_prompt : str | None
+            An optional system prompt to guide the style of the model answers. The default is `None` which uses
+            the default template system prompt.
         conv_history : GenericConversation | None
             An optional existing conversation object, representing the current dialogue between the user and
             the model.
@@ -690,7 +691,8 @@ class HFModel(object):
             conv_history = self.get_empty_conversation()
 
         # Set system prompt
-        conv_history.set_system_prompt(system_prompt)
+        if system_prompt is not None:
+            conv_history.set_system_prompt(system_prompt)
 
         # Add the prompt to the current conversation
         conv_history.append_user_message(prompt)

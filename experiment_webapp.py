@@ -166,7 +166,7 @@ def chat_generation(prompt: str, max_new_tokens: int = 60) -> tuple[str, list[tu
         # This will update `conversation` in-place
         future = executor.submit(model.generate_conversation, prompt, system_prompt='', conv_history=conversation,
                                  max_new_tokens=max_new_tokens, do_sample=True, top_k=None, top_p=0.9,
-                                 temperature=0.8, seed=None, streamer=streamer)
+                                 temperature=0.8, seed=None, truncate_if_conv_too_long=True, streamer=streamer)
         
         # Get results from the streamer and yield it
         try:
