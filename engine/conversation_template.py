@@ -2,6 +2,7 @@
 This file contains the conversation templates for the models we use.
 """
 import uuid
+import copy
 
 from engine import loader
 
@@ -23,7 +24,12 @@ class GenericConversation(object):
         # Extra eos tokens
         self.extra_eos_tokens = []
 
+        # Some templates need an additional space
+        self.add_space_to_continuation_prompt = False
+
         # create unique identifier (used in gradio flagging)
+        # TODO: maybe override __deepcopy__ method so that the id is different for deepcopies? For now it is
+        # not needed but keep it in mind
         self.id = str(uuid.uuid4())
 
 
@@ -135,25 +141,32 @@ class GenericConversation(object):
     
 
     def get_last_turn_continuation_prompt(self) -> str:
-        """Format the prompt to feed to the model in order to continue the last turn model output, in case
+        """Format the prompt to feed to the model in order to continue the last turn of the model output, in case
         `max_new_tokens` was set to a low value and the model did not finish its output.
         """
+
+        if len(self) == 0:
+            raise RuntimeError('Cannot continue the last turn on an empty conversation.')
     
-        prompt = ''
-
-        N = len(self) - 1
         if self.model_history_text[-1] is None:
-            raise RuntimeError('Cannot continue an empty last turn')
+            raise RuntimeError('Cannot continue an empty last turn.')
+        
+        # Use a copy since we will modify the last model turn
+        conv_copy = copy.deepcopy(self)
+        last_model_output = conv_copy.model_history_text[-1]
+        # Set it to None to mimic the behavior of an un
+        conv_copy.model_history_text[-1] = None
 
-        for i, (user_message, model_response) in enumerate(self):
-
-            prompt += user_message + self.eos_token
-            if i < N:
-                prompt += model_response + self.eos_token
-            else:
-                prompt += model_response
+        # Get prompt of conversation without the last model turn
+        prompt = conv_copy.get_prompt()
+        # Reattach last turn, with or without additional space
+        if self.add_space_to_continuation_prompt:
+            prompt += ' ' + last_model_output
+        else:
+            prompt += last_model_output
 
         return prompt
+    
 
     def get_extra_eos(self) -> list[str]:
         return self.extra_eos_tokens
@@ -206,7 +219,7 @@ class StarChatConversation(GenericConversation):
         """Format the prompt representing the conversation that we will feed to the tokenizer.
         """
         
-        prompt = self.system_token + '\n' + self.system_prompt + self.sep_token + '\n'
+        prompt = self.system_token + '\n' + self.system_prompt + self.sep_token + '\n' if self.system_prompt != '' else ''
 
         for user_message, model_response in self:
 
@@ -218,6 +231,7 @@ class StarChatConversation(GenericConversation):
 
         return prompt
     
+    
 
 # reference: https://github.com/lm-sys/FastChat/blob/main/fastchat/conversation.py#L334
 class VicunaConversation(GenericConversation):
@@ -225,6 +239,9 @@ class VicunaConversation(GenericConversation):
     def __init__(self, eos_token: str):
 
         super().__init__(eos_token)
+
+        # Override value
+        self.add_space_to_continuation_prompt = True
 
         self.system_prompt = ("A chat between a curious user and an artificial intelligence assistant. "
                               "The assistant gives helpful, detailed, and polite answers to the user's questions.")
@@ -249,6 +266,7 @@ class VicunaConversation(GenericConversation):
 
         return prompt
     
+    
 
 # reference: https://github.com/facebookresearch/llama/blob/1a240688810f8036049e8da36b073f63d2ac552c/llama/generation.py#L212
 class Llama2ChatConversation(GenericConversation):
@@ -256,6 +274,9 @@ class Llama2ChatConversation(GenericConversation):
     def __init__(self, eos_token: str):
 
         super().__init__(eos_token)
+
+        # Override value
+        self.add_space_to_continuation_prompt = True
 
         self.bos_token = '<s>'
 
@@ -298,40 +319,7 @@ class Llama2ChatConversation(GenericConversation):
 
         return prompt
     
-
-    def get_last_turn_continuation_prompt(self) -> str:
-        """Format the prompt to feed to the model in order to continue the last turn model output, in case
-        `max_new_tokens` was set to a low value and the model did not finish its output.
-        """
-
-        # If we are not using system prompt, do not add the template formatting with empty prompt
-        if self.system_prompt.strip() != '':
-            system_prompt = self.system_template.format(system_prompt=self.system_prompt.strip())
-        else:
-            system_prompt = ''
-        prompt = ''
-
-        N = len(self) - 1
-        if self.model_history_text[-1] is None:
-            raise RuntimeError('Cannot continue an empty last turn')
-
-        for i, (user_message, model_response) in enumerate(self):
-
-            if i == 0:
-                # Do not add bos_token here as it will be added automatically at the start of the prompt by 
-                # the tokenizer 
-                prompt += self.user_token + ' ' + system_prompt + user_message.strip() + ' '
-            else:
-                prompt += self.bos_token + self.user_token + ' ' + user_message.strip() + ' '
-
-            if i < N:
-                prompt += self.assistant_token + ' ' + model_response.strip() + ' ' + self.eos_token
-            else:
-                prompt += self.assistant_token + ' ' + model_response
-
-        return prompt
     
-
 
 # Mapping from model name to conversation class name
 CONVERSATION_MAPPING = {
