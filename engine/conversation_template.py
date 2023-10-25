@@ -24,7 +24,7 @@ class GenericConversation(object):
         # Extra eos tokens
         self.extra_eos_tokens = []
 
-        # Some templates need an additional space
+        # Some templates need an additional space when using `get_last_turn_continuation_prompt`
         self.add_space_to_continuation_prompt = False
 
         # create unique identifier (used in gradio flagging)

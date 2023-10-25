@@ -8,6 +8,7 @@ import gradio as gr
 
 import engine
 from helpers import utils
+from engine.streamer import TextContinuationStreamer
 
 
 # Default model to load at start-up
@@ -146,7 +147,7 @@ def continue_generation(additional_max_new_tokens: int = 60) -> tuple[str, list[
     timeout = 20
 
     # To show text as it is being generated
-    streamer = TextIteratorStreamer(model.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
+    streamer = TextContinuationStreamer(model.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
 
     conv_copy = copy.deepcopy(conversation)
     
@@ -240,7 +241,7 @@ model_name = gr.Dropdown(list(REVERSE_MAPPING.keys()), value=MAPPING[DEFAULT], l
 max_new_tokens = gr.Slider(10, 4000, value=500, step=10, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
 max_additional_new_tokens = gr.Slider(1, 500, value=100, step=1, label='Max additional new tokens',
-                           info='Maximum number of additional new tokens to generate when using "Continue last conversation turn" feature.')
+                           info='Maximum number of new tokens to generate when using "Continue last answer" feature.')
 load_button = gr.Button('Load model', variant='primary')
 
 
@@ -248,7 +249,7 @@ load_button = gr.Button('Load model', variant='primary')
 prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
 output_chat = gr.Chatbot(label='Conversation')
 generate_button_chat = gr.Button('Generate text', variant='primary')
-continue_button_chat = gr.Button('Continue last conversation turn', variant='primary')
+continue_button_chat = gr.Button('Continue last answer', variant='primary')
 clear_button_chat = gr.Button('Clear conversation')
 
 # Define the inputs for the main inference
