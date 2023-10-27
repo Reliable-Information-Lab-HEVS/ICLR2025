@@ -308,11 +308,6 @@ def loading(model_name: str, request: gr.Request) -> tuple[GenericConversation, 
     conv_id = actual_conv.id
     
     return actual_conv, conv_id, username, masked_model_name, model.model_name, actual_conv.to_gradio_format()
-
-
-def echo(username):
-
-    print(f'The username is {username}')
     
 
 
