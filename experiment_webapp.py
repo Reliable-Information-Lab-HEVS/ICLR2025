@@ -16,8 +16,7 @@ from engine.conversation_template import GenericConversation
 DEFAULT = 'model1'
 
 # Load both models at the beginning for fast switch between them later on
-# MODELS = [engine.HFModel('llama2-70B-chat'), engine.HFModel('llama2-13B-chat', gpu_rank=5)]
-MODELS = [engine.HFModel('llama2-7B-chat', gpu_rank=0), engine.HFModel('llama2-13B-chat', gpu_rank=1)]
+MODELS = [engine.HFModel('llama2-70B-chat'), engine.HFModel('llama2-13B-chat', gpu_rank=5)]
 
 # Mapping to mask actual model name
 MAPPING = {f'model{i+1}': MODELS[i].model_name for i in range(len(MODELS))}
