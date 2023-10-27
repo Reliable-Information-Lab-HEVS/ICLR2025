@@ -430,7 +430,7 @@ with demo:
     # Correctly set all variables and callback at load time
     loading_events = demo.load(loading, inputs=model_name,
                                outputs=[conversation, conv_id, username, masked_model_name, model_name, output_chat])
-    loading_events.then(lambda username: LOGGERS[username].setup(inputs_to_chat_callback, flagging_dir=f'chatbot_logs_{username}'),
+    loading_events.then(lambda username: LOGGERS[username].setup(inputs_to_chat_callback, flagging_dir=f'chatbot_logs/{username}'),
                         inputs=username)
 
 
