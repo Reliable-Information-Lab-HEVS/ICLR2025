@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     # Create the commands to run
     gpu_footprints = engine.estimate_number_of_gpus(models, int8, int4)
-    commands = [f'python3 -u human_eval_exec.py {model} --mode {mode}' for model in models]
+    commands = [f'python3 -u human_eval.py {model} --mode {mode}' for model in models]
     if int8:
         commands = [c + ' --int8' for c in commands]
     if int4:

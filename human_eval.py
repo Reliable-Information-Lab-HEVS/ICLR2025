@@ -5,8 +5,6 @@ import time
 import copy
 import re
 
-import torch
-
 import engine
 from engine import stopping
 from engine.prompt_template import PROMPT_MODES
@@ -72,7 +70,6 @@ def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = P
 
 
 
-@utils.duplicate_function_for_gpu_dispatch
 def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: bool = False,
                quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
                generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
@@ -92,7 +89,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'Starting with model {model_name}')
+    print(f'{utils.get_time()}  Starting with model {model_name}')
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
@@ -156,13 +153,12 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
 
     dt = time.time() - t0
 
-    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    print(f'{utils.get_time()}  Done with model {model_name} in {dt/3600:.2f}h!')
     del model
     gc.collect()
 
 
 
-@utils.duplicate_function_for_gpu_dispatch
 def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context: bool, quantization_8bits: bool = False,
                         quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
                         generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
@@ -182,7 +178,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'Starting with model {model_name}')
+    print(f'{utils.get_time()}  Starting with model {model_name}')
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
@@ -195,7 +191,7 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         stopping_patterns = None
     else:
         stopping_patterns = stopping.StoppingType.PYTHON_HUMAN_EVAL
-        
+
     folder = humaneval.get_folder('HumanEvalInstruct', prompt_template_mode, model_name, model.dtype_category(),
                                   use_context=use_context)
 
@@ -253,13 +249,12 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
     dt = time.time() - t0
 
-    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    print(f'{utils.get_time()}  Done with model {model_name} in {dt/3600:.2f}h!')
     del model
     gc.collect()
 
 
 
-@utils.duplicate_function_for_gpu_dispatch
 def human_eval_php(model_name: str, quantization_8bits: bool = False,
                    quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
                    generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
@@ -279,7 +274,7 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'Starting with model {model_name}')
+    print(f'{utils.get_time()}  Starting with model {model_name}')
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
@@ -304,7 +299,7 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
         for sample in dataset:
 
             task_id = sample['task_id']
-            prompt = sample['prompt'].strip() 
+            prompt = sample['prompt'].strip()
             stopping_patterns = sample['stop_tokens']
 
             # In this case we use greedy decoding (the temperature parameters does not matter anymore
@@ -323,7 +318,7 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
 
     dt = time.time() - t0
 
-    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    print(f'{utils.get_time()}  Done with model {model_name} in {dt/3600:.2f}h!')
     del model
     gc.collect()
 
@@ -331,16 +326,12 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='HumanEval benchmark')
+    parser.add_argument('model', type=str,
+                        help='The model to run.')
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
     parser.add_argument('--int4', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int4.')
-    parser.add_argument('--big_models', action='store_true',
-                        help='If given, run the benchmark on large models that do not fit on a single gpu.')
-    parser.add_argument('--big_models_only', action='store_true',
-                        help='If given, only run the benchmark on large models that do not fit on a single gpu.')
-    parser.add_argument('--special_only', action='store_true',
-                        help='If given, will only run the benchmark on models with a non-default prompt template.')
     parser.add_argument('--mode', type=str, default='default', choices=PROMPT_MODES,
                         help='The mode for the prompt template.')
     parser.add_argument('--instruct', action='store_true',
@@ -351,11 +342,9 @@ if __name__ == '__main__':
                         help='If given, run the HumanEvalPHP benchmark.')
     
     args = parser.parse_args()
+    model = args.model
     int8 = args.int8
     int4 = args.int4
-    big_models = args.big_models
-    big_models_only = args.big_models_only
-    special_only = args.special_only
     instruct = args.instruct
     mode = args.mode
     use_context = args.no_context
@@ -367,39 +356,16 @@ if __name__ == '__main__':
     if instruct and php:
         raise ValueError('instruct and php options are mutually exclusive.')
 
-    # Do not even attempt to run the script without access to gpus
-    if not torch.cuda.is_available():
-        raise RuntimeError("I'm begging you, run this benchmark with some GPUs...")
-    
-    num_gpus = torch.cuda.device_count()
-
-    # Select models (only keep the good coders)
-    small_models = engine.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.SMALL_GOOD_CODERS
-    large_models = engine.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.LARGE_GOOD_CODERS
-    if big_models_only:
-        models = large_models
-    elif big_models:
-        models = small_models + large_models
-    else:
-        models = small_models
-
     # target function
     if instruct:
         target_func = human_eval_instruct
-        args = (models, mode, use_context, int8, int4)
+        args = (model, mode, use_context, int8, int4)
     elif php:
         target_func = human_eval_php
-        args = (models, int8, int4)
+        args = (model, int8, int4)
     else:
         target_func = human_eval
-        args = (models, mode, int8, int4)
+        args = (model, mode, int8, int4)
 
-    print(f'Launching computations with {num_gpus} gpus available.')
-
-    if num_gpus > 1:
-        gpu_footprints = engine.estimate_number_of_gpus(models, int8, int4)
-        utils.dispatch_jobs(gpu_footprints, num_gpus, target_func, *args)
-    else:
-        for model in models:
-            target_func(*args)
+    target_func(*args)
 

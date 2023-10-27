@@ -20,4 +20,3 @@ RUN chown -R random_user /LLMs
 USER random_user
 
 CMD [ "python3", "code_eval.py" ]
-# CMD [ "python3", "code_execution/test.py" ]
