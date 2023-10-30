@@ -329,17 +329,20 @@ continue_button_chat = gr.Button('Continue last answer', variant='primary')
 clear_button_chat = gr.Button('Clear conversation')
 
 
-# Define NON-VISIBLE elements: only used to save variables to the callback
+# State variable to keep one conversation per session (default value does not matter here -> it will be set
+# by loading() method anyway)
+conversation = gr.State(MODELS[0].get_empty_conversation())
+
+
+# Define NON-VISIBLE elements: only used to save variables to the callback. Somewhat used as state variables.
 model_name = gr.Dropdown(list(REVERSE_MAPPING.keys()), value=MAPPING[DEFAULT], label='Model name',
                          multiselect=False, visible=False)
-# We use Textboxes only because `Markdown` does not have label
 username = gr.Textbox('', label='Username', visible=False)
 conv_id = gr.Textbox('', label='Conversation id', visible=False)
 
 
 # Define the inputs for the main inference
 inputs_to_chatbot = [prompt_chat, max_new_tokens]
-
 # Define inputs for the logging callbacks
 inputs_to_chat_callback = [model_name, max_new_tokens, max_additional_new_tokens, output_chat, conv_id, username]
 
@@ -359,8 +362,8 @@ demo = gr.Blocks(title='Text generation with LLMs')
 
 with demo:
 
-    # State variables (default value does not matter here -> it will be set by loading() method anyway)
-    conversation = gr.State(MODELS[0].get_empty_conversation())
+    # State variable
+    conversation.render()
 
     # State variables that do not need to be updated (except conv_id but the value is mostly fix and we know when
     # to update it) -- will not be visible
