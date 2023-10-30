@@ -334,7 +334,7 @@ clear_button_chat = gr.Button('Clear conversation')
 conversation = gr.State(MODELS[0].get_empty_conversation())
 
 
-# Define NON-VISIBLE elements: only used to save variables to the callback. Somewhat used as state variables.
+# Define NON-VISIBLE elements: they are only used to keep track of variables and save them to the callback.
 model_name = gr.Dropdown(list(REVERSE_MAPPING.keys()), value=MAPPING[DEFAULT], label='Model name',
                          multiselect=False, visible=False)
 username = gr.Textbox('', label='Username', visible=False)
@@ -365,8 +365,7 @@ with demo:
     # State variable
     conversation.render()
 
-    # State variables that do not need to be updated (except conv_id but the value is mostly fix and we know when
-    # to update it) -- will not be visible
+    # Variables we track with usual components: they do not need to be State variables -- will not be visible
     model_name.render()
     conv_id.render()
     username.render()
