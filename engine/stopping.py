@@ -31,7 +31,8 @@ OUT_OF_INDENTATION_REGEX = r'^[^#\s]|\n[^#\s]'
 # Pattern to match out of assignment, i.e. anything after a newline that does not start by a space
 # (some long assignment may be on multiple lines, but in this case there are spaces between newlines and
 # continuation of the assignment)
-# It will match any newline that are not immediately at the start of the string (double negative look-behind groups)
+# It will match any newline that is not immediately at the start of the string (double negative look-behind groups)
+# and is not followed by a space character
 OUT_OF_ASSIGNMENT_REGEX = r'(?<!^)(?<!\n)\n[^#\s]'
 
 

@@ -10,6 +10,7 @@ import pandas as pd
 
 from helpers import utils
 from helpers import datasets
+from helpers import plot_config
 
 CATEGORIES = ['completions', 'results']
 DATASETS = ['HumanEval', 'HumanEvalInstruct', 'HumanEvalPHP']
@@ -630,7 +631,9 @@ def model_wise_best_score(dtype: str = 'default', k: int = 1, greedy: bool = Tru
 
 
 
-def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = True, save: bool = False):
+def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = True, save: bool = False,
+                            model_subset: list | None = None, pretty_names_mapping: dict | None = None,
+                            title: bool = True):
     """Plot the model-wise error causes for each benchmark, for the given `dtype` and `k`. Note that `k` is only
     used to select which temperature gave the best results if `greedy=False`.
 
@@ -652,9 +655,14 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
 
     benchs = all_passes_at_k_and_error_causes(dtype=dtype, k=k, greedy=greedy, to_df=False)
 
+    figs = []
+
     for benchmark in benchs:
 
         records = benchs[benchmark]
+
+        if model_subset is not None:
+            records = [record for record in records if record['model'] in model_subset]
 
         if len(records) == 0:
             continue
@@ -685,12 +693,21 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
 
         # Mask to avoid plotting cells with 0s
         mask = np.where(error_matrix == 0, 1, 0)
-        size = (6.4, 4.8*2.5) if len(records) > 25 else (6.4, 4.8*1.4)
+
+        if pretty_names_mapping is not None:
+            pretty_names = [pretty_names_mapping[model] for model in models]
+            ylabels = pretty_names
+        else:
+            ylabels = models
+
+        size = np.array(plt.rcParams['figure.figsize']) * 2
 
         plt.figure(figsize=size)
-        plt.title(f'{benchmark}, dtype={dtype}, k={k}')
+        if title:
+            plt.title(f'{benchmark}, dtype={dtype}, k={k}')
         sns.heatmap(error_matrix, mask=mask, annot=True, annot_kws={'fontsize': 'x-small'}, fmt='.2f',
-                    xticklabels=possible_errors, yticklabels=models, cbar=True, cmap='Blues')
+                    xticklabels=possible_errors, yticklabels=ylabels, cbar=True, cmap='Blues')
+        plt.xticks(rotation=45, ha='right')
         # Set background color for masked values
         ax = plt.gca()
         ax.set_facecolor('lightyellow')
@@ -698,6 +715,10 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
 
         if save:
             plt.savefig(os.path.join(utils.ROOT_FOLDER, 'plots', f'{benchmark}_{k}_{dtype}.pdf'), bbox_inches='tight')
+
+        figs.append(plt.gcf())
+
+    return figs
 
 
 
@@ -751,3 +772,20 @@ def model_wise_pass_at_k_comparison(dtypes: list[str] = ['default', 'int8'], k: 
     final_df.columns = pd.MultiIndex.from_tuples(final_df.columns)
 
     return final_df
+
+
+PRETTY_NAMES_MAPPING = {
+    'code-llama-34B': 'CodeLlama 34B',
+    'code-llama-34B-instruct': 'CodeLlama - Instruct 34B',
+    'code-llama-34B-python': 'CodeLlama - Python 34B',
+    'codegen-16B': 'CodeGen - Mono 16B',
+    'codegen25-7B': 'CodeGen2.5 - Mono 7B',
+    'codegen25-7B-instruct': 'CodeGen2.5 - Instruct 7B',
+    'llama2-70B': 'Llama2 70B',
+    'llama2-70B-chat': 'Llama2 - Chat 70B',
+    'star-chat-alpha': 'StarChat (alpha)',
+    'star-coder': 'StarCoder',
+    'star-coder-base': 'StarCoderBase',
+}
+
+MODELS = [k for k in PRETTY_NAMES_MAPPING.keys()]

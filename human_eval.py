@@ -332,7 +332,7 @@ if __name__ == '__main__':
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
     parser.add_argument('--int4', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int4.')
-    parser.add_argument('--mode', type=str, default='default', choices=PROMPT_MODES,
+    parser.add_argument('--mode', type=str, default='generation', choices=PROMPT_MODES,
                         help='The mode for the prompt template.')
     parser.add_argument('--instruct', action='store_true',
                         help='If given, run the HumanEvalInstruct benchmark.')
