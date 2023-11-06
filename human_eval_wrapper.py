@@ -5,6 +5,7 @@ import torch
 
 import engine
 from engine.prompt_template import PROMPT_MODES
+from helpers import datasets
 from helpers import utils
 
 
@@ -29,8 +30,8 @@ if __name__ == '__main__':
                         help='If given, run the HumanEvalInstruct benchmark.')
     parser.add_argument('--no_context', action='store_false',
                         help='If given, do NOT use the context in the HumanEvalInstruct benchmark.')
-    parser.add_argument('--php', action='store_true',
-                        help='If given, run the HumanEvalPHP benchmark.')
+    parser.add_argument('--language', type=str, default='py',
+                        help='If given, run the corresponding benchmark.')
     
     args = parser.parse_args()
     int8 = args.int8
@@ -41,13 +42,16 @@ if __name__ == '__main__':
     instruct = args.instruct
     mode = args.mode
     use_context = args.no_context
-    php = args.php
+    language = args.language
 
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
     
-    if instruct and php:
-        raise ValueError('instruct and php options are mutually exclusive.')
+    if instruct and language != 'py':
+        raise ValueError('instruct and language options are mutually exclusive.')
+    
+    if language not in datasets.MULTIPLE_LANGUAGE_MAPPING.keys() and language != 'py':
+        raise ValueError(f'The language must be one of {*datasets.MULTIPLE_LANGUAGE_MAPPING.keys(),}.')
 
     # Do not even attempt to run the script without access to gpus
     if not torch.cuda.is_available():
@@ -69,7 +73,7 @@ if __name__ == '__main__':
 
     # Create the commands to run
     gpu_footprints = engine.estimate_number_of_gpus(models, int8, int4)
-    commands = [f'python3 -u human_eval.py {model} --mode {mode}' for model in models]
+    commands = [f'python3 -u human_eval.py {model} --language {language} --mode {mode}' for model in models]
     if int8:
         commands = [c + ' --int8' for c in commands]
     if int4:
@@ -78,8 +82,6 @@ if __name__ == '__main__':
         commands = [c + ' --instruct' for c in commands]
     if not use_context:
         commands = [c + ' --no_context' for c in commands]
-    if php:
-        commands = [c + ' --php' for c in commands]
         
     t0 = time.time()
 

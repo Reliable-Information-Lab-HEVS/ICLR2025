@@ -157,7 +157,7 @@ def evaluate_functional_correctness(sample_file: str, n_workers: int = 6, timeou
     out_file = attributes['associated_results_file']
     dataset = attributes['dataset']
 
-    problems = datasets.DATASETS_MAPPING[dataset]().samples_by_id()
+    problems = datasets.HUMANEVAL_DATASETS_MAPPING[dataset]().samples_by_id()
     check_function = CHECK_FUNCTION_MAPPING[dataset]
 
     # Check the generated samples against test suites.

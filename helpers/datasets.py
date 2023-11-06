@@ -64,11 +64,36 @@ class HumanEvalPHP(SampleDataset):
     id_key: str = 'task_id'
 
 
+class HumanEvalCPP(SampleDataset):
+    """Class representing the MutiPL-E variation of the HumanEval dataset for the C++ language.
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval_cpp.jsonl')
+    id_key: str = 'task_id'
+
+
+class HumanEvalRust(SampleDataset):
+    """Class representing the MutiPL-E variation of the HumanEval dataset for the Rust language.
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval_rs.jsonl')
+    id_key: str = 'task_id'
+
+
 # Dataset mapping from dataset name to actual dataset to use for evaluation
-DATASETS_MAPPING = {
+HUMANEVAL_DATASETS_MAPPING = {
     'HumanEval': HumanEval,
     'HumanEvalInstruct': HumanEvalInstruct,
     'HumanEvalPHP': HumanEvalPHP,
+    'HumanEvalCPP': HumanEvalCPP,
+    'HumanEvalRust': HumanEvalRust,
+}
+
+# Mapping from extension to dataset name for MultiPL-E
+MULTIPLE_LANGUAGE_MAPPING = {
+    'php': 'HumanEvalPHP',
+    'cpp': 'HumanEvalCPP',
+    'rs': 'HumanEvalRust',
 }
 
 

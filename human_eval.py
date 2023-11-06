@@ -40,7 +40,6 @@ HUMAN_EVAL_GREEDY_GENERATION_KWARGS = {
 
 
 
-
 def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = PythonParser(),
                         stopping_patterns: tuple[str] = stopping.EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
     
@@ -255,17 +254,19 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
 
 
-def human_eval_php(model_name: str, quantization_8bits: bool = False,
-                   quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
-                   generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
-                   greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
-    """Generate the HumanEvalPHP completions for different temperatures with the model `model_name` and
-    save the results.
+def human_eval_multiple(model_name: str, language: str, quantization_8bits: bool = False,
+                        quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
+                        generation_kwargs: dict = HUMAN_EVAL_GENERATION_KWARGS,
+                        greedy_generation_kwargs: dict = HUMAN_EVAL_GREEDY_GENERATION_KWARGS):
+    """Generate the MultiPL-E HumanEval completions for `language` fordifferent temperatures with the model
+    `model_name` and save the results.
 
     Parameters
     ----------
     model_name : str
         The model name.
+    language : str
+        The programming language.
     temperatures : tuple[int], optional
         The different temperaturs to use to generate the completions, by default TEMPERATURES
     generation_kwargs : dict, optional
@@ -273,6 +274,9 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
     greedy_generation_kwargs : dict, optional
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
+
+    if language not in datasets.MULTIPLE_LANGUAGE_MAPPING.keys():
+        raise ValueError(f'The language must be one of {*datasets.MULTIPLE_LANGUAGE_MAPPING.keys(),}.')
 
     print(f'{utils.get_time()}  Starting with model {model_name}')
 
@@ -282,9 +286,11 @@ def human_eval_php(model_name: str, quantization_8bits: bool = False,
     else:
         model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    folder = humaneval.get_folder('HumanEvalPHP', 'generation', model_name, model.dtype_category())
+    dataset_name = datasets.MULTIPLE_LANGUAGE_MAPPING[language]
 
-    dataset = datasets.HumanEvalPHP()
+    folder = humaneval.get_folder(dataset_name, 'generation', model_name, model.dtype_category())
+
+    dataset = datasets.HUMANEVAL_DATASETS_MAPPING[dataset_name]()
 
     t0 = time.time()
 
@@ -338,8 +344,8 @@ if __name__ == '__main__':
                         help='If given, run the HumanEvalInstruct benchmark.')
     parser.add_argument('--no_context', action='store_false',
                         help='If given, do NOT use the context in the HumanEvalInstruct benchmark.')
-    parser.add_argument('--php', action='store_true',
-                        help='If given, run the HumanEvalPHP benchmark.')
+    parser.add_argument('--language', type=str, default='py',
+                        help='If given, run the corresponding benchmark.')
     
     args = parser.parse_args()
     model = args.model
@@ -348,21 +354,24 @@ if __name__ == '__main__':
     instruct = args.instruct
     mode = args.mode
     use_context = args.no_context
-    php = args.php
+    language = args.language
 
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
     
-    if instruct and php:
-        raise ValueError('instruct and php options are mutually exclusive.')
-
+    if instruct and language != 'py':
+        raise ValueError('instruct and language options are mutually exclusive.')
+    
+    if language not in datasets.MULTIPLE_LANGUAGE_MAPPING.keys() and language != 'py':
+        raise ValueError(f'The language must be one of {*datasets.MULTIPLE_LANGUAGE_MAPPING.keys(),}.')
+    
     # target function
     if instruct:
         target_func = human_eval_instruct
         args = (model, mode, use_context, int8, int4)
-    elif php:
-        target_func = human_eval_php
-        args = (model, int8, int4)
+    elif language != 'py':
+        target_func = human_eval_multiple
+        args = (model, language, int8, int4)
     else:
         target_func = human_eval
         args = (model, mode, int8, int4)

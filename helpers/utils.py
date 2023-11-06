@@ -302,6 +302,26 @@ def load_txt(filename: str, separator: str = '\n') -> list[str]:
     return strings
 
 
+def save_human_eval_dataset(language: str):
+    """Download the `language` version of the HumanEval dataset (MultiPL-E version).
+
+    Parameters
+    ----------
+    language : str
+        The language extension.
+    """
+
+    # Should be the huggingface datasets, not local one
+    import datasets
+    
+    problems = datasets.load_dataset("nuprl/MultiPL-E", f"humaneval-{language}")
+    problems = problems['test'].to_list()
+    problems = sorted(problems, key=lambda x: int(x['name'].split('_')[1]))
+    # Add task_id
+    problems = [{**problem, 'task_id': '/'.join(problem['name'].split('_')[0:2])} for problem in problems]
+    save_jsonl(problems, os.path.join(DATA_FOLDER, f'HumanEval_{language}.jsonl'))
+
+
 def find_rank_of_subprocess_inside_the_pool():
     """Find the rank of the current subprocess inside the pool that was launched either by 
     multiprocessing.Pool() or concurrent.futures.ProcessPoolExecutor(), starting with rank 0.
