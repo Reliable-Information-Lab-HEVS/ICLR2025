@@ -3,6 +3,7 @@
 
 import tempfile
 import subprocess
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing as mp
 from tqdm import tqdm
@@ -98,18 +99,14 @@ def check_correctness_php(problem: dict, completion: str, timeout: float,
         f.write(program.encode("utf-8"))
         f.flush()
 
-        p = subprocess.Popen(['php', f.name], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT, start_new_session=True)
-        
         try:
-            outs, _ = p.communicate(timeout=timeout)
+            p = subprocess.run(['php', f.name], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT, start_new_session=True, text=True, timeout=timeout)
             expired = False
         except subprocess.TimeoutExpired:
-            p.kill()
-            outs, _ = p.communicate()
             expired = True
 
-        outs = outs.decode('utf-8', errors='ignore')
+        outs = p.stdout
 
         if expired:
             out = {"passed": False, 'result': 'passed out', 'exception': 'TimeoutException'}
@@ -130,11 +127,153 @@ def check_correctness_php(problem: dict, completion: str, timeout: float,
         return output, completion_id
     
 
+def check_correctness_cpp(problem: dict, completion: str, timeout: float,
+                          completion_id: int | None = None) -> dict:
+    """Evaluates the functional correctness of a cpp completion by running the test
+    suite provided in the problem. There are no safeguards as in `check_correctness_python`.
+
+    Parameters
+    ----------
+    problem : dict
+        A sample of the HumanEvalCPP dataset corresponding to a problem.
+    completion : str
+        The completion of the program as given by a model.
+    timeout : float
+        The time after which to stop the program execution.
+    completion_id : int | None, optional
+        An optional completion ID so we can match the results later even if execution finishes asynchronously,
+        by default None.
+
+    Returns
+    -------
+    dict
+        A dict with the result of the test suite.
+    """
+
+    # Construct the check program 
+    program = (
+        problem["prompt"] + completion + "\n" +
+        problem["tests"] 
+    )
+
+    with tempfile.TemporaryDirectory() as folder:
+        # Write the code to file
+        filename = os.path.join(folder, 'code.cpp')
+        build_name = os.path.join(folder, 'code.out')
+        with open(filename) as file:
+            file.write(program)
+            file.flush()
+
+        # Compilation of file
+        build = subprocess.run(['g++', filename, '-o', build_name, '-std=c++17'], stdin=subprocess.DEVNULL,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, start_new_session=True)
+        
+        if build.returncode != 0:
+            outs = build.stdout
+            out = {"passed": False, 'result': outs, 'exception': 'CompilationException'}
+        else:
+            try:
+                p = subprocess.run([build_name], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT, text=True, start_new_session=True, timeout=timeout)
+                expired = False
+            except subprocess.TimeoutExpired:
+                expired = True
+
+            if expired:
+                out = {"passed": False, 'result': 'passed out', 'exception': 'TimeoutException'}
+            else:
+                if p.returncode == 0:
+                    out = {"passed": True, 'result': 'passed', 'exception': None}
+                else:
+                    outs = p.stdout
+                    out = {"passed": False, 'result': outs, 'exception': 'RuntimeException'}
+
+        output = {'task_id': problem['task_id'], 'completion': completion, **out}
+    
+
+    if completion_id is None:
+        return output
+    else:
+        return output, completion_id
+    
+
+def check_correctness_rs(problem: dict, completion: str, timeout: float,
+                          completion_id: int | None = None) -> dict:
+    """Evaluates the functional correctness of a rust completion by running the test
+    suite provided in the problem. There are no safeguards as in `check_correctness_python`.
+
+    Parameters
+    ----------
+    problem : dict
+        A sample of the HumanEvalRust dataset corresponding to a problem.
+    completion : str
+        The completion of the program as given by a model.
+    timeout : float
+        The time after which to stop the program execution.
+    completion_id : int | None, optional
+        An optional completion ID so we can match the results later even if execution finishes asynchronously,
+        by default None.
+
+    Returns
+    -------
+    dict
+        A dict with the result of the test suite.
+    """
+
+    # Construct the check program 
+    program = (
+        problem["prompt"] + completion + "\n" +
+        problem["tests"] 
+    )
+
+    with tempfile.TemporaryDirectory() as folder:
+        # Write the code to file
+        filename = os.path.join(folder, 'code.rs')
+        build_name = os.path.join(folder, 'code.out')
+        with open(filename) as file:
+            file.write(program)
+            file.flush()
+
+        # Compilation of file
+        build = subprocess.run(['rustc', filename, '-o', build_name], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, text=True, start_new_session=True)
+        
+        if build.returncode != 0:
+            outs = build.stdout
+            out = {"passed": False, 'result': outs, 'exception': 'CompilationException'}
+        else:
+            try:
+                p = subprocess.run([build_name], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT, text=True, start_new_session=True, timeout=timeout)
+                expired = False
+            except subprocess.TimeoutExpired:
+                expired = True
+
+            if expired:
+                out = {"passed": False, 'result': 'passed out', 'exception': 'TimeoutException'}
+            else:
+                if p.returncode == 0:
+                    out = {"passed": True, 'result': 'passed', 'exception': None}
+                else:
+                    outs = p.stdout
+                    out = {"passed": False, 'result': outs, 'exception': 'RuntimeException'}
+
+        output = {'task_id': problem['task_id'], 'completion': completion, **out}
+    
+
+    if completion_id is None:
+        return output
+    else:
+        return output, completion_id
+    
+
 # Mapping from dataset name to check function for evaluation
 CHECK_FUNCTION_MAPPING = {
     'HumanEval': check_correctness_python,
     'HumanEvalInstruct': check_correctness_python,
     'HumanEvalPHP': check_correctness_php,
+    'HumanEvalCPP': check_correctness_cpp,
+    'HumanEvalRust': check_correctness_rs,
 }
 
 
