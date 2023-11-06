@@ -89,16 +89,17 @@ def aatk_benchmark(model_name: str, quantization_8bits: bool = False, quantizati
             else:
                 raise RuntimeError('This type of stopping criteria is unknown.')
 
-            # In this case we use greedy decoding (the temperature parameters does not matter anymore
-            # so we set it to the default which is 1)
+            # In this case we use greedy decoding
             if temperature == 0:
-                completions = [model(prompt, temperature=1., batch_size=1, stopping_patterns=stopping_patterns,
+                completions = [model(prompt, batch_size=1, stopping_patterns=stopping_patterns,
                                      **greedy_generation_kwargs)]
             # In this case we use top-p sampling
             else:
                 completions = model(prompt, temperature=temperature, stopping_patterns=stopping_patterns,
                                     **generation_kwargs)
-
+                
+            # Remove trailing whitespaces
+            completions = [completion.rstrip() for completion in completions]
         
             results = [{'id': id, 'completion': completion} for completion in completions]
             utils.save_jsonl(results, filename, append=True)
