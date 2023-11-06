@@ -56,7 +56,7 @@ def aatk_benchmark(model_name: str, quantization_8bits: bool = False, quantizati
         The argument for greedy generation used in the HumanEval benchmark, by default AATK_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'Starting with model {model_name}')
+    print(f'{utils.get_time()}  Starting with model {model_name}')
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
@@ -106,7 +106,7 @@ def aatk_benchmark(model_name: str, quantization_8bits: bool = False, quantizati
 
     dt = time.time() - t0
 
-    print(f'Done with model {model_name} in {dt/3600:.2f}h!')
+    print(f'{utils.get_time()}  Done with model {model_name} in {dt/3600:.2f}h!')
     del model
     gc.collect()
 
