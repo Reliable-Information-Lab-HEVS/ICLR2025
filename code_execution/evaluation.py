@@ -37,11 +37,7 @@ def check_correctness_python(problem: dict, completion: str, timeout: float,
     """
 
     # Construct the check program 
-    program = (
-        problem["prompt"] + completion + "\n" +
-        problem["test"] + "\n" +
-        f"check({problem['entry_point']})"
-    )
+    program = problem["prompt"] + completion + "\n" + problem["test"] + "\n" + f"check({problem['entry_point']})"
 
     # We need a Queue to communicate with the other process, because as we may kill it, we cannot just 
     # return a value and use a "finally" clause for cleanup (kill() prevents the finally clauses from being executed)
@@ -90,10 +86,7 @@ def check_correctness_php(problem: dict, completion: str, timeout: float,
     """
 
     # Construct the check program 
-    program = (
-        problem["prompt"] + completion + "\n" +
-        problem["tests"] 
-    )
+    program = problem["prompt"] + completion + "\n" + problem["tests"]
 
     with tempfile.NamedTemporaryFile(suffix='.php', delete=True) as f:
         f.write(program.encode("utf-8"))
@@ -151,10 +144,7 @@ def check_correctness_cpp(problem: dict, completion: str, timeout: float,
     """
 
     # Construct the check program 
-    program = (
-        problem["prompt"] + completion + "\n" +
-        problem["tests"] 
-    )
+    program = problem["prompt"] + completion + "\n" + problem["tests"]
 
     with tempfile.TemporaryDirectory() as folder:
         # Write the code to file
@@ -221,10 +211,7 @@ def check_correctness_rs(problem: dict, completion: str, timeout: float,
     """
 
     # Construct the check program 
-    program = (
-        problem["prompt"] + completion + "\n" +
-        problem["tests"] 
-    )
+    program = problem["prompt"] + completion + "\n" + problem["tests"]
 
     with tempfile.TemporaryDirectory() as folder:
         # Write the code to file
