@@ -10,7 +10,7 @@ import pandas as pd
 
 from helpers import utils
 from helpers import datasets
-from helpers import plot_config
+
 
 CATEGORIES = ['completions', 'results']
 DATASETS = list(datasets.HUMANEVAL_DATASETS_MAPPING.keys())
@@ -171,7 +171,9 @@ def extract_all_filenames(category: str = 'completions', only_unprocessed: bool 
     
 
     files = []
-    for dataset in DATASETS:
+
+    existing_datasets = [dataset for dataset in os.listdir(utils.RESULTS_FOLDER) if dataset in DATASETS]
+    for dataset in existing_datasets:
         dataset_path = os.path.join(utils.RESULTS_FOLDER, dataset)
         for mode in os.listdir(dataset_path):
             if not mode.startswith('.'):
@@ -652,6 +654,8 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
 
     import matplotlib.pyplot as plt
     import seaborn as sns
+
+    from helpers import plot_config
 
     benchs = all_passes_at_k_and_error_causes(dtype=dtype, k=k, greedy=greedy, to_df=False)
 

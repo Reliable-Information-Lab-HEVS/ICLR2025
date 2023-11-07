@@ -1,7 +1,11 @@
 FROM python:3.11.3
+
+# Install other programming languages
 RUN apt-get update
 RUN apt-get install php -y
-# RUN echo $(php --version)
+RUN apt-get install g++ -y
+RUN apt-get install rustc -y
+
 
 WORKDIR /LLMs
 

@@ -150,7 +150,7 @@ def check_correctness_cpp(problem: dict, completion: str, timeout: float,
         # Write the code to file
         filename = os.path.join(folder, 'code.cpp')
         build_name = os.path.join(folder, 'code.out')
-        with open(filename) as file:
+        with open(filename, 'w') as file:
             file.write(program)
             file.flush()
 
@@ -217,7 +217,7 @@ def check_correctness_rs(problem: dict, completion: str, timeout: float,
         # Write the code to file
         filename = os.path.join(folder, 'code.rs')
         build_name = os.path.join(folder, 'code.out')
-        with open(filename) as file:
+        with open(filename, 'w') as file:
             file.write(program)
             file.flush()
 
