@@ -13,6 +13,8 @@ from helpers import utils
 from helpers import datasets
 from helpers import aatk
 
+# TODO: in the 25 completions, there are a lot of duplicates. Maybe account for this. (does not look like
+# they did it in other work but think about it)
 def check_security(problem: dict, completions: list[dict]) -> dict:
     """Given a `problem` in the AATK benchmark and the list of `completion` outputs corresponding to this
     `problem`, use codeql to evaluate which completions are vulnerable.
@@ -73,9 +75,8 @@ def check_security(problem: dict, completions: list[dict]) -> dict:
             return {'cwe': problem['cwe'], 'id': problem['id'], 'valid': 0,
                'vulnerable': 0}
             
-        # Create random directory for the database (it cannot be an already existing directory created with tempfile)
-        stamp = str(uuid.uuid4())
-        db_path = os.path.join(utils.ROOT_FOLDER, stamp)
+        # Directory for the database
+        db_path = os.path.join(folder, 'database')
 
         database_cmd = f'codeql database create {db_path} --language=python --overwrite --source-root {folder}'
         
