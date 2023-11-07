@@ -1,6 +1,5 @@
 import subprocess
 import tempfile
-import uuid
 import shlex
 import os
 import py_compile
