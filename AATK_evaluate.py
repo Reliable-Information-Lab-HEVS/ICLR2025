@@ -167,4 +167,4 @@ if __name__ == '__main__':
     files = aatk.extract_all_filenames(category='completions', only_unprocessed=True)
 
     for file in tqdm(files):
-        evaluate_security(file, n_workers=6)
+        evaluate_security(file, n_workers=4)
