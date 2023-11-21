@@ -1,6 +1,6 @@
 import gc
 import os
-import time
+import argparse
 import queue
 import copy
 from concurrent.futures import ThreadPoolExecutor
@@ -679,4 +679,15 @@ with demo:
 
 
 if __name__ == '__main__':
-    demo.queue(concurrency_count=4).launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])
+
+    parser = argparse.ArgumentParser(description='LLM Playground')
+    parser.add_argument('--no_auth', action='store_true',
+                        help='If given, will NOT require authentification to access the webapp.')
+    
+    args = parser.parse_args()
+    no_auth = args.no_auth
+    
+    if no_auth:
+        demo.queue(concurrency_count=4).launch(share=True, blocked_paths=[CREDENTIALS_FILE])
+    else:
+        demo.queue(concurrency_count=4).launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])
