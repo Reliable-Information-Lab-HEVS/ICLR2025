@@ -274,8 +274,8 @@ class Llama2ChatPromptTemplate(GenericPromptTemplate):
 
     def format_chat(self, prompt: str, model_context: str = '', system_prompt: str = '') -> str:
 
-        if self.system_prompt.strip() != '':
-            system_prompt = self.system_template.format(system_prompt=self.system_prompt.strip())
+        if system_prompt.strip() != '':
+            system_prompt = self.system_template.format(system_prompt=system_prompt.strip())
         else:
             system_prompt = ''
 

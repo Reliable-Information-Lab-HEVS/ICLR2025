@@ -518,15 +518,15 @@ load_button = gr.Button('Load model', variant='primary')
 prompt_text = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
 output_text = gr.Textbox(label='Model output')
 generate_button_text = gr.Button('▶️ Submit', variant='primary')
-clear_button_text = gr.Button('🗑 Clear prompt', variant='secondary')
+clear_button_text = gr.Button('🗑 Clear', variant='secondary')
 
 # Define elements of the chatbot Tab
 prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
 output_chat = gr.Chatbot(label='Conversation')
 generate_button_chat = gr.Button('▶️ Submit', variant='primary')
-continue_button_chat = gr.Button('🔂 Continue last answer', variant='primary')
+continue_button_chat = gr.Button('🔂 Continue', variant='primary')
 retry_button_chat = gr.Button('🔄 Retry', variant='primary')
-clear_button_chat = gr.Button('🗑 Clear conversation')
+clear_button_chat = gr.Button('🗑 Clear')
 
 
 conversation = gr.State(MODEL.get_empty_conversation())
