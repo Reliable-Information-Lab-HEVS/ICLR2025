@@ -33,7 +33,7 @@ LOGGERS_TEXT = {}
 LOGGERS_CHAT = {}
 
 
-def update_model(conversation: GenericConversation, model_name: str, quantization_8bits: bool = False,
+def update_model(conversation: GenericConversation, username: str | None, model_name: str, quantization_8bits: bool = False,
                  quantization_4bits: bool = False) -> tuple[GenericConversation, str, str, str, str, list[list]]:
     """Update the model in the global scope.
 
@@ -41,6 +41,8 @@ def update_model(conversation: GenericConversation, model_name: str, quantizatio
     ----------
     conversation : GenericConversation
         Current conversation. This is the value inside a gr.State instance.
+    username : str | None
+        Username of current user if any.
     model_name : str
         The new model name.
     quantization_8bits : bool, optional
@@ -86,6 +88,8 @@ def update_model(conversation: GenericConversation, model_name: str, quantizatio
         raise gr.Error(f'The following error happened during loading: {repr(e)}. Please retry or choose another one.')
     
     new_conv = MODEL.get_empty_conversation()
+    if username is not None:
+        CACHED_CONVERSATIONS[username] = new_conv
     
     # Return values to clear the input and output textboxes, and input and output chatbot boxes
     return new_conv, new_conv.id, '', '', '', [[None, None]]
@@ -662,13 +666,13 @@ with demo:
                             else None, inputs=inputs_to_chat_callback, preprocess=False)
 
     # Switch the model loaded in memory when clicking
-    load_button.click(update_model, inputs=[conversation, model_name, quantization_8bits, quantization_4bits],
+    load_button.click(update_model, inputs=[conversation, username, model_name, quantization_8bits, quantization_4bits],
                       outputs=[conversation, conv_id, prompt_text, output_text, prompt_chat, output_chat],
                       cancels=[generate_event1, generate_event2, generate_event3])
     
     # Clear the prompt and output boxes when clicking the button
     clear_button_text.click(lambda: ['', ''], outputs=[prompt_text, output_text], queue=False)
-    clear_button_chat.click(clear_chatbot, inputs=[username], outputs=[prompt_chat, output_chat], queue=False)
+    clear_button_chat.click(clear_chatbot, inputs=[username], outputs=[conversation, output_chat, conv_id], queue=False)
 
     # Change visibility of generation parameters if we perform greedy search
     do_sample.input(lambda value: [gr.update(visible=value) for _ in range(5)], inputs=do_sample,
