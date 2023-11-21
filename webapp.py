@@ -465,8 +465,6 @@ def loading(request: gr.Request) -> tuple[GenericConversation, list[list], str, 
             username = request.username
         except BaseException:
             username = None
-
-    print(f'Username: {username}')
     
     # Check if we have cached a value for the conversation to use
     if username is not None:
@@ -634,7 +632,7 @@ with demo:
     generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation,
                                                  outputs=output_text)
     # Add automatic callback on success
-    generate_event1.success(lambda *args: LOGGERS_TEXT[args[3]].flag(args) if args[3] is not None else None,
+    generate_event1.success(lambda *args: LOGGERS_TEXT[args[3]].flag(args),
                             inputs=inputs_to_text_callback, preprocess=False)
 
     # Perform chat generation when clicking the button
