@@ -69,7 +69,7 @@ def update_model(new_masked_model_name: str, username: str) -> tuple[GenericConv
 
 
 def chat_generation(model_name: str, conversation: GenericConversation, prompt: str,
-                    max_new_tokens: int = 60) -> tuple[GenericConversation, str, list[list[str, str]]]:
+                    max_new_tokens: int) -> tuple[GenericConversation, str, list[list[str, str]]]:
     """Chat generation with streamed output.
 
     Parameters
@@ -80,8 +80,8 @@ def chat_generation(model_name: str, conversation: GenericConversation, prompt: 
         Prompt to the model.
     conversation : GenericConversation
         Current conversation. This is the value inside a gr.State instance.
-    max_new_tokens : int, optional
-        Maximum new tokens to generate, by default 60
+    max_new_tokens : int
+        Maximum new tokens to generate.
 
     Yields
     ------
@@ -137,7 +137,7 @@ def chat_generation(model_name: str, conversation: GenericConversation, prompt: 
 
 
 def continue_generation(model_name: str, conversation: GenericConversation,
-                        additional_max_new_tokens: int = 60) -> tuple[GenericConversation, str, list[list[str, str]]]:
+                        additional_max_new_tokens) -> tuple[GenericConversation, str, list[list[str, str]]]:
     """Continue the last turn of the conversation, with streamed output.
 
     Parameters
@@ -146,8 +146,8 @@ def continue_generation(model_name: str, conversation: GenericConversation,
         Current "true" model name.
     conversation : GenericConversation
         Current conversation. This is the value inside a gr.State instance.
-    max_new_tokens : int, optional
-        Maximum new tokens to generate, by default 60
+    max_new_tokens : int
+        Maximum new tokens to generate.
 
     Yields
     ------
