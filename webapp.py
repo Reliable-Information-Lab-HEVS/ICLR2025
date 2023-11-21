@@ -542,7 +542,7 @@ inputs_to_chatbot_retry = [conversation, max_new_tokens, do_sample, top_k, top_p
 # Define inputs for the logging callbacks
 inputs_to_text_callback = [model_name, quantization_8bits, quantization_4bits, username,
                            *inputs_to_simple_generation, output_text]
-inputs_to_chat_callback = [model_name, quantization_8bits, quantization_4bits, username, conversation, conv_id,
+inputs_to_chat_callback = [model_name, quantization_8bits, quantization_4bits, username, output_chat, conv_id,
                            max_new_tokens, max_additional_new_tokens, do_sample, top_k, top_p, temperature, use_seed, seed]
 
 # Some prompt examples
@@ -632,7 +632,7 @@ with demo:
     generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation,
                                                  outputs=output_text)
     # Add automatic callback on success
-    generate_event1.success(lambda *args: LOGGERS_TEXT[args[3]].flag(args),
+    generate_event1.success(lambda *args: LOGGERS_TEXT[args[3]].flag(args) if args[3] is not None else None,
                             inputs=inputs_to_text_callback, preprocess=False)
 
     # Perform chat generation when clicking the button
