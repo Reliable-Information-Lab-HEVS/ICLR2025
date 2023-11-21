@@ -530,8 +530,10 @@ clear_button_chat = gr.Button('🗑 Clear')
 
 
 conversation = gr.State(MODEL.get_empty_conversation())
-username = gr.State(None)
-conv_id = gr.State('')
+# Define NON-VISIBLE elements: they are only used to keep track of variables and save them to the callback (States
+# cannot be used in callbacks).
+username = gr.Textbox('', label='Username', visible=False)
+conv_id = gr.Textbox('', label='Conversation id', visible=False)
 
 # Define the inputs for the main inference
 inputs_to_simple_generation = [prompt_text, max_new_tokens, do_sample, top_k, top_p, temperature, use_seed, seed]
