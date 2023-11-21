@@ -679,4 +679,4 @@ with demo:
 
 
 if __name__ == '__main__':
-    demo.queue().launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])
+    demo.queue(concurrency_count=4).launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])
