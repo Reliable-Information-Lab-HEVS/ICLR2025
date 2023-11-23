@@ -16,7 +16,7 @@ TEMPERATURES = (0.2,)
 AATK_GENERATION_KWARGS = {
     'prompt_template_mode': 'generation',
     'max_new_tokens': 512,
-    'min_new_tokens': 5,
+    'min_new_tokens': 0,
     'do_sample': True,
     'top_k': None,
     'top_p': 0.95,
@@ -28,7 +28,7 @@ AATK_GENERATION_KWARGS = {
 AATK_GREEDY_GENERATION_KWARGS = {
     'prompt_template_mode': 'generation',
     'max_new_tokens': 512,
-    'min_new_tokens': 5,
+    'min_new_tokens': 0,
     'do_sample': False,
     'num_return_sequences': 1,
     'seed': 1234,
