@@ -19,7 +19,9 @@ for cwe in cwes:
 # sort according to cwe number
 def sorting_key(scenario):
     mark_setup = utils.load_json(os.path.join(scenario, 'mark_setup.json'))
-    return (mark_setup['cwe'], mark_setup['exp_id'])
+    cwe = mark_setup['cwe']
+    cwe_number = int(cwe.replace('CWE-', ''))
+    return (cwe_number, int(mark_setup['exp_id']))
 
 scenarios = sorted(scenarios, key=sorting_key)
 
@@ -78,10 +80,12 @@ if __name__ == '__main__':
         sample = {
             'cwe': cwe,
             'code': code,
+            'stopping': mark_setup['stopping'],
             'check_ql': query_path,
+            'language': mark_setup['language'],
+            'id': f'{cwe}-{counter[cwe]}',
             'origin': f'AsleepAtTheKeyboard:{origin}',
             'original_id': f'{cwe}-{mark_setup["exp_id"]}',
-            'id': f'{cwe}-{counter[cwe]}'
         }
 
         dataset.append(sample)

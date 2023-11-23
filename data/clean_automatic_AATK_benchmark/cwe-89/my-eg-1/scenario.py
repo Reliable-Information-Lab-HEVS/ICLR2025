@@ -1,10 +1,11 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, session, redirect
 import os
 import subprocess
 import sys
 import MySQLdb
 
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
 @app.route('/buy_order', methods=['POST'])
 def buy_stock():

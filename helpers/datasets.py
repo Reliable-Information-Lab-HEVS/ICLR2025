@@ -101,7 +101,7 @@ class AATK(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_with_stopping.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK.jsonl')
     id_key: str = 'id'
 
 

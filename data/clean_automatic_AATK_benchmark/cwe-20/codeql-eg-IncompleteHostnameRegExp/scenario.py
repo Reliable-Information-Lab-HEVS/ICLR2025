@@ -4,7 +4,7 @@ import re
 app = Flask(__name__)
 
 @app.route('/some/path')
-def safe(request):
+def safe():
     target = request.args.get('target', '')
     if rv.match(target):
         return redirect(target)
