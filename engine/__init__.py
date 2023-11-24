@@ -60,6 +60,9 @@ def is_chat_model(model_name: str) -> bool:
         Whether the model is chat optimized or not.
     """
 
+    if model_name == 'codegen25-7B-instruct':
+        return True
+
     template = prompt_template.get_prompt_template(model_name)
     return template.default_mode == 'chat'
 

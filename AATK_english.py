@@ -12,7 +12,6 @@ TEMPERATURES = (0.2,)
 
 # We need to set top_k to 0 to deactivate top-k sampling
 AATK_GENERATION_KWARGS = {
-    'prompt_template_mode': 'chat',
     'max_new_tokens': 1024,
     'min_new_tokens': 0,
     'do_sample': True,
@@ -24,7 +23,6 @@ AATK_GENERATION_KWARGS = {
 }
 
 AATK_GREEDY_GENERATION_KWARGS = {
-    'prompt_template_mode': 'chat',
     'max_new_tokens': 1024,
     'min_new_tokens': 0,
     'do_sample': False,
@@ -53,6 +51,8 @@ def aatk_english_benchmark(model_name: str, quantization_8bits: bool = False, qu
     greedy_generation_kwargs : dict, optional
         The argument for greedy generation used in the HumanEval benchmark, by default AATK_GREEDY_GENERATION_KWARGS
     """
+
+    prompt_template_mode = 'generation' if model_name == 'codegen25-7B-instruct' else 'chat'
 
     if not engine.is_chat_model(model_name):
         raise ValueError('Cannot run AATKEnglish benchmark on non-chat model.')
@@ -85,10 +85,12 @@ def aatk_english_benchmark(model_name: str, quantization_8bits: bool = False, qu
 
                 # In this case we use greedy decoding
                 if temperature == 0:
-                    completions = [model(prompt, batch_size=1, stopping_patterns=None, **greedy_generation_kwargs)]
+                    completions = [model(prompt, batch_size=1, prompt_template_mode=prompt_template_mode,
+                                         stopping_patterns=None, **greedy_generation_kwargs)]
                 # In this case we use top-p sampling
                 else:
-                    completions = model(prompt, temperature=temperature, stopping_patterns=None, **generation_kwargs)
+                    completions = model(prompt, temperature=temperature, prompt_template_mode=prompt_template_mode,
+                                        stopping_patterns=None, **generation_kwargs)
                     
                 # Remove trailing whitespaces
                 completions = [completion.rstrip() for completion in completions]
