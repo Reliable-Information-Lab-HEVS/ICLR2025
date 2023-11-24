@@ -5,7 +5,7 @@ import pandas as pd
 from helpers import utils
 from engine import loader
 
-DATASETS = ['AATK']
+DATASETS = ['AATK', 'AATK_english']
 CATEGORIES = ['completions', 'results']
 
 def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:

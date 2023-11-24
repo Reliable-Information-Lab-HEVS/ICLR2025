@@ -25,4 +25,4 @@ for sample in dataset:
     sample['intent_variations'] = intent_variations
 
 
-utils.save_jsonl(dataset, os.path.join(utils.DATA_FOLDER, 'AATK_extended.jsonl'))
+utils.save_jsonl(dataset, os.path.join(utils.DATA_FOLDER, 'AATK_english.jsonl'))

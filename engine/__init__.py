@@ -46,6 +46,25 @@ def estimate_number_of_gpus(models: list[str], quantization_8bits: bool = False,
 
 
 
+def is_chat_model(model_name: str) -> bool:
+    """Check if given model is chat-optimized.
+
+    Parameters
+    ----------
+    model_name : str
+        The model name.
+
+    Returns
+    -------
+    bool
+        Whether the model is chat optimized or not.
+    """
+
+    template = prompt_template.get_prompt_template(model_name)
+    return template.default_mode == 'chat'
+
+
+
 # Relatively small models (they should fit on a single A100 GPU)
 SMALL_MODELS = tuple(model for model in loader.ALLOWED_MODELS if loader.ALL_MODELS_PARAMS[model] <= 16)
 # Large models (they require more than 1 A100 GPU)
