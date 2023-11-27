@@ -74,7 +74,7 @@ def parse_filename(filename: str) -> dict:
     return out
 
 
-def extract_filenames(dataset: str = 'AATK', category: str = 'completions') -> list[str]:
+def extract_filenames(dataset: str = 'AATK', category: str = 'completions', only_unprocessed: bool = True) -> list[str]:
     """Return all filenames corresponding to the AATK benchmark.
 
     Parameters
@@ -84,6 +84,9 @@ def extract_filenames(dataset: str = 'AATK', category: str = 'completions') -> l
     category : str, optional
         Whether to return filenames corresponding to the 'completions' or 'results' subfolders,
         by default 'completions'.
+    only_unprocessed : bool, optional
+        If `True` and `category='completions'`, will keep only files from benchmarks for which the 'results' 
+        folder does not exist. By default True.
 
     Returns
     -------
@@ -111,8 +114,16 @@ def extract_filenames(dataset: str = 'AATK', category: str = 'completions') -> l
             for dtype_dir in os.listdir(model_path):
                 if not dtype_dir.startswith('.'):
                     full_path = os.path.join(model_path, dtype_dir)
-                    files.extend([os.path.join(full_path, file) for file in os.listdir(full_path) \
-                                  if not file.startswith('.')])
+                    existing_files = [os.path.join(full_path, file) for file in os.listdir(full_path) \
+                                      if not file.startswith('.')]
+                    
+                    if category == 'completions' and only_unprocessed:
+                        # Add it only if corresponding results file does not already exist
+                        for file in existing_files:
+                            if not os.path.exists(file.replace('completions', 'results')):
+                                files.append(file)
+                    else:
+                        files.extend(existing_files)
                     
     return files
 
@@ -143,18 +154,11 @@ def extract_all_filenames(category: str = 'completions', only_unprocessed: bool 
     for dataset in DATASETS:
 
         try:
-            existing_files = extract_filenames(dataset, category=category)
+            existing_files = extract_filenames(dataset, category=category, only_unprocessed=only_unprocessed)
         except RuntimeError:
             continue
 
-        # Only keep those that were not already processed
-        if category == 'completions' and only_unprocessed:
-            # Add it only if corresponding results file does not already exist
-            for file in existing_files:
-                if not os.path.exists(file.replace('completions', 'results')):
-                    files.append(file)
-        else:
-            files.extend(existing_files)
+        files.extend(existing_files)
 
     return files
 
