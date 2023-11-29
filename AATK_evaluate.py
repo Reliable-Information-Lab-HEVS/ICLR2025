@@ -1,20 +1,22 @@
 import subprocess
 import tempfile
 import shlex
+import re
 import os
 import py_compile
 import csv
-import shutil
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 
 from helpers import utils
 from helpers import datasets
 from helpers import aatk
+from engine.code_parser import PythonParser
 
 # TODO: in the 25 completions, there are a lot of duplicates. Maybe account for this. (does not look like
 # they did it in other work but think about it)
-def check_security(problem: dict, completions: list[dict]) -> dict:
+def check_security(problem: dict, completions: list[dict], is_code_completion: bool) -> dict:
     """Given a `problem` in the AATK benchmark and the list of `completion` outputs corresponding to this
     `problem`, use codeql to evaluate which completions are vulnerable.
 
@@ -24,6 +26,8 @@ def check_security(problem: dict, completions: list[dict]) -> dict:
         A sample of the AATK benchmark.
     completions : list[dict]
         List of completion outputs corresponding to `problem`.
+    is_code_completion : bool
+        Whether this is raw code completion, or answer to a prompt en natural language (english).
 
     Returns
     -------
@@ -46,7 +50,10 @@ def check_security(problem: dict, completions: list[dict]) -> dict:
 
         # Create a python file for each completion
         for i, completion in enumerate(completions):
-            file_content = problem['code'] + completion['completion']
+            if is_code_completion:
+                file_content = problem['code'] + completion['completion']
+            else:
+                file_content = completion['extracted_code']
             with open(os.path.join(folder, f'{i}.py'), 'w') as file:
                 file.write(file_content)
 
@@ -103,12 +110,12 @@ def check_security(problem: dict, completions: list[dict]) -> dict:
         
         vulnerable_files = set(vulnerable_files)
 
-        # delete database folder
-        shutil.rmtree(db_path)
-
         # Write the output dict
         out = {'cwe': problem['cwe'], 'id': problem['id'], 'valid': correct_files,
                'vulnerable': len(vulnerable_files)}
+        
+    if not is_code_completion:
+        out['prompt_id'] = completions[0]['prompt_id']
         
     return out
         
@@ -131,14 +138,12 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
 
     problems = datasets.AATK().samples_by_id()
     samples = utils.load_jsonl(sample_file)
+
     # Find all samples corresponding to each id
-    samples_by_id = {}
-    for key in problems.keys():
-        corresponding_samples = []
-        for sample in samples:
-            if sample['id'] == key:
-                corresponding_samples.append(sample)
-        samples_by_id[key] = corresponding_samples
+    samples_by_id = defaultdict(list)
+    for sample in samples:
+        id = sample['id']
+        samples_by_id[id].append(sample)
 
     # Check the generated samples against test suites.
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
@@ -148,7 +153,7 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
         for id in problems.keys():
             problem = problems[id]
             completions = samples_by_id[id]
-            args = (problem, completions)
+            args = (problem, completions, True)
             future = executor.submit(check_security, *args)
             futures.append(future)
 
@@ -162,9 +167,128 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
 
 
 
+def evaluate_security_english(sample_file: str, n_workers: int = 6):
+    """Evaluate the security of every sample in `sample_file`, and save the results. This is supposed to be
+    used with the completions of prompts in natural language (english).
+
+    Parameters
+    ----------
+    sample_file : str
+        File where the completions are.
+    n_workers : int, optional
+        The number of threads to use, by default 6
+    """
+    
+    # Compute name of the output file
+    attributes = aatk.parse_filename(sample_file)
+    out_file = attributes['associated_results_file']
+
+    problems = datasets.AATKEnglish().samples_by_id()
+    samples = utils.load_jsonl(sample_file)
+
+    # Find all samples corresponding to each id and prompt
+    samples_by_id = {key: defaultdict(list) for key in problems.keys()}
+    for sample in samples:
+        id = sample['id']
+        prompt_id = sample['prompt_id']
+        # extract the code contained in the sample
+        sample['extracted_code'] = extract_code(sample['completion'])
+        # Add the sample to the list
+        samples_by_id[id][prompt_id].append(sample)
+
+    # Check the generated samples against test suites.
+    with ThreadPoolExecutor(max_workers=n_workers) as executor:
+
+        futures = []
+
+        for id in problems.keys():
+            problem = problems[id]
+            all_prompt_completions = samples_by_id[id]
+            for prompt in all_prompt_completions.keys():
+                completions = all_prompt_completions[prompt]
+                args = (problem, completions, False)
+                future = executor.submit(check_security, *args)
+                futures.append(future)
+
+        results = []
+
+        for future in tqdm(as_completed(futures), total=len(futures), leave=False):
+            results.append(future.result())
+
+    # Save to file
+    utils.save_jsonl(results, out_file)
+
+
+
+def extract_code(completion: str) -> str:
+    """Extract code from the completion of a chat model.
+
+    Parameters
+    ----------
+    completion : str
+        The answer of the model to the given prompt.
+
+    Returns
+    -------
+    str
+        The code contained in the answer.
+    """
+
+    parser = PythonParser()
+    code = parser(completion)
+
+    # If we find this clause, take only the code before it
+    stop = code.find("if __name__ ==")
+    if stop != -1:
+        code = code[:stop]
+
+    # Split on new lines
+    good_lines = code.split('\n')
+
+    # If we find this, the model gave an example on how to run from terminal -> this is not Python code
+    python_pattern = r'python3? [a-zA-Z0-9_/-]+.py'
+    good_lines = [l for l in good_lines if re.search(python_pattern, l) is None]
+    good_lines = [l for l in good_lines if not l.startswith('flask run')]
+
+    # If we find this, the model gave an example on how to create a new env -> this is not Python code
+    env_pattern = r'python3? -m (?:venv|virtualenv)'
+    good_lines = [l for l in good_lines if re.search(env_pattern, l) is None]
+    good_lines = [l for l in good_lines if not l.startswith('virtualenv ')]
+    source_pattern = r'(?:source [a-zA-Z0-9_-]+/bin/activate|source [a-zA-Z0-9_-]+/Scripts/activate|^[a-zA-Z0-9_-]+\\Scripts\\activate)'
+    good_lines = [l for l in good_lines if re.search(source_pattern, l) is None]
+
+
+    # If we find this, the model gave an example on how to install packages -> this is not Python code
+    good_lines = [l for l in good_lines if not l.startswith('pip install')]
+
+    # If we find this, the model gave instruction to create a SQL db -> this is not Python code
+    sql_pattern = r'^(?:CREATE DATABASE|USE|CREATE TABLE|REFERENCES) '
+    good_lines = [l for l in good_lines if re.search(sql_pattern, l) is None]
+
+    # If we find this, the model gave a command line instruction -> this is not Python code
+    good_lines = [l for l in good_lines if not l.startswith('$ ')]
+
+    # Reassemble the lines containing correct code
+    code = '\n'.join(good_lines)
+
+    # If we find this, the model gave some html template examples between backticks -> this is not Python code
+    html_pattern = r'(?:^|\n)<!DOCTYPE html>\n<html(?:.*?)\n</html>'
+    matches = re.findall(html_pattern, code, re.DOTALL)
+    for match in matches:
+        # code = code[:match.start()] + code[match.end():]
+        code = code.replace(match, '', 1)
+
+    return code.strip()
+
+
+
 if __name__ == '__main__':
 
     files = aatk.extract_filenames(dataset='AATK', category='completions', only_unprocessed=True)
-
     for file in tqdm(files):
         evaluate_security(file, n_workers=4)
+
+
+    files = aatk.extract_filenames(dataset='AATK_english', category='completions', only_unprocessed=True)
+    for file in tqdm(files):
+        evaluate_security_english(file, n_workers=4)

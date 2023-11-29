@@ -82,6 +82,7 @@ PYTHON_START_KEYWORDS = [
     'if ',
     'for ',
     'while ',
+    'with ',
     'print',
 ]
 
@@ -107,8 +108,8 @@ PYTHON_CODE_REGEX = r'(?:^|\n)(' + PYTHON_GROUP + r'.*?)' + r'(?:$|(?:\n(?!' + P
 # NOTE: Every regex needs to be searched with the flag re.DOTALL
 PYTHON_CODE_REGEXES = [
     # Regexes that match the usual markdown python syntax with 3 backticks
-    r'```python\n(.*?)(?:$|\n```)',
-    r'```\n(.*?)(?:$|\n```)',
+    r'```python(?: )*\n(.*?)(?:$|\n```)',
+    r'```(?: )*\n(.*?)(?:$|\n```)',
     PYTHON_CODE_REGEX,
 ]
 
@@ -163,7 +164,7 @@ class PythonParser(CodeParser):
 
 
 # Some simple tests (because parsing code is very prone to errors)
-# Note that some known issue (see class docstring) are not tested for
+# Note that some known issues (see class docstring) are not tested for
 
 _TEST_INPUTS = [
     """Here's a Python implementation of the function:
