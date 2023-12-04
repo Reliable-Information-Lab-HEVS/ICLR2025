@@ -1,6 +1,10 @@
 import os
+from collections import defaultdict
 
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from helpers import utils
 from engine import loader
@@ -163,9 +167,9 @@ def extract_all_filenames(category: str = 'completions', only_unprocessed: bool 
     return files
 
 
-def model_wise_results():
+def model_wise_results(dataset: str = 'AATK'):
 
-    files = extract_all_filenames(category='results')
+    files = extract_filenames(dataset, category='results')
 
     out = []
     for file in files:
@@ -191,5 +195,48 @@ def model_wise_results():
     df = pd.DataFrame.from_records(out)
     df = df.drop(columns=['model_family', 'model_size'])
     df.set_index('model', inplace=True)
+
+    return df
+
+
+def scenario_stats(filename: str):
+
+    result = utils.load_jsonl(filename)
+
+    model = parse_filename(filename)['model']
+
+    res_by_id = defaultdict(list)
+    for res in result:
+        res_by_id[res['id']].append(res['vulnerable'])
+
+    means = {key: np.mean(value) for key, value in res_by_id.items()}
+    stds = {key: np.std(value) for key, value in res_by_id.items()}
+    vals = {key: f'${means[key]:.1f} \pm {stds[key]:.1f}$' for key in means.keys()}
+
+    # scenarios = list(res_by_id.keys())
+    # counter = 0
+
+    # fig, axes = plt.subplots(9, 2, sharex=True, sharey=True)
+    # for i in range(axes.size[0]):
+    #     for j in range(axes.size[1]):
+    #         axes[i,j].boxplot(res_by_id[scenarios[counter]])
+    #         counter += 1
+
+    # sns.boxplot(res_by_id)
+
+    return vals, model
+
+
+def scenarios_wise_stats():
+
+    files = extract_filenames('AATK_english', category='results')
+
+    results = [scenario_stats(file) for file in files]
+
+    assert all(sorted(x[0].keys()) == sorted(results[0][0].keys()) for x in results)
+    
+    df = pd.DataFrame(index=results[0][0].keys())
+    for values, name in results:
+        df[name] = df.index.map(values)
 
     return df

@@ -588,19 +588,6 @@ def model_wise_pass_at_k(dtype: str = 'default', k: int = 1, greedy: bool = True
 
 
 
-def latex(df: pd.DataFrame, **kwargs):
-    """Print a DataFrame as a latex table with some default arguments.
-    """
-    table = df.to_latex(float_format=lambda s: f'${s:.1f}$', escape=True, position='H', na_rep='-',
-                        column_format='l|' + 'c'*len(df.columns), multicolumn_format='c',
-                        index_names=False, **kwargs)
-    # Add centering (no option for this)
-    split = table.split('\n', 1)
-    table = split[0] + '\n' + '\\centering\n' + split[1]
-    print(table)
-    return table
-
-
 def model_wise_best_score(dtype: str = 'default', k: int = 1, greedy: bool = True) -> pd.DataFrame:
     """Return the best pass@k for each model across all available benchmarks for the given `dtype` and `k`.
 

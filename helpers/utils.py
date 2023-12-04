@@ -12,6 +12,7 @@ from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, TypeVar, ParamSpec
 
 import numpy as np
+import pandas as pd
 
 
 P = ParamSpec("P")
@@ -300,6 +301,18 @@ def load_txt(filename: str, separator: str = '\n') -> list[str]:
     strings = file.split(separator)
 
     return strings
+
+
+def latex(df: pd.DataFrame, escape: bool = True, **kwargs):
+    """Print a DataFrame as a latex table with some default arguments.
+    """
+    table = df.to_latex(float_format=lambda s: f'${s:.1f}$', escape=escape, position='H', na_rep='-',
+                        column_format='l|' + 'c'*len(df.columns), multicolumn_format='c',
+                        index_names=False, **kwargs)
+    # Add centering (no option for this)
+    split = table.split('\n', 1)
+    table = split[0] + '\n' + '\\centering\n' + split[1]
+    return table
 
 
 def save_human_eval_dataset(language: str):
