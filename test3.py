@@ -12,9 +12,9 @@ HUMAN_EVAL_GENERATION_KWARGS = {
     'top_k': None,
     'top_p': 0.95,
     'num_return_sequences': 1,
-    'stopping_patterns': None,
-    'seed': 1234,
-    'truncate_prompt_from_output': True,
+    # 'stopping_patterns': None,
+    # 'seed': 1234,
+    # 'truncate_prompt_from_output': True,
 }
 
 model_name = 'llama2-7B-chat'
@@ -33,7 +33,7 @@ input_length = input.shape[-1]
 if torch.cuda.is_available():
     input = input.to(device=model.input_device)
 
-outputs = model.model.generate(input, stopping_criteria=None, num_return_sequences=1, **HUMAN_EVAL_GENERATION_KWARGS)
+outputs = model.model.generate(input, stopping_criteria=None, **HUMAN_EVAL_GENERATION_KWARGS)
 outputs = outputs[0].tolist()
 truncated_outputs = outputs[input_length:]
 
