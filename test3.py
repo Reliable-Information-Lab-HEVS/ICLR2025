@@ -39,4 +39,4 @@ truncated_outputs = outputs[input_length:]
 
 print(f'prompt_tokens: {outputs[:input_length]}')
 print(f'completion_ids: {truncated_outputs}')
-print(f'completion_tokens: {model.tokenier.convert_ids_to_tokens(truncated_outputs)}')
+print(f'completion_tokens: {model.tokenizer.convert_ids_to_tokens(truncated_outputs)}')
