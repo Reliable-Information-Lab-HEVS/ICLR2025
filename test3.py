@@ -17,7 +17,8 @@ HUMAN_EVAL_GENERATION_KWARGS = {
     # 'truncate_prompt_from_output': True,
 }
 
-model_name = 'llama2-7B-chat'
+# model_name = 'llama2-7B-chat'
+model_name = 'vicuna-7B'
 
 model = engine.HFModel(model_name)
 prompt = 'Hello there, could you tell me what is the meaning of life?'
