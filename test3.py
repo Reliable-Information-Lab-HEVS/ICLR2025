@@ -6,7 +6,7 @@ from engine import loader, stopping
 from helpers import utils, datasets
 
 HUMAN_EVAL_GENERATION_KWARGS = {
-    'max_new_tokens': 256,
+    'max_new_tokens': 10,
     'min_new_tokens': 0,
     'do_sample': True,
     'top_k': None,
@@ -22,9 +22,21 @@ model_name = 'llama2-7B-chat'
 model = engine.HFModel(model_name)
 prompt = 'Hello there, could you tell me what is the meaning of life?'
 
-t0 = time.time()
-completions = model(prompt, temperature=0.8, **HUMAN_EVAL_GENERATION_KWARGS)
-dt = time.time() - t0
-print(f'It took {dt:.2f} s')
+# t0 = time.time()
+# completions = model(prompt, temperature=0.8, **HUMAN_EVAL_GENERATION_KWARGS)
+# dt = time.time() - t0
+# print(f'It took {dt:.2f} s')
 
-print(completions)
+prompt = model.format_prompt(prompt)
+input = model.tokenizer.encode(prompt, return_tensors='pt')
+input_length = input.shape[-1]
+if torch.cuda.is_available():
+    input = input.to(device=model.input_device)
+
+outputs = model.model.generate(input, stopping_criteria=None, num_return_sequences=1, **HUMAN_EVAL_GENERATION_KWARGS)
+outputs = outputs[0].tolist()
+truncated_outputs = outputs[input_length:]
+
+print(f'prompt_tokens: {outputs[:input_length]}')
+print(f'completion_ids: {truncated_outputs}')
+print(f'completion_tokens: {model.tokenier.convert_ids_to_tokens(truncated_outputs)}')
