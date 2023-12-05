@@ -46,10 +46,10 @@ GENERATION_KWARGS = {
 models = list(loader.CODEGEN2_MODELS_MAPPING.keys())
 for model in models:
 
-    model = engine.HFModel(model)
     prompt = 'Hello there, could you tell me what is the meaning of life?'
 
     try:
+        model = engine.HFModel(model)
         out = model(prompt, **GENERATION_KWARGS)
     except BaseException as e:
         print(f'{model}: {repr(e)}')
