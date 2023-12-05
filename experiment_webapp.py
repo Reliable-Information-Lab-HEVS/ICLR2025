@@ -13,8 +13,7 @@ from engine.conversation_template import GenericConversation
 
 
 # Load model
-# MODEL = engine.HFModel('llama2-70B-chat')
-MODEL = engine.HFModel('llama2-7B-chat')
+MODEL = engine.HFModel('llama2-70B-chat')
 
 # File where the valid credentials are stored
 CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
