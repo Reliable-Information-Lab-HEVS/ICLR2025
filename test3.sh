@@ -14,7 +14,8 @@
 eval "$(conda shell.bash hook)"
 
 # Activate (local) env
-conda activate llm
+# conda activate llm
+conda activate nutrition-chatbot
 
 python3 test3.py "$@"
 
