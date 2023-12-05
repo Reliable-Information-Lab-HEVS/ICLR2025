@@ -12,19 +12,9 @@ from engine.streamer import TextContinuationStreamer
 from engine.conversation_template import GenericConversation
 
 
-# Default model to load at start-up
-DEFAULT = 'model1'
-
-# Load both models at the beginning for fast switch between them later on
-MODELS = [engine.HFModel('llama2-70B-chat'), engine.HFModel('llama2-13B-chat', gpu_rank=5)]
-
-# Mapping to mask actual model name
-MAPPING = {f'model{i+1}': MODELS[i].model_name for i in range(len(MODELS))}
-
-MAPPING_TO_INDICES = {f'model{i+1}': i for i in range(len(MODELS))}
-
-# Reverse mapping
-REVERSE_MAPPING = {value: key for key, value in MAPPING.items()}
+# Load model
+# MODEL = engine.HFModel('llama2-70B-chat')
+MODEL = engine.HFModel('llama2-7B-chat')
 
 # File where the valid credentials are stored
 CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
@@ -32,50 +22,16 @@ CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
 # This will be a mapping between users and current conversation, to reload them with page reload
 CACHED_CONVERSATIONS = {}
 
-# This will be a mapping between users and current models, to reload them with page reload
-CACHED_MODELS = {}
-
 # Need to define one logger per user
 LOGGERS = {}
 
 
-def update_model(new_masked_model_name: str, username: str) -> tuple[GenericConversation, str, str, str, list[list[str]]]:
-    """Update the "true" model name and clear the conversation (even if we ask for the same model as the old
-    one).
-
-    Parameters
-    ----------
-    new_masked_model_name : str
-        The masked name for the new model.
-    username : str
-        The username of the current session.
-
-    Returns
-    -------
-    tuple[GenericConversation, str, str, str, list[list[str]]]
-        Corresponds to the tuple of components (conversation, conv_id, model_name, prompt_chat, output_chat)
-    """
-
-    index = MAPPING_TO_INDICES[new_masked_model_name]
-    model = MODELS[index]
-
-    conversation = model.get_empty_conversation()
-    # Update cached values
-    CACHED_CONVERSATIONS[username] = conversation
-    CACHED_MODELS[username] = model.model_name
-
-    return conversation, conversation.id, model.model_name, '', conversation.to_gradio_format()
-    
-
-
-def chat_generation(model_name: str, conversation: GenericConversation, prompt: str,
+def chat_generation(conversation: GenericConversation, prompt: str,
                     max_new_tokens: int) -> tuple[GenericConversation, str, list[list[str, str]]]:
     """Chat generation with streamed output.
 
     Parameters
     ----------
-    model_name : str
-        Current "true" model name.
     prompt : str
         Prompt to the model.
     conversation : GenericConversation
@@ -89,15 +45,10 @@ def chat_generation(model_name: str, conversation: GenericConversation, prompt: 
         Corresponds to the tuple of components (conversation, prompt_chat, output_chat)
     """
 
-    # Compute the reference to the model (already loaded) that we use
-    masked_model_name = REVERSE_MAPPING[model_name]
-    index = MAPPING_TO_INDICES[masked_model_name]
-    model = MODELS[index]
-
     timeout = 20
 
     # To show text as it is being generated
-    streamer = TextIteratorStreamer(model.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
+    streamer = TextIteratorStreamer(MODEL.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
 
     conv_copy = copy.deepcopy(conversation)
     conv_copy.append_user_message(prompt)
@@ -106,7 +57,7 @@ def chat_generation(model_name: str, conversation: GenericConversation, prompt: 
     # use an executor because it makes it easier to catch possible exceptions
     with ThreadPoolExecutor(max_workers=1) as executor:
         # This will update `conversation` in-place
-        future = executor.submit(model.generate_conversation, prompt, system_prompt='', conv_history=conversation,
+        future = executor.submit(MODEL.generate_conversation, prompt, system_prompt='', conv_history=conversation,
                                  max_new_tokens=max_new_tokens, do_sample=True, top_k=None, top_p=0.9,
                                  temperature=0.8, seed=None, truncate_if_conv_too_long=True, streamer=streamer)
         
@@ -136,14 +87,12 @@ def chat_generation(model_name: str, conversation: GenericConversation, prompt: 
 
 
 
-def continue_generation(model_name: str, conversation: GenericConversation,
+def continue_generation(conversation: GenericConversation,
                         additional_max_new_tokens) -> tuple[GenericConversation, str, list[list[str, str]]]:
     """Continue the last turn of the conversation, with streamed output.
 
     Parameters
     ----------
-    model_name : str
-        Current "true" model name.
     conversation : GenericConversation
         Current conversation. This is the value inside a gr.State instance.
     max_new_tokens : int
@@ -155,15 +104,10 @@ def continue_generation(model_name: str, conversation: GenericConversation,
         Corresponds to the tuple of components (conversation, prompt_chat, output_chat)
     """
    
-   # Compute the reference to the model (already loaded) that we use
-    masked_model_name = REVERSE_MAPPING[model_name]
-    index = MAPPING_TO_INDICES[masked_model_name]
-    model = MODELS[index]
-
     timeout = 20
 
     # To show text as it is being generated
-    streamer = TextContinuationStreamer(model.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
+    streamer = TextContinuationStreamer(MODEL.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
 
     conv_copy = copy.deepcopy(conversation)
     
@@ -171,7 +115,7 @@ def continue_generation(model_name: str, conversation: GenericConversation,
     # use an executor because it makes it easier to catch possible exceptions
     with ThreadPoolExecutor(max_workers=1) as executor:
         # This will update `conversation` in-place
-        future = executor.submit(model.continue_last_conversation_turn, conv_history=conversation,
+        future = executor.submit(MODEL.continue_last_conversation_turn, conv_history=conversation,
                                  max_new_tokens=additional_max_new_tokens, do_sample=True, top_k=None, top_p=0.9,
                                  temperature=0.8, seed=None, truncate_if_conv_too_long=True, streamer=streamer)
         
@@ -234,7 +178,7 @@ def authentication(username: str, password: str) -> bool:
     return False
     
 
-def clear_chatbot(model_name: str, username: str) -> tuple[GenericConversation, str, str, list[list[str]]]:
+def clear_chatbot(username: str) -> tuple[GenericConversation, str, str, list[list[str]]]:
     """Erase the conversation history and reinitialize the elements.
 
     Parameters
@@ -250,33 +194,27 @@ def clear_chatbot(model_name: str, username: str) -> tuple[GenericConversation, 
         Corresponds to the tuple of components (conversation, conv_id, prompt_chat, output_chat)
     """
 
-    # Compute the reference to the model (already loaded) that we use
-    masked_model_name = REVERSE_MAPPING[model_name]
-    index = MAPPING_TO_INDICES[masked_model_name]
-    model = MODELS[index]
-
     # Create new global conv object (we need a new unique id)
-    conversation = model.get_empty_conversation()
+    conversation = MODEL.get_empty_conversation()
     # Cache value
     CACHED_CONVERSATIONS[username] = conversation
+
     return conversation, conversation.id, '', conversation.to_gradio_format()
 
 
 
-def loading(model_name: str, request: gr.Request) -> tuple[GenericConversation, str, str, str, str, list[list[str]]]:
+def loading(request: gr.Request) -> tuple[GenericConversation, str, str, str, str, list[list[str]]]:
     """Retrieve username and all cached values at load time, and set the elements to the correct values.
 
     Parameters
     ----------
-    model_name : str
-        Current "true" model name.
     request : gr.Request
         Request sent to the app.
 
     Returns
     -------
     tuple[GenericConversation, str, str, str, str, list[list[str]]]
-        Corresponds to the tuple of components (conversation, conv_id, username, masked_model_name, model_name, output_chat)
+        Corresponds to the tuple of components (conversation, conv_id, username, model_name, output_chat)
     """
 
     # Retrieve username
@@ -285,40 +223,26 @@ def loading(model_name: str, request: gr.Request) -> tuple[GenericConversation, 
     else:
         raise RuntimeError('Impossible to find username on startup.')
     
-    # Check if we have cached values
-    if username in CACHED_MODELS.keys():
-        model_name = CACHED_MODELS[username]
-    else:
-        # default value of the element
-        CACHED_MODELS[username] = model_name
-
-    masked_model_name = REVERSE_MAPPING[model_name]
-    index = MAPPING_TO_INDICES[masked_model_name]
-    model = MODELS[index]
-    
     # Check if we have cached a value for the conversation to use
     if username in CACHED_CONVERSATIONS.keys():
         actual_conv = CACHED_CONVERSATIONS[username]
     else:
-        actual_conv = model.get_empty_conversation()
+        actual_conv = MODEL.get_empty_conversation()
         CACHED_CONVERSATIONS[username] = actual_conv
         LOGGERS[username] = gr.CSVLogger()
 
     conv_id = actual_conv.id
     
-    return actual_conv, conv_id, username, masked_model_name, model.model_name, actual_conv.to_gradio_format()
+    return actual_conv, conv_id, username, MODEL.model_name, actual_conv.to_gradio_format()
     
 
 
 
-# Define generation parameters and model selection
-masked_model_name = gr.Dropdown(list(MAPPING.keys()), value=DEFAULT, label='Model name',
-                                info='Choose the model you want to use.', multiselect=False)
+# Define generation parameters
 max_new_tokens = gr.Slider(10, 4000, value=500, step=10, label='Max new tokens',
                            info='Maximum number of new tokens to generate.')
 max_additional_new_tokens = gr.Slider(1, 500, value=100, step=1, label='Max additional new tokens',
                            info='Maximum number of new tokens to generate when using "Continue last answer" feature.')
-load_button = gr.Button('Load model', variant='primary')
 
 
 # Define elements of the chatbot Tab
@@ -331,12 +255,11 @@ clear_button_chat = gr.Button('Clear conversation')
 
 # State variable to keep one conversation per session (default value does not matter here -> it will be set
 # by loading() method anyway)
-conversation = gr.State(MODELS[0].get_empty_conversation())
+conversation = gr.State(MODEL.get_empty_conversation())
 
 
 # Define NON-VISIBLE elements: they are only used to keep track of variables and save them to the callback.
-model_name = gr.Dropdown(list(REVERSE_MAPPING.keys()), value=MAPPING[DEFAULT], label='Model name',
-                         multiselect=False, visible=False)
+model_name = gr.Textbox(MODEL.model_name, label='Model Name', visible=False)
 username = gr.Textbox('', label='Username', visible=False)
 conv_id = gr.Textbox('', label='Conversation id', visible=False)
 
@@ -370,70 +293,47 @@ with demo:
     conv_id.render()
     username.render()
 
-    # Need to wrap everything in a row because we want two side-by-side columns
+    # Actual UI
+    output_chat.render()
+    prompt_chat.render()
     with gr.Row():
+        generate_button_chat.render()
+        continue_button_chat.render()
+        clear_button_chat.render()
 
-        # First column where we have prompts and outputs. We use large scale because we want a 1.7:1 ratio
-        # but scale needs to be an integer
-        with gr.Column(scale=17):
+    # Accordion for generation parameters
+    with gr.Accordion("Text generation parameters", open=False):
+        max_new_tokens.render()
+        max_additional_new_tokens.render()
 
-            prompt_chat.render()
-            with gr.Row():
-                generate_button_chat.render()
-                clear_button_chat.render()
-                continue_button_chat.render()
-            output_chat.render()
-
-            gr.Markdown("### Prompt Examples")
-            gr.Examples(prompt_examples, inputs=prompt_chat)
-
-        # Second column defines model selection and generation parameters
-        with gr.Column(scale=10):
-                
-            # First box for model selection
-            with gr.Box():
-                gr.Markdown("### Model selection")
-                with gr.Row():
-                    masked_model_name.render()
-                with gr.Row():
-                    load_button.render()
-            
-            # Accordion for generation parameters
-            with gr.Accordion("Text generation parameters", open=False):
-                max_new_tokens.render()
-                max_additional_new_tokens.render()
+    gr.Markdown("### Prompt Examples")
+    gr.Examples(prompt_examples, inputs=prompt_chat)
 
 
     # Perform chat generation when clicking the button
-    generate_event1 = generate_button_chat.click(chat_generation, inputs=[model_name, conversation, *inputs_to_chatbot],
+    generate_event1 = generate_button_chat.click(chat_generation, inputs=[conversation, *inputs_to_chatbot],
                                                  outputs=[conversation, prompt_chat, output_chat])
 
     # Add automatic callback on success (args[-1] is the username)
     generate_event1.success(lambda *args: LOGGERS[args[-1]].flag(args, flag_option=f'generation'),
-                            inputs=inputs_to_chat_callback, preprocess=False)
+                            inputs=inputs_to_chat_callback, preprocess=False, queue=False)
     
     # Continue generation when clicking the button
-    generate_event2 = continue_button_chat.click(continue_generation, inputs=[model_name, conversation, max_additional_new_tokens],
+    generate_event2 = continue_button_chat.click(continue_generation, inputs=[conversation, max_additional_new_tokens],
                                                  outputs=[conversation, prompt_chat, output_chat])
     
     # Add automatic callback on success (args[-1] is the username)
     generate_event2.success(lambda *args: LOGGERS[args[-1]].flag(args, flag_option=f'continuation'),
-                            inputs=inputs_to_chat_callback, preprocess=False)
-
-    # Switch the model loaded in memory when clicking
-    events_to_cancel = [generate_event1, generate_event2]
-    load_event = load_button.click(update_model, inputs=[masked_model_name, username],
-                                   outputs=[conversation, conv_id, model_name, prompt_chat, output_chat],
-                                   cancels=events_to_cancel)
+                            inputs=inputs_to_chat_callback, preprocess=False, queue=False)
     
     # Clear the prompt and output boxes when clicking the button
-    clear_button_chat.click(clear_chatbot, inputs=[model_name, username], outputs=[conversation, conv_id, prompt_chat, output_chat])
+    clear_button_chat.click(clear_chatbot, inputs=[username], outputs=[conversation, conv_id, prompt_chat, output_chat],
+                            queue=False)
     
     # Correctly set all variables and callback at load time
-    loading_events = demo.load(loading, inputs=model_name,
-                               outputs=[conversation, conv_id, username, masked_model_name, model_name, output_chat])
+    loading_events = demo.load(loading, outputs=[conversation, conv_id, username, model_name, output_chat], queue=False)
     loading_events.then(lambda username: LOGGERS[username].setup(inputs_to_chat_callback, flagging_dir=f'chatbot_logs/{username}'),
-                        inputs=username)
+                        inputs=username, queue=False)
 
 
 if __name__ == '__main__':
