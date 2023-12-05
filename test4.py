@@ -14,7 +14,7 @@ GENERATION_KWARGS = {
 models = list(textwiz.loader.CODEGEN2_MODELS_MAPPING.keys())
 for model in models:
 
-    prompt = 'Hello there, could you tell me what is the meaning of life?'
+    prompt = 'Hello there, '
 
     try:
         model = textwiz.HFModel(model)
