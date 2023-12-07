@@ -1,8 +1,8 @@
 import torch
 import time
 
-import engine
-from engine import loader, stopping
+from TextWiz import textwiz
+from TextWiz.textwiz import loader, stopping
 from helpers import utils, datasets
 
 GENERATION_KWARGS = {
@@ -20,7 +20,7 @@ GENERATION_KWARGS = {
 # # model_name = 'llama2-7B-chat'
 # model_name = 'vicuna-7B'
 
-# model = engine.HFModel(model_name)
+# model = textwiz.HFModel(model_name)
 # prompt = 'Hello there, could you tell me what is the meaning of life?'
 
 # # t0 = time.time()
@@ -49,7 +49,7 @@ for model in models:
     prompt = 'Hello there, could you tell me what is the meaning of life?'
 
     try:
-        model = engine.HFModel(model)
+        model = textwiz.HFModel(model)
         out = model(prompt, **GENERATION_KWARGS)
     except BaseException as e:
         print(f'{model}: {repr(e)}')

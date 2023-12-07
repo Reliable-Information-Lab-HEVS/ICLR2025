@@ -3,7 +3,7 @@ import gc
 import argparse
 import time
 
-import engine
+from TextWiz import textwiz
 from helpers import datasets
 from helpers import utils
 from helpers import aatk
@@ -54,12 +54,12 @@ def aatk_english_benchmark(model_name: str, quantization_8bits: bool = False, qu
 
     prompt_template_mode = 'generation' if model_name == 'codegen25-7B-instruct' else 'chat'
 
-    if not engine.is_chat_model(model_name):
+    if not textwiz.is_chat_model(model_name):
         raise ValueError('Cannot run AATKEnglish benchmark on non-chat model.')
 
     print(f'{utils.get_time()}  Starting with model {model_name}')
 
-    model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+    model = textwiz.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     folder = aatk.get_folder('AATK_english', model_name, model.dtype_category())
 

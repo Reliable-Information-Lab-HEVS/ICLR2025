@@ -6,14 +6,13 @@ from concurrent.futures import ThreadPoolExecutor
 from transformers import TextIteratorStreamer
 import gradio as gr
 
-import engine
+from TextWiz.textwiz import HFModel, TextContinuationStreamer
+from TextWiz.textwiz.conversation_template import GenericConversation
 from helpers import utils
-from engine.streamer import TextContinuationStreamer
-from engine.conversation_template import GenericConversation
 
 
 # Load model
-MODEL = engine.HFModel('llama2-70B-chat')
+MODEL = HFModel('llama2-70B-chat')
 
 # File where the valid credentials are stored
 CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')

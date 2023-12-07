@@ -1,19 +1,14 @@
-import torch
-
-
-import engine
-from engine import generation
-from engine import stopping
 import time
 import resource
 import gc
 import math
 import warnings
 
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-import engine
-from engine import loader
+from TextWiz import textwiz
+from TextWiz.textwiz import loader, stopping, generation
 from helpers import utils, datasets
 
 large_text = """Monkeys: Nature's Pranksters, Social Geniuses, and Ecological Wonders
@@ -81,7 +76,7 @@ Monkeys, these captivating creatures of the wild, offer us a glimpse into the wo
 # model_name = 'code-llama-7B-python'
 
 # t0 = time.time()
-# model = engine.HFModel(model_name)
+# model = textwiz.HFModel(model_name)
 # dt = time.time() - t0
 # print(f'Time for loading: {dt:.2f} s')
 
@@ -116,7 +111,7 @@ Monkeys, these captivating creatures of the wild, offer us a glimpse into the wo
 
 # model = load_model(model_name)
 
-# model = engine.HFModel(model_name)
+# model = textwiz.HFModel(model_name)
 # print(model.dtype_category())
 # print(model.get_gpu_memory_footprint())
 
@@ -191,6 +186,6 @@ Monkeys, these captivating creatures of the wild, offer us a glimpse into the wo
 
 
 t0 = time.time()
-model = engine.HFModel('star-coder')
+model = textwiz.HFModel('star-coder')
 dt = time.time() - t0
 print(f'Loading time: {dt:.2f} s')

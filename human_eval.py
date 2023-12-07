@@ -5,10 +5,9 @@ import time
 import copy
 import re
 
-import engine
-from engine import stopping
-from engine.prompt_template import PROMPT_MODES
-from engine.code_parser import CodeParser, PythonParser
+from TextWiz.textwiz import HFModel, stopping
+from TextWiz.textwiz.prompt_template import PROMPT_MODES
+from TextWiz.textwiz.code_parser import CodeParser, PythonParser
 from helpers import datasets
 from helpers import utils
 from helpers import humaneval
@@ -92,9 +91,9 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
-        model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+        model = HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
     else:
-        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        model = HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     # Define stopping type
     if model.is_chat_model() and (prompt_template_mode == 'default' or prompt_template_mode == 'chat'):
@@ -181,9 +180,9 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
-        model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+        model = HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
     else:
-        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        model = HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     # Define stopping type
     if model.is_chat_model():
@@ -282,9 +281,9 @@ def human_eval_multiple(model_name: str, language: str, quantization_8bits: bool
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
-        model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+        model = HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
     else:
-        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        model = HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     dataset_name = datasets.MULTIPLE_LANGUAGE_MAPPING[language]
 

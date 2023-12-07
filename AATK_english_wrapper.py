@@ -3,7 +3,7 @@ import time
 
 import torch
 
-import engine
+from TextWiz import textwiz
 from helpers import utils
 
 
@@ -37,8 +37,8 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
     # Select chat models (only keep the good coders)
-    small_models = [model for model in engine.SMALL_GOOD_CODERS if engine.is_chat_model(model)]
-    large_models = [model for model in engine.LARGE_GOOD_CODERS if engine.is_chat_model(model)]
+    small_models = [model for model in textwiz.SMALL_GOOD_CODERS if textwiz.is_chat_model(model)]
+    large_models = [model for model in textwiz.LARGE_GOOD_CODERS if textwiz.is_chat_model(model)]
     if big_models_only:
         models = large_models
     elif big_models:
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     print(f'Launching computations with {num_gpus} gpus available.')
 
     # Create the commands to run
-    gpu_footprints = engine.estimate_number_of_gpus(models, int8, int4)
+    gpu_footprints = textwiz.estimate_number_of_gpus(models, int8, int4)
     commands = [f'python3 -u AATK_english.py {model}' for model in models]
     if int8:
         commands = [c + ' --int8' for c in commands]

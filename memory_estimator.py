@@ -7,9 +7,9 @@ import logging
 import torch
 import numpy as np
 
-import engine
-from engine import loader
-from engine import warnings_suppressor
+import textwiz
+from textwiz import loader
+from textwiz import warnings_suppressor
 from helpers import utils
 
 # Remove warning when tokenizing sequences longer than expected: we know we are doing it!
@@ -168,7 +168,7 @@ Monkeys are not merely subjects of fascination; they are ambassadors of the wild
 
 # For models with max context size of 1024 (e.g. GPT2)
 SMALL_CONTEXT_SIZES = [25*i for i in range(1, 41)]
-# For other models (we only estimate memory usage up to context size of 2048 as we are almost never gonna use more)
+# For other models (we only estimate memory usage up to context size of 2048)
 CONTEXT_SIZES = [25*i for i in range(1, 82)]
 
 

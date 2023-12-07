@@ -1,5 +1,5 @@
 
-import textwiz
+from TextWiz import textwiz
 
 GENERATION_KWARGS = {
     'max_new_tokens': 10,

@@ -12,7 +12,7 @@ from tqdm import tqdm
 from helpers import utils
 from helpers import datasets
 from helpers import aatk
-from engine.code_parser import PythonParser
+from TextWiz.textwiz import PythonParser
 
 # TODO: in the 25 completions, there are a lot of duplicates. Maybe account for this. (does not look like
 # they did it in other work but think about it)

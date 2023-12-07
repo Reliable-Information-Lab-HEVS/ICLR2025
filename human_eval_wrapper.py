@@ -3,8 +3,8 @@ import time
 
 import torch
 
-import engine
-from engine.prompt_template import PROMPT_MODES
+from TextWiz import textwiz
+from TextWiz.textwiz.prompt_template import PROMPT_MODES
 from helpers import datasets
 from helpers import utils
 
@@ -60,8 +60,8 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
     # Select models (only keep the good coders)
-    small_models = engine.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.SMALL_GOOD_CODERS
-    large_models = engine.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else engine.LARGE_GOOD_CODERS
+    small_models = textwiz.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else textwiz.SMALL_GOOD_CODERS
+    large_models = textwiz.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else textwiz.LARGE_GOOD_CODERS
     if big_models_only:
         models = large_models
     elif big_models:
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     print(f'Launching computations with {num_gpus} gpus available.')
 
     # Create the commands to run
-    gpu_footprints = engine.estimate_number_of_gpus(models, int8, int4)
+    gpu_footprints = textwiz.estimate_number_of_gpus(models, int8, int4)
     commands = [f'python3 -u human_eval.py {model} --language {language} --mode {mode}' for model in models]
     if int8:
         commands = [c + ' --int8' for c in commands]
