@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from helpers import utils
-from engine import loader
+from TextWiz.textwiz import loader
 
 DATASETS = ['AATK', 'AATK_english']
 CATEGORIES = ['completions', 'results']

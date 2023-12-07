@@ -14,7 +14,7 @@
 *.md
 
 # All directories in root EXCEPT code_execution, data and results
-engine
+TextWiz
 __pycache__
 flagged
 memory_estimator
