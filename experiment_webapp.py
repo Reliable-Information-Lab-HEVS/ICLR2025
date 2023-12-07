@@ -1,13 +1,10 @@
 import os
-import queue
-import copy
-from concurrent.futures import ThreadPoolExecutor
 
-from transformers import TextIteratorStreamer
 import gradio as gr
 
-from TextWiz.textwiz import HFModel, TextContinuationStreamer
+from TextWiz.textwiz import HFModel
 from TextWiz.textwiz.conversation_template import GenericConversation
+import TextWiz.textwiz.web_interface as wi
 from helpers import utils
 
 
@@ -25,156 +22,22 @@ LOGGERS = {}
 
 
 def chat_generation(conversation: GenericConversation, prompt: str,
-                    max_new_tokens: int) -> tuple[GenericConversation, str, list[list[str, str]]]:
-    """Chat generation with streamed output.
-
-    Parameters
-    ----------
-    prompt : str
-        Prompt to the model.
-    conversation : GenericConversation
-        Current conversation. This is the value inside a gr.State instance.
-    max_new_tokens : int
-        Maximum new tokens to generate.
-
-    Yields
-    ------
-    Iterator[tuple[GenericConversation, str, list[list[str, str]]]]
-        Corresponds to the tuple of components (conversation, prompt_chat, output_chat)
-    """
-
-    timeout = 20
-
-    # To show text as it is being generated
-    streamer = TextIteratorStreamer(MODEL.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
-
-    conv_copy = copy.deepcopy(conversation)
-    conv_copy.append_user_message(prompt)
-    
-    # We need to launch a new thread to get text from the streamer in real-time as it is being generated. We
-    # use an executor because it makes it easier to catch possible exceptions
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        # This will update `conversation` in-place
-        future = executor.submit(MODEL.generate_conversation, prompt, system_prompt='', conv_history=conversation,
-                                 max_new_tokens=max_new_tokens, do_sample=True, top_k=None, top_p=0.9,
-                                 temperature=0.8, seed=None, truncate_if_conv_too_long=True, streamer=streamer)
+                    max_new_tokens: int) -> tuple[str, GenericConversation, list[list]]:
+    yield from wi.chat_generation(MODEL, conversation=conversation, prompt=prompt, max_new_tokens=max_new_tokens,
+                                  do_sample=True, top_k=None, top_p=0.9, temperature=0.8, use_seed=False,
+                                  seed=None, system_prompt='')
         
-        # Get results from the streamer and yield it
-        try:
-            generated_text = ''
-            for new_text in streamer:
-                generated_text += new_text
-                # Update model answer (on a copy of the conversation) as it is being generated
-                conv_copy.model_history_text[-1] = generated_text
-                # The first output is an empty string to clear the input box, the second is the format output
-                # to use in a gradio chatbot component
-                yield conversation, '', conv_copy.to_gradio_format()
-
-        # If for some reason the queue (from the streamer) is still empty after timeout, we probably
-        # encountered an exception
-        except queue.Empty:
-            e = future.exception()
-            if e is not None:
-                raise gr.Error(f'The following error happened during generation: {repr(e)}')
-            else:
-                raise gr.Error(f'Generation timed out (no new tokens were generated after {timeout} s)')
-    
-    
-    # Update the chatbot with the real conversation (which may be slightly different due to postprocessing)
-    yield conversation, '', conversation.to_gradio_format()
-
-
 
 def continue_generation(conversation: GenericConversation,
-                        additional_max_new_tokens) -> tuple[GenericConversation, str, list[list[str, str]]]:
-    """Continue the last turn of the conversation, with streamed output.
-
-    Parameters
-    ----------
-    conversation : GenericConversation
-        Current conversation. This is the value inside a gr.State instance.
-    max_new_tokens : int
-        Maximum new tokens to generate.
-
-    Yields
-    ------
-    Iterator[tuple[GenericConversation, str, list[list[str, str]]]]
-        Corresponds to the tuple of components (conversation, prompt_chat, output_chat)
-    """
+                        additional_max_new_tokens) -> tuple[GenericConversation, list[list]]:
+    yield from wi.continue_generation(MODEL, conversation=conversation, additional_max_new_tokens=additional_max_new_tokens,
+                                      do_sample=True, top_k=None, top_p=0.9, temperature=0.8, use_seed=False, seed=None)
    
-    timeout = 20
-
-    # To show text as it is being generated
-    streamer = TextContinuationStreamer(MODEL.tokenizer, skip_prompt=True, timeout=timeout, skip_special_tokens=True)
-
-    conv_copy = copy.deepcopy(conversation)
-    
-    # We need to launch a new thread to get text from the streamer in real-time as it is being generated. We
-    # use an executor because it makes it easier to catch possible exceptions
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        # This will update `conversation` in-place
-        future = executor.submit(MODEL.continue_last_conversation_turn, conv_history=conversation,
-                                 max_new_tokens=additional_max_new_tokens, do_sample=True, top_k=None, top_p=0.9,
-                                 temperature=0.8, seed=None, truncate_if_conv_too_long=True, streamer=streamer)
-        
-        # Get results from the streamer and yield it
-        try:
-            generated_text = conv_copy.model_history_text[-1]
-            for new_text in streamer:
-                generated_text += new_text
-                # Update model answer (on a copy of the conversation) as it is being generated
-                conv_copy.model_history_text[-1] = generated_text
-                # The first output is an empty string to clear the input box, the second is the format output
-                # to use in a gradio chatbot component
-                yield conversation, '', conv_copy.to_gradio_format()
-
-        # If for some reason the queue (from the streamer) is still empty after timeout, we probably
-        # encountered an exception
-        except queue.Empty:
-            e = future.exception()
-            if e is not None:
-                raise gr.Error(f'The following error happened during generation: {repr(e)}')
-            else:
-                raise gr.Error(f'Generation timed out (no new tokens were generated after {timeout} s)')
-    
-    
-    # Update the chatbot with the real conversation (which may be slightly different due to postprocessing)
-    yield conversation, '', conversation.to_gradio_format()
-
-
 
 def authentication(username: str, password: str) -> bool:
-    """Simple authentication method.
-
-    Parameters
-    ----------
-    username : str
-        The username provided.
-    password : str
-        The password provided.
-
-    Returns
-    -------
-    bool
-        Return True if both the username and password match some credentials stored in `CREDENTIALS_FILE`. 
-        False otherwise.
-    """
-
-    with open(CREDENTIALS_FILE, 'r') as file:
-        # Read lines and remove whitespaces
-        lines = [line.strip() for line in file.readlines() if line.strip() != '']
-
-    valid_usernames = lines[0::2]
-    valid_passwords = lines[1::2]
-
-    if username in valid_usernames:
-        index = valid_usernames.index(username)
-        # Check that the password also matches at the corresponding index
-        if password == valid_passwords[index]:
-            return True
+    return wi.simple_authentication(CREDENTIALS_FILE, username, password)
     
-    return False
-    
+
 
 def clear_chatbot(username: str) -> tuple[GenericConversation, str, str, list[list[str]]]:
     """Erase the conversation history and reinitialize the elements.
@@ -310,7 +173,7 @@ with demo:
 
     # Perform chat generation when clicking the button
     generate_event1 = generate_button_chat.click(chat_generation, inputs=[conversation, *inputs_to_chatbot],
-                                                 outputs=[conversation, prompt_chat, output_chat])
+                                                 outputs=[prompt_chat, conversation, output_chat])
 
     # Add automatic callback on success (args[-1] is the username)
     generate_event1.success(lambda *args: LOGGERS[args[-1]].flag(args, flag_option=f'generation'),
@@ -318,7 +181,7 @@ with demo:
     
     # Continue generation when clicking the button
     generate_event2 = continue_button_chat.click(continue_generation, inputs=[conversation, max_additional_new_tokens],
-                                                 outputs=[conversation, prompt_chat, output_chat])
+                                                 outputs=[conversation, output_chat])
     
     # Add automatic callback on success (args[-1] is the username)
     generate_event2.success(lambda *args: LOGGERS[args[-1]].flag(args, flag_option=f'continuation'),
