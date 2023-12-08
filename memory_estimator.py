@@ -7,9 +7,7 @@ import logging
 import torch
 import numpy as np
 
-import textwiz
-from textwiz import loader
-from textwiz import warnings_suppressor
+from textwiz import HFModel, loader, warnings_suppressor
 from helpers import utils
 
 # Remove warning when tokenizing sequences longer than expected: we know we are doing it!
@@ -195,7 +193,6 @@ def dtype_category(model, quantization_4bits: bool, quantization_8bits: bool) ->
 
 
 
-@utils.duplicate_function_for_gpu_dispatch
 def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4bits: bool, N_repeat: int = 10):
     """Estimate the memory needed to generate text depending on the context size. This function will also check
     if the memory scale with the full context (input size + max_new_tokens), or only with the input size. Indeed,
@@ -226,9 +223,9 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
-        model = engine.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+        model = HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
     else:
-        model = engine.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        model = HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     # To avoid possible early stopping on extra eos
     model.extra_eos_tokens = []
@@ -259,7 +256,7 @@ def memory_estimation(model_name: str, quantization_8bits: bool, quantization_4b
             # Generate 2 new tokens to take into account that we need to estimate the memory of the 
             # computation of past_key_values, and a second forward pass using them (which usually is more costly
             # since the past K-V is large). Subsequent passes will scale linearly with the number of new tokens
-            foo = model(prompt, num_return_sequences=2, max_new_tokens=2, min_new_tokens=2, batch_size=1)
+            foo = model(prompt, num_return_sequences=1, max_new_tokens=2, min_new_tokens=2, batch_size=1)
             
             memory_used = {}
             for gpu_rank in gpus:
