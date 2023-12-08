@@ -1,15 +1,11 @@
 import gc
 import os
 import argparse
-import queue
-import copy
-from concurrent.futures import ThreadPoolExecutor
 
-from transformers import TextIteratorStreamer
 import torch
 import gradio as gr
 
-from TextWiz.textwiz import HFModel, TextContinuationStreamer, loader
+from TextWiz.textwiz import HFModel, loader
 from TextWiz.textwiz.conversation_template import GenericConversation
 import TextWiz.textwiz.web_interface as wi
 from helpers import utils
