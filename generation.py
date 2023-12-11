@@ -50,7 +50,7 @@ def create_variations(model: HFModel, original_prompt: str, N: int = 10) -> list
     if not isinstance(N, int):
         raise RuntimeError('`N` must be an int.')
 
-    prompt = f'Give me {N} reformulations of this (number them from 1 to {N}): "{original_prompt}"'
+    prompt = f'Give me {N} reformulations of this: "{original_prompt}"'
     out = model(prompt, max_new_tokens=2048, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1)
 
     return out
