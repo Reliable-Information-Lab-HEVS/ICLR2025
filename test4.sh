@@ -5,7 +5,7 @@
 #SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=10G
+#SBATCH --mem=100M
 #SBATCH --partition=nodes
 #SBATCH --gres=gpu:a100:1
 #SBATCH --chdir=/cluster/raid/home/vacy/LLMs
