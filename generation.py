@@ -2,6 +2,7 @@ from TextWiz.textwiz import HFModel
 from helpers import utils
 
 import argparse
+import warnings
 import json
 import gc
 import os
@@ -29,8 +30,50 @@ GREEDY_GENERATION_KWARGS = {
 }
 
 
-def create_variations(model: HFModel, original_prompt: str, N: int = 10) -> list[str]:
-    """Use `model` to create `N` other formulations of `original_prompt`.
+class BadFormatException(Exception):
+    """Custom Exception to catch if format of model is incorrect.
+    """
+    pass
+
+
+def parse_output(output: str, N: int) -> list[str]:
+    """Parse the output of the model asked to create prompt variation, and raise `BadFormatException` if the
+    format is incorrect.
+
+    Parameters
+    ----------
+    output : str
+        Output of the model asked to generate the prompt variations.
+    N : int
+        Number of prompt variations.
+
+    Returns
+    -------
+    list[str]
+        The `N` prompts if the parsing is successful.
+    """
+
+    prompts = output.split('\n\n')
+
+    # format error
+    if len(prompts) != N:
+        raise BadFormatException('Cannot find `N` variations of the prompt')
+    
+    formatted_prompts = []
+    for i, prompt in enumerate(prompts):
+
+        # This is a format error
+        if not prompt.startswith(f'{i}. '):
+            raise BadFormatException('The listing format is incorrect')
+        
+        formatted_prompts.append(prompt.replace(f'{i}. ', '', 1))
+
+    return formatted_prompts
+
+
+def create_variations(model: HFModel, original_prompt: str, N: int = 10, recursion_depth: int = 10) -> list[str]:
+    """Use `model` to create `N` other formulations of `original_prompt`. This function will retry the generation
+    of the prompts `recursion_depth` times if the parsing of the output is unsuccessful before abandoning.
 
     Parameters
     ----------
@@ -40,6 +83,8 @@ def create_variations(model: HFModel, original_prompt: str, N: int = 10) -> list
         The original prompt to use.
     N : int, optional
         How many new prompts to generate. By default 10.
+    recursion_depth : int, optional
+        How many retries we allow before abandoning the creation of the prompts.
 
     Returns
     -------
@@ -49,11 +94,22 @@ def create_variations(model: HFModel, original_prompt: str, N: int = 10) -> list
 
     if not isinstance(N, int):
         raise RuntimeError('`N` must be an int.')
-
+    
     prompt = f'Give me {N} reformulations of this: "{original_prompt}"'
-    out = model(prompt, max_new_tokens=2048, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1)
 
-    return out
+    recursion_count = 0
+    # We try to generate 10 times the new prompts, and abandon afterwards
+    while recursion_count < recursion_depth:
+
+        recursion_count += 1
+        out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1)
+        try:
+            prompts = parse_output(out, N)
+            return prompts
+        except BadFormatException:
+            pass
+    
+    raise BadFormatException(f'Could not correctly generate {N} variations after {recursion_depth} tries.')
 
 
 def main(main_model: str, sub_model: str, input_file: str, output_file: str, N: int, generation_kwargs: dict):
@@ -94,8 +150,13 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, N: 
 
     prompt_bank = []
     for prompt in prompts:
+        # Try to create the prompt variations
+        try:
+            variations = create_variations(sub_model, prompt, N)
+        except BadFormatException:
+            warnings.warn(f'Could not create {N} variations of the following prompt (ignoring it):\n{prompt}')
+            continue
         prompt_bank.append({'original_prompt': prompt, 'prompt': prompt})
-        variations = create_variations(sub_model, prompt, N)
         prompt_bank.extend([{'original_prompt': prompt, 'prompt': x} for x in variations])
     
     del sub_model
@@ -120,8 +181,8 @@ if __name__ == '__main__':
                         help='Path to the file containing the prompts.')
     parser.add_argument('--output_file', type=str, required=True,
                         help='A path to save the output file.')
-    parser.add_argument('--sub_model', type=str, default='zephyr-7B-beta',
-                        help='The model to use to create prompt variations.')
+    # parser.add_argument('--sub_model', type=str, default='zephyr-7B-beta',
+    #                     help='The model to use to create prompt variations.')
     parser.add_argument('--greedy', action='store_true',
                         help='If given, will use greedy decoding for inference (i.e. only one completion per prompt).')
     parser.add_argument('--N', type=int, default=10,
@@ -129,7 +190,8 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     main_model = args.model
-    sub_model = args.sub_model
+    # sub_model = args.sub_model
+    sub_model = 'zephyr-7B-beta'
     input_file = args.input_file
     output_file = args.output_file
     generation_kwargs = GREEDY_GENERATION_KWARGS if args.greedy else GENERATION_KWARGS
