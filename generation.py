@@ -145,6 +145,7 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, N: 
 
     # Load the prompts and create the variations
     prompts = utils.load_txt(input_file, separator='\n\n')
+    prompts = [prompt.strip() for prompt in prompts if prompt.strip() != '']
 
     sub_model = HFModel(sub_model)
 
