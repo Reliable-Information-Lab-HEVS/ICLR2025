@@ -68,6 +68,10 @@ def parse_output(output: str, N: int) -> list[str]:
     if len(prompts) != N:
         raise BadFormatException('Cannot find `N` variations of the prompt')
     
+    # Repetition
+    if len(set(prompts)) != len(prompts):
+        raise BadFormatException('The same prompt was repeated')
+    
     # Check that the enumeration numbers (the separators in `split`) are correctly ordered
     formatted_prompts = []
     for i, prompt in enumerate(prompts, 1):
