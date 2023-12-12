@@ -6,6 +6,7 @@ import warnings
 import json
 import gc
 import os
+import re
 
 GENERATION_KWARGS = {
     'max_new_tokens': 1024,
@@ -53,12 +54,21 @@ def parse_output(output: str, N: int) -> list[str]:
         The `N` prompts if the parsing is successful.
     """
 
-    prompts = output.split('\n\n')
+    # Pattern that matches the enumeration format. We add the capturing group to also keep the separators
+    prompts = re.split(r'((?:^|\n)[0-9]+\. )', output)
+
+    # The split pattern usually creates a first empty string as it matches at the immediate beginning of output
+    if prompts[0] == '':
+        prompts.pop(0)
+
+    # Rejoin each separator and what is after it, and strip whitespaces
+    prompts = [''.join((prompts[i], prompts[i+1])).strip() for i in range(0, len(prompts), 2)]
 
     # format error
     if len(prompts) != N:
         raise BadFormatException('Cannot find `N` variations of the prompt')
     
+    # Check that the enumeration numbers (the separators in `split`) are correctly ordered
     formatted_prompts = []
     for i, prompt in enumerate(prompts):
 
