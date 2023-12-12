@@ -1,4 +1,4 @@
-from TextWiz.textwiz import HFModel
+from TextWiz.textwiz import HFModel, loader
 from helpers import utils
 
 import argparse
@@ -202,7 +202,7 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, N: 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Text generation')
-    parser.add_argument('model', type=str,
+    parser.add_argument('model', type=str, choices=loader.ALLOWED_MODELS,
                         help='The model to use for inference.')
     parser.add_argument('--input_file', type=str, required=True,
                         help='Path to the file containing the prompts.')
