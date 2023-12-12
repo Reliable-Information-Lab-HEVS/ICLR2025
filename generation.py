@@ -109,14 +109,26 @@ def create_variations(model: HFModel, original_prompt: str, N: int = 10, recursi
     if not isinstance(N, int):
         raise RuntimeError('`N` must be an int.')
     
-    prompt = f'Give me {N} reformulations of the following instruction: "{original_prompt}"'
+    prompt = f'Give me {N} reformulations (without repeating yourself) of the following instruction: "{original_prompt}"'
 
+    # Try greedy decoding first (use some repetition penalty to create more diverse prompts)
+    out = model(prompt, max_new_tokens=4096, do_sample=False, batch_size=1, stopping_patterns=[f'\n{N+1}. '],
+                repetition_penalty=1.1)
+    try:
+        prompts = parse_output(out, N)
+        return prompts
+    except BadFormatException:
+        pass
+
+    # Greedy decoding failed to output a correct format -> try stochastic sample of the new tokens
     recursion_count = 0
     # We try to generate 10 times the new prompts, and abandon afterwards
     while recursion_count < recursion_depth:
 
         recursion_count += 1
-        out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1)
+        # We use a larger repetition_penalty because its effect gets smoothed by the low temperature
+        out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1,
+                    stopping_patterns=[f'\n{N+1}. '], repetition_penalty=1.2)
         try:
             prompts = parse_output(out, N)
             return prompts
