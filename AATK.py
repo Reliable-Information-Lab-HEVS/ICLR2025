@@ -60,7 +60,7 @@ def aatk_benchmark(model_name: str, quantization_8bits: bool = False, quantizati
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
-        model = textwiz.HFModel(model_name, quantization_8bits=True, max_fraction_gpu_0=0.9, max_fraction_gpus=0.9)
+        model = textwiz.HFModel(model_name, quantization_8bits=True)
     else:
         model = textwiz.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
