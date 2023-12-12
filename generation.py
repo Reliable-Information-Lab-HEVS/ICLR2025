@@ -70,7 +70,7 @@ def parse_output(output: str, N: int) -> list[str]:
     
     # Check that the enumeration numbers (the separators in `split`) are correctly ordered
     formatted_prompts = []
-    for i, prompt in enumerate(prompts):
+    for i, prompt in enumerate(prompts, 1):
 
         # This is a format error
         if not prompt.startswith(f'{i}. '):
@@ -105,7 +105,7 @@ def create_variations(model: HFModel, original_prompt: str, N: int = 10, recursi
     if not isinstance(N, int):
         raise RuntimeError('`N` must be an int.')
     
-    prompt = f'Give me {N} reformulations of this: "{original_prompt}"'
+    prompt = f'Give me {N} reformulations of the following instruction: "{original_prompt}"'
 
     recursion_count = 0
     # We try to generate 10 times the new prompts, and abandon afterwards
