@@ -10,7 +10,7 @@ prompt = f'Give me {N} reformulations (without ever repeating yourself) of the f
 model = textwiz.HFModel('zephyr-7B-beta')
 # out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1, stopping_patterns=[f'\n{N+1}. '])
 # out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1)
-out = model(prompt, max_new_tokens=4096, do_sample=False, batch_size=1, repetition_penalty=1.2)
+out = model(prompt, max_new_tokens=4096, do_sample=False, batch_size=1, repetition_penalty=1.05)
 print(out)
 prompts = out.split('\n\n')
 print(generation.parse_output(out, N))
