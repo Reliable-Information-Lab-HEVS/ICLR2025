@@ -128,7 +128,7 @@ def create_variations(model: HFModel, original_prompt: str, N: int = 10, recursi
         recursion_count += 1
         # We use a larger repetition_penalty because its effect gets smoothed by the low temperature
         out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1,
-                    stopping_patterns=[f'\n{N+1}. '], repetition_penalty=1.15)
+                    stopping_patterns=[f'\n{N+1}. '], repetition_penalty=1.15, seed=123)
         try:
             prompts = parse_output(out, N)
             return prompts
