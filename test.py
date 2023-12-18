@@ -16,12 +16,8 @@ device = model.input_device
 max_length = model.get_context_size()
 seq_len = encodings.input_ids.size(1)
 stride = 512
-target_ids = model.tokenizer.encode(input, add_special_tokens=False)
 
 
-max_length = model.config.n_positions
-stride = 512
-seq_len = encodings.input_ids.size(1)
 
 nlls = []
 prev_end_loc = 0
