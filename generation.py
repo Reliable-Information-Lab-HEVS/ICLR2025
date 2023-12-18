@@ -138,9 +138,11 @@ def create_variations(model: HFModel, original_prompt: str, N: int = 10, recursi
     raise BadFormatException(f'Could not correctly generate {N} variations after {recursion_depth} tries.')
 
 
-def main(main_model: str, sub_model: str, input_file: str, output_file: str, N: int, generation_kwargs: dict):
+def main(main_model: str, sub_model: str, input_file: str, output_file: str, existing_variations: bool,
+         N: int, generation_kwargs: dict):
     """Create `N` different versions of the prompts in `input_file`, and then use `main_model` to generate
-    text based on those prompts and `generation_kwargs`. Save results to `output_file`.
+    text based on those prompts and `generation_kwargs`. If `existing_variations` is True, ìnput_file` is assumed
+    to already contain the prompts variations and they are not re-generated. Save results to `output_file`.
 
     Parameters
     ----------
@@ -152,6 +154,8 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, N: 
         Path to the file containing the prompts.
     output_file : str
         Where to save the results.
+    existing_variations : bool
+        If `True`, the prompts variations are not recomputed.
     N : int
         How many prompts to generate.
     generation_kwargs : dict
@@ -163,6 +167,7 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, N: 
     if basename == '':
         raise ValueError('The output file cannot end by directory separator.')
     if not basename.endswith('.jsonl'):
+        warnings.warn('The output file extension should be `.jsonl`. Adding the extension to given filename.')
         basename += '.jsonl'
     if dirname != '':
         if not os.path.exists(dirname):
@@ -170,24 +175,33 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, N: 
     output_file = os.path.join(dirname, basename)
 
     # Load the prompts and create the variations
-    prompts = utils.load_txt(input_file, separator='\n\n')
-    prompts = [prompt.strip() for prompt in prompts if prompt.strip() != '']
+    if not existing_variations:
+        prompts = utils.load_txt(input_file, separator='\n\n')
+        prompts = [prompt.strip() for prompt in prompts if prompt.strip() != '']
 
-    sub_model = HFModel(sub_model)
+        sub_model = HFModel(sub_model)
 
-    prompt_bank = []
-    for prompt in prompts:
-        # Try to create the prompt variations
-        try:
-            variations = create_variations(sub_model, prompt, N)
-        except BadFormatException:
-            warnings.warn(f'Could not create {N} variations of the following prompt (ignoring it):\n{prompt}')
-            continue
-        prompt_bank.append({'original_prompt': prompt, 'prompt': prompt})
-        prompt_bank.extend([{'original_prompt': prompt, 'prompt': x} for x in variations])
-    
-    del sub_model
-    gc.collect()
+        prompt_bank = []
+        for prompt in prompts:
+            # Try to create the prompt variations
+            try:
+                variations = create_variations(sub_model, prompt, N)
+            except BadFormatException:
+                warnings.warn(f'Could not create {N} variations of the following prompt (ignoring it):\n{prompt}')
+                continue
+            prompt_bank.append({'original_prompt': prompt, 'prompt': prompt})
+            prompt_bank.extend([{'original_prompt': prompt, 'prompt': x} for x in variations])
+
+        # Save the generated prompts
+        basename, _ = os.path.splitext(input_file)
+        name = os.path.join(basename, '_extended.jsonl')
+        utils.save_jsonl(prompt_bank, name)
+
+        del sub_model
+        gc.collect()
+
+    else:
+        prompt_bank = utils.load_jsonl(input_file)
 
     # Perform inference on all the prompts
     model = HFModel(main_model)
@@ -208,6 +222,8 @@ if __name__ == '__main__':
                         help='Path to the file containing the prompts.')
     parser.add_argument('--output_file', type=str, required=True,
                         help='A path to save the output file.')
+    parser.add_argument('--existing_variations', action='store_true',
+                        help='If given, `input_file` is assumed to already containe the prompt variations.')
     # parser.add_argument('--sub_model', type=str, default='zephyr-7B-beta',
     #                     help='The model to use to create prompt variations.')
     parser.add_argument('--greedy', action='store_true',
@@ -222,8 +238,9 @@ if __name__ == '__main__':
     input_file = args.input_file
     output_file = args.output_file
     generation_kwargs = GREEDY_GENERATION_KWARGS if args.greedy else GENERATION_KWARGS
+    existing_variations = args.existing_variations
     N = args.N
 
     main(main_model=main_model, sub_model=sub_model, input_file=input_file, output_file=output_file,
-         N=N, generation_kwargs=generation_kwargs)
+         existing_variations=existing_variations, N=N, generation_kwargs=generation_kwargs)
 

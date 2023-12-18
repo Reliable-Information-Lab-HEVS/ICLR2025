@@ -205,26 +205,35 @@ def scenario_stats(filename: str):
 
     model = parse_filename(filename)['model']
 
-    res_by_id = defaultdict(list)
+    vulnerable_by_id = defaultdict(list)
+    valid_by_id = defaultdict(list)
     for res in result:
-        res_by_id[res['id']].append(res['vulnerable'])
+        vulnerable_by_id[res['id']].append(res['vulnerable'])
+        valid_by_id[res['id']].append(res['valid'])
 
-    means = {key: np.mean(value) for key, value in res_by_id.items()}
-    stds = {key: np.std(value) for key, value in res_by_id.items()}
-    vals = {key: f'${means[key]:.1f} \pm {stds[key]:.1f}$' for key in means.keys()}
+    weighted_mean, weighted_std, frac_vulnerable, frac_valid, x, y = {}, {}, {}, {}, {}, {}
+    for key in valid_by_id.keys():
+        weighted_mean[key] = np.average(vulnerable_by_id[key], weights=valid_by_id[key])
+        weighted_std[key] = np.sqrt(np.average((vulnerable_by_id[key]-weighted_mean[key])**2, weights=valid_by_id[key]))
 
-    # scenarios = list(res_by_id.keys())
-    # counter = 0
+        frac_vulnerable[key] = np.sum(vulnerable_by_id[key]) / np.sum(valid_by_id[key]) * 100
+        frac_valid[key] = np.sum(valid_by_id[key]) / (25 * len(valid_by_id[key])) * 100
 
-    # fig, axes = plt.subplots(9, 2, sharex=True, sharey=True)
-    # for i in range(axes.size[0]):
-    #     for j in range(axes.size[1]):
-    #         axes[i,j].boxplot(res_by_id[scenarios[counter]])
-    #         counter += 1
+        x[key] = []
+        for a, b in zip(vulnerable_by_id[key], valid_by_id[key]):
+            x[key].append(a/b if b != 0 else 0)
+        x[key] = np.array(x[key])
+        y[key] = np.array(valid_by_id[key]) / 25
 
-    # sns.boxplot(res_by_id)
+    # means = {key: np.mean(value) for key, value in res_by_id.items()}
+    # stds = {key: np.std(value) for key, value in res_by_id.items()}
+    # vals = {key: f'${means[key]:.1f} \pm {stds[key]:.1f}$' for key in means.keys()}
 
-    return vals, model
+    vals = {key: f'${weighted_mean[key]:.1f} \pm {weighted_std[key]:.1f}$' for key in weighted_std.keys()}
+    # vals = {key: f'${frac_valid[key]:.1f} \pm {frac_vulnerable[key]:.1f}$' for key in weighted_std.keys()}
+
+    # return vals, model
+    return x, y, model
 
 
 def scenarios_wise_stats():
