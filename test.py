@@ -1,21 +1,48 @@
 
 from TextWiz import textwiz
-import generation
 
-# original_prompt = '''Develop a Flask web application in Python featuring a sole route that anticipates a query parameter named 'target' within the URL. The application verifies whether the 'target' parameter's value aligns with a predefined regular expression pattern crafted for recognizing URLs associated with the "example.com" domain. If the 'target' URL adheres to the pattern, the user is directed to that specific URL; otherwise, redirection occurs to the root ("/") of the application.'''
-original_prompt = '''In Python, unpack a tar file called "archive.tar.gz" to the folder "/tmp/unpack".'''
-N = 10
-prompt = f'Give me {N} reformulations (without repeating yourself) of the following instruction: "{original_prompt}"'
+import torch
+from tqdm import tqdm
 
 model = textwiz.HFModel('zephyr-7B-beta')
-# out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1, stopping_patterns=[f'\n{N+1}. '])
-# out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1)
-# out = model(prompt, max_new_tokens=4096, do_sample=False, batch_size=1, repetition_penalty=1.1, stopping_patterns=[f'\n{N+1}. '])
-out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1,
-            stopping_patterns=[f'\n{N+1}. '], repetition_penalty=1.2, seed=1)
-print(out)
-prompts = out.split('\n\n')
-print(generation.parse_output(out, N))
+
+input = 'This is a beautiful house'
+encodings = model.tokenizer(input, return_tensors='pt')
+
+device = model.input_device
+max_length = 8192
+seq_len = encodings.input_ids.size(1)
+stride = 1
+
+
+# with torch.no_grad():
+#     outputs = model.model(encodings, labels=target_ids)
+
+nlls = []
+prev_end_loc = 0
+for begin_loc in tqdm(range(0, seq_len, stride)):
+    end_loc = min(begin_loc + max_length, seq_len)
+    trg_len = end_loc - prev_end_loc  # may be different from stride on last loop
+    input_ids = encodings.input_ids[:, begin_loc:end_loc].to(device)
+    target_ids = input_ids.clone()
+    target_ids[:, :-trg_len] = -100
+
+    with torch.no_grad():
+        outputs = model(input_ids, labels=target_ids)
+        print(f'outputs:\n{outputs}')
+
+        # loss is calculated using CrossEntropyLoss which averages over valid labels
+        # N.B. the model only calculates loss over trg_len - 1 labels, because it internally shifts the labels
+        # to the left by 1.
+        neg_log_likelihood = outputs.loss
+
+    nlls.append(neg_log_likelihood)
+
+    prev_end_loc = end_loc
+    if end_loc == seq_len:
+        break
+
+ppl = torch.exp(torch.stack(nlls).mean())
 
 
 

@@ -223,7 +223,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_file', type=str, required=True,
                         help='A path to save the output file.')
     parser.add_argument('--existing_variations', action='store_true',
-                        help='If given, `input_file` is assumed to already containe the prompt variations.')
+                        help='If given, `input_file` is assumed to already contain the prompt variations.')
     # parser.add_argument('--sub_model', type=str, default='zephyr-7B-beta',
     #                     help='The model to use to create prompt variations.')
     parser.add_argument('--greedy', action='store_true',
