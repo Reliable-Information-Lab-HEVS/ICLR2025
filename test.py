@@ -13,6 +13,7 @@ device = model.input_device
 max_length = 8192
 seq_len = encodings.input_ids.size(1)
 stride = 1
+target_ids = model.tokenizer.encode(input, add_special_token=False)
 
 
 # with torch.no_grad():
@@ -35,6 +36,9 @@ for begin_loc in range(0, seq_len, stride):
         logits = outputs.logits
         print(f'logits_shape:\n{logits.shape}')
         print(f'logits:\n{logits}')
+
+        foo = model.tokenizer.decode(torch.argmax(logits[:, 0, :]))
+        print(f'FIRST TOKEN:{foo}')
 
         # loss is calculated using CrossEntropyLoss which averages over valid labels
         # N.B. the model only calculates loss over trg_len - 1 labels, because it internally shifts the labels
