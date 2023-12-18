@@ -26,6 +26,8 @@ for begin_loc in tqdm(range(0, seq_len, stride)):
     input_ids = encodings.input_ids[:, begin_loc:end_loc].to(device)
     target_ids = input_ids.clone()
     target_ids[:, :-trg_len] = -100
+    print(f'target_shape:{target_ids.shape}')
+    print(f'target:{target_ids}')
 
     with torch.no_grad():
         outputs = model.model(input_ids, labels=target_ids)
