@@ -48,6 +48,7 @@ for begin_loc in tqdm(range(0, seq_len, stride)):
         break
 
 ppl = torch.exp(torch.stack(nlls).mean())
+print(ppl)
 
 
 
