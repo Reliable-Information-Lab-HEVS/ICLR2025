@@ -7,6 +7,7 @@ from tqdm import tqdm
 model = textwiz.HFModel('zephyr-7B-beta')
 
 input = 'This is a beautiful house'
+input = ''
 encodings = model.tokenizer(input, return_tensors='pt')
 
 device = model.input_device
@@ -16,8 +17,8 @@ stride = 1
 target_ids = model.tokenizer.encode(input, add_special_token=False)
 
 
-# with torch.no_grad():
-#     outputs = model.model(encodings, labels=target_ids)
+# # with torch.no_grad():
+# #     outputs = model.model(encodings, labels=target_ids)
 
 nlls = []
 prev_end_loc = 0
