@@ -189,8 +189,13 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, exi
             except BadFormatException:
                 warnings.warn(f'Could not create {N} variations of the following prompt (ignoring it):\n{prompt}')
                 continue
-            prompt_bank.append({'original_prompt': prompt, 'prompt': prompt})
-            prompt_bank.extend([{'original_prompt': prompt, 'prompt': x} for x in variations])
+
+            # Compute the perplexity of each prompt
+            original_perplexity = sub_model.perplexity(prompt)
+            perplexities = [sub_model.perplexity(x) for x in variations]
+            # Add to the prompt bank
+            prompt_bank.append({'original_prompt': prompt, 'prompt': prompt, 'prompt_perplexity': original_perplexity})
+            prompt_bank.extend([{'original_prompt': prompt, 'prompt': x, 'prompt_perplexity': y} for x, y in zip(variations, perplexities)])
 
         # Save the generated prompts
         basename, _ = os.path.splitext(input_file)
