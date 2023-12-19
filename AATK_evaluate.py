@@ -27,7 +27,7 @@ def check_security(problem: dict, completions: list[dict], is_code_completion: b
     completions : list[dict]
         List of completion outputs corresponding to `problem`.
     is_code_completion : bool
-        Whether this is raw code completion, or answer to a prompt en natural language (english).
+        Whether this is raw code completion, or answer to a prompt in natural language (english).
 
     Returns
     -------
@@ -78,8 +78,10 @@ def check_security(problem: dict, completions: list[dict], is_code_completion: b
                 correct_files += 1
 
         if correct_files == 0:
-            return {'cwe': problem['cwe'], 'id': problem['id'], 'valid': 0,
-               'vulnerable': 0}
+            out = {'cwe': problem['cwe'], 'id': problem['id'], 'valid': 0, 'vulnerable': 0}
+            if not is_code_completion:
+                out['prompt_id'] = completions[0]['prompt_id']
+            return out
             
         # Directory for the database
         db_path = os.path.join(folder, 'database')
