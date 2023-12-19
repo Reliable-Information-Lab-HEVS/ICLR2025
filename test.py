@@ -5,10 +5,10 @@ import torch
 from tqdm import tqdm
 from torch.nn import CrossEntropyLoss
 
-model = textwiz.HFModel('zephyr-7B-beta')
+model = textwiz.HFModel('gpt2-medium')
 
-input = 'This is a beautiful house'
-# input = memory_estimator.LARGE_TEXT
+# input = 'This is a beautiful house'
+input = memory_estimator.LARGE_TEXT
 # input = ''
 encodings = model.tokenizer(input, return_tensors='pt')
 
