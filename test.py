@@ -7,8 +7,8 @@ from torch.nn import CrossEntropyLoss
 
 model = textwiz.HFModel('gpt2-medium')
 
-# input = 'This is a beautiful house'
-input = memory_estimator.LARGE_TEXT
+input = 'This is a beautiful house'
+# input = memory_estimator.LARGE_TEXT
 # input = ''
 encodings = model.tokenizer(input, return_tensors='pt')
 
