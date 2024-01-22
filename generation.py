@@ -199,7 +199,7 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, exi
 
         # Save the generated prompts
         basename, _ = os.path.splitext(input_file)
-        name = os.path.join(basename, '_extended.jsonl')
+        name = basename + '_extended.jsonl'
         utils.save_jsonl(prompt_bank, name)
 
         del sub_model
