@@ -9,7 +9,7 @@ import seaborn as sns
 from helpers import utils
 from TextWiz.textwiz import loader
 
-DATASETS = ['AATK', 'AATK_english']
+DATASETS = ['AATK', 'AATK_english', 'AATK_english_v2']
 CATEGORIES = ['completions', 'results']
 
 def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:
@@ -249,3 +249,57 @@ def scenarios_wise_stats():
         df[name] = df.index.map(values)
 
     return df
+
+
+
+
+def paper_boxplot(filename: str | None = None):
+
+    # files = [
+    # '/Users/cyrilvallez/Desktop/LLMs/results/AATK_perplexity/results/code-llama-34B-instruct/bfloat16/temperature_0.2.jsonl',
+    # '/Users/cyrilvallez/Desktop/LLMs/results/AATK_perplexity/results/llama2-70B-chat/float16/temperature_0.2.jsonl',
+    # '/Users/cyrilvallez/Desktop/LLMs/results/AATK_perplexity/results/star-chat-alpha/float16/temperature_0.2.jsonl'
+    # ]
+
+    files = extract_filenames('AATK_english', category='results')
+
+    name_mapping = {'code-llama-34B-instruct': 'CodeLlama 34B - Instruct', 'llama2-70B-chat': 'Llama2 70B - Chat',
+                    'star-chat-alpha': 'StarChat (alpha)'}
+    model_names = ['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']
+
+    Py_per_model = {}
+
+    for file in files:
+        result = utils.load_jsonl(file)
+        model = parse_filename(file)['model']
+        Py = defaultdict(list)
+
+        for res in result:
+            id = res['id']
+            Py[id].append(0 if res['valid'] == 0 else res['vulnerable'] / res['valid'])
+
+        Py_per_model[model] = Py
+
+    fig, axes = plt.subplots(1, 3, sharex=True, sharey=True, figsize=(4.8*2, 6.4/1.2))
+
+
+    ticks = list(Py_per_model['code-llama-34B-instruct'].keys())
+    new_ticks = [x.rsplit('-', 1)[0] + ' - ' + x.rsplit('-', 1)[1] for x in ticks]
+    ticks_mapping = {tick: new_tick for tick, new_tick in zip(ticks, new_ticks)}
+
+    tot = 0
+    for ax, model in zip(axes, model_names):
+        tot += 1
+        df = pd.DataFrame(Py_per_model[model])
+        df.rename(columns=ticks_mapping, inplace=True)
+        ax.set_axisbelow(True)
+        ax.grid(axis='x')
+        sns.boxplot(df, orient='h', ax=ax)
+        ax.set(xlabel=f'Distribution of $P_y$')
+        if tot == 1:
+            ax.set(ylabel='Prompt')
+        ax.set(title=name_mapping[model])
+
+    plt.show()
+    if filename is not None:
+        fig.savefig(filename, bbox_inches='tight')

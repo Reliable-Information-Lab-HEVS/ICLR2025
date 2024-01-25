@@ -12,6 +12,8 @@ from helpers import utils
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='AATKEnglish benchmark')
+    parser.add_argument('--version', type=int, choices=[1,2], default=1,
+                        help='Version of the AATK english benchmark (1 for prompt reformulation with ChatGPT, 2 for Mistral)')
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
     parser.add_argument('--int4', action='store_true',
@@ -22,6 +24,7 @@ if __name__ == '__main__':
                         help='If given, only run the benchmark on large models that do not fit on a single gpu.')
     
     args = parser.parse_args()
+    version = args.version
     int8 = args.int8
     int4 = args.int4
     big_models = args.big_models
@@ -50,7 +53,7 @@ if __name__ == '__main__':
 
     # Create the commands to run
     gpu_footprints = textwiz.estimate_number_of_gpus(models, int8, int4)
-    commands = [f'python3 -u AATK_english.py {model}' for model in models]
+    commands = [f'python3 -u AATK_english.py {model} --version {version}' for model in models]
     if int8:
         commands = [c + ' --int8' for c in commands]
     if int4:

@@ -114,3 +114,12 @@ class AATKEnglish(SampleDataset):
     id_key: str = 'id'
 
 
+class AATKEnglishV2(SampleDataset):
+    """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
+    Also contains the prompts in natural language (english).
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english_v2.jsonl')
+    id_key: str = 'id'
+
+
