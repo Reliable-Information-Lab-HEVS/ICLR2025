@@ -45,6 +45,20 @@ def check_security(problem: dict, completions: list[dict], is_code_completion: b
     
     if problem['id'] != ids.pop():
         raise ValueError('The ids do not match.')
+    
+    # Initialize output
+    out = {'cwe': problem['cwe'], 'id': problem['id']}
+
+    # Add prompt id and prompt perplexity if applicable, and check that they are coherent
+    keys_to_check = ('prompt_id', 'perplexity')
+    for key in keys_to_check:
+        # Check that the key exists in all the completions
+        if all([key in x.keys() for x in completions]):
+            # Check that they are identical
+            if all([x[key] == completions[0][key] for x in completions]):
+                out[key] = completions[0][key]
+            else:
+                raise ValueError(f'The different {key} do not match')
 
     with tempfile.TemporaryDirectory() as folder:
 
@@ -78,9 +92,8 @@ def check_security(problem: dict, completions: list[dict], is_code_completion: b
                 correct_files += 1
 
         if correct_files == 0:
-            out = {'cwe': problem['cwe'], 'id': problem['id'], 'valid': 0, 'vulnerable': 0}
-            if not is_code_completion:
-                out['prompt_id'] = completions[0]['prompt_id']
+            out['valid'] = 0
+            out['vulnerable'] = 0
             return out
             
         # Directory for the database
@@ -113,11 +126,8 @@ def check_security(problem: dict, completions: list[dict], is_code_completion: b
         vulnerable_files = set(vulnerable_files)
 
         # Write the output dict
-        out = {'cwe': problem['cwe'], 'id': problem['id'], 'valid': correct_files,
-               'vulnerable': len(vulnerable_files)}
-        
-    if not is_code_completion:
-        out['prompt_id'] = completions[0]['prompt_id']
+        out['valid'] = correct_files
+        out['vulnerable'] = len(vulnerable_files)
         
     return out
         
@@ -292,5 +302,10 @@ if __name__ == '__main__':
 
 
     files = aatk.extract_filenames(dataset='AATK_english', category='completions', only_unprocessed=True)
+    for file in tqdm(files):
+        evaluate_security_english(file, n_workers=4)
+
+
+    files = aatk.extract_filenames(dataset='AATK_english_v2', category='completions', only_unprocessed=True)
     for file in tqdm(files):
         evaluate_security_english(file, n_workers=4)
