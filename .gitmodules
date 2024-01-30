@@ -2,5 +2,3 @@
 	path = TextWiz
 	url = git@github.com:Cyrilvallez/TextWiz.git
 	branch = dev
-[submodule]
-	recurse = true
