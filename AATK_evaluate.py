@@ -76,6 +76,11 @@ def check_security(problem: dict, completions: list[dict], is_code_completion: b
             file = os.path.join(folder, f'{i}.py')
             byte_code_file = os.path.join(folder, f'{i}_byte_code.pyc')
 
+            # First check that file is not empty (code extraction may return empty string -> not valid code)
+            if os.stat(file).st_size == 0:
+                os.remove(file)
+                continue
+
             try:
                 py_compile.compile(file, cfile=byte_code_file, doraise=True)
             except py_compile.PyCompileError:

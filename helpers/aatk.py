@@ -167,7 +167,19 @@ def extract_all_filenames(category: str = 'completions', only_unprocessed: bool 
     return files
 
 
-def model_wise_results(dataset: str = 'AATK'):
+def model_wise_results(dataset: str = 'AATK') -> pd.DataFrame:
+    """Get total proportion of valid and vulnerable code in `dataset`.
+
+    Parameters
+    ----------
+    dataset : str, optional
+        The name of the dataset, by default `AATK`.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing results summary.
+    """
 
     files = extract_filenames(dataset, category='results')
 
@@ -199,72 +211,26 @@ def model_wise_results(dataset: str = 'AATK'):
     return df
 
 
-def scenario_stats(filename: str):
 
-    result = utils.load_jsonl(filename)
-
-    model = parse_filename(filename)['model']
-
-    vulnerable_by_id = defaultdict(list)
-    valid_by_id = defaultdict(list)
-    for res in result:
-        vulnerable_by_id[res['id']].append(res['vulnerable'])
-        valid_by_id[res['id']].append(res['valid'])
-
-    weighted_mean, weighted_std, frac_vulnerable, frac_valid, x, y = {}, {}, {}, {}, {}, {}
-    for key in valid_by_id.keys():
-        weighted_mean[key] = np.average(vulnerable_by_id[key], weights=valid_by_id[key])
-        weighted_std[key] = np.sqrt(np.average((vulnerable_by_id[key]-weighted_mean[key])**2, weights=valid_by_id[key]))
-
-        frac_vulnerable[key] = np.sum(vulnerable_by_id[key]) / np.sum(valid_by_id[key]) * 100
-        frac_valid[key] = np.sum(valid_by_id[key]) / (25 * len(valid_by_id[key])) * 100
-
-        x[key] = []
-        for a, b in zip(vulnerable_by_id[key], valid_by_id[key]):
-            x[key].append(a/b if b != 0 else 0)
-        x[key] = np.array(x[key])
-        y[key] = np.array(valid_by_id[key]) / 25
-
-    # means = {key: np.mean(value) for key, value in res_by_id.items()}
-    # stds = {key: np.std(value) for key, value in res_by_id.items()}
-    # vals = {key: f'${means[key]:.1f} \pm {stds[key]:.1f}$' for key in means.keys()}
-
-    vals = {key: f'${weighted_mean[key]:.1f} \pm {weighted_std[key]:.1f}$' for key in weighted_std.keys()}
-    # vals = {key: f'${frac_valid[key]:.1f} \pm {frac_vulnerable[key]:.1f}$' for key in weighted_std.keys()}
-
-    # return vals, model
-    return x, y, model
-
-
-def scenarios_wise_stats():
-
-    files = extract_filenames('AATK_english', category='results')
-
-    results = [scenario_stats(file) for file in files]
-
-    assert all(sorted(x[0].keys()) == sorted(results[0][0].keys()) for x in results)
-    
-    df = pd.DataFrame(index=results[0][0].keys())
-    for values, name in results:
-        df[name] = df.index.map(values)
-
-    return df
+NAME_MAPPING = {'code-llama-34B-instruct': 'CodeLlama 34B - Instruct', 'llama2-70B-chat': 'Llama2 70B - Chat',
+                'star-chat-alpha': 'StarChat (alpha)'}
 
 
 
+def probability_distributions(dataset: str = 'AATK_english', filename: str | None = None):
+    """Show the probability distribution per scenarios.
 
-def paper_boxplot(filename: str | None = None):
+    Parameters
+    ----------
+    dataset : str, optional
+        The name of the dataset, by default 'AATK_english'
+    filename : str | None, optional
+        Optional filename to save the figure, by default None
+    """
 
-    # files = [
-    # '/Users/cyrilvallez/Desktop/LLMs/results/AATK_perplexity/results/code-llama-34B-instruct/bfloat16/temperature_0.2.jsonl',
-    # '/Users/cyrilvallez/Desktop/LLMs/results/AATK_perplexity/results/llama2-70B-chat/float16/temperature_0.2.jsonl',
-    # '/Users/cyrilvallez/Desktop/LLMs/results/AATK_perplexity/results/star-chat-alpha/float16/temperature_0.2.jsonl'
-    # ]
+    assert dataset in ['AATK_english', 'AATK_english_v2'], 'Probability distributions only defined for reformulated AATK datasets'
+    files = extract_filenames(dataset, category='results')
 
-    files = extract_filenames('AATK_english', category='results')
-
-    name_mapping = {'code-llama-34B-instruct': 'CodeLlama 34B - Instruct', 'llama2-70B-chat': 'Llama2 70B - Chat',
-                    'star-chat-alpha': 'StarChat (alpha)'}
     model_names = ['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']
 
     Py_per_model = {}
@@ -298,8 +264,94 @@ def paper_boxplot(filename: str | None = None):
         ax.set(xlabel=f'Distribution of $P_y$')
         if tot == 1:
             ax.set(ylabel='Prompt')
-        ax.set(title=name_mapping[model])
+        ax.set(title=NAME_MAPPING[model])
 
     plt.show()
     if filename is not None:
         fig.savefig(filename, bbox_inches='tight')
+
+
+
+def sigmoid(x, nu=20, sigma=10):
+    """Sigmoid used to convert to probability."""
+    return 1 / (1 + np.exp(-(x-nu)/sigma))
+
+
+def get_cvss_scores() -> dict:
+    """Retrieve the CVSS score for each scenario.
+
+    Returns
+    -------
+    dict
+        The scores.
+    """
+
+    with open(os.path.join(utils.DATA_FOLDER, 'cvss_scores.txt')) as file:
+        scores = [x.strip() for x in file.readlines()]
+
+    cvss = {}
+    for x in scores:
+        a, b = x.split(' ')
+        cvss[a] = float(b)
+
+    return cvss
+
+
+def prompt_exposure(dataset: str = 'AATK_english', to_df: bool = True) -> dict | pd.DataFrame:
+    """Compute the prompt exposure for each scenario.
+
+    Parameters
+    ----------
+    dataset : str, optional
+        The name of the dataset, by default 'AATK_english'
+    to_df : bool, optional
+        Whether to convert output to dataframe, by default True
+
+    Returns
+    -------
+    dict | pd.DataFrame
+        The scores.
+    """
+
+    assert dataset in ['AATK_english', 'AATK_english_v2'], 'Prompt exposure only defined for reformulated AATK datasets'
+    files = extract_filenames(dataset, category='results')
+    cvss = get_cvss_scores()
+
+    model_names = ['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']
+
+    PEs_by_model = {}
+
+    for file in files:
+        result = utils.load_jsonl(file)
+        model = parse_filename(file)['model']
+
+        PEs = defaultdict(lambda: 0.)
+        id_frequency = defaultdict(lambda: 0)
+
+
+        for prompt in result:
+            id = prompt['id']
+            id_frequency[id] += 1
+            Ry = 1 - sigmoid(prompt['perplexity'])
+            Py = 0 if prompt['valid'] == 0 else prompt['vulnerable'] / prompt['valid']
+            CVSSy = cvss[id]
+
+            PEs[id] += CVSSy * Py * Ry
+
+        # Divide by id frequency (i.e. N+1)
+        assert set(PEs.keys()) == set(id_frequency.keys()), 'Problem with regards to ids'
+        normalized_PEs = {id: PEs[id] / id_frequency[id] for id in PEs.keys()}
+
+        PEs_by_model[model] = normalized_PEs
+
+    if to_df:
+        df = pd.DataFrame(PEs_by_model)
+        df.drop(columns=['codegen25-7B-instruct'], inplace=True)
+        df = df[['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']]
+        df.rename(columns=NAME_MAPPING, inplace=True)
+        df.rename(index=lambda cwe: ' - '.join(cwe.rsplit('-', 1)), inplace=True)
+
+        return df
+    
+    else:
+        return PEs_by_model
