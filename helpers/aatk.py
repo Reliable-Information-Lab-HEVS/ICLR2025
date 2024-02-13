@@ -9,7 +9,7 @@ import seaborn as sns
 from helpers import utils
 from TextWiz.textwiz import loader
 
-DATASETS = ['AATK', 'AATK_english', 'AATK_english_v2']
+DATASETS = ['AATK', 'AATK_english_chatGPT', 'AATK_english_zephyr']
 CATEGORIES = ['completions', 'results']
 
 def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:
@@ -217,18 +217,18 @@ NAME_MAPPING = {'code-llama-34B-instruct': 'CodeLlama 34B - Instruct', 'llama2-7
 
 
 
-def probability_distributions(dataset: str = 'AATK_english', filename: str | None = None):
+def probability_distributions(dataset: str = 'AATK_english_chatGPT', filename: str | None = None):
     """Show the probability distribution per scenarios.
 
     Parameters
     ----------
     dataset : str, optional
-        The name of the dataset, by default 'AATK_english'
+        The name of the dataset, by default 'AATK_english_chatGPT'
     filename : str | None, optional
         Optional filename to save the figure, by default None
     """
 
-    assert dataset in ['AATK_english', 'AATK_english_v2'], 'Probability distributions only defined for reformulated AATK datasets'
+    assert dataset in ['AATK_english_chatGPT', 'AATK_english_zephyr'], 'Probability distributions only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
 
     model_names = ['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']
@@ -297,13 +297,13 @@ def get_cvss_scores() -> dict:
     return cvss
 
 
-def prompt_exposure(dataset: str = 'AATK_english', to_df: bool = True) -> dict | pd.DataFrame:
+def prompt_exposure(dataset: str = 'AATK_english_chatGPT', to_df: bool = True) -> dict | pd.DataFrame:
     """Compute the prompt exposure for each scenario.
 
     Parameters
     ----------
     dataset : str, optional
-        The name of the dataset, by default 'AATK_english'
+        The name of the dataset, by default 'AATK_english_chatGPT'
     to_df : bool, optional
         Whether to convert output to dataframe, by default True
 
@@ -313,11 +313,9 @@ def prompt_exposure(dataset: str = 'AATK_english', to_df: bool = True) -> dict |
         The scores.
     """
 
-    assert dataset in ['AATK_english', 'AATK_english_v2'], 'Prompt exposure only defined for reformulated AATK datasets'
+    assert dataset in ['AATK_english_chatGPT', 'AATK_english_zephyr'], 'Prompt exposure only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
     cvss = get_cvss_scores()
-
-    model_names = ['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']
 
     PEs_by_model = {}
 

@@ -105,21 +105,21 @@ class AATK(SampleDataset):
     id_key: str = 'id'
 
 
-class AATKEnglish(SampleDataset):
+class AATKEnglishChatGPT(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
     Also contains the prompts in natural language (english).
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english_chatGPT.jsonl')
     id_key: str = 'id'
 
 
-class AATKEnglishV2(SampleDataset):
+class AATKEnglishZephyr(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
     Also contains the prompts in natural language (english).
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english_v2.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english_zephyr.jsonl')
     id_key: str = 'id'
 
 

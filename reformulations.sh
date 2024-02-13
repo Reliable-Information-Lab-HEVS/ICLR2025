@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=generation
+#SBATCH --job-name=reformulations
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
@@ -16,6 +16,6 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm-playground
 
-python3 generation.py "$@"
+python3 reformulations.py "$@"
 
 conda deactivate
