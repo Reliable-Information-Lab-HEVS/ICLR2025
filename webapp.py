@@ -393,6 +393,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     no_auth = args.no_auth
     
+    print('Started')
     if no_auth:
         demo.queue(concurrency_count=4).launch(share=True, blocked_paths=[CREDENTIALS_FILE])
     else:
