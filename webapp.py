@@ -10,11 +10,9 @@ from TextWiz.textwiz.conversation_template import GenericConversation
 import TextWiz.textwiz.web_interface as wi
 from helpers import utils
 
-print('Started')
 
 # Default model to load at start-up
 DEFAULT = 'llama2-7B-chat' if torch.cuda.is_available() else 'bloom-560M'
-# DEFAULT = 'bloom-560M'
 
 # Initialize global model (necessary not to reload the model for each new inference)
 MODEL = HFModel(DEFAULT)
@@ -396,6 +394,7 @@ if __name__ == '__main__':
     no_auth = args.no_auth
     
     if no_auth:
-        demo.queue(concurrency_count=4).launch(share=True, blocked_paths=[CREDENTIALS_FILE])
+        demo.queue(concurrency_count=4).launch(share=False, server_port=7861, blocked_paths=[CREDENTIALS_FILE])
     else:
-        demo.queue(concurrency_count=4).launch(share=True, auth=authentication, blocked_paths=[CREDENTIALS_FILE])
+        demo.queue(concurrency_count=4).launch(share=False, server_port=7861, auth=authentication,
+                                               blocked_paths=[CREDENTIALS_FILE])

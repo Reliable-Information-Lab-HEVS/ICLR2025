@@ -198,5 +198,5 @@ with demo:
 
 
 if __name__ == '__main__':
-    demo.queue(concurrency_count=4).launch(share=False, server_port=8000,
-                                           auth=authentication, blocked_paths=[CREDENTIALS_FILE])
+    demo.queue(concurrency_count=4).launch(share=False, server_port=7860, auth=authentication,
+                                           blocked_paths=[CREDENTIALS_FILE])
