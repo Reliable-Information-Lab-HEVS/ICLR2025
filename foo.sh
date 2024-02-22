@@ -22,6 +22,7 @@ conda activate test
 # docker run --memory=1G --cpus=1 --name frpc -d --restart unless-stopped --network host -v ../frp_server/frpc/frpc.toml:/frpc.toml frpc -c /frpc.toml
 # docker compose -f ../frp_server/frpc/docker-compose.yaml up -d
 
+ss -tulpn
 python3 foo.py
 
 
