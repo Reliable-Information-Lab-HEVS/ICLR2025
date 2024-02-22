@@ -24,6 +24,7 @@ conda activate test
 
 ss -tulpn
 python3 foo.py
+ss -tulpn
 
 
 
