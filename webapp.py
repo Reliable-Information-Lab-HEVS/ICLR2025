@@ -10,6 +10,7 @@ from TextWiz.textwiz.conversation_template import GenericConversation
 import TextWiz.textwiz.web_interface as wi
 from helpers import utils
 
+print('Started')
 
 # Default model to load at start-up
 # DEFAULT = 'llama2-7B-chat' if torch.cuda.is_available() else 'bloom-560M'
@@ -394,7 +395,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     no_auth = args.no_auth
     
-    print('Started')
     if no_auth:
         demo.queue(concurrency_count=4).launch(share=True, blocked_paths=[CREDENTIALS_FILE])
     else:
