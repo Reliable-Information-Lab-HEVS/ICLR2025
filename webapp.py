@@ -13,8 +13,8 @@ from helpers import utils
 print('Started')
 
 # Default model to load at start-up
-# DEFAULT = 'llama2-7B-chat' if torch.cuda.is_available() else 'bloom-560M'
-DEFAULT = 'bloom-560M'
+DEFAULT = 'llama2-7B-chat' if torch.cuda.is_available() else 'bloom-560M'
+# DEFAULT = 'bloom-560M'
 
 # Initialize global model (necessary not to reload the model for each new inference)
 MODEL = HFModel(DEFAULT)
