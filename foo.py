@@ -10,4 +10,4 @@ def hello_world():
 if __name__ == '__main__':
 
     subprocess.run(['../frp_server/frp_0.54.0_linux_amd64/frpc', '-c', '../frp_server/frpc/frpc.toml'])
-    app.run(port=8500)
+    app.run(port=7860)
