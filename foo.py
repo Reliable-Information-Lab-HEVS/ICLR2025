@@ -9,5 +9,5 @@ def hello_world():
 
 if __name__ == '__main__':
 
-    subprocess.Popen(['../frp_server/frp_0.54.0_linux_amd64/frpc', '-c', '../frp_server/frpc/frpc.toml'])
+    # subprocess.Popen(['../frp_server/frp_0.54.0_linux_amd64/frpc', '-c', '../frp_server/frpc/frpc.toml'])
     app.run(port=7860)
