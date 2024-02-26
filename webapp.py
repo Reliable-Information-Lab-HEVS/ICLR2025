@@ -398,4 +398,4 @@ if __name__ == '__main__':
                                                favicon_path='https://ai-forge.ch/favicon.ico')
     else:
         demo.queue(concurrency_count=4).launch(share=False, server_port=7861, auth=authentication,
-                                               blocked_paths=[CREDENTIALS_FILE])
+                                               blocked_paths=[CREDENTIALS_FILE], favicon_path='https://ai-forge.ch/favicon.ico')
