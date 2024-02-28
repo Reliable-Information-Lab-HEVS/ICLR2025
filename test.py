@@ -16,6 +16,8 @@ N = 10
 times = {}
 memories = {}
 
+print(torch.cuda.memory_allocated())
+
 for input_size in sizes:
     prompt = model.tokenizer.decode(large_tokens[:input_size], skip_special_tokens=True)
     gen_times = []
