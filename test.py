@@ -21,7 +21,7 @@ for input_size in sizes:
 
     for i in range(N):
         t0 = time.time()
-        with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
+        with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_math=False, enable_mem_efficient=False):
             foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
         gen_times.append(time.time() - t0)
 
