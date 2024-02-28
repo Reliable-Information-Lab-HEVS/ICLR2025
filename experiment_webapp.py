@@ -5,6 +5,7 @@ import gradio as gr
 from TextWiz.textwiz import HFModel
 from TextWiz.textwiz.conversation_template import GenericConversation
 import TextWiz.textwiz.web_interface as wi
+from TextWiz.textwiz.web_interface import generator
 from helpers import utils
 
 
@@ -21,15 +22,13 @@ CACHED_CONVERSATIONS = {}
 LOGGERS = {}
 
 
-def chat_generation(conversation: GenericConversation, prompt: str,
-                    max_new_tokens: int) -> tuple[str, GenericConversation, list[list]]:
+def chat_generation(conversation: GenericConversation, prompt: str, max_new_tokens: int) -> generator[tuple[str, GenericConversation, list[list]]]:
     yield from wi.chat_generation(MODEL, conversation=conversation, prompt=prompt, max_new_tokens=max_new_tokens,
                                   do_sample=True, top_k=None, top_p=0.9, temperature=0.8, use_seed=False,
                                   seed=None, system_prompt='')
         
 
-def continue_generation(conversation: GenericConversation,
-                        additional_max_new_tokens) -> tuple[GenericConversation, list[list]]:
+def continue_generation(conversation: GenericConversation, additional_max_new_tokens) -> generator[tuple[GenericConversation, list[list]]]:
     yield from wi.continue_generation(MODEL, conversation=conversation, additional_max_new_tokens=additional_max_new_tokens,
                                       do_sample=True, top_k=None, top_p=0.9, temperature=0.8, use_seed=False, seed=None)
    
