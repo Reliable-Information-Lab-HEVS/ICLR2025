@@ -24,6 +24,6 @@ for input_size in sizes:
         gen_times.append(time.time() - t0)
 
     # res[input_size] = np.mean(gen_times)
-    # res[input_size] = gen_times
+    res[input_size] = gen_times
 
 print(res)
