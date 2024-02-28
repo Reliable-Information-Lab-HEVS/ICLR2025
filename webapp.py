@@ -91,7 +91,7 @@ def update_model(conversation: GenericConversation, username: str, model_name: s
 
 
 def text_generation(prompt: str, max_new_tokens: int, do_sample: bool, top_k: int, top_p: float,
-                    temperature: float, use_seed: bool, seed: int) -> str:
+                    temperature: float, use_seed: bool, seed: int) -> generator[str]:
     yield from wi.text_generation(MODEL, prompt=prompt, max_new_tokens=max_new_tokens, do_sample=do_sample,
                                   top_k=top_k, top_p=top_p, temperature=temperature, use_seed=use_seed, seed=seed)
 
