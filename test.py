@@ -1,6 +1,7 @@
 
 import time
 import numpy as np
+import torch
 
 from TextWiz import textwiz
 from TextWiz.memory_estimator import LARGE_TEXT
@@ -20,7 +21,8 @@ for input_size in sizes:
 
     for i in range(N):
         t0 = time.time()
-        foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
+        with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
+            foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
         gen_times.append(time.time() - t0)
 
     res[input_size] = np.mean(gen_times)
