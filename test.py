@@ -6,6 +6,7 @@ from TextWiz import textwiz
 from TextWiz.memory_estimator import LARGE_TEXT
 
 model = textwiz.HFModel('zephyr-7B-beta')
+model('Hello please do your magic', num_return_sequences=1, batch_size=1, max_new_tokens=2)
 
 large_tokens = model.tokenizer.encode(LARGE_TEXT)
 sizes = [10, 100, 1000, 2000, 4000]
