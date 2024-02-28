@@ -1,0 +1,25 @@
+name: test
+channels:
+  - nvidia # need to specify this as first channel to go grab the dependencies of pytorch-cuda correctly
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.11.3
+  - conda
+  - pip
+  - pytorch::pytorch # use pytorch channel
+  - pytorch::pytorch-cuda=11.8 # Remove this line if your hardware does not support cuda, otherwise it will create conflicts
+  - numpy
+  - pandas
+  - scipy
+  - pip:
+    - transformers
+    - tokenizers
+    - accelerate
+    - huggingface-hub
+    - optimum
+    - gradio>=4.0
+    - bitsandbytes
+    - sentencepiece
+    - protobuf
+    - tiktoken
