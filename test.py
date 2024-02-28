@@ -16,8 +16,6 @@ N = 10
 times = {}
 memories = {}
 
-print(torch.cuda.memory_allocated())
-
 for input_size in sizes:
     prompt = model.tokenizer.decode(large_tokens[:input_size], skip_special_tokens=True)
     gen_times = []
@@ -26,13 +24,15 @@ for input_size in sizes:
     for i in range(N):
         t0 = time.time()
         torch.cuda.reset_peak_memory_stats()
-        actual_peak = torch.cuda.memory_allocated() / 1024**3
+        actual_peak = torch.cuda.max_memory_allocated() / 1024**3
 
         with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
             foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
 
+        memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
+
         gen_times.append(time.time() - t0)
-        # memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
+        gen_mem.append(memory_used)
 
     times[input_size] = np.mean(gen_times)
     memories[input_size] = np.mean(gen_mem)
