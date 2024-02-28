@@ -30,7 +30,7 @@ for input_size in sizes:
             foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
 
         gen_times.append(time.time() - t0)
-        memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
+        # memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
 
     times[input_size] = np.mean(gen_times)
     memories[input_size] = np.mean(gen_mem)
