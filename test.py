@@ -23,7 +23,7 @@ for input_size in sizes:
         foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
         gen_times.append(time.time() - t0)
 
-    # res[input_size] = np.mean(gen_times)
-    res[input_size] = gen_times
+    res[input_size] = np.mean(gen_times)
+    # res[input_size] = gen_times
 
 print(res)
