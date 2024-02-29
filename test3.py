@@ -2,10 +2,23 @@
 import time
 import numpy as np
 import torch
+import gc
 from transformers import AutoModelForCausalLM
 
 from TextWiz import textwiz
 from TextWiz.memory_estimator import LARGE_TEXT
+
+def memory_usage(past_key_values):
+    """Recursively compute the memory footprint of past key values (in bytes).
+    """
+
+    if isinstance(past_key_values, torch.Tensor):
+        return past_key_values.nelement() * past_key_values.element_size()
+    elif isinstance(past_key_values[0], torch.Tensor):
+        return sum([x.nelement() * x.element_size() for x in past_key_values])
+    else:
+        return sum([memory_usage(x) for x in past_key_values])
+    
 
 model = textwiz.HFModel('zephyr-7B-beta')
 # new_model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/zephyr-7b-beta', torch_dtype=torch.bfloat16,
@@ -32,17 +45,22 @@ with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=True, enable_
         memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
         print(f'Memory first forward: {memory_used}')
             
-        past_key_values_memory = output.past_key_values
+        past_key_values = output.past_key_values
+        past_key_values_memory = memory_usage(past_key_values) / 1024**3
+        print(f'Past key values: {past_key_values_memory}')
 
         next_token_logits = output.logits[:, -1, :]
         next_tokens = torch.argmax(next_token_logits, dim=-1)
         input_ids = torch.cat([prompt_ids, next_tokens[:, None]], dim=-1)
 
+        del output
+        gc.collect()
+
         # Single forward pass, with past key values
         torch.cuda.reset_peak_memory_stats()
         actual_peak = torch.cuda.max_memory_allocated() / 1024**3
 
-        output = model.model(input_ids, use_cache=True, past_key_values=output.past_key_values)
+        output = model.model(input_ids, use_cache=True, past_key_values=past_key_values)
 
         memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
         print(f'Memory second forward: {memory_used}')
