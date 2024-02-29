@@ -32,7 +32,7 @@ N = 10
 
 prompt = model.tokenizer.decode(large_tokens[:4000], skip_special_tokens=True)
 
-with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=True, enable_mem_efficient=False):
+with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
     with torch.no_grad():
         prompt_ids = model.tokenizer.encode(prompt, return_tensors='pt').cuda()
 
