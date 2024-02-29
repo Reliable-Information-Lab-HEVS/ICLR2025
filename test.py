@@ -31,8 +31,8 @@ for input_size in sizes:
         torch.cuda.reset_peak_memory_stats()
         actual_peak = torch.cuda.max_memory_allocated() / 1024**3
 
-        # with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
-        foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
+        with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
+            foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
 
         memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
 
