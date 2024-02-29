@@ -50,9 +50,7 @@ with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable
         past_key_values_memory = memory_usage(past_key_values) / 1024**3
         print(f'Past key values: {past_key_values_memory}')
 
-        next_token_logits = output.logits[:, -1, :]
-        next_tokens = torch.argmax(next_token_logits, dim=-1)
-        input_ids = torch.cat([prompt_ids, next_tokens[:, None]], dim=-1)
+        input_ids = torch.cat([prompt_ids, torch.tensor([[47]])], dim=-1)
 
         del output
         gc.collect()
