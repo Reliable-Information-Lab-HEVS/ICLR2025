@@ -40,8 +40,8 @@ with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable
         actual_peak = torch.cuda.max_memory_allocated() / 1024**3
 
         # Single forward pass, caching past key values
-        output = model.model.greedy_search(prompt_ids, use_cache=True, return_dict_in_generate=True, pad_token_id=model.tokenizer.eos_token_id,
-                                           max_new_tokens=1)
+        output = model.model.generate(prompt_ids, use_cache=True, return_dict_in_generate=True, pad_token_id=model.tokenizer.eos_token_id,
+                                           max_new_tokens=1, do_sample=False)
 
         memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
         print(f'Memory first forward: {memory_used}')
@@ -61,8 +61,8 @@ with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable
         torch.cuda.reset_peak_memory_stats()
         actual_peak = torch.cuda.max_memory_allocated() / 1024**3
 
-        output = model.model.greedy_search(input_ids, use_cache=True, past_key_values=past_key_values, pad_token_id=model.tokenizer.eos_token_id,
-                                           max_new_tokens=1)
+        output = model.model.generate(input_ids, use_cache=True, past_key_values=past_key_values, pad_token_id=model.tokenizer.eos_token_id,
+                                           max_new_tokens=1, do_sample=False)
 
         memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
         print(f'Memory second forward: {memory_used}')
