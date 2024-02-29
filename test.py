@@ -8,10 +8,10 @@ from TextWiz import textwiz
 from TextWiz.memory_estimator import LARGE_TEXT
 
 model = textwiz.HFModel('llama2-7B-chat')
-# new_model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/zephyr-7b-beta', torch_dtype=torch.bfloat16,
-#                                              low_cpu_mem_usage=True, attn_implementation='sdpa').cuda()
+new_model = AutoModelForCausalLM.from_pretrained('meta-llama/Llama-2-7b-chat-hf', torch_dtype=torch.bfloat16,
+                                             low_cpu_mem_usage=True, attn_implementation='sdpa').cuda()
 # model = model.to_bettertransformer()
-# model.model = new_model
+model.model = new_model
 model('Hello please do your magic', num_return_sequences=1, batch_size=1, max_new_tokens=2)
 
 large_tokens = model.tokenizer.encode(LARGE_TEXT)
