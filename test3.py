@@ -34,3 +34,15 @@ with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable
             
         past_key_values_memory = output.past_key_values
 
+        next_token_logits = output.logits[:, -1, :]
+        next_tokens = torch.argmax(next_token_logits, dim=-1)
+        input_ids = torch.cat([prompt_ids, next_tokens[:, None]], dim=-1)
+
+        # Single forward pass, with past key values
+        torch.cuda.reset_peak_memory_stats()
+        actual_peak = torch.cuda.max_memory_allocated() / 1024**3
+
+        output = model.model(input_ids, use_cache=True, past_key_values=output.past_key_values)
+
+        memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
+        print(f'Memory second forward: {memory_used}')
