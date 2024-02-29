@@ -40,7 +40,7 @@ with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=True, enable_
         actual_peak = torch.cuda.max_memory_allocated() / 1024**3
 
         # Single forward pass, caching past key values
-        output = model.model(prompt_ids, use_cache=True)
+        output = model.model.greedy_search(prompt_ids, use_cache=True, return_dict_in_generate=True)
 
         memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
         print(f'Memory first forward: {memory_used}')
