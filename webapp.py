@@ -306,16 +306,14 @@ with demo:
         # Second column defines model selection and generation parameters
         with gr.Column(scale=10):
                 
-            # First box for model selection
-            with gr.Box():
-                gr.Markdown("### Model selection")
-                with gr.Row():
-                    model_name.render()
-                with gr.Row():
-                    quantization_8bits.render()
-                    quantization_4bits.render()
-                with gr.Row():
-                    load_button.render()
+            gr.Markdown("### Model selection")
+            with gr.Row():
+                model_name.render()
+            with gr.Row():
+                quantization_8bits.render()
+                quantization_4bits.render()
+            with gr.Row():
+                load_button.render()
             
             # Accordion for generation parameters
             with gr.Accordion("Text generation parameters", open=False):
@@ -395,8 +393,8 @@ if __name__ == '__main__':
     no_auth = args.no_auth
     
     if no_auth:
-        demo.queue(concurrency_count=4).launch(share=False, server_port=7861, blocked_paths=[CREDENTIALS_FILE],
-                                               favicon_path='https://ai-forge.ch/favicon.ico')
+        demo.queue(default_concurrency_limit=4).launch(share=False, server_port=7861,
+                                                       favicon_path='https://ai-forge.ch/favicon.ico')
     else:
-        demo.queue(concurrency_count=4).launch(share=False, server_port=7861, auth=authentication,
-                                               blocked_paths=[CREDENTIALS_FILE], favicon_path='https://ai-forge.ch/favicon.ico')
+        demo.queue(default_concurrency_limit=4).launch(share=False, server_port=7861, auth=authentication,
+                                                       favicon_path='https://ai-forge.ch/favicon.ico')
