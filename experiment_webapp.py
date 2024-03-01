@@ -106,7 +106,7 @@ max_additional_new_tokens = gr.Slider(1, 500, value=100, step=1, label='Max addi
 
 
 # Define elements of the chatbot Tab
-prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt', lines=2)
+prompt_chat = gr.Textbox(placeholder='Write your prompt here.', label='Prompt')
 output_chat = gr.Chatbot(label='Conversation')
 generate_button_chat = gr.Button('Generate text', variant='primary')
 continue_button_chat = gr.Button('Continue last answer', variant='primary')
@@ -171,31 +171,33 @@ with demo:
 
 
     # Perform chat generation when clicking the button
-    generate_event1 = generate_button_chat.click(chat_generation, inputs=[conversation, *inputs_to_chatbot],
-                                                 outputs=[prompt_chat, conversation, output_chat])
+    generate_event1 = gr.on(triggers=[generate_button_chat.click, prompt_chat.submit], fn=chat_generation,
+                            inputs=[conversation, *inputs_to_chatbot], outputs=[prompt_chat, conversation, output_chat],
+                            concurrency_id='generation', concurrency_limit=4)
 
     # Add automatic callback on success (args[-1] is the username)
     generate_event1.success(lambda *args: LOGGERS[args[-1]].flag(args, flag_option=f'generation'),
-                            inputs=inputs_to_chat_callback, preprocess=False, queue=False)
+                            inputs=inputs_to_chat_callback, preprocess=False, queue=False, concurrency_limit=None)
     
     # Continue generation when clicking the button
     generate_event2 = continue_button_chat.click(continue_generation, inputs=[conversation, max_additional_new_tokens],
-                                                 outputs=[conversation, output_chat])
+                                                 outputs=[conversation, output_chat], concurrency_id='generation')
     
     # Add automatic callback on success (args[-1] is the username)
     generate_event2.success(lambda *args: LOGGERS[args[-1]].flag(args, flag_option=f'continuation'),
-                            inputs=inputs_to_chat_callback, preprocess=False, queue=False)
+                            inputs=inputs_to_chat_callback, preprocess=False, queue=False, concurrency_limit=None)
     
     # Clear the prompt and output boxes when clicking the button
     clear_button_chat.click(clear_chatbot, inputs=[username], outputs=[conversation, conv_id, prompt_chat, output_chat],
-                            queue=False)
+                            queue=False, concurrency_limit=None)
     
     # Correctly set all variables and callback at load time
-    loading_events = demo.load(loading, outputs=[conversation, conv_id, username, model_name, output_chat], queue=False)
+    loading_events = demo.load(loading, outputs=[conversation, conv_id, username, model_name, output_chat],
+                               queue=False, concurrency_limit=None)
     loading_events.then(lambda username: LOGGERS[username].setup(inputs_to_chat_callback, flagging_dir=f'chatbot_logs/{username}'),
-                        inputs=username, queue=False)
+                        inputs=username, queue=False, concurrency_limit=None)
 
 
 if __name__ == '__main__':
-    demo.queue(concurrency_count=4).launch(share=False, server_port=7860, auth=authentication,
-                                           blocked_paths=[CREDENTIALS_FILE], favicon_path='https://ai-forge.ch/favicon.ico')
+    demo.queue(default_concurrency_limit=None).launch(share=False, server_port=7860, auth=authentication,
+                                                      favicon_path='https://ai-forge.ch/favicon.ico')
