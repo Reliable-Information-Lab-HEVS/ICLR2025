@@ -337,7 +337,7 @@ with demo:
 
     # Perform simple text generation when clicking the button
     generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation,
-                                                 outputs=output_text, queue=False)
+                                                 outputs=output_text)
     # Add automatic callback on success
     generate_event1.success(lambda *args: LOGGERS_TEXT[args[3]].flag(args) if args[3] != '' else None,
                             inputs=inputs_to_text_callback, preprocess=False)
@@ -395,8 +395,8 @@ if __name__ == '__main__':
     no_auth = args.no_auth
     
     if no_auth:
-        demo.queue(concurrency_count=1).launch(share=False, server_port=7861, blocked_paths=[CREDENTIALS_FILE],
+        demo.queue(concurrency_count=4).launch(share=False, server_port=7861, blocked_paths=[CREDENTIALS_FILE],
                                                favicon_path='https://ai-forge.ch/favicon.ico')
     else:
-        demo.queue(concurrency_count=1).launch(share=False, server_port=7861, auth=authentication,
+        demo.queue(concurrency_count=4).launch(share=False, server_port=7861, auth=authentication,
                                                blocked_paths=[CREDENTIALS_FILE], favicon_path='https://ai-forge.ch/favicon.ico')
