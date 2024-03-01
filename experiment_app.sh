@@ -17,9 +17,9 @@ eval "$(conda shell.bash hook)"
 conda activate llm
 
 # Launch frpc server - note that the '&' is essential to run the command in a non-blocking way
-# srun --exclusive --exact --ntasks=1 --cpus-per-task=1 --mem=1G ../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc.toml &
-../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc.toml &
+# srun --exclusive --exact --ntasks=1 --cpus-per-task=1 --mem=1G ../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc_experiment.toml &
+../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc_experiment.toml &
 # Launch app
-python3 experiment_webapp.py
+python3 -u experiment_webapp.py
 
 conda deactivate
