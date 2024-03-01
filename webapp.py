@@ -337,7 +337,7 @@ with demo:
 
     # Perform simple text generation when clicking the button
     generate_event1 = generate_button_text.click(text_generation, inputs=inputs_to_simple_generation,
-                                                 outputs=output_text)
+                                                 outputs=output_text, queue=False)
     # Add automatic callback on success
     generate_event1.success(lambda *args: LOGGERS_TEXT[args[3]].flag(args) if args[3] != '' else None,
                             inputs=inputs_to_text_callback, preprocess=False)
