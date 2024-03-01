@@ -395,8 +395,8 @@ if __name__ == '__main__':
     no_auth = args.no_auth
     
     if no_auth:
-        demo.queue(concurrency_count=4).launch(share=False, server_port=7861, blocked_paths=[CREDENTIALS_FILE],
+        demo.queue(concurrency_count=1).launch(share=False, server_port=7861, blocked_paths=[CREDENTIALS_FILE],
                                                favicon_path='https://ai-forge.ch/favicon.ico')
     else:
-        demo.queue(concurrency_count=4).launch(share=False, server_port=7861, auth=authentication,
+        demo.queue(concurrency_count=1).launch(share=False, server_port=7861, auth=authentication,
                                                blocked_paths=[CREDENTIALS_FILE], favicon_path='https://ai-forge.ch/favicon.ico')
