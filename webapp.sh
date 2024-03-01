@@ -16,7 +16,8 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
-../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc_play.toml &
+srun --exclusive --exact --ntasks=1 --cpus-per-task=1 --mem=1G ../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc_play.toml &
+# ../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc_play.toml &
 python3 -u webapp.py "$@"
 
 conda deactivate
