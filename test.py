@@ -50,31 +50,6 @@ print(f'memory: {memories}')
 times = {}
 memories = {}
 
-for input_size in sizes:
-    prompt = model.tokenizer.decode(large_tokens[:input_size], skip_special_tokens=True)
-    gen_times = []
-    gen_mem = []
-
-    for i in range(N):
-        t0 = time.time()
-        torch.cuda.reset_peak_memory_stats()
-        actual_peak = torch.cuda.max_memory_allocated() / 1024**3
-
-        with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
-            foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
-
-        memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
-
-        gen_times.append(time.time() - t0)
-        gen_mem.append(memory_used)
-
-    times[input_size] = np.mean(gen_times)
-    memories[input_size] = np.mean(gen_mem)
-
-print('With flash')
-print(f'time: {times}')
-print(f'memory: {memories}')
-
 
 times = {}
 memories = {}
@@ -101,5 +76,57 @@ for input_size in sizes:
     memories[input_size] = np.mean(gen_mem)
 
 print('With math')
+print(f'time: {times}')
+print(f'memory: {memories}')
+
+
+for input_size in sizes:
+    prompt = model.tokenizer.decode(large_tokens[:input_size], skip_special_tokens=True)
+    gen_times = []
+    gen_mem = []
+
+    for i in range(N):
+        t0 = time.time()
+        torch.cuda.reset_peak_memory_stats()
+        actual_peak = torch.cuda.max_memory_allocated() / 1024**3
+
+        with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_math=False, enable_mem_efficient=True):
+            foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
+
+        memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
+
+        gen_times.append(time.time() - t0)
+        gen_mem.append(memory_used)
+
+    times[input_size] = np.mean(gen_times)
+    memories[input_size] = np.mean(gen_mem)
+
+print('With memory')
+print(f'time: {times}')
+print(f'memory: {memories}')
+
+
+for input_size in sizes:
+    prompt = model.tokenizer.decode(large_tokens[:input_size], skip_special_tokens=True)
+    gen_times = []
+    gen_mem = []
+
+    for i in range(N):
+        t0 = time.time()
+        torch.cuda.reset_peak_memory_stats()
+        actual_peak = torch.cuda.max_memory_allocated() / 1024**3
+
+        with torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False):
+            foo = model(prompt, num_return_sequences=1, batch_size=1, max_new_tokens=2)
+
+        memory_used = (torch.cuda.max_memory_allocated() / 1024**3) - actual_peak
+
+        gen_times.append(time.time() - t0)
+        gen_mem.append(memory_used)
+
+    times[input_size] = np.mean(gen_times)
+    memories[input_size] = np.mean(gen_mem)
+
+print('With flash')
 print(f'time: {times}')
 print(f'memory: {memories}')
