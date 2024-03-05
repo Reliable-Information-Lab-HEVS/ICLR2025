@@ -8,6 +8,8 @@ import TextWiz.textwiz.web_interface as wi
 from TextWiz.textwiz.web_interface import generator
 from helpers import utils
 
+# Disable analytics (can be set to anything except True really, we set it to False)
+os.environ['GRADIO_ANALYTICS_ENABLED'] = 'False'
 
 # Load model
 MODEL = HFModel('llama2-70B-chat')

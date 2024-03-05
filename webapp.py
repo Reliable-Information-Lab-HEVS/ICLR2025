@@ -11,6 +11,8 @@ import TextWiz.textwiz.web_interface as wi
 from TextWiz.textwiz.web_interface import generator
 from helpers import utils
 
+# Disable analytics (can be set to anything except True really, we set it to False)
+os.environ['GRADIO_ANALYTICS_ENABLED'] = 'False'
 
 # Default model to load at start-up
 DEFAULT = 'llama2-7B-chat' if torch.cuda.is_available() else 'bloom-560M'
