@@ -15,7 +15,7 @@ gc.collect()
 torch.cuda.empty_cache()
 # model.model = torch.compile(model.model)
 new_model = AutoModelForCausalLM.from_pretrained('codellama/CodeLlama-34b-Instruct-hf', torch_dtype=torch.bfloat16,
-                                             low_cpu_mem_usage=True, attn_implementation='flash_attention_2', device_map='auto')
+                                             low_cpu_mem_usage=True, attn_implementation='sdpa', device_map='auto')
 new_tokenizer = textwiz.load_tokenizer('code-llama-34B-instruct')
 # model = model.to_bettertransformer()
 model.model = new_model
