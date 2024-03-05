@@ -7,7 +7,8 @@ from transformers import AutoModelForCausalLM
 from TextWiz import textwiz
 from TextWiz.memory_estimator import LARGE_TEXT
 
-model = textwiz.HFModel('llama2-70B-chat')
+# model = textwiz.HFModel('llama2-70B-chat')
+model = textwiz.HFModel('code-llama-34B-instruct')
 # model.model = torch.compile(model.model)
 # new_model = AutoModelForCausalLM.from_pretrained('meta-llama/Llama-2-7b-chat-hf', torch_dtype=torch.bfloat16,
 #                                              low_cpu_mem_usage=True, attn_implementation='sdpa').cuda()
