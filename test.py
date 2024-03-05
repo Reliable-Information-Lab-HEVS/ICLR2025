@@ -156,16 +156,16 @@ Monkeys are not merely subjects of fascination; they are ambassadors of the wild
 """
 
 # model = textwiz.HFModel('llama2-70B-chat')
-model = textwiz.HFModel('code-llama-34B-instruct')
-model.model = None
-gc.collect()
-torch.cuda.empty_cache()
+# model = textwiz.HFModel('code-llama-34B-instruct')
+# model.model = None
+# gc.collect()
+# torch.cuda.empty_cache()
 # model.model = torch.compile(model.model)
-new_model = AutoModelForCausalLM.from_pretrained('codellama/CodeLlama-34b-Instruct-hf', torch_dtype=torch.bfloat16,
-                                             low_cpu_mem_usage=True, attn_implementation='flash_attention_2', device_map='auto')
+new_model = AutoModelForCausalLM.from_pretrained('codellama/CodeLlama-7b-Instruct-hf', torch_dtype=torch.bfloat16,
+                                             low_cpu_mem_usage=True, device_map='auto')
 # new_tokenizer = textwiz.load_tokenizer('code-llama-34B-instruct')
-# model = model.to_bettertransformer()
-model.model = new_model
+new_model = new_model.to_bettertransformer()
+# model.model = new_model
 # model.tokenizer = new_tokenizer
 model('Hello please do your magic', num_return_sequences=1, batch_size=1, max_new_tokens=2)
 
