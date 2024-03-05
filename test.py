@@ -162,7 +162,7 @@ Monkeys are not merely subjects of fascination; they are ambassadors of the wild
 # torch.cuda.empty_cache()
 # model.model = torch.compile(model.model)
 new_model = AutoModelForCausalLM.from_pretrained('codellama/CodeLlama-7b-Instruct-hf', torch_dtype=torch.bfloat16,
-                                             low_cpu_mem_usage=True, device_map='auto')
+                                             low_cpu_mem_usage=True, attn_implementation="flash_attention_2", device_map='auto')
 # new_tokenizer = textwiz.load_tokenizer('code-llama-34B-instruct')
 new_model = new_model.to_bettertransformer()
 # model.model = new_model
