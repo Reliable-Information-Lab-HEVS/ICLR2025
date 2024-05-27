@@ -30,7 +30,7 @@ def main(model: str, input_file: str, output_file: str, AATK_format: bool):
         for prompt in all_prompts:
             if not append_to_file:
                 output[prompt] = {}
-            output[prompt][model] = model.perplexity(prompt)
+            output[prompt][model.model_name] = model.perplexity(prompt)
 
     utils.save_json(output, output_file)
 

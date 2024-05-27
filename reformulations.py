@@ -118,7 +118,7 @@ def create_variations(model: HFCausalModel, original_prompt: str, N: int = 10, r
 def map_output_to_AATK_format(output_bank: list[dict]) -> list[dict]:
     """Map created variations to AATK format (mapping by id)"""
 
-    AATK_samples = datasets.AATK.samples_by_id()
+    AATK_samples = datasets.AATK().samples_by_id()
     out = []
     for sample in output_bank:
         aatk_sample = AATK_samples[sample['id']]
