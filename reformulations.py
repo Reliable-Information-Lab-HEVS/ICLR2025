@@ -1,34 +1,11 @@
-from TextWiz.textwiz import HFCausalModel, loader
-from helpers import utils
-
 import argparse
 import warnings
-import json
-import gc
 import os
 import re
+from tqdm import tqdm
 
-GENERATION_KWARGS = {
-    'max_new_tokens': 1024,
-    'min_new_tokens': 0,
-    'do_sample': True,
-    'temperature': 0.2,
-    'top_k': None,
-    'top_p': 0.95,
-    'num_return_sequences': 25,
-    'seed': 1234,
-    'truncate_prompt_from_output': True,
-}
-
-GREEDY_GENERATION_KWARGS = {
-    'max_new_tokens': 1024,
-    'min_new_tokens': 0,
-    'do_sample': False,
-    'num_return_sequences': 1,
-    'batch_size': 1,
-    'seed': 1234,
-    'truncate_prompt_from_output': True,
-}
+from TextWiz.textwiz import HFCausalModel, loader
+from helpers import utils, datasets
 
 
 class BadFormatException(Exception):
@@ -138,28 +115,35 @@ def create_variations(model: HFCausalModel, original_prompt: str, N: int = 10, r
     raise BadFormatException(f'Could not correctly generate {N} variations after {recursion_depth} tries.')
 
 
-def main(main_model: str, sub_model: str, input_file: str, output_file: str, existing_variations: bool,
-         N: int, generation_kwargs: dict):
+def map_output_to_AATK_format(output_bank: list[dict]) -> list[dict]:
+    """Map created variations to AATK format (mapping by id)"""
+
+    AATK_samples = datasets.AATK.samples_by_id()
+    out = []
+    for sample in output_bank:
+        aatk_sample = AATK_samples[sample['id']]
+        aatk_sample['intent'] = sample['original_prompt']
+        aatk_sample['intent_variations'] = sample['prompt_variations']
+        out.append(aatk_sample)
+
+    return out
+
+
+def main(model: str, input_file: str, output_file: str, N: int, map_to_AATK_format: bool):
     """Create `N` different versions of the prompts in `input_file`, and then use `main_model` to generate
     text based on those prompts and `generation_kwargs`. If `existing_variations` is True, ìnput_file` is assumed
     to already contain the prompts variations and they are not re-generated. Save results to `output_file`.
 
     Parameters
     ----------
-    main_model : str
-        The model to use to generate text based on the prompts.
-    sub_model : str
+    model : str
         The model to use to generate the prompt variations.
     input_file : str
         Path to the file containing the prompts.
     output_file : str
         Where to save the results.
-    existing_variations : bool
-        If `True`, the prompts variations are not recomputed.
     N : int
         How many prompts to generate.
-    generation_kwargs : dict
-        Generation parameters used by `main_model`.
     """
 
     # Make sure output file will be writable
@@ -174,78 +158,60 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, exi
             os.makedirs(dirname, exist_ok=True)
     output_file = os.path.join(dirname, basename)
 
-    # Load the prompts and create the variations
-    if not existing_variations:
-        prompts = utils.load_txt(input_file, separator='\n\n')
-        prompts = [prompt.strip() for prompt in prompts if prompt.strip() != '']
+    # Create variations
+    samples = utils.load_jsonl(input_file)
+    assert all(['prompt' in sample.keys() for sample in samples]), 'Input file format is incorrect'
 
-        sub_model = HFCausalModel(sub_model)
+    model = HFCausalModel(model)
 
-        prompt_bank = []
-        for prompt in prompts:
-            # Try to create the prompt variations
-            try:
-                variations = create_variations(sub_model, prompt, N)
-            except BadFormatException:
-                warnings.warn(f'Could not create {N} variations of the following prompt (ignoring it):\n{prompt}')
-                continue
+    output_bank = []
+    for sample in tqdm(samples):
+        prompt = sample['prompt']
+        # Try to create the prompt variations
+        try:
+            variations = create_variations(model, prompt, N)
+        except BadFormatException:
+            warnings.warn(f'Could not create {N} variations of the following prompt (ignoring it):\n{prompt}')
+            continue
 
-            # Compute the perplexity of each prompt
-            original_perplexity = sub_model.perplexity(prompt)
-            perplexities = [sub_model.perplexity(x) for x in variations]
-            # Add to the prompt bank
-            prompt_bank.append({'original_prompt': prompt, 'prompt': prompt, 'prompt_perplexity': original_perplexity})
-            prompt_bank.extend([{'original_prompt': prompt, 'prompt': x, 'prompt_perplexity': y} for x, y in zip(variations, perplexities)])
+        output_sample = {k:v for k,v in sample.items() if k != 'prompt'}
+        output_sample['original_prompt'] = prompt
+        output_sample['prompt_variations'] = variations
+        # Add to the output bank
+        output_bank.append(output_sample)
 
         # Save the generated prompts
-        basename, _ = os.path.splitext(input_file)
-        name = basename + '_extended.jsonl'
-        utils.save_jsonl(prompt_bank, name)
+        utils.save_jsonl(output_bank, output_file)
 
-        del sub_model
-        gc.collect()
+    if map_to_AATK_format:
+        # Save the generated prompts
+        output_bank = map_output_to_AATK_format(output_bank)
+        utils.save_jsonl(output_bank, output_file)
 
-    else:
-        prompt_bank = utils.load_jsonl(input_file)
-
-    # Perform inference on all the prompts
-    model = HFCausalModel(main_model)
-    for sample in prompt_bank:
-        prompt = sample['prompt']
-        outputs = model(prompt, **generation_kwargs)
-        sample['output'] = outputs
-        with open(output_file, 'a') as fp:
-            fp.write(json.dumps(sample) + '\n')
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Text generation')
-    parser.add_argument('model', type=str, choices=loader.ALLOWED_MODELS,
-                        help='The model to use for inference.')
+    parser.add_argument('model', type=str, choices=loader.ALLOWED_CAUSAL_MODELS,
+                        help='The model to use for the reformulations.')
     parser.add_argument('--input_file', type=str, required=True,
                         help='Path to the file containing the prompts.')
     parser.add_argument('--output_file', type=str, required=True,
                         help='A path to save the output file.')
-    parser.add_argument('--existing_variations', action='store_true',
-                        help='If given, `input_file` is assumed to already contain the prompt variations.')
-    # parser.add_argument('--sub_model', type=str, default='zephyr-7B-beta',
-    #                     help='The model to use to create prompt variations.')
-    parser.add_argument('--greedy', action='store_true',
-                        help='If given, will use greedy decoding for inference (i.e. only one completion per prompt).')
     parser.add_argument('--N', type=int, default=10,
                         help='How many variations of each prompt to create.')
+    parser.add_argument('--map_to_AATK_format', action='store_true',
+                        help='If given, try to map to the AATK dataset format.')
     
     args = parser.parse_args()
     main_model = args.model
-    # sub_model = args.sub_model
-    sub_model = 'zephyr-7B-beta'
+    model = args.model
     input_file = args.input_file
     output_file = args.output_file
-    generation_kwargs = GREEDY_GENERATION_KWARGS if args.greedy else GENERATION_KWARGS
-    existing_variations = args.existing_variations
     N = args.N
+    map_to_AATK_format = args.map_to_AATK_format
 
-    main(main_model=main_model, sub_model=sub_model, input_file=input_file, output_file=output_file,
-         existing_variations=existing_variations, N=N, generation_kwargs=generation_kwargs)
+    main(model=model, input_file=input_file, output_file=output_file, N=N,
+         map_to_AATK_format=map_to_AATK_format)
 
