@@ -59,7 +59,7 @@ def aatk_english_chatgpt_benchmark(model_name: str, quantization_8bits: bool = F
 
     print(f'{utils.get_time()}  Starting with model {model_name}')
 
-    model = textwiz.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+    model = textwiz.HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     folder = aatk.get_folder('AATK_english_chatGPT', model_name, model.dtype_category())
 
@@ -132,7 +132,7 @@ def aatk_english_zephyr_benchmark(model_name: str, quantization_8bits: bool = Fa
 
     print(f'{utils.get_time()}  Starting with model {model_name}')
 
-    model = textwiz.HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+    model = textwiz.HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     folder = aatk.get_folder('AATK_english_zephyr', model_name, model.dtype_category())
 

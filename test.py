@@ -155,8 +155,8 @@ Monkeys, these captivating creatures of the wild, offer us a unique lens through
 Monkeys are not merely subjects of fascination; they are ambassadors of the wild, beckoning us to protect and preserve the ecosystems they call home. In doing so, we honor our shared heritage and ensure a brighter future for all living creatures. Our commitment to the conservation of monkeys is not just a moral imperative; it is a testament to our dedication to preserving the wonders of the natural world for generations to come. In their presence, we find inspiration, wonder, and a reminder of the rich tapestry of life that is Earth's greatest treasure.
 """
 
-# model = textwiz.HFModel('llama2-70B-chat')
-# model = textwiz.HFModel('code-llama-34B-instruct')
+# model = textwiz.HFCausalModel('llama2-70B-chat')
+# model = textwiz.HFCausalModel('code-llama-34B-instruct')
 # model.model = None
 # gc.collect()
 # torch.cuda.empty_cache()

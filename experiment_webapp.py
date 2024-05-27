@@ -2,17 +2,16 @@ import os
 
 import gradio as gr
 
-from TextWiz.textwiz import HFModel
-from TextWiz.textwiz.conversation_template import GenericConversation
-import TextWiz.textwiz.web_interface as wi
-from TextWiz.textwiz.web_interface import generator
+from TextWiz.textwiz import HFCausalModel, GenericConversation
+import TextWiz.textwiz.webapp as wi
+from TextWiz.textwiz.webapp import generator
 from helpers import utils
 
 # Disable analytics (can be set to anything except True really, we set it to False)
 os.environ['GRADIO_ANALYTICS_ENABLED'] = 'False'
 
 # Load model
-MODEL = HFModel('llama2-70B-chat')
+MODEL = HFCausalModel('llama2-70B-chat')
 
 # File where the valid credentials are stored
 CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')

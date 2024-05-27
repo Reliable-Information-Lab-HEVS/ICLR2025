@@ -5,10 +5,10 @@ import argparse
 import torch
 import gradio as gr
 
-from TextWiz.textwiz import HFModel, loader
-from TextWiz.textwiz.conversation_template import GenericConversation
-import TextWiz.textwiz.web_interface as wi
-from TextWiz.textwiz.web_interface import generator
+from TextWiz.textwiz import HFCausalModel, loader
+from TextWiz.textwiz import GenericConversation
+import TextWiz.textwiz.webapp as wi
+from TextWiz.textwiz.webapp import generator
 from helpers import utils
 
 # Disable analytics (can be set to anything except True really, we set it to False)
@@ -18,7 +18,7 @@ os.environ['GRADIO_ANALYTICS_ENABLED'] = 'False'
 DEFAULT = 'llama2-7B-chat' if torch.cuda.is_available() else 'bloom-560M'
 
 # Initialize global model (necessary not to reload the model for each new inference)
-MODEL = HFModel(DEFAULT)
+MODEL = HFCausalModel(DEFAULT)
 
 # File where the valid credentials are stored
 CREDENTIALS_FILE = os.path.join(utils.ROOT_FOLDER, '.gradio_login.txt')
@@ -76,7 +76,7 @@ def update_model(conversation: GenericConversation, username: str, model_name: s
 
     # Try loading the model
     try:
-        MODEL = HFModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
+        MODEL = HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
     except Exception as e:
         raise gr.Error(f'The following error happened during loading: {repr(e)}. Please retry or choose another one.')
     

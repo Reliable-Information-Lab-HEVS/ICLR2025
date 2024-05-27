@@ -7,7 +7,7 @@ from transformers import AutoModelForCausalLM
 from TextWiz import textwiz
 from TextWiz.memory_estimator import LARGE_TEXT
 
-model = textwiz.HFModel('zephyr-7B-beta')
+model = textwiz.HFCausalModel('zephyr-7B-beta')
 new_model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/zephyr-7b-beta', torch_dtype=torch.bfloat16,
                                              low_cpu_mem_usage=True, attn_implementation='sdpa').cuda()
 # model = model.to_bettertransformer()

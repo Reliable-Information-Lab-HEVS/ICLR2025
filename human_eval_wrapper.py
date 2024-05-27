@@ -4,7 +4,7 @@ import time
 import torch
 
 from TextWiz import textwiz
-from TextWiz.textwiz.prompt_template import PROMPT_MODES
+from TextWiz.textwiz.templates.prompt_template import PROMPT_MODES
 from helpers import datasets
 from helpers import utils
 

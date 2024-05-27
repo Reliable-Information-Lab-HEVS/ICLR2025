@@ -1,4 +1,4 @@
-from TextWiz.textwiz import HFModel, loader
+from TextWiz.textwiz import HFCausalModel, loader
 from helpers import utils
 
 import argparse
@@ -85,13 +85,13 @@ def parse_output(output: str, N: int) -> list[str]:
     return formatted_prompts
 
 
-def create_variations(model: HFModel, original_prompt: str, N: int = 10, recursion_depth: int = 10) -> list[str]:
+def create_variations(model: HFCausalModel, original_prompt: str, N: int = 10, recursion_depth: int = 10) -> list[str]:
     """Use `model` to create `N` other formulations of `original_prompt`. This function will retry the generation
     of the prompts `recursion_depth` times if the parsing of the output is unsuccessful before abandoning.
 
     Parameters
     ----------
-    model : HFModel
+    model : HFCausalModel
         The model to use.
     original_prompt : str
         The original prompt to use.
@@ -179,7 +179,7 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, exi
         prompts = utils.load_txt(input_file, separator='\n\n')
         prompts = [prompt.strip() for prompt in prompts if prompt.strip() != '']
 
-        sub_model = HFModel(sub_model)
+        sub_model = HFCausalModel(sub_model)
 
         prompt_bank = []
         for prompt in prompts:
@@ -209,7 +209,7 @@ def main(main_model: str, sub_model: str, input_file: str, output_file: str, exi
         prompt_bank = utils.load_jsonl(input_file)
 
     # Perform inference on all the prompts
-    model = HFModel(main_model)
+    model = HFCausalModel(main_model)
     for sample in prompt_bank:
         prompt = sample['prompt']
         outputs = model(prompt, **generation_kwargs)

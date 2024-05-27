@@ -20,7 +20,7 @@ def memory_usage(past_key_values):
         return sum([memory_usage(x) for x in past_key_values])
     
 
-model = textwiz.HFModel('zephyr-7B-beta')
+model = textwiz.HFCausalModel('zephyr-7B-beta')
 # new_model = AutoModelForCausalLM.from_pretrained('HuggingFaceH4/zephyr-7b-beta', torch_dtype=torch.bfloat16,
 #                                              low_cpu_mem_usage=True, attn_implementation='sdpa').cuda()
 # model = model.to_bettertransformer()
