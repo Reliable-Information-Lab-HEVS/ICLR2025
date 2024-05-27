@@ -17,6 +17,8 @@ dependencies:
   - pip:
     # - transformers==4.33.1
     - git+https://github.com/Cyrilvallez/transformers.git@cache-efficiency
+    - tokenizers
+    - huggingface-hub
     - accelerate
     - optimum
     - gradio>=4.0.0
@@ -27,3 +29,5 @@ dependencies:
     # For flash attention 2
     - packaging
     - ninja
+    # needs to be run afterwards with the flag
+    # pip install flash-attn --no-build-isolation
