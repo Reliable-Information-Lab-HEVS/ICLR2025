@@ -31,6 +31,8 @@ def parse_output(output: str, N: int) -> list[str]:
         The `N` prompts if the parsing is successful.
     """
 
+    print(output)
+
     # Pattern that matches the enumeration format. We add the capturing group to also keep the separators
     prompts = re.split(r'((?:^|\n)[0-9]+\. )', output)
 
