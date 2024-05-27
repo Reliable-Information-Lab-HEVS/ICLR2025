@@ -305,12 +305,7 @@ if __name__ == '__main__':
     for file in tqdm(files):
         evaluate_security(file, n_workers=4)
 
-
-    files = aatk.extract_filenames(dataset='AATK_english_chatGPT', category='completions', only_unprocessed=True)
-    for file in tqdm(files):
-        evaluate_security_english(file, n_workers=4)
-
-
-    files = aatk.extract_filenames(dataset='AATK_english_zephyr', category='completions', only_unprocessed=True)
-    for file in tqdm(files):
-        evaluate_security_english(file, n_workers=4)
+    for dataset in ('AATK_english_chatGPT', 'AATK_english_zephyr'):
+        files = aatk.extract_filenames(dataset=dataset, category='completions', only_unprocessed=True)
+        for file in tqdm(files):
+            evaluate_security_english(file, n_workers=4)
