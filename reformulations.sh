@@ -14,7 +14,7 @@
 eval "$(conda shell.bash hook)"
 
 # Activate (local) env
-conda activate llm-playground
+conda activate llm
 
 python3 reformulations.py "$@"
 
