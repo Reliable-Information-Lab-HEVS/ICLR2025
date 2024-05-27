@@ -31,13 +31,11 @@ def parse_output(output: str, N: int) -> list[str]:
         The `N` prompts if the parsing is successful.
     """
 
-    print(output)
-
     # Pattern that matches the enumeration format. We add the capturing group to also keep the separators
     prompts = re.split(r'((?:^|\n)[0-9]+\. )', output)
 
-    # The split pattern usually creates a first empty string as it matches at the immediate beginning of output
-    if prompts[0] == '':
+    # First item in the list is usually "Here are the reformulations..."
+    if not prompts[0].startswith('1.'):
         prompts.pop(0)
 
     # Rejoin each separator and what is after it, and strip whitespaces
