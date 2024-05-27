@@ -205,7 +205,6 @@ if __name__ == '__main__':
                         help='If given, try to map to the AATK dataset format.')
     
     args = parser.parse_args()
-    main_model = args.model
     model = args.model
     input_file = args.input_file
     output_file = args.output_file

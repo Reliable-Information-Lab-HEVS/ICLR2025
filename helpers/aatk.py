@@ -6,11 +6,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from helpers import utils
+from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
 DATASETS = ['AATK', 'AATK_english_chatGPT', 'AATK_english_zephyr']
 CATEGORIES = ['completions', 'results']
+
+NAME_TO_SAMPLES_BY_ID = {
+    'AATK_english_chatGPT': datasets.AATKEnglishChatGPT().samples_by_id(),
+    'AATK_english_zephyr': datasets.AATKEnglishZephyr().samples_by_id(),
+}
 
 def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:
     """Return the folder upon which to save the results of the given AATK benchmark.
@@ -297,13 +302,30 @@ def get_cvss_scores() -> dict:
     return cvss
 
 
-def prompt_exposure(dataset: str = 'AATK_english_chatGPT', to_df: bool = True) -> dict | pd.DataFrame:
+def get_perplexity(model: str, dataset: str, id: str, prompt_id: str) -> float:
+    """Get the perplexity computed by the given `model`, for the given `id` and `prompt_id` in `dataset`."""
+    
+    file = os.path.join(utils.RESULTS_FOLDER, dataset, 'perplexities.json')
+    perplexities = utils.load_json(file)
+    sample = NAME_TO_SAMPLES_BY_ID[dataset][id]
+    if prompt_id == 'original':
+        prompt = sample['intent']
+    else:
+        _, index = prompt_id.split(' ', 1)
+        prompt = sample['intent_variations'][int(index)]
+    
+    return perplexities[prompt][model]
+
+
+def prompt_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str = 'zephyr-7B-beta', to_df: bool = True) -> dict | pd.DataFrame:
     """Compute the prompt exposure for each scenario.
 
     Parameters
     ----------
     dataset : str, optional
         The name of the dataset, by default 'AATK_english_chatGPT'
+    reference_model : str, optional
+        The model used to compute the perplexities, by default 'zephyr-7B-beta'.
     to_df : bool, optional
         Whether to convert output to dataframe, by default True
 
@@ -329,8 +351,9 @@ def prompt_exposure(dataset: str = 'AATK_english_chatGPT', to_df: bool = True) -
 
         for prompt in result:
             id = prompt['id']
+            prompt_id = prompt['prompt_id']
             id_frequency[id] += 1
-            Ry = 1 - sigmoid(prompt['perplexity'])
+            Ry = 1 - sigmoid(get_perplexity(reference_model, dataset, id, prompt_id))
             Py = 0 if prompt['valid'] == 0 else prompt['vulnerable'] / prompt['valid']
             CVSSy = cvss[id]
 
