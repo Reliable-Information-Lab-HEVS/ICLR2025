@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
     parser.add_argument('--int4', action='store_true',
-                        help='If given, will estimate the memory footprint of the model quantized to int4.'))
+                        help='If given, will estimate the memory footprint of the model quantized to int4.')
     
     args = parser.parse_args()
     reformulation_model = args.reformulation_model
