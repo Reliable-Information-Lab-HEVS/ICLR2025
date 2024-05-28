@@ -10,23 +10,17 @@ from helpers import utils
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='AATKEnglish benchmark')
-    parser.add_argument('--reformulation_model', type=str, choices=['chatGPT', 'zephyr'], default='chatGPT',
+    parser.add_argument('--reformulation_model', type=str, choices=['chatGPT', 'zephyr', 'llama3'], default='chatGPT',
                         help='Version of the AATK english benchmark (i.e. model used for reformulations)')
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
     parser.add_argument('--int4', action='store_true',
-                        help='If given, will estimate the memory footprint of the model quantized to int4.')
-    parser.add_argument('--big_models', action='store_true',
-                        help='If given, run the benchmark on large models that do not fit on a single gpu.')
-    parser.add_argument('--big_models_only', action='store_true',
-                        help='If given, only run the benchmark on large models that do not fit on a single gpu.')
+                        help='If given, will estimate the memory footprint of the model quantized to int4.'))
     
     args = parser.parse_args()
     reformulation_model = args.reformulation_model
     int8 = args.int8
     int4 = args.int4
-    big_models = args.big_models
-    big_models_only = args.big_models_only
 
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
@@ -37,15 +31,19 @@ if __name__ == '__main__':
     
     num_gpus = torch.cuda.device_count()
 
-    # Select chat models (only keep the good coders)
-    small_models = [model for model in textwiz.SMALL_GOOD_CODERS if textwiz.is_chat_model(model)]
-    large_models = [model for model in textwiz.LARGE_GOOD_CODERS if textwiz.is_chat_model(model)]
-    if big_models_only:
-        models = large_models
-    elif big_models:
-        models = small_models + large_models
-    else:
-        models = small_models
+    # Select models
+    models = [
+        'zephyr-7B-beta',
+        'mistral-7B-instruct-v2',
+        'starling-7B-beta',
+        'star-chat-alpha',
+        'llama3-8B-instruct',
+        'command-r',
+        'code-llama-34B-instruct',
+        'llama2-70B-chat',
+        'code-llama-70B-instruct',
+        'llama3-70B-instruct',
+    ]
 
     print(f'Launching computations with {num_gpus} gpus available.')
 

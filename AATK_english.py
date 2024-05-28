@@ -34,12 +34,14 @@ AATK_GREEDY_GENERATION_KWARGS = {
 REFORMULATION_MODEL_TO_DATASET = {
     'chatGPT': datasets.AATKEnglishChatGPT(),
     'zephyr': datasets.AATKEnglishZephyr(),
+    'llama3': datasets.AATKEnglishLlama3(),
 }
 
 
 REFORMULATION_MODEL_TO_DATASET_NAME = {
     'chatGPT': 'AATK_english_chatGPT',
     'zephyr': 'AATK_english_zephyr',
+    'llama3': 'AATK_english_llama3',
 }
 
 
@@ -68,13 +70,17 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
 
     if not textwiz.is_chat_model(model_name):
         raise ValueError('Cannot run AATKEnglish benchmark on non-chat model.')
+    
+    dtype_name = textwiz.dtype_category(model_name, quantization_4bits, quantization_8bits)
+    folder = aatk.get_folder(REFORMULATION_MODEL_TO_DATASET_NAME[reformulation_model], model_name, dtype_name)
+    # In this case, immediately return
+    if all(os.path.exists(os.path.join(folder, f'temperature_{temperature}.jsonl')) for temperature in temperatures):
+        print(f'The benchmark for {model_name} already exists.')
+        return
 
     print(f'{utils.get_time()}  Starting with model {model_name}')
 
     model = textwiz.HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
-
-    folder = aatk.get_folder(REFORMULATION_MODEL_TO_DATASET_NAME[reformulation_model], model_name, model.dtype_category())
-
     dataset = REFORMULATION_MODEL_TO_DATASET[reformulation_model]
 
     t0 = time.time()
@@ -105,7 +111,7 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
                                         stopping_patterns=None, **generation_kwargs)
                     
                 # Remove trailing whitespaces
-                completions = [completion.rstrip() for completion in completions]
+                completions = [completion.strip() for completion in completions]
             
                 results = [{'id': id, 'prompt': prompt, 'prompt_id': prompt_name, 'completion': completion} for completion in completions]
                 utils.save_jsonl(results, filename, append=True)
@@ -120,7 +126,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='AATK english benchmark')
     parser.add_argument('model', type=str,
                         help='The model to run.')
-    parser.add_argument('--reformulation_model', type=str, choices=['chatGPT', 'zephyr'], default='chatGPT',
+    parser.add_argument('--reformulation_model', type=str, choices=['chatGPT', 'zephyr', 'llama3'], default='chatGPT',
                         help='Version of the AATK english benchmark (i.e. model used for reformulations)')
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
