@@ -9,12 +9,13 @@ import seaborn as sns
 from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
-DATASETS = ['AATK', 'AATK_english_chatGPT', 'AATK_english_zephyr']
+DATASETS = ['AATK', 'AATK_english_chatGPT', 'AATK_english_zephyr', 'AATK_english_llama3']
 CATEGORIES = ['completions', 'results']
 
 NAME_TO_SAMPLES_BY_ID = {
     'AATK_english_chatGPT': datasets.AATKEnglishChatGPT().samples_by_id(),
     'AATK_english_zephyr': datasets.AATKEnglishZephyr().samples_by_id(),
+    'AATK_english_llama3': datasets.AATKEnglishLlama3().samples_by_id(),
 }
 
 def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:
@@ -304,17 +305,21 @@ def get_cvss_scores() -> dict:
 
 def get_perplexity(model: str, dataset: str, id: str, prompt_id: str) -> float:
     """Get the perplexity computed by the given `model`, for the given `id` and `prompt_id` in `dataset`."""
+
+    try:
+        file = os.path.join(utils.RESULTS_FOLDER, dataset, 'perplexities.json')
+        perplexities = utils.load_json(file)
+        sample = NAME_TO_SAMPLES_BY_ID[dataset][id]
+        if prompt_id == 'original':
+            prompt = sample['intent']
+        else:
+            _, index = prompt_id.split(' ', 1)
+            prompt = sample['intent_variations'][int(index)]
+        
+        return perplexities[prompt][model]
     
-    file = os.path.join(utils.RESULTS_FOLDER, dataset, 'perplexities.json')
-    perplexities = utils.load_json(file)
-    sample = NAME_TO_SAMPLES_BY_ID[dataset][id]
-    if prompt_id == 'original':
-        prompt = sample['intent']
-    else:
-        _, index = prompt_id.split(' ', 1)
-        prompt = sample['intent_variations'][int(index)]
-    
-    return perplexities[prompt][model]
+    except (FileNotFoundError, KeyError):
+        raise RuntimeError(f'It seems that perplexities were not computed with {model} on the dataset {dataset}')
 
 
 def prompt_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str = 'zephyr-7B-beta', to_df: bool = True) -> dict | pd.DataFrame:

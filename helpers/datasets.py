@@ -123,3 +123,12 @@ class AATKEnglishZephyr(SampleDataset):
     id_key: str = 'id'
 
 
+class AATKEnglishLlama3(SampleDataset):
+    """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
+    Also contains the prompts in natural language (english).
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english_llama3.jsonl')
+    id_key: str = 'id'
+
+
