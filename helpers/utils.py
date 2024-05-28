@@ -8,7 +8,7 @@ import textwrap
 import subprocess
 import shlex
 import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor
+from tqdm import tqdm
 from typing import Callable, TypeVar, ParamSpec
 
 import numpy as np
@@ -631,7 +631,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
     gpus contained in `gpu_footprints`. The dispatch of models to gpus is very naive: as soon as enough gpus
     are available to run the job that requires the less gpu, we launch it. Thus the gpu efficiency may not be the
     best possible. However, this would be extremely hard to improve on this simple strategy, especially since we do
-    not know the runtime of each job.
+    not know how long each job will run.
 
     This function is a bit more tedious to use compared to `dispatch_jobs` (which uses multiprocessing), because it
     needs an additional wrapper script around a python executable actually running the function we want. However,
@@ -684,6 +684,9 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
     processes = []
     associated_gpus = []
 
+    # Custom tqdm bar since we use an infinite while loop
+    progress_bar = tqdm(total=len(commands), file=sys.stdout)
+
     while True:
 
         no_sleep = False
@@ -728,6 +731,8 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
             # Remove processes which are done
             processes = [process for i, process in enumerate(processes) if i not in indices_to_remove]
             associated_gpus = [gpus for i, gpus in enumerate(associated_gpus) if i not in indices_to_remove]
+            # Update progress bar
+            progress_bar.update(len(indices_to_remove))
 
         # If we scheduled all jobs, break from the infinite loop
         if len(gpu_footprints) == 0:
@@ -741,6 +746,11 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
     # Sleep until all processes are finished (they have all been scheduled at this point)
     for process in processes:
         process.wait()
+        # Update when process is finished waiting
+        progress_bar.update(1)
+
+    # Close the progress bar
+    progress_bar.close()
 
 
     
