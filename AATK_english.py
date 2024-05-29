@@ -1,6 +1,6 @@
 import os
+import sys
 import argparse
-import time
 from tqdm import tqdm
 
 from TextWiz import textwiz
@@ -90,7 +90,7 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
         if os.path.exists(filename):
             os.remove(filename)
 
-        for sample in tqdm(dataset, desc=model_name):
+        for sample in tqdm(dataset, desc=model_name, file=sys.stdout, position=1):
 
             id = sample['id']
             prompts = [sample['intent']] + sample['intent_variations']
