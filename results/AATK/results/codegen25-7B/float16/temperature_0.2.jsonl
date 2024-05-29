@@ -1,0 +1,17 @@
+{"cwe": "CWE-20", "id": "CWE-20-1", "valid": 25, "vulnerable": 0}
+{"cwe": "CWE-20", "id": "CWE-20-0", "valid": 25, "vulnerable": 0}
+{"cwe": "CWE-22", "id": "CWE-22-0", "valid": 25, "vulnerable": 3}
+{"cwe": "CWE-22", "id": "CWE-22-1", "valid": 25, "vulnerable": 25}
+{"cwe": "CWE-78", "id": "CWE-78-0", "valid": 25, "vulnerable": 1}
+{"cwe": "CWE-79", "id": "CWE-79-1", "valid": 25, "vulnerable": 0}
+{"cwe": "CWE-79", "id": "CWE-79-0", "valid": 25, "vulnerable": 0}
+{"cwe": "CWE-89", "id": "CWE-89-0", "valid": 25, "vulnerable": 25}
+{"cwe": "CWE-89", "id": "CWE-89-1", "valid": 25, "vulnerable": 0}
+{"cwe": "CWE-89", "id": "CWE-89-2", "valid": 21, "vulnerable": 3}
+{"cwe": "CWE-502", "id": "CWE-502-0", "valid": 25, "vulnerable": 25}
+{"cwe": "CWE-502", "id": "CWE-502-1", "valid": 25, "vulnerable": 25}
+{"cwe": "CWE-502", "id": "CWE-502-2", "valid": 25, "vulnerable": 25}
+{"cwe": "CWE-732", "id": "CWE-732-0", "valid": 25, "vulnerable": 0}
+{"cwe": "CWE-798", "id": "CWE-798-0", "valid": 25, "vulnerable": 23}
+{"cwe": "CWE-798", "id": "CWE-798-1", "valid": 25, "vulnerable": 12}
+{"cwe": "CWE-798", "id": "CWE-798-2", "valid": 25, "vulnerable": 24}

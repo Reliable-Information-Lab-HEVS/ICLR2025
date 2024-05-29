@@ -1,0 +1,164 @@
+{"task_id": "HumanEval/0", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/1", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/2", "completion": "\n    \"\"\"\n    >>> truncate_number(3.", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 28) (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/3", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/4", "completion": "\n    ", "passed": false, "result": "unsupported operand type(s) for -: 'NoneType' and 'float'", "exception": "TypeError"}
+{"task_id": "HumanEval/5", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/6", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/7", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/8", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/9", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/10", "completion": "\n    \"\"\" Make a palindrome \"\"\"\n    return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/11", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/12", "completion": "\n    if not strings:\n        return None\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/13", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/14", "completion": "", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/15", "completion": "\n    return''.join(", "passed": false, "result": "'(' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/16", "completion": "\n    \"\"\"\n    ", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 28) (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/17", "completion": "\n    return [int(", "passed": false, "result": "'(' was never closed (<string>, line 18)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/18", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/19", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/20", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/21", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/22", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/23", "completion": "\n    \"\"\"\n", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 26) (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/24", "completion": "\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/25", "completion": "\n    factors = []\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/26", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/27", "completion": "\n    return string.", "passed": false, "result": "invalid syntax (<string>, line 9)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/28", "completion": "\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/29", "completion": "", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/30", "completion": "\n    return [i for i in l if i", "passed": false, "result": "'[' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/31", "completion": "\n    if n < 2:\n        return False\n    if n == 2", "passed": false, "result": "expected ':' (<string>, line 23)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/32", "completion": "\n    return poly(xs, 0)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/33", "completion": "\n    \"\"\"\n    >>> sort_third([1, 2, 3])\n    [1, 2, 3]", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 31) (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/34", "completion": "\n    \"\"\"\n    >>> unique([5, 3, 5", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 20) (<string>, line 9)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/35", "completion": "\n    \"\"\"\n    >>> max_element([1, 2", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 22) (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/36", "completion": "\n    if n % 11 == 0:\n        ", "passed": false, "result": "expected an indented block after 'if' statement on line 13 (<string>, line 17)", "exception": "IndentationError"}
+{"task_id": "HumanEval/37", "completion": "\n    \"\"\"\n    >>> sort_even([1, 2, 3])\n    [1,", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 27) (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/38", "completion": "\n    \"\"\"\n    returns decoded string by cycling groups of three characters.\n    \"\"\"\n    #", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/39", "completion": "\n    if n < 2:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/40", "completion": "\n    return sum(l) == 0", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/41", "completion": "\n    if n == 1:\n        return 0\n    else:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/42", "completion": "\n    \"\"\"\n    >>> incr_list([1, 2, 3])\n", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 25) (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/43", "completion": "\n    return sum(l) == 0\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/44", "completion": "\n    if base < 10:\n        return str(x", "passed": false, "result": "'(' was never closed (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/45", "completion": "\n    return a * h", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/46", "completion": "\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n    return fib4(n", "passed": false, "result": "'(' was never closed (<string>, line 23)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/47", "completion": "\n    if len(l) % 2 == 0:\n        ", "passed": false, "result": "expected an indented block after 'if' statement on line 11 (<string>, line 15)", "exception": "IndentationError"}
+{"task_id": "HumanEval/48", "completion": "\n    \"\"\"\n    >>> is_palindrome('", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 33) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/49", "completion": "\n    if n < 0:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/50", "completion": "\n    \"\"\"\n    returns decoded string by shifting every character by 5 in the alphabet.\n    \"\"\"\n    return \"\".join([chr(((ord(ch) - ord(\"a\")) % 26) + ord(\"a\")) for ch in s])\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/51", "completion": "\n    return text.translate(str.maketrans('', '", "passed": false, "result": "unterminated string literal (detected at line 20) (<string>, line 20)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/52", "completion": "\n    for i in l:\n        ", "passed": false, "result": "expected an indented block after 'for' statement on line 11 (<string>, line 15)", "exception": "IndentationError"}
+{"task_id": "HumanEval/53", "completion": "\n    return x +", "passed": false, "result": "invalid syntax (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/54", "completion": "\n    return s0.count(s1", "passed": false, "result": "'(' was never closed (<string>, line 20)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/55", "completion": "\n    if n == 1 or n", "passed": false, "result": "expected ':' (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/56", "completion": "\n    \"\"\"\n    >>> correct_bracketing(\"<>\")\n    ", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 40) (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/57", "completion": "\n    if len(l) == 0:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/58", "completion": "\n    return sorted(set(l1) & set(l", "passed": false, "result": "'(' was never closed (<string>, line 12)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/59", "completion": "\n    if n == 1:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/60", "completion": "\n    return n + sum(", "passed": false, "result": "'(' was never closed (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/61", "completion": "\n    stack = []\n    for bracket in brackets:\n        if bracket == \"(\":\n            stack.append", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/62", "completion": "\n    if len(xs) == 0:\n        return []\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/63", "completion": "\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n    return fibfib(n", "passed": false, "result": "'(' was never closed (<string>, line 22)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/64", "completion": "\n    ", "passed": false, "result": "Test 1", "exception": "AssertionError"}
+{"task_id": "HumanEval/65", "completion": "\n    if shift > len(str(x)):\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/66", "completion": " int = {\n    var sum = 0\n    for (var i = 0; i < s.length", "passed": false, "result": "unindent does not match any outer indentation level (<string>, line 15)", "exception": "IndentationError"}
+{"task_id": "HumanEval/67", "completion": "\n    count = 0\n    for i in range(len(s)):\n        if s[i] == 'a':\n            count += 1\n    return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/68", "completion": "\n    \"\"\"\n    :type arr: List[int]\n    :rtype: List[int]\n    \"\"\"\n    ", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/69", "completion": "\n    if len(lst) == 0:\n        return -1\n    else:\n        return max(", "passed": false, "result": "'(' was never closed (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/70", "completion": "\n    \"\"\"\n    :type lst: List[int]\n    :rtype: List", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 34) (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/71", "completion": "\n    return a * b", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/72", "completion": "\n    if len(q) == 0:\n        return False\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/73", "completion": "\n    \"\"\"\n    :type arr: List[int]\n    :rtype: int\n    \"\"\"\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/74", "completion": "\n    if len(lst1) == 0 or len(lst2) == 0:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/75", "completion": "\n    if a < 100:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/76", "completion": "\n    if n == 0:\n        return True\n    if n == 1:\n        return", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/77", "completion": "\n    if a < 0:\n        return False\n    if a == 0:\n        return", "passed": false, "result": "First test error: None", "exception": "AssertionError"}
+{"task_id": "HumanEval/78", "completion": "\n    \"\"\"\n    Write a function hex_key(num) to solve the following problem:\n    You have been tasked to write a function that receives a hexadecimal number as a string and counts the number of hexadecimal digits that are primes (prime number, or a prime, is a natural number greater than 1 that is not a product of two smaller natural numbers).\n    Hexadecimal digits are 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F.\n    \"\"\"\n    return len(num) - len(num.lstrip(\"0\"))\n", "passed": false, "result": "First test error: 0", "exception": "AssertionError"}
+{"task_id": "HumanEval/79", "completion": "\n    binary = \"\"\n    while decimal > 0:\n        binary = str(decimal % 2) + binary\n        decimal =", "passed": false, "result": "invalid syntax (<string>, line 18)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/80", "completion": "\n    if len(s) < 3:\n        return False\n    ", "passed": false, "result": "abcd", "exception": "AssertionError"}
+{"task_id": "HumanEval/81", "completion": "\n    \"\"\"\n    >>> numerical_letter_grade([4.0, 3, 1.7, 2, 3.5", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 44) (<string>, line 28)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/82", "completion": "\n    if len(string) == 1:\n        return False\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/83", "completion": "\n    count = 0\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/84", "completion": "\n    if N < 0:\n        return \"0\"\n    if N == 0:\n        return \"0\"", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/85", "completion": "\n    for i in range(len(lst)", "passed": false, "result": "'(' was never closed (<string>, line 10)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/86", "completion": "\n    \"\"\"\n    :type s: str\n    :rtype: str\n    \"\"\"\n    return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/87", "completion": "\n    \"\"\"\n    :type lst: list\n    :type x: int\n    :rtype: list\n    \"\"\"\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/88", "completion": "\n    if len(array) == 0:\n        return []\n    if len(array) == 1:\n        return", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/89", "completion": "\n    return ''.join(sorted(s))\n", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/90", "completion": "\n    if len(lst) == 0:\n        return None\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/91", "completion": "\n    \"\"\"\n    :type S: str\n    :rtype: int\n    \"\"\"\n", "passed": false, "result": "Test 1", "exception": "AssertionError"}
+{"task_id": "HumanEval/92", "completion": "\n    if x == y and y == z:\n        return True\n    ", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/93", "completion": "\n    return message.translate(None, 'abcdefghijklmnopqrstuv", "passed": false, "result": "unterminated string literal (detected at line 17) (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/94", "completion": "\n    max = 0\n    for i in lst:\n        if i > max:\n            max = i", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/95", "completion": "\n    for key in dict:\n        if type(dict[key]) is str:\n            if key.lower() in dict", "passed": false, "result": "expected ':' (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/96", "completion": "\n    res = []\n    for i in range(n):\n        if i+1 in primes:\n            res.append(i+1", "passed": false, "result": "'(' was never closed (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/97", "completion": "\n    return a * b\n", "passed": false, "result": "First test error: 60976", "exception": "AssertionError"}
+{"task_id": "HumanEval/98", "completion": "\n    count = 0\n    for i in range(len(s)", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/99", "completion": "\n    \"\"\"\n    >>> closest_integer(\"10\")\n    10\n    >>> closest_integer(\"15.3\")\n    15\n    ", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 39) (<string>, line 21)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/100", "completion": "\n    if n % 2 == 0:\n        return [n, n", "passed": false, "result": "'[' was never closed (<string>, line 18)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/101", "completion": "\n    words = []\n    for word in s.split(\",\"):\n        words.append(word.strip", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/102", "completion": "\n    if x % 2 == 0:\n        return x // 2\n    else:", "passed": false, "result": "expected an indented block after 'else' statement on line 14 (<string>, line 15)", "exception": "IndentationError"}
+{"task_id": "HumanEval/103", "completion": "\n    if n > m:\n        return -1\n    return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/104", "completion": "\n    \"\"\"\n    >>> unique_digits([15, 33, 1422, 1", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 29) (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/105", "completion": "\n    if len(arr) == 0:\n        return []\n    else:\n        return [arr[", "passed": false, "result": "'[' was never closed (<string>, line 28)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/106", "completion": "\n    if n % 2 == 0:\n        return [n, n * 2]\n    else:\n        return [n", "passed": false, "result": "'[' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/107", "completion": "\n    if n % 2 == 0:\n        return (n, n", "passed": false, "result": "'(' was never closed (<string>, line 27)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/108", "completion": "\n    count = 0\n    for i in arr:\n        if i > 0:\n            count +=", "passed": false, "result": "invalid syntax (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/109", "completion": "\n    n = len(arr)\n    for i in range(n):\n        ", "passed": false, "result": "expected an indented block after 'for' statement on line 31 (<string>, line 33)", "exception": "IndentationError"}
+{"task_id": "HumanEval/110", "completion": "\n    \"\"\"\n    :type lst1: List[int]\n    :type lst2: List[int]\n    :rtype:", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 34) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/111", "completion": "\n    d = {}\n    for i in test:\n        if i in d:\n            d[i] += 1\n        else:\n            d[i]", "passed": false, "result": "'a'", "exception": "KeyError"}
+{"task_id": "HumanEval/112", "completion": "\n    s = s.rstrip()\n    c = c.rstrip()\n    return s", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/113", "completion": "\n    odd_count = 0\n    for i in lst:\n        if i % 2 == 0:\n            odd_count +=", "passed": false, "result": "invalid syntax (<string>, line 18)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/114", "completion": "\n    \"\"\"\n    :type nums: List[", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 31) (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/115", "completion": " to solve the following problem:\nYou are given a rectangular grid of wells. Each row represents a single well,\nand each 1 in a row represents a single unit of water.\nEach well has a corresponding bucket that can be used to extract water from it,\nand all buckets have the same capacity.\nYour task is to use the buckets to empty the wells.\n", "passed": false, "result": "unindent does not match any outer indentation level (<string>, line 37)", "exception": "IndentationError"}
+{"task_id": "HumanEval/116", "completion": "\n    \"\"\"\n    >>> sort_array([1, 5, 2, 3, 4]) == [1, 2, 3, 4, 5]\n    ", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 34) (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/117", "completion": "\n    words = []\n    for i in range(len(s)):\n        if s[i] in", "passed": false, "result": "invalid syntax (<string>, line 18)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/118", "completion": "\n    \"\"\"\n    :type word: str\n    :rtype: str\n    \"\"\"\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/119", "completion": "\n    \"\"\"\n    :type lst: List[str]\n    :rtype: str\n    \"\"\"\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/120", "completion": "\n    \"\"\"\n    :type arr: List[int]\n    :type k: int\n    :rtype: List[int]\n    \"\"\"\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/121", "completion": "\n    odd_sum = 0\n    even_sum = 0\n    for i in l", "passed": false, "result": "expected ':' (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/122", "completion": "\n    \"\"\"\n    :type arr: List[int]\n    :type k:", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 32) (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/123", "completion": "\n    if n % 2 == 0:\n        return [n]\n    else:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/124", "completion": "\n    if len(date) == 10:\n        return True\n    elif len(date) ==", "passed": false, "result": "invalid syntax (<string>, line 25)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/125", "completion": "\n    return [word.lower() for word in txt.split() if word.", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/126", "completion": "\n    if len(lst) <= 1:\n        return True\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/127", "completion": "\n    if interval1[0] <= interval2[1] and interval2[0] <= interval1[", "passed": false, "result": "'[' was never closed (<string>, line 23)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/128", "completion": "\n    if len(arr) == 0:\n        return None\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/129", "completion": "\n    \"\"\"\n    :type grid: List[List[int]]\n    :type k:", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 55) (<string>, line 33)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/130", "completion": "\n    if n == 0:\n        return [0]\n    if n == 1:\n        return [1]\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/131", "completion": "\n    if n % 2 == 0:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/132", "completion": "\n    stack = []\n    for char in string:\n        if char == '[':\n            stack.append(char)\n        elif char ==", "passed": false, "result": "invalid syntax (<string>, line 20)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/133", "completion": "\n    return sum(map(lambda x: x**2, lst", "passed": false, "result": "'(' was never closed (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/134", "completion": "\n    return txt[-1] in", "passed": false, "result": "invalid syntax (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/135", "completion": "\n    if len(arr) == 0:\n        return -1\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/136", "completion": "\n    if len(lst) == 0:\n        return None\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/137", "completion": "\n    if a == b:\n        return a\n    elif a > b:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/138", "completion": "\n    if n % 2 == 0:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/139", "completion": "\n    if n == 0:\n        return 1\n    return n", "passed": false, "result": "Test 4", "exception": "AssertionError"}
+{"task_id": "HumanEval/140", "completion": "\n    return text.replace(\" \", \"-\")\n", "passed": false, "result": "This prints if this assert fails 2 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/141", "completion": "\n    if len(file_name) < 3:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/142", "completion": "\n    \"\"\"\n    >>> sum_squares([1,2,3])\n    6\n    >>> sum_squares([", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 39) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/143", "completion": "\n    words = []\n    for word in sentence.split():\n        if len(word) >", "passed": false, "result": "invalid syntax (<string>, line 25)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/144", "completion": "\n    if x == \"\":\n        return True\n    if x[0] == \"0\":\n        return", "passed": false, "result": "test1", "exception": "AssertionError"}
+{"task_id": "HumanEval/145", "completion": "\n    \"\"\"\n    >>> order_by_points([1, 11, -1, -11, -12", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 30) (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/146", "completion": "\n    odd_nums = []\n    for num in nums:\n        if num %", "passed": false, "result": "invalid syntax (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/147", "completion": "\n    a = [1] * n\n    for i in range(1, n):\n        a[i] = i", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/148", "completion": "\n    if planet1 == \"Sun\":\n        return \"Sun\", \"Earth\", \"Mars\", \"Jupiter\", \"Saturn\"\n    elif planet2 == \"Sun\":\n        return \"Sun\", \"Earth\", \"Mars\", \"Jupiter\", \"Saturn\"\n    else:\n        return", "passed": false, "result": "object of type 'NoneType' has no len()", "exception": "TypeError"}
+{"task_id": "HumanEval/149", "completion": "\n    \"\"\"\n    :type lst: List[str]\n    :rtype: List[str]\n    \"\"\"\n    return sorted(lst", "passed": false, "result": "'(' was never closed (<string>, line 22)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/150", "completion": "\n    if n % x == 0:\n        ", "passed": false, "result": "expected an indented block after 'if' statement on line 12 (<string>, line 14)", "exception": "IndentationError"}
+{"task_id": "HumanEval/151", "completion": "\n    if len(lst) == 0:\n        return 0\n    ", "passed": false, "result": "This prints if this assert fails 2 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/152", "completion": "\n    if len(game) == len(guess):\n        return 0\n    ", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/153", "completion": "\n    \"\"\"\n    :type class_name: str\n    :type extensions: List[str]\n    :rtype: str\n    \"\"\"\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/154", "completion": "\n    if a in b:\n        return True\n    else:\n        return False", "passed": false, "result": "test #1", "exception": "AssertionError"}
+{"task_id": "HumanEval/155", "completion": "\n    if num % 2 == 0:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/156", "completion": "\n    roman = ''\n    while number > 0:\n        roman +=", "passed": false, "result": "invalid syntax (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/157", "completion": "\n    if a == b and b == c:\n        return", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/158", "completion": "\n    max_count = 0\n    for word in words:\n        if len(word) > max_count:\n            max_count = len(word", "passed": false, "result": "'(' was never closed (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/159", "completion": "\n    if number == need:\n        return [number, remaining]\n    ", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/160", "completion": "\n    result = 0\n    for i in range(len(operand)):\n        result += operator[i]", "passed": false, "result": "unsupported operand type(s) for +=: 'int' and 'str'", "exception": "TypeError"}
+{"task_id": "HumanEval/161", "completion": "\n    if s[0] == '#", "passed": false, "result": "unterminated string literal (detected at line 14) (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/162", "completion": "\n    \"\"\"\n    >>> string_to_md5('", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 24) (<string>, line 10)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/163", "completion": "\n    return [i for i in range(a, b + 1", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}

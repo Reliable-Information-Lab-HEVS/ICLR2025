@@ -6,6 +6,4 @@ test.ipynb
 .gradio_login.txt
 .snippet_bin
 .hf_token.txt
-results
-old_results
 plots

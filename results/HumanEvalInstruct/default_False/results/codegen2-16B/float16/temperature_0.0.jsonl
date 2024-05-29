@@ -1,0 +1,164 @@
+{"task_id": "HumanEval/0", "completion": "\n    for i in range(len(numbers) - 1):\n        if numbers[i] - numbers[i + 1] < threshold:\n            return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/1", "completion": "\n    pass\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/2", "completion": "\n    return number - int(number)\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/3", "completion": "\n    for i in operations:\n        if i < 0:\n            return True\n    return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/4", "completion": "\n    return sum(abs(x - numbers.mean()) for x in numbers", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/5", "completion": "\n    return [delimeter] + [n for n in numbers if n!= delimeter]", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/6", "completion": "\n    pass\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/7", "completion": "\n    return [string for string in strings if substring in string]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/8", "completion": "\n    return sum(numbers), reduce(lambda x, y: x * y, numbers", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/9", "completion": "\n    pass\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/10", "completion": "\n    \"\"\" Find the shortest palindrome that begins with a supplied string \"\"\"\n    return string + string[::-1", "passed": false, "result": "'[' was never closed (<string>, line 22)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/11", "completion": "\n    return ''.join(chr(ord(a) ^ ord(b))", "passed": false, "result": "'(' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/12", "completion": "\n    if strings:\n        return max(strings, key=len)\n    ", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/13", "completion": "\n    \"\"\"\n    return a if a > b else greatest_common_divisor(b, a", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 27) (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/14", "completion": "\n   ...\n\"\"\"\n", "passed": false, "result": "unindent does not match any outer indentation level (<string>, line 10)", "exception": "IndentationError"}
+{"task_id": "HumanEval/15", "completion": "\n    return''.join(str(i) for i in range(n", "passed": false, "result": "'(' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/16", "completion": "\n    return len(set(string))\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/17", "completion": "\n    pass\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/18", "completion": "\n    return len(string) - len(string.replace(substring, ''", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/19", "completion": "\n    return''.join(sorted(numbers.split()))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/20", "completion": "\n   ...\n\"\"\"\n\n__test__ = {name: value for name, value in locals().items() if name.startswith(\"test_\")", "passed": false, "result": "unindent does not match any outer indentation level (<string>, line 13)", "exception": "IndentationError"}
+{"task_id": "HumanEval/21", "completion": "\n    return [0.0 if x < min(numbers) else 1.0 for x in numbers", "passed": false, "result": "'[' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/22", "completion": "\n    return [value for value in values if isinstance(value, int)]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/23", "completion": "\n    return len(string)\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/24", "completion": "\n    for i in range(1, n):\n        if n % i == 0:\n            return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/25", "completion": "\n    pass\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/26", "completion": "\n    return list(set(numbers))\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/27", "completion": "\n    return string.swapcase()\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/28", "completion": "\n    return ''.join(strings)\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/29", "completion": "\n    return [string for string in strings if string.startswith(prefix)]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/30", "completion": "\n    return [x for x in l if x > 0]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/31", "completion": "\n    if n > 1:\n        for i in range(2, n):\n            if n % i == 0:\n                return False\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/32", "completion": "\n    \"\"\"\n    Finds zero of polynomial with coefficients xs.\n    \"\"\"\n    return", "passed": false, "result": "must be real number, not NoneType", "exception": "TypeError"}
+{"task_id": "HumanEval/33", "completion": "\n    return [l[i] for i in range(len(l)) if i % 3!= 0", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/34", "completion": "\n    return sorted(set(l))\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 21) (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/35", "completion": "\n    return max(l)\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/36", "completion": "\n    return sum(1 for i in range(n) if i % 3 == 0 or i % 5 == 0", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/37", "completion": "\n    return [l[i] for i in range(0, len(l), 2)]", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/38", "completion": "\n    \"\"\"\n    returns decoded string by cycling groups of three characters.\n    \"\"\"\n    return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/39", "completion": "\n    if n == 1:\n        return 2\n    return prime_fib(n-1) + prime_fib(n-2", "passed": false, "result": "'(' was never closed (<string>, line 20)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/40", "completion": "\n    return len(set(l)) == 3 and sum(l) == 0", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/41", "completion": "\n    return n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/42", "completion": "\n    return [i+1 for i in l]\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 25) (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/43", "completion": "\n    return len(set(l)) == len(l) and len(l) > 1", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/44", "completion": "\n    return str(x) if x < base else change_base(x//base, base", "passed": false, "result": "'(' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/45", "completion": "\n    return (a * h) / 2\n\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/46", "completion": "\n    if n == 0:\n        return 0\n    elif n == 1:\n        return 0\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/47", "completion": "\n    l.sort()\n    return l[len(l)//2", "passed": false, "result": "'[' was never closed (<string>, line 12)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/48", "completion": "\n    return text == text[::-1]\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/49", "completion": "\n    return pow(2, n, p)\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 35) (<string>, line 19)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/50", "completion": "\n    \"\"\"\n    returns decoded string by shifting every character by 5 in the alphabet.\n    ", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 35) (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/51", "completion": "\n    return ''.join([c for c in text if c not in 'aeiou'", "passed": false, "result": "'[' was never closed (<string>, line 20)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/52", "completion": "\n    return all(x < t for x in l)\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 28) (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/53", "completion": "\n    return x + y\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/54", "completion": "\n    return len(set(s0)) == len(set(s1))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/55", "completion": "\n    if n == 1:\n        return 1\n    return fib(n-1) + fib(n-", "passed": false, "result": "'(' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/56", "completion": "\n    return all(brackets[i] == brackets[i+1] for i in range(len(brackets)-1", "passed": false, "result": "'(' was never closed (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/57", "completion": "\n    return all(l[i] <= l[i+1] for i in range(len(l)-1", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/58", "completion": "\n    return sorted(set(l1) & set(l2))", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/59", "completion": "\n    for i in range(2, n):\n        if n % i == 0:\n            return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/60", "completion": "\n    return n * (n + 1) // 2\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 33) (<string>, line 19)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/61", "completion": "\n    return len(brackets) % 2 == 0\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/62", "completion": "\n    return [xs[i] * (i + 1) for i in range(len(xs))", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/63", "completion": "\n    if n == 0:\n        return 0\n    elif n == 1:\n        return 0\n    ", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/64", "completion": "\n    return len([c for c in s if c in 'aeiouy'])", "passed": false, "result": "Test 2", "exception": "AssertionError"}
+{"task_id": "HumanEval/65", "completion": "\n    return x[-shift:] + x[:-shift]\n", "passed": false, "result": "'int' object is not subscriptable", "exception": "TypeError"}
+{"task_id": "HumanEval/66", "completion": "\n    return sum(ord(c) for c in s if c.isupper", "passed": false, "result": "'(' was never closed (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/67", "completion": "\n    return n - sum(map(int,s.split(\" \")))\n", "passed": false, "result": "invalid literal for int() with base 10: 'apples'", "exception": "ValueError"}
+{"task_id": "HumanEval/68", "completion": "\n    return [min(arr), arr.index(min(arr))]", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/69", "completion": "\n    for i in lst:\n        if i > 0:\n            return i\n    return -", "passed": false, "result": "invalid syntax (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/70", "completion": "\n    return lst\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/71", "completion": "\n    return round((a + b + c) / 2, 2)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/72", "completion": "\n    return sum(q) <= w and is_palindrome(q)\n", "passed": false, "result": "name 'is_palindrome' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/73", "completion": "\n    return min(arr) - max(arr)\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 32) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/74", "completion": "\n    return lst1 if len(lst1) == len(lst2) else lst2", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/75", "completion": "\n    for i in range(2, a):\n        if a % i == 0:\n            return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/76", "completion": "\n    return x == n**int(x/n)\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 35) (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/77", "completion": "\n    return a**3 == a", "passed": false, "result": "Fourth test error: False", "exception": "AssertionError"}
+{"task_id": "HumanEval/78", "completion": "\n    return len([x for x in num if x in '0123456789ABCDEF'])", "passed": false, "result": "First test error: 2", "exception": "AssertionError"}
+{"task_id": "HumanEval/79", "completion": "\n    return \"db\" + str(bin(decimal))[2:]", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/80", "completion": "\n    return len(s) >= 3 and len(set(s)) == len(s", "passed": false, "result": "'(' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/81", "completion": "\n    return [grade_equation(grade) for grade in grades]", "passed": false, "result": "name 'grade_equation' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/82", "completion": "\n    if len(string) > 1:\n        return True\n    else:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/83", "completion": "\n    return sum(1 for i in range(1, n+1)", "passed": false, "result": "'(' was never closed (<string>, line 8)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/84", "completion": "\n    return str(bin(N))[2:]\n", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/85", "completion": "\n    return sum([i for i in lst if i % 2 == 1", "passed": false, "result": "'[' was never closed (<string>, line 10)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/86", "completion": "\n    return''.join(sorted(s.split()))\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/87", "completion": "\n    return [(i, lst[i].index(x)) for i in range(len(lst))", "passed": false, "result": "'[' was never closed (<string>, line 23)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/88", "completion": "\n    return sorted(array, key=lambda x: x)\n", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/89", "completion": "\n    return ''.join(chr(ord(c) + 2) for c in s", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/90", "completion": "\n    if len(lst) == 0:\n        return None\n    return min(lst", "passed": false, "result": "'(' was never closed (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/91", "completion": "\n    return len(S.split(\" \")) - S.count(\"I\")", "passed": false, "result": "Test 1", "exception": "AssertionError"}
+{"task_id": "HumanEval/92", "completion": "\n    return (x == y + z) and (type(x) == int)", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/93", "completion": "\n    return ''.join(c.upper() if c.isalpha() else c for c in message", "passed": false, "result": "'(' was never closed (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/94", "completion": "\n    return sum([int(i) for i in str(max(lst))])", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/95", "completion": "\n    for key in dict:\n        if type(key)!= str:\n            return False\n    return", "passed": false, "result": "First test error: None", "exception": "AssertionError"}
+{"task_id": "HumanEval/96", "completion": "\n    pass\n\n\"\"\"\n\n\"\"\"\n\n\"\"\"\n\n\"\"\"\n\n\"\"\"\n\n", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 41) (<string>, line 24)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/97", "completion": "\n    return a * b\n", "passed": false, "result": "First test error: 60976", "exception": "AssertionError"}
+{"task_id": "HumanEval/98", "completion": "\n    return sum(1 for c in s if c in 'AEIOU')", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/99", "completion": "\n    return int(round(float(value)))\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 36) (<string>, line 23)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/100", "completion": "\n    return [n, n+1, n+2]\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 33) (<string>, line 19)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/101", "completion": "\n    return s.split(',')\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/102", "completion": "\n    for i in range(x, y+1):\n        if i % 2 == 0:\n            return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/103", "completion": "\n    return -1 if n > m else bin(int((n + m) / 2))[2:", "passed": false, "result": "'[' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/104", "completion": "\n    return sorted(list(set([int(i) for i in str(x)])))", "passed": false, "result": "invalid literal for int() with base 10: '['", "exception": "ValueError"}
+{"task_id": "HumanEval/105", "completion": "\n    return [str(i) for i in sorted(arr, reverse=True)]", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/106", "completion": "\n    return [1, 2, 6, 24, 15]\n\n\"\"\"", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 22) (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/107", "completion": "\n    return (n - 1) // 2, n // 2\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/108", "completion": "\n    return len([x for x in arr if sum(map(int, str(x))) > 0", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/109", "completion": "\n    if len(arr) == 0:\n        return True\n    return arr[0] > arr[-1", "passed": false, "result": "'[' was never closed (<string>, line 32)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/110", "completion": "\n    return \"YES\" if lst1 == lst2 else \"NO\"\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/111", "completion": "\n    d = {}\n    for i in test.split():\n        d[i] = d.get(i, 0) + 1\n    ", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/112", "completion": "\n    return s[::-1].replace(c,''),s[::-1]==s", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/113", "completion": "\n    return [f\"the number of odd elements {len(lst)} the str{len(lst)} of the {len(lst)}put.\"", "passed": false, "result": "'[' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/114", "completion": "\n    pass\n\n\"\"\"\n\n\"\"\"\n\n", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/115", "completion": "\n    return math.ceil(sum(sum(1 for x in row if x) for row in grid) / capacity", "passed": false, "result": "'(' was never closed (<string>, line 38)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/116", "completion": "\n    return sorted(arr, key=lambda x: bin(x).count('1'", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/117", "completion": "\n    return [word for word in s.split() if len(word) == n]", "passed": false, "result": "First test error: ['Mary', 'lamb']", "exception": "AssertionError"}
+{"task_id": "HumanEval/118", "completion": "\n    vowels = 'aeiou'\n    for i in vowels:\n        if i in word:\n            return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/119", "completion": "\n    return 'Yes' if lst[0] == lst[1] else 'No", "passed": false, "result": "unterminated string literal (detected at line 18) (<string>, line 18)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/120", "completion": "\n    return sorted(arr)[-k:]\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/121", "completion": "\n    return sum(lst) - sum(lst)//2", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/122", "completion": "\n    return sum(min(int(str(x)[:2]), x) for x in arr[:k", "passed": false, "result": "'[' was never closed (<string>, line 17)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/123", "completion": "\n    return [i for i in range(1, n+1) if i % 2 == 1]", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/124", "completion": "\n    if date.count('-') == 2:\n        return True\n    return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/125", "completion": "\n    return txt.split()\n\nsplit_words(\"Hello,world!\")", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/126", "completion": "\n    return lst == sorted(lst)\n\nis_sorted([1, 2, 3, 4, 5])", "passed": false, "result": "This prints if this assert fails 5 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/127", "completion": "\n    return \"YES\" if len(interval1) == len(interval2) else \"NO", "passed": false, "result": "unterminated string literal (detected at line 23) (<string>, line 23)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/128", "completion": "\n    return sum(arr) * reduce(lambda x, y: x * y, arr", "passed": false, "result": "'(' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/129", "completion": "\n    pass\n\ngrid = [[1,2,3],[4,5,6],[7,8,9]]\nk =", "passed": false, "result": "invalid syntax (<string>, line 36)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/130", "completion": "\n    return [1, 3, 2, 8]\n\ntri(4) = [1, 3, 2, 8]", "passed": false, "result": "cannot assign to function call here. Maybe you meant '==' instead of '='? (<string>, line 22)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/131", "completion": "\n    return sum(int(c) for c in str(n))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/132", "completion": "\n    return len(string) % 2 == 0 and string.count('[') == string.count(']", "passed": false, "result": "unterminated string literal (detected at line 16) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/133", "completion": "\n    return sum([x**2 for x in lst])\n", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/134", "completion": "\n    return txt[-1] in string.ascii_letters and txt[-1] not in \"", "passed": false, "result": "unterminated string literal (detected at line 16) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/135", "completion": "\n    for i in range(len(arr)):\n        if arr[i] > arr[i-1]:\n            ", "passed": false, "result": "expected an indented block after 'if' statement on line 14 (<string>, line 16)", "exception": "IndentationError"}
+{"task_id": "HumanEval/136", "completion": "\n    if lst:\n        return max(lst), min(lst)\n    return None", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/137", "completion": "\n    if a > b:\n        return a\n    elif a == b:\n        return None\n    else:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/138", "completion": "\n    return n % 2 == 0 and n % 3 == 0 and n % 4 == 0", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/139", "completion": "\n    return n * (n-1) * (n-2) *... *", "passed": false, "result": "invalid syntax (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/140", "completion": "\n    return text.replace(' ', '_').replace('  ', '-')", "passed": false, "result": "This prints if this assert fails 4 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/141", "completion": "\n    if file_name.count('.') == 1:\n        return 'Yes'\n    return 'No", "passed": false, "result": "unterminated string literal (detected at line 19) (<string>, line 19)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/142", "completion": "\n    return sum([x**2 if x%3==0 else x**3 for x in lst", "passed": false, "result": "'[' was never closed (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/143", "completion": "\n    return''.join(sentence.split()).split(' ')", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/144", "completion": "\n    return True if x * n == int(x * n) else False", "passed": false, "result": "can't multiply sequence by non-int of type 'str'", "exception": "TypeError"}
+{"task_id": "HumanEval/145", "completion": "\n    return sorted(nums, key=lambda x: sum(map(int, str(x))))", "passed": false, "result": "invalid literal for int() with base 10: '-'", "exception": "ValueError"}
+{"task_id": "HumanEval/146", "completion": "\n    return len([num for num in nums if num > 10 and num % 2 == 1", "passed": false, "result": "'[' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/147", "completion": "\n    return n * (n - 1) // 2 // 3\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/148", "completion": "\n    return sorted([planet1, planet2])\n", "passed": false, "result": "First test error: 2", "exception": "AssertionError"}
+{"task_id": "HumanEval/149", "completion": "\n    return sorted(lst, key=lambda x: len(x))\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/150", "completion": "\n    if n % 2 == 0:\n        return x\n    else:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/151", "completion": "\n    return sum([x**2 for x in lst if x > 0])", "passed": false, "result": "This prints if this assert fails 2 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/152", "completion": "\n    return [abs(game[i]-guess[i]) for i in range(len(game))", "passed": false, "result": "'[' was never closed (<string>, line 18)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/153", "completion": "\n    return class_name + '.' + max(extensions, key=len)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/154", "completion": "\n    return b in a or any(b in a for a in (a[1:] + a[:1]", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/155", "completion": "\n    even = num // 2\n    odd = num % 2\n    return even,", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/156", "completion": "\n    pass\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/157", "completion": "\n    return a**2 + b**2 == c**2", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/158", "completion": "\n    return max(words, key=lambda x: len(set(x)))", "passed": false, "result": "t2", "exception": "AssertionError"}
+{"task_id": "HumanEval/159", "completion": "\n    return [number + need, remaining - need]\n\n'''", "passed": false, "result": "unterminated triple-quoted string literal (detected at line 50) (<string>, line 34)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/160", "completion": "\n    pass\n\n\"\"\"\n\n\"\"\"", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/161", "completion": "\n    return s.swapcase() if s else s\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/162", "completion": "\n    if text == '':\n        return None\n    return hashlib.md5(text).hexdig", "passed": false, "result": "name 'hashlib' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/163", "completion": "\n    return [i for i in range(a, b) if i % 2 == 0", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}

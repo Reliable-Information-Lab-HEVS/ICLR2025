@@ -1,0 +1,164 @@
+{"task_id": "HumanEval/0", "completion": "\n    return any(abs(numbers[i] - numbers[i + 1]) < threshold for i in range(len(numbers) - 1", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/1", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/2", "completion": "\n    return math.trunc(number) - math.trunc(number", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/3", "completion": "\n    return any(x < 0 for x in operations)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/4", "completion": "\n    return sum(abs(x - numbers.mean()) for x in numbers", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/5", "completion": "\n    return [delimeter] + [n for n in numbers] + [delimeter", "passed": false, "result": "'[' was never closed (<string>, line 12)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/6", "completion": "\n    return [len(paren_string) - i for i in range(len(paren_string))", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/7", "completion": "\n    return [string for string in strings if substring in string]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/8", "completion": "\n    return sum(numbers), reduce(lambda x, y: x * y, numbers", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/9", "completion": "\n    return [max(numbers[i:]) for i in range(len(numbers))", "passed": false, "result": "'[' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/10", "completion": "\n    return string + ''.join(reversed(string)[:len(string) // 2])", "passed": false, "result": "'reversed' object is not subscriptable", "exception": "TypeError"}
+{"task_id": "HumanEval/11", "completion": "\n    return ''.join(chr(ord(a) ^ ord(b))", "passed": false, "result": "'(' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/12", "completion": "\n    return max(strings, key=len) if strings else", "passed": false, "result": "invalid syntax (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/13", "completion": "\n    return a if b == 0 else greatest_common_divisor(b, a % b", "passed": false, "result": "'(' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/14", "completion": "\n    return [string[:i+1] for i in range(len(string))", "passed": false, "result": "'[' was never closed (<string>, line 10)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/15", "completion": "\n    return''.join(str(i) for i in range(n", "passed": false, "result": "'(' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/16", "completion": "\n    return len(set(string))\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/17", "completion": "\n    return [int(x) for x in music_string.split()", "passed": false, "result": "'[' was never closed (<string>, line 18)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/18", "completion": "\n    return len(string) - len(string.replace(substring, ''", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/19", "completion": "\n    return''.join(sorted(numbers.split()))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/20", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/21", "completion": "\n    return [0.0 if x < 0.5 else 1.0 for x in numbers", "passed": false, "result": "'[' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/22", "completion": "\n    return [int(value) for value in values if isinstance(value, int)]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/23", "completion": "\n    return len(string)\n\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/24", "completion": "\n    return n if n % 2 == 0 else n - 1", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/25", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/26", "completion": "\n    return list(set(numbers))\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/27", "completion": "\n    return string.swapcase()\n\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/28", "completion": "\n    return ''.join(strings)\n\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/29", "completion": "\n    return [s for s in strings if s.startswith(prefix)]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/30", "completion": "\n    return [x for x in l if x > 0]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/31", "completion": "\n    if n < 2:\n        return False\n    if n == 2:\n        return True\n    return not n % 2", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/32", "completion": "\n    return -poly(xs, 0) / poly(xs, 1)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/33", "completion": "\n    return [l[i] for i in range(len(l)) if i % 3!= 0", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/34", "completion": "\n    return sorted(set(l), key=l.index", "passed": false, "result": "'(' was never closed (<string>, line 9)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/35", "completion": "\n    return max(l)\n\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/36", "completion": "\n    return sum(1 for i in range(1, n) if i % 3 == 0", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/37", "completion": "\n    return [l[i] for i in range(0, len(l), 2)]", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/38", "completion": "\n    return \"\".join([s[i:i + 3] for i in range(0, len(s), 3)", "passed": false, "result": "'[' was never closed (<string>, line 19)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/39", "completion": "\n    return fib(n)[-1]\n\n", "passed": false, "result": "name 'fib' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/40", "completion": "\n    return len(set(l)) == 3 and sum(set(l)) == 0", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/41", "completion": "\n    return n * (n - 1) // 2\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/42", "completion": "\n    return [x + 1 for x in l]", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/43", "completion": "\n    return len(set(l)) == len(l) and len(l) > 1", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/44", "completion": "\n    return str(x).zfill(base)\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/45", "completion": "\n    return (a * h) / 2.0", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/46", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/47", "completion": "\n    return sorted(l)[len(l) // 2]", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/48", "completion": "\n    return text == text[::-1]\n\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/49", "completion": "\n    return (n * p) % (2 ** 32)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/50", "completion": "\n    return \"\".join([chr((ord(ch) - 5) % 26 + ord(\"a\")) for ch in s", "passed": false, "result": "'[' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/51", "completion": "\n    return ''.join([c for c in text if c not in 'aeiouAEIOU'", "passed": false, "result": "'[' was never closed (<string>, line 20)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/52", "completion": "\n    return all(x < t for x in l)", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/53", "completion": "\n    return x + y\n\n\nadd(2, 3", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/54", "completion": "\n    return set(s0) == set(s1)\n\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/55", "completion": "\n    return fib_rec(n)[-1]", "passed": false, "result": "name 'fib_rec' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/56", "completion": "\n    return all(brackets[i] == brackets[-i - 1] for i in range(len(brackets)))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/57", "completion": "\n    return all(a < b for a, b in zip(l, l[1:]", "passed": false, "result": "'(' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/58", "completion": "\n    return list(set(l1) & set(l2))", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/59", "completion": "\n    return max(factor for factor in prime_factors(n) if factor > 1", "passed": false, "result": "'(' was never closed (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/60", "completion": "\n    return n * (n + 1) // 2\n\n", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/61", "completion": "\n    return all(brackets[i] == brackets[-i-1] for i in range(len(brackets)))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/62", "completion": "\n    return [i * x for i, x in enumerate(xs[1:])", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/63", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/64", "completion": "\n    return len([c for c in s if c in 'aeiouy'", "passed": false, "result": "'[' was never closed (<string>, line 19)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/65", "completion": "\n    return str(int(str(x)[-shift:] + str(x)[:-shift]", "passed": false, "result": "'(' was never closed (<string>, line 12)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/66", "completion": "\n    return sum(ord(c) for c in s if c.isupper", "passed": false, "result": "'(' was never closed (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/67", "completion": "\n    return n - int(s.split()[0]) - int(s.split()[1])", "passed": false, "result": "invalid literal for int() with base 10: 'apples'", "exception": "ValueError"}
+{"task_id": "HumanEval/68", "completion": "\n    pass\n\n", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/69", "completion": "\n    pass\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/70", "completion": "\n    return lst[::-1] + lst[1:][::-1", "passed": false, "result": "'[' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/71", "completion": "\n    return round((a + b + c) / 2, 2)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/72", "completion": "\n    return q == q[::-1] and sum(q) <= w", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/73", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/74", "completion": "\n    return lst1 if len(lst1) == len(lst2) else lst2", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/75", "completion": "\n    return a % 3 == 0 and a % 5 == 0 and a % 7 ==", "passed": false, "result": "invalid syntax (<string>, line 11)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/76", "completion": "\n    return x == n ** int(x / n)\n\n", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/77", "completion": "\n    return a**3 == int(a**3)\n", "passed": false, "result": "Second test error: True", "exception": "AssertionError"}
+{"task_id": "HumanEval/78", "completion": "\n    return len([x for x in num if x in '0123456789ABCDEF'])", "passed": false, "result": "First test error: 2", "exception": "AssertionError"}
+{"task_id": "HumanEval/79", "completion": "\n    return \"db\" + bin(decimal)[2:] + \"db\"", "passed": true, "result": "passed", "exception": null}
+{"task_id": "HumanEval/80", "completion": "\n    return len(s) >= 3 and len(set(s)) == len(s", "passed": false, "result": "'(' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/81", "completion": "\n    return [grade_equation(gpa) for gpa in grades]", "passed": false, "result": "name 'grade_equation' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/82", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/83", "completion": "\n    return n * (n + 1) // 2", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/84", "completion": "\n    return bin(N)[2:]\n\n\nsolve(1000)", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/85", "completion": "\n    return sum([lst[i] for i in range(len(lst)) if i % 2 == 1", "passed": false, "result": "'[' was never closed (<string>, line 10)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/86", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/87", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/88", "completion": "\n    pass\n\n", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/89", "completion": "\n    return ''.join(chr((ord(c) + 2) % 26 + ord('a')) for c in s", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/90", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/91", "completion": "\n    return sum(1 for word in S.split() if word.startswith(\"I\"))", "passed": false, "result": "Test 2", "exception": "AssertionError"}
+{"task_id": "HumanEval/92", "completion": "\n    return (x == y + z) and (x.is_integer()) and (y.is_integer()) and (z.is_integer", "passed": false, "result": "'(' was never closed (<string>, line 21)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/93", "completion": "\n    pass\n\n", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/94", "completion": "\n    return sum(map(lambda x: int(str(x)[-1]), lst", "passed": false, "result": "'(' was never closed (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/95", "completion": "\n    if dict:\n        return all(isinstance(key, str) for key in dict.keys())\n    return", "passed": false, "result": "Second test error: True", "exception": "AssertionError"}
+{"task_id": "HumanEval/96", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/97", "completion": "\n    return a // 10 * b + a % 10 * b // 10", "passed": false, "result": "First test error: 6097", "exception": "AssertionError"}
+{"task_id": "HumanEval/98", "completion": "\n    return sum(1 for c in s if c.isupper())", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/99", "completion": "\n    pass\n\n", "passed": false, "result": "Test 1", "exception": "AssertionError"}
+{"task_id": "HumanEval/100", "completion": "\n    pass\n\n", "passed": false, "result": "Test 3", "exception": "AssertionError"}
+{"task_id": "HumanEval/101", "completion": "\n    return s.split(',') if ',' in s else s.split()", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/102", "completion": "\n    return -1\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/103", "completion": "\n    return bin(int(round(n + m) / 2))[2:]", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/104", "completion": "\n    return sorted(list(set([x for x in x if x % 2 == 0])))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/105", "completion": "\n    return [name for name, num in sorted(zip(digits, arr))]", "passed": false, "result": "name 'digits' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/106", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/107", "completion": "\n    return (n - 1) // 2, n // 2\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/108", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/109", "completion": "\n    pass\n", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/110", "completion": "\n    return \"YES\" if sorted(lst1) == sorted(lst2) else \"NO", "passed": false, "result": "unterminated string literal (detected at line 16) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/111", "completion": "\n    return Counter(test.split())\n", "passed": false, "result": "name 'Counter' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/112", "completion": "\n    return s[::-1].replace(c, ''), s == s[::-1", "passed": false, "result": "'[' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/113", "completion": "\n    return [f\"the number of odd elements {len(lst)} of the {lst}put.\"", "passed": false, "result": "'[' was never closed (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/114", "completion": "\n    pass\n\n", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/115", "completion": "\n    return math.ceil(sum(max(row) for row in grid) / capacity)", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/116", "completion": "\n    return sorted(arr, key=lambda x: bin(x).count('1'", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/117", "completion": "\n    pass\n\n", "passed": false, "result": "First test error: None", "exception": "AssertionError"}
+{"task_id": "HumanEval/118", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/119", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/120", "completion": "\n    return sorted(arr)[-k:]\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/121", "completion": "\n    return sum([i for i in lst if i % 2 == 0", "passed": false, "result": "'[' was never closed (<string>, line 12)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/122", "completion": "\n    return sum(min(arr[i], arr[i + k]) for i in range(k))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/123", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/124", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/125", "completion": "\n    return txt.split()\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/126", "completion": "\n    return all(lst[i] <= lst[i + 1] for i in range(len(lst) - 1", "passed": false, "result": "'(' was never closed (<string>, line 19)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/127", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/128", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/129", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/130", "completion": "\n    return [1, 3, 2, 8][:n+1]", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/131", "completion": "\n    return sum(int(c) for c in str(n))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/132", "completion": "\n    return len(string) % 2 == 0 and string.count('[') == string.count(']", "passed": false, "result": "unterminated string literal (detected at line 16) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/133", "completion": "\n    return sum([x**2 for x in lst])\n", "passed": false, "result": "This prints if this assert fails 1 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/134", "completion": "\n    return txt[-1].isalpha() and txt[-1] not in '", "passed": false, "result": "unterminated string literal (detected at line 16) (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/135", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/136", "completion": "\n    return max(lst), min(lst)\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/137", "completion": "\n    if a > b:\n        return a\n    elif a < b:\n        return b\n    else:\n        ", "passed": false, "result": "expected an indented block after 'else' statement on line 19 (<string>, line 21)", "exception": "IndentationError"}
+{"task_id": "HumanEval/138", "completion": "\n    return n % 2 == 0 and n % 4 == 0", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/139", "completion": "\n    return n * special_factorial(n - 1) if n > 0 else", "passed": false, "result": "invalid syntax (<string>, line 15)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/140", "completion": "\n    return re.sub(r'\\s+', '_', text", "passed": false, "result": "'(' was never closed (<string>, line 14)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/141", "completion": "\n    if file_name.count('.') == 1:\n        return 'Yes'\n    else:\n        return 'No", "passed": false, "result": "unterminated string literal (detected at line 20) (<string>, line 20)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/142", "completion": "\n    return sum([x**2 if x%3==0 else x**3 for x in lst", "passed": false, "result": "'[' was never closed (<string>, line 16)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/143", "completion": "\n    return \" \".join(sorted(sentence.split()))", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/144", "completion": "\n    pass\n\n", "passed": false, "result": "test1", "exception": "AssertionError"}
+{"task_id": "HumanEval/145", "completion": "\n    return sorted(nums, key=lambda x: sum(map(int, str(x))))", "passed": false, "result": "invalid literal for int() with base 10: '-'", "exception": "ValueError"}
+{"task_id": "HumanEval/146", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/147", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/148", "completion": "\n    pass\n", "passed": false, "result": "object of type 'NoneType' has no len()", "exception": "TypeError"}
+{"task_id": "HumanEval/149", "completion": "\n    return sorted(lst, key=lambda x: len(x))\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/150", "completion": "\n    if n % 2 == 0:\n        return x\n    else:\n        return", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/151", "completion": "\n    return sum([x**2 for x in lst if x > 0])", "passed": false, "result": "This prints if this assert fails 2 (good for debugging!)", "exception": "AssertionError"}
+{"task_id": "HumanEval/152", "completion": "\n    return [abs(guess-score) for score in game]", "passed": false, "result": "unsupported operand type(s) for -: 'list' and 'int'", "exception": "TypeError"}
+{"task_id": "HumanEval/153", "completion": "\n    return class_name + '.' + max(extensions, key=len)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/154", "completion": "\n    return a.find(b)!= -1 or b.find(a)!= -", "passed": false, "result": "invalid syntax (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/155", "completion": "\n    return (num // 10, num % 10)", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/156", "completion": "\n    return int_to_roman(number,'m')\n\n", "passed": false, "result": "name 'int_to_roman' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/157", "completion": "\n    return a**2 + b**2 == c**2 or a**2 + c**2 == b**", "passed": false, "result": "invalid syntax (<string>, line 13)", "exception": "SyntaxError"}
+{"task_id": "HumanEval/158", "completion": "\n    pass\n\n", "passed": false, "result": "t1", "exception": "AssertionError"}
+{"task_id": "HumanEval/159", "completion": "\n    return [number + need, remaining - need]\n", "passed": false, "result": "Error", "exception": "AssertionError"}
+{"task_id": "HumanEval/160", "completion": "\n    pass\n\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/161", "completion": "\n    return s.swapcase() if s else s\n", "passed": false, "result": "", "exception": "AssertionError"}
+{"task_id": "HumanEval/162", "completion": "\n    return hashlib.md5(text.encode()).hexdigest", "passed": false, "result": "name 'hashlib' is not defined", "exception": "NameError"}
+{"task_id": "HumanEval/163", "completion": "\n    return [i for i in range(a, b) if i % 2 == 0", "passed": false, "result": "'[' was never closed (<string>, line 13)", "exception": "SyntaxError"}
