@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import warnings
 from tqdm import tqdm
 
 from TextWiz import textwiz
@@ -76,7 +77,7 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
     folder = aatk.get_folder(REFORMULATION_MODEL_TO_DATASET_NAME[reformulation_model], model_name, dtype_name)
     # In this case, immediately return
     if all(os.path.exists(os.path.join(folder, f'temperature_{temperature}.jsonl')) for temperature in temperatures):
-        print(f'The benchmark for {model_name} already exists.')
+        warnings.warn(f'The benchmark for {model_name} already exists.')
         return
 
     model = textwiz.HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
