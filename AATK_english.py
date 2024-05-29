@@ -1,6 +1,7 @@
 import os
 import argparse
 import time
+from tqdm import tqdm
 
 from TextWiz import textwiz
 from helpers import datasets
@@ -78,12 +79,8 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
         print(f'The benchmark for {model_name} already exists.')
         return
 
-    print(f'{utils.get_time()}  Starting with model {model_name}')
-
     model = textwiz.HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
     dataset = REFORMULATION_MODEL_TO_DATASET[reformulation_model]
-
-    t0 = time.time()
 
     for temperature in temperatures:
 
@@ -93,7 +90,7 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
         if os.path.exists(filename):
             os.remove(filename)
 
-        for sample in dataset:
+        for sample in tqdm(dataset, desc=model_name):
 
             id = sample['id']
             prompts = [sample['intent']] + sample['intent_variations']
@@ -115,9 +112,6 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
             
                 results = [{'id': id, 'prompt': prompt, 'prompt_id': prompt_name, 'completion': completion} for completion in completions]
                 utils.save_jsonl(results, filename, append=True)
-
-    dt = time.time() - t0
-    print(f'{utils.get_time()}  Done with model {model_name} in {dt/3600:.2f}h!')
 
 
 
