@@ -685,7 +685,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
     associated_gpus = []
 
     # Custom tqdm bar since we use an infinite while loop
-    progress_bar = tqdm(total=len(commands), file=sys.stdout)
+    progress_bar = tqdm(total=len(commands), file=sys.stdout, desc='Dispatcher')
 
     while True:
 
