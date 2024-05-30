@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=aatk_english
-#SBATCH --output=%x-%J.out
-#SBATCH --error=%x-%J.err
+#SBATCH --output=%x-%j.out
+#SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
 #SBATCH --cpus-per-task=11
 #SBATCH --mem=150G
