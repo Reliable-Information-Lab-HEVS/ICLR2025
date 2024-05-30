@@ -755,7 +755,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
         # a new job
         if not no_sleep:
             synchronize_file_streams(output_files, error_files, progress_bar)
-            time.sleep(3)
+            time.sleep(5)
 
     # Synchronize one last time after finishing all subprocesses
     synchronize_file_streams(output_files, error_files, progress_bar)
