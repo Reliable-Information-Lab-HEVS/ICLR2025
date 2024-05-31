@@ -6,6 +6,7 @@ import datetime
 import random
 import tempfile
 import uuid
+import re
 import textwrap
 import subprocess
 import shlex
@@ -714,8 +715,10 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
             available_gpus = available_gpus[footprint:]
 
             # Create output and error files
-            output_file = open(os.path.join(writing_dir.name, str(uuid.uuid4()) + '.out'), mode='w+b')
-            error_file = open(os.path.join(writing_dir.name, str(uuid.uuid4()) + '.err'), mode='w+b')
+            match = re.search(r'python3 -u .+?\.py (.+?)(?:$| )', executable)
+            filename = match.group(1) if match is not None else str(uuid.uuid4())
+            output_file = open(os.path.join(writing_dir.name, filename + '.out'), mode='w+b')
+            error_file = open(os.path.join(writing_dir.name, filename + '.err'), mode='w+b')
             output_files.append(output_file)
             error_files.append(error_file)
 
@@ -751,11 +754,11 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
         if len(commands) == 0 and len(processes) == 0:
             break
 
-        # Sleep for 5 seconds before restarting the loop and check if we have enough resources to launch
+        # Sleep before restarting the loop and check if we have enough resources to launch
         # a new job
         if not no_sleep:
             synchronize_file_streams(output_files, error_files, progress_bar)
-            time.sleep(5)
+            time.sleep(30)
 
     # Synchronize one last time after finishing all subprocesses
     synchronize_file_streams(output_files, error_files, progress_bar)
@@ -788,9 +791,9 @@ def synchronize_file_streams(output_files: list, error_files: list, main_process
     for f_out, f_err in zip(output_files, error_files):
         # We need to seek before reading
         f_out.seek(0)
-        out = f_out.read().decode().strip()
+        out = f_out.read().decode(errors='ignore').strip()
         f_err.seek(0)
-        err = f_err.read().decode().strip()
+        err = f_err.read().decode(errors='ignore').strip()
         
         if out != '':
             tot_output += out + '\n'
@@ -798,8 +801,8 @@ def synchronize_file_streams(output_files: list, error_files: list, main_process
             tot_error += err + '\n'
 
     tot_output += str(main_process_bar)
-    tot_output = tot_output.strip()
-    tot_error = tot_error.strip()
+    tot_output = tot_output.strip() + '\n'
+    tot_error = tot_error.strip() + '\n'
 
     # Truncate and rewrite stdout and stderr of the main process
     sys.stdout.truncate(0)
