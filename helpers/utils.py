@@ -688,7 +688,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
     output_files = []
     error_files = []
 
-    # Temporary directory to store output files
+    # Temporary directory to store output files. This will automatically be deleted
     writing_dir = tempfile.TemporaryDirectory(dir=os.getcwd())
 
     # Custom tqdm bar since we use an infinite while loop
@@ -751,7 +751,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
         if len(commands) == 0 and len(processes) == 0:
             break
 
-        # Sleep for 3 seconds before restarting the loop and check if we have enough resources to launch
+        # Sleep for 5 seconds before restarting the loop and check if we have enough resources to launch
         # a new job
         if not no_sleep:
             synchronize_file_streams(output_files, error_files, progress_bar)
@@ -771,7 +771,7 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
 
 def synchronize_file_streams(output_files: list, error_files: list, main_process_bar: tqdm):
     """Synchronize the outputs of all subprocesses into main process stdout and stderr. This is needed
-    to correctly display the progress bar of the subprocesses in real-time.
+    to correctly display the progress bar of the subprocesses in real-time in a single file.
 
     Parameters
     ----------
