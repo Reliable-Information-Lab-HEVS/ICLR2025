@@ -220,16 +220,16 @@ def model_wise_results(dataset: str = 'AATK') -> pd.DataFrame:
 
 
 NAME_MAPPING = {
+    'star-chat-alpha': 'StarChat (alpha)',
     'code-llama-34B-instruct': 'CodeLlama 34B - Instruct',
     'llama2-70B-chat': 'Llama2 70B - Chat',
-    'star-chat-alpha': 'StarChat (alpha)',
     'code-llama-70B-instruct': 'CodeLlama 70B - Instruct',
+    'zephyr-7B-beta': 'Zephyr 7B (beta)',
+    'mistral-7B-instruct-v2': 'Mistral 7B - Instruct (v2)',
+    'starling-7B-beta': 'Starling 7B (beta)',
     'command-r': 'Command-R',
     'llama3-8B-instruct': 'Llama3 8B - Instruct',
     'llama3-70B-instruct': 'Llama3 70B - Instruct',
-    'mistral-7B-instruct-v2': 'Mistral 7B - Instruct (v2)',
-    'starling-7B-beta': 'Starling 7B (beta)',
-    'zephyr-7B-beta': 'Zephyr 7B (beta)',
 }
 
 
@@ -248,7 +248,7 @@ def probability_distributions(dataset: str = 'AATK_english_chatGPT', filename: s
     assert dataset in ENGLISH_CATASETS, 'Probability distributions only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
 
-    model_names = ['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']
+    model_names = list(NAME_MAPPING.keys())
 
     Py_per_model = {}
 
@@ -263,7 +263,8 @@ def probability_distributions(dataset: str = 'AATK_english_chatGPT', filename: s
 
         Py_per_model[model] = Py
 
-    fig, axes = plt.subplots(1, 3, sharex=True, sharey=True, figsize=(4.8*2, 6.4/1.2))
+    fig, axes = plt.subplots(2, 5, sharex=True, sharey=True, figsize=(4.8*2.5, 6.4*2))
+    axes = [ax for ax in axes[0,:]] + [ax for ax in axes[1,:]]
 
 
     ticks = list(Py_per_model['code-llama-34B-instruct'].keys())
