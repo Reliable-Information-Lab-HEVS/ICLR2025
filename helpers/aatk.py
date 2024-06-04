@@ -9,8 +9,9 @@ import seaborn as sns
 from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
-DATASETS = ['AATK', 'AATK_english_chatGPT', 'AATK_english_zephyr', 'AATK_english_llama3']
-CATEGORIES = ['completions', 'results']
+DATASETS = ('AATK', 'AATK_english_chatGPT', 'AATK_english_zephyr', 'AATK_english_llama3')
+ENGLISH_CATASETS = tuple(x for x in DATASETS if x != 'AATK')
+CATEGORIES = ('completions', 'results')
 
 NAME_TO_SAMPLES_BY_ID = {
     'AATK_english_chatGPT': datasets.AATKEnglishChatGPT().samples_by_id(),
@@ -218,8 +219,11 @@ def model_wise_results(dataset: str = 'AATK') -> pd.DataFrame:
 
 
 
-NAME_MAPPING = {'code-llama-34B-instruct': 'CodeLlama 34B - Instruct', 'llama2-70B-chat': 'Llama2 70B - Chat',
-                'star-chat-alpha': 'StarChat (alpha)'}
+NAME_MAPPING = {
+    'code-llama-34B-instruct': 'CodeLlama 34B - Instruct',
+    'llama2-70B-chat': 'Llama2 70B - Chat',
+    'star-chat-alpha': 'StarChat (alpha)',
+}
 
 
 
@@ -234,7 +238,7 @@ def probability_distributions(dataset: str = 'AATK_english_chatGPT', filename: s
         Optional filename to save the figure, by default None
     """
 
-    assert dataset in ['AATK_english_chatGPT', 'AATK_english_zephyr'], 'Probability distributions only defined for reformulated AATK datasets'
+    assert dataset in ENGLISH_CATASETS, 'Probability distributions only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
 
     model_names = ['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']
@@ -340,7 +344,7 @@ def prompt_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str 
         The scores.
     """
 
-    assert dataset in ['AATK_english_chatGPT', 'AATK_english_zephyr'], 'Prompt exposure only defined for reformulated AATK datasets'
+    assert dataset in ENGLISH_CATASETS, 'Prompt exposure only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
     cvss = get_cvss_scores()
 
