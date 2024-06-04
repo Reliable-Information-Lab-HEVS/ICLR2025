@@ -223,6 +223,13 @@ NAME_MAPPING = {
     'code-llama-34B-instruct': 'CodeLlama 34B - Instruct',
     'llama2-70B-chat': 'Llama2 70B - Chat',
     'star-chat-alpha': 'StarChat (alpha)',
+    'code-llama-70B-instruct': 'CodeLlama 70B - Instruct',
+    'command-r': 'Command-R',
+    'llama3-8B-instruct': 'Llama3 8B - Instruct',
+    'llama3-70B-instruct': 'Llama3 70B - Instruct',
+    'mistral-7B-instruct-v2': 'Mistral 7B - Instruct (v2)',
+    'starling-7B-beta': 'Starling 7B (beta)',
+    'zephyr-7B-beta': 'Zephyr 7B (beta)',
 }
 
 
