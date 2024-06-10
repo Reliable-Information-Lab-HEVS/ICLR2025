@@ -5,7 +5,7 @@ from transformers import Trainer, TrainingArguments, DataCollatorForLanguageMode
 
 training_args = TrainingArguments(
     optim='adamw_torch',
-    per_device_train_batch_size=4,
+    per_device_train_batch_size=3,
     learning_rate=5e-5,
     num_train_epochs=5,
     bf16=True,
