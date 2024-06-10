@@ -1,7 +1,9 @@
-from helpers import datasets
-from TextWiz.textwiz import loader
+import os
 
 from transformers import Trainer, TrainingArguments, DataCollatorForLanguageModeling
+
+from helpers import datasets
+from TextWiz.textwiz import loader
 
 def main():
 
@@ -18,6 +20,7 @@ def main():
         save_strategy='epoch',
         report_to='tensorboard',
         seed=123,
+        local_rank=int(os.environ["LOCAL_RANK"]),
     )
 
     model_name = 'llama3-8B-instruct'
