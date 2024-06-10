@@ -17,6 +17,6 @@ eval "$(conda shell.bash hook)"
 conda activate llm
 
 # Needs to be launched in this way to correctly use Torch DDP
-python -m torch.distributed.launch --nproc_per_node 4 train.py
+torchrun --n-proc-per-node 4 train.py
 
 conda deactivate
