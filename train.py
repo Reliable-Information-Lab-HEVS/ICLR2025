@@ -1,11 +1,11 @@
 import os
 
-from transformers import AutoModelForCausalLM, Trainer, TrainingArguments, DataCollatorForLanguageModeling
+from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 
 from helpers import datasets
 from TextWiz.textwiz import loader
 
-model_name = 'llama3-8B-instruct'
+model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'
 
 training_args = TrainingArguments(
         optim='adamw_torch',
@@ -31,7 +31,7 @@ def main():
         torch_dtype=loader.get_model_dtype(model_name),
         low_cpu_mem_usage=True
     )
-    tokenizer = loader.load_tokenizer(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
 
     dataset = datasets.WalliserDeutschDataset(tokenizer, sample_size=loader.get_model_context_size(model_name))
     collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
