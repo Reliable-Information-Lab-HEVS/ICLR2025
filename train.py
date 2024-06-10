@@ -6,6 +6,8 @@ from helpers import datasets
 from TextWiz.textwiz import loader
 
 model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'
+reverse_mapping = {v:k for k,v in loader.ALL_MODELS_MAPPING}
+textwiz_model_name = reverse_mapping[model_name]
 
 training_args = TrainingArguments(
         optim='adamw_torch',
@@ -28,12 +30,12 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         attn_implementation='flash_attention_2',
-        torch_dtype=loader.get_model_dtype(model_name),
+        torch_dtype=loader.get_model_dtype(textwiz_model_name),
         low_cpu_mem_usage=True
     )
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
 
-    dataset = datasets.WalliserDeutschDataset(tokenizer, sample_size=loader.get_model_context_size(model_name))
+    dataset = datasets.WalliserDeutschDataset(tokenizer, sample_size=loader.get_model_context_size(textwiz_model_name))
     collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
 
     trainer = Trainer(
