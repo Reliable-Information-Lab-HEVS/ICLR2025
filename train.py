@@ -34,6 +34,8 @@ def main():
         low_cpu_mem_usage=True
     )
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token_id = tokenizer.eos_token_id
 
     dataset = datasets.WalliserDeutschDataset(tokenizer, sample_size=loader.get_model_context_size(textwiz_model_name))
     collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
