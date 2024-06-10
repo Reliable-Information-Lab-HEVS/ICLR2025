@@ -6,7 +6,7 @@ from helpers import datasets
 from TextWiz.textwiz import loader
 
 model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'
-reverse_mapping = {v:k for k,v in loader.ALL_MODELS_MAPPING}
+reverse_mapping = {v:k for k,v in loader.ALL_MODELS_MAPPING.items()}
 textwiz_model_name = reverse_mapping[model_name]
 
 training_args = TrainingArguments(
