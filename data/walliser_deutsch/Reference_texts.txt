@@ -1,0 +1,61 @@
+Fine-tuning dataset: 
+
+Prompt: 
+"Please generate a short (100-150 words) news story about an event that took place in the Swiss canton of Valais, in the local language - Walliser Deutsch. The news story should be titled <title>" #Andrei : if no title, just omit the last part
+
+Reference texts: 
+
+<Title> "Lukas"
+
+Inämu chleinu Dorf im Oberwallis, umgä va majesthetischu Bärga, het än jungä Ma gläbt wa Lukas het gheissu. Der het därva giträumt, uf du hechsti Bärg va där ganzu Region dsschtigu. Das isch eppis wa schich der jungi Ma schon sid friäschtär Jugend het vorgnu. Doch het schich inä letschtu 10 Jahr ds'Klima värandrut. Di Gipfla va damals sind nimme ds ganz Jahr mit Schnee bideckt. Im Summär geseht mu da nur no Gras und Felsä. 
+
+Im Summär 2018 et där Lukas bischlossu, schinä Tröim la wahr dswärdu. Zämu mit Kollegä hed är schich uf du Wäg gmacht. Obwolls asträndung isch gsi, hetsmu suppär gfallu will är isch mit Kollegu dsämu gsi und het än suppär Zit ärläbt. 
+
+Wasch obina sind acho hensch nummu so gstünt ab där üssicht und dä tollu Bärga. Dum Lukas ist richtig biwusst wordu, wiä wichtig äs isch, öi d'Natur dsgniässu und mit Koolegä än tolli Zit ds'ärläbu.
+
+
+<Title> "Där Rägubogu"
+Inämu chleinu Dorf im Obärwallis het än chleinä Fux gläbt wa "Fini" het gheissu. Där "Fini" isch mega-gär durch d'Wise und d'Fäldär ghüpft und het öi gäru um Bachji gspillt. Nur ischär immär ä leinzig gsi und het kei Freunda ka. Äs tagsch het är plötzlisch uf d'smal än leuchtundä Stei gseh. Der het glüchtut wiä än Rägubogu. Där Fini het du Stei zwei andrä gizeigt, dum Vogil und dum schlauu Eihoorli. 
+
+Zämu sinsch losgizogu um dsgheimnis vam Stei zärgründu. Schi sind äns wit glufu, hend Wisä und Wäldär durchquert, bisch irgändswe zumu Rägubogu sind cho wa kei Farbe me het ka und nimme glüchtut het. Där Fini het gesh das im Rägubogu än Öffnig isch gis. Vorsichtig het är du Stei in d'Öffnig gita. Und plötzlich het där Rägubogu widär afa lüchtu in allä prächtigu Farbe. Und där Fini het plötzlich gmerkt, dass är zwei neui Freunda het gfundu.
+
+
+<Title> "Ds'Modäll va de Generationuhiischär".
+Vor 10 Jahr het ds'Obärwallis än innovativi Äntscheidig gitroffu. Mu het äntschidu, dass alli Altärsheim und Chindärtagesstätte zämugleit wärdung und dadrus soginannti Genärationuhiischär sellund äntstaa. Mu het du Üstüsch dwischu du Biwonär und dä Chindär wellu fördru. Die Biwonär sind weniger isoliärt gsi, aktivär und glücklichär. Mu het spetär sogar chänu feschststellu, das d'Läbunsärwartig isch gstigu. Fär d'Chindär is öi äns wichtig gsi. Schi hend va de Gschichte va du eltru Personä äns profitiärt und öi vill a Sozialkompetänz glehrt. DsWallisär Modäll isch so ärfolgrich gsi, dass sus die ganz Schwiz kopiärt het. Und ä so profitiärund jetzt - 10 Jahr spetär - alli därfa. Und d'Wallis het eimal meh än wichtigi Vorritärrollu igno. 
+
+
+<Title> Open Air Gampel
+Am vergangunu Wuchunänd heiwer am Open Gampel mal widder än unvergässlichi Ziit derfu erläbu mit super Müsig und güetu Vibes! Die atemberaubundi Kulissu vanu Walliser Alpä und die mitrissundu Performances va internationalu Künstler heint z’Festival zumä Summerhighlight la wärdu. Vo Elektro, Rock bis Hip-Hop isch ver jedä epis derbi gsi. T’Stimmig isch elektrisierund gsi und t’Energie ufum Gländ eifach unglaublich! Äs riesigs Dankeschön an die Bands, Organisatoru und vor allum eu an eib, ischum fantastischu Publikum! Markier dini festivalcrew und teil dinu bestu Erinnrigä mit dum Hashtag #OpenAirGampel2023! Wier fröiä isch uf tolli Bilder, die Vorfreude ver die negsti Üsgab isch jetz scho riesig. Bis dahin, eiwers Open Air Gampel Team!
+
+<Title> 11-er Turnier FC-Leuk-Susten
+Äs riesigs Merci an alli Bsüecher vam 11-er-Turnier vam FC Leigg-Sustu! Ier heit der Event wieder mal zumä unvergässlichu Tag gmacht. Eiwi Begeistrig und Unterstützig heint z’Spilfäld zum bäbu gibrungu und ischi jungi Mannschaft isch am brännu gsi. Es isch grossartig gsi z’gseh, wie die Gmeinschaft zämmuchund, um der Füessballgeist z’fiiru. Eiwi Lieduschaft het nit nur t’Spieler, sondern eu z’ganz Dorf inspiriert. Wier schätzä eiwi Awäsuheit und hoffä, dass ier genau so viel Gspass heit ka wie wier. Äs härzlichs Dankeschön ver eiwi Unterstützig, eiwi Jubelrüef und eiwu positivu Vibes. Ier sid die wahru Heldu vam Turnier und wie freuä isch scho druf, eib negst Jahr wieder z’gseh! #FCL11erTurnier #Gmeinschaft #DankeFerEiwiUnterstützig!
+
+<Title> Schlossmarkt Leuk-Stadt
+Es isch widder sowit, der Schlossmärt va Leigg steit vor der Port! Am chummundu Samstag findut zum 45. Mal der traditionell Schlossmärt inu Gassä va Leigg statt. Es sind insgesamt 50 Ständ agmäldu mit dumä vielfältigu Agibot, so dass ver jedä epis debi isch. Chinder chännund mit du Kameli oder Ponys vam Tildi ritu, schi chännund bastlu mit der Kita va Leigg, oder schich la schminku la vanu fröiwä va Kinderweelten. Eu ver die Erwachsunu giz natirli vil gseh und zmachu. Wie jedäs Jahr findut eu dizmal widder ischers traditionell Schnäggurännu statt, chum verbi und setz uf dinä Favorit. Dischers Jahr isch mim Schleimigu George än Topfavorit mit am Start, aber die jungu Schnäggä wie der glitschig Sepp oder die sanfti Paula wärdunt alles gä, um dum Topfavorit äs Bei z’stellu. Si eu derbi, das wird fantastisch! 
+
+
+<Title> 
+Der Wald oberhalb va Bitsch brännt !  Sit zweit Täg brännt der Wald oberhalb vaner Gemei Bitsch und bis jetzt gsehts nit so üs, wiä wen d Fiirwehrlit z Fiir bald uner Kontroll chänti bringu. Das trotz der Hilf vaner Armee und va verschidnu Fiirwehrä vaner ganz Schwiz. Gmäss dum Präsidänt vaner Gmei Bitsch isch der Brand rächt kompliziärt, nit nur will z Gländ rächt Steil isch und will z Risiko va Steischlag bisteit, aber sit gester winduts züäsätzlich, was z Fiir no witer üffacht und verbreitut. Öi ver d negschtu Täg gsehts Wättermässig nit besser üs. Wiär hoffä, dass z Fiir bald unter kontroll cha gibrungu wärdu. 
+
+
+<Title> 
+Dischä Fritag ischs äntlich so wit, nah fascht dum na Jahr wartu, chunt äntlich d neu Staffla vanä « Tschugger » üsa. Nah dum grossu Erfolg wa d Seria iner erst Staffla het chänu erzilu hent schich die Produzäntu entschidu, än witeri Stafla z machu. Wiä scho im erstu Teil verzellt d Seria di Gschicht vam Tschugger Bax, wa probiärt z Wallis z rettu. Das uf rächt unkonventionelli Art und mit vill Walliser Charm. D Seria isch uf Walliser Ditsch und spillt so ziemlich mit jedum Klische vam Wallis wans git, vam korruptu Bauunternähmer bis hin zu unkompetäntu Tschugger. D Seria wird uf SRF üsgstrallt und dassus öi di Grüäzini verstehnt, wird schi uf Hochditsch unertitlut.
+
+<Title> 
+Z Riedbrig isch än Wolf tot üfgfunnu wordu. Vor zweit Täg het än Ahwohner vaner Gmei vor schinum Hüs der Kadaver vam na Wolf gfunnu. Dass z Tiär uf natürlichi Wiss gstorbu isch cha üsgschlossu wärdu, da der Wolf än Schusswunda het. Öi wen Welf als gschützti Tiäri gältunt und nit därfunt gitetu wärdu, isch das nit der erscht Zwischufall im Wallis. Inä letztu Jahr sind mehreri Tiäri illegal gitetut word. Bim totu Wolf z Riedbrig wird momentan noh nach dum Täter gsüächt. Äs wird derfah üsgigangu, dass äs schich um än lokalä Landwirt handlut. Das will der Wolf in letschter Zit iner Gmei unzähligi Schafjini grissu het und drum ver grossä Schadu gsorgut het. Der Täter müäs mit ra Ahchlag und ra konsequäntu Gäldbüäs rächnu. 
+
+<Title>
+Diz isch ä kurzi Zämmufassig fa minum Job wa ni scho uber 20 Jahr machu. Ich bi där Leiter fam Studiugang Betriebsökonomie a der Hochschuel Wallis. Där Studiugang cha mu uf französisch und uf tidsch machu, prfüsbegleitund oder teilzyt oder vollzyt. Vollzyt geit dri Jahr und anduru 2 Üsbildigsmodi 4 Jahr.
+Ich bi züständig fär ca. 300 Studäntu und ungefähr 55 Dozentu. Es isch also ä richtig Managementufgab, aber sehr interessant, das müsi dä scho gseit ha.
+Zur Zyt siwär am neugstaltu fam Studiugang, er wird modernisiert, hät ja äu viel mit där Digitalisierig ztü. Das isch ä Prozess wa no einige Jahr wird düru.
+
+
+<Title>
+Ich bi ä Walliser und chomu fa Varu. Ich bin in Siders geboru und ha s’Kollegium in Brig gmacht. Dana bini nach Friburg an d’Uni gangu. Nachum Studium bini fär dri monat nach Ekuador gangu fär spanisch z’leru. Was fär a super Erfahrig, insbsundera d’Reis uf di Galapagos. 
+Spanisch hani sehr gschnell glehrt, leider brüchi di schöni Sprach nimä so oft und vergessu immer meh. Aber ich cha schon o mi verständigu. Ich hoffu, dass i bald wieder meh cha reisu und somit eu wieder meh mis Spanisch cha brüchu, di Sprach vam Härz, di mär so guet gfallt.
+
+
+<Title>
+Ich bi ä begeistertä Töfffahrer. Ich ha erst vor vier Jahr wieder agfangu Töff zfaru. Zur zyt fahri ä Honda 750 x, mi Träum isch sobald das i pänsioniert bi à GoldWing zfhru und no vil Kilometer zmachu und schöni Sachä zentedcku, sigs noch oder wit ä wäg – je nach Lust und Lünu.
+Super wäri wenn i super Lit würdu durch di Reisä kännulehru, denn der Kontakt zwischu Töfffahrer isch normalerwies einfach und schnäll möglich. Zudäm sind vili älteri uner dä Töfffahrer – also Lit wa Zyt händ und äs Hobby üsvierung wa g’Spass macht. So – jätzt hani dri mal äpis uber mich gschribu und insgesamt mehr als drihunder Werter ufs Papier gibrungu und all das i dra recht kurz Zyt.
+

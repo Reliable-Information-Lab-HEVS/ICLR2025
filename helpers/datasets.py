@@ -1,9 +1,10 @@
 import os
 from abc import ABC
 
+from torch.utils.data import Dataset
+
 from helpers import utils
 
-# TODO: Maybe inherit from a torch Dataset, but for now no need
 class SampleDataset(ABC):
     """Base class for dataset consisting of a serie of samples (dictionaries) with an id. We define it as
     an ABC because it cannot be instantiated (path attribute does not exist and is needed for __init__).
@@ -132,3 +133,30 @@ class AATKEnglishLlama3(SampleDataset):
     id_key: str = 'id'
 
 
+class WalliserDeutschDataset(Dataset):
+
+    def __init__(self, tokenizer, sample_size: int = 8192):
+
+        self.path = os.path.join(utils.DATA_FOLDER, 'walliser_deutsch', 'clean_data.txt')
+        self.texts = utils.load_txt(self.path, separator='\n\n\n\n')
+        # Remove whitespaces
+        self.texts = [x.strip() for x in self.texts]
+        # Tokenize
+        tokenized_texts = [tokenizer(text) for text in self.texts]
+
+        # Split if any text is longer than sample_size
+        self.tokenized_texts = []
+        for sample in tokenized_texts:
+            current_size = len(sample['input_ids'])
+            truncated_samples = [{k: v[i:i+sample_size] for k,v in sample.items()} for i in range(0, current_size, sample_size)]
+            self.tokenized_texts.extend(truncated_samples)
+        
+        # Add labels to samples
+        self.tokenized_texts = [{'labels': sample['input_ids'].copy(), **sample} for sample in self.tokenized_texts]
+
+    def __len__(self) -> int:
+        return len(self.tokenized_texts)
+    
+    def __getitem__(self, index: int | slice) -> dict | list[dict]:
+        return self.tokenized_texts[index]
+            
