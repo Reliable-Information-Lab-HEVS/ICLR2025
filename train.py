@@ -18,7 +18,8 @@ training_args = TrainingArguments(
     seed=123,
 )
 
-if __name__ == '__main__':
+
+def main():
 
     model_name = 'llama3-8B-instruct'
     model, tokenizer = loader.load_model_and_tokenizer(model_name)
@@ -35,3 +36,8 @@ if __name__ == '__main__':
     )
 
     trainer.train()
+
+
+if __name__ == '__main__':
+
+    main()
