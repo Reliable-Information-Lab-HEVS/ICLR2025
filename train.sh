@@ -16,6 +16,8 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
+echo CUDA_VISIBLE_DEVICES
+
 # Needs to be launched in this way to correctly use Torch DDP
 torchrun --nnodes 1 --nproc-per-node 4 --standalone train.py
 
