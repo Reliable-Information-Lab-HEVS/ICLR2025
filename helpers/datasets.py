@@ -151,8 +151,9 @@ class WalliserDeutschDataset(Dataset):
             truncated_samples = [{k: v[i:i+sample_size] for k,v in sample.items()} for i in range(0, current_size, sample_size)]
             self.tokenized_texts.extend(truncated_samples)
         
-        # Add labels to samples
-        self.tokenized_texts = [{'labels': sample['input_ids'].copy(), **sample} for sample in self.tokenized_texts]
+        # Add labels to samples -> This is not needed when using DataCollatorForLanguageModeling as it will
+        # be added automatically
+        # self.tokenized_texts = [{'labels': sample['input_ids'].copy(), **sample} for sample in self.tokenized_texts]
 
     def __len__(self) -> int:
         return len(self.tokenized_texts)
