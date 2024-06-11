@@ -10,13 +10,15 @@ reverse_mapping = {v:k for k,v in loader.ALL_MODELS_MAPPING.items()}
 textwiz_model_name = reverse_mapping[model_name]
 
 training_args = TrainingArguments(
-        optim='adamw_torch',
+        # optim='adamw_torch',
+        optim='adafactor',
         per_device_train_batch_size=3,
         learning_rate=5e-5,
         num_train_epochs=5,
         bf16=True,
         dataloader_num_workers=2,
         # torch_compile=True,
+        # torch_compile_backend=
         output_dir='training_results',
         logging_strategy='epoch',
         save_strategy='epoch',
