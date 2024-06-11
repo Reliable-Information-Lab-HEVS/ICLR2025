@@ -1,6 +1,7 @@
 import os
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
+from transformers.training_args import OptimizerNames
 
 from helpers import datasets
 from TextWiz.textwiz import loader
@@ -11,7 +12,7 @@ textwiz_model_name = reverse_mapping[model_name]
 
 training_args = TrainingArguments(
         # optim='adamw_torch',
-        optim='adafactor',
+        optim=OptimizerNames.SGD,
         per_device_train_batch_size=3,
         learning_rate=5e-5,
         num_train_epochs=5,
