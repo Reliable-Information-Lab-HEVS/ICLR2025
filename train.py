@@ -10,6 +10,8 @@ model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'
 reverse_mapping = {v:k for k,v in loader.ALL_MODELS_MAPPING.items()}
 textwiz_model_name = reverse_mapping[model_name]
 
+result_folder = 'training_results'
+
 training_args = TrainingArguments(
         optim='adamw_torch',
         # optim=OptimizerNames.SGD,
@@ -19,8 +21,8 @@ training_args = TrainingArguments(
         bf16=True,
         dataloader_num_workers=2,
         # torch_compile=True,
-        output_dir='training_results_new',
-        logging_dir='training_results_new/logs',
+        output_dir=result_folder,
+        logging_dir=result_folder + '/logs',
         logging_strategy='epoch',
         report_to='tensorboard',
         save_strategy='epoch',
