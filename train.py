@@ -10,13 +10,13 @@ model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'
 reverse_mapping = {v:k for k,v in loader.ALL_MODELS_MAPPING.items()}
 textwiz_model_name = reverse_mapping[model_name]
 
-result_folder = 'training_results'
+result_folder = 'training_results_2'
 
 training_args = TrainingArguments(
         optim='adamw_torch',
         # optim=OptimizerNames.SGD,
         per_device_train_batch_size=4,
-        learning_rate=5e-5,
+        learning_rate=5e-7,
         num_train_epochs=5,
         bf16=True,
         dataloader_num_workers=2,
