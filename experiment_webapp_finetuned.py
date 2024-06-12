@@ -273,8 +273,6 @@ with demo:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='LLM Playground')
-    parser.add_argument('--gpu_rank', type=int, default=0,
-                        help='The gpu to use (if only one gpu is needed).')
     parser.add_argument('--concurrency', type=int, default=1,
                         help='Number of threads that can run for generation (using the GPUs).')
     parser.add_argument('--no_auth', action='store_true',
@@ -286,14 +284,12 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     no_auth = args.no_auth
-    rank = args.gpu_rank
-    int8 = args.int8
     concurrency = args.concurrency
     LOG = args.log
     port = args.port
 
     # Initialize global model (necessary not to reload the model for each new inference)
-    MODEL = HFCausalModel(DEFAULT, gpu_rank=rank, quantization_8bits=int8)
+    MODEL = HFCausalModel(DEFAULT)
     
     print(f'Analytics: {demo.analytics_enabled}')
     if no_auth:
