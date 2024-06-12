@@ -19,11 +19,12 @@ training_args = TrainingArguments(
         bf16=True,
         dataloader_num_workers=2,
         # torch_compile=True,
-        # torch_compile_backend=
-        output_dir='training_results',
+        output_dir='training_results_new',
+        logging_dir='training_results_new/logs',
         logging_strategy='epoch',
-        save_strategy='epoch',
         report_to='tensorboard',
+        save_strategy='epoch',
+        save_only_model=True,
         seed=123,
     )
 
