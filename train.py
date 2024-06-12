@@ -4,7 +4,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingA
 from transformers.training_args import OptimizerNames
 
 from helpers import datasets
-from TextWiz.textwiz import loader
+from TextWiz.textwiz import loader, get_empty_conversation_template
 
 model_name = 'meta-llama/Meta-Llama-3-8B-Instruct'
 reverse_mapping = {v:k for k,v in loader.ALL_MODELS_MAPPING.items()}
@@ -44,7 +44,8 @@ def main():
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    dataset = datasets.WalliserDeutschDataset(tokenizer, sample_size=loader.get_model_context_size(textwiz_model_name))
+    dataset = datasets.WalliserDeutschDataset(tokenizer, template=get_empty_conversation_template(textwiz_model_name),
+                                              sample_size=loader.get_model_context_size(textwiz_model_name))
     collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
 
     trainer = Trainer(
