@@ -34,7 +34,8 @@ def main():
         model_name,
         attn_implementation='flash_attention_2',
         torch_dtype=loader.get_model_dtype(textwiz_model_name),
-        low_cpu_mem_usage=True
+        low_cpu_mem_usage=True,
+        device_map='auto'
     )
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
     if tokenizer.pad_token_id is None:
