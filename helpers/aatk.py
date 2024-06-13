@@ -10,7 +10,7 @@ from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
 DATASETS = ('AATK', 'AATK_english_chatGPT', 'AATK_english_zephyr', 'AATK_english_llama3')
-ENGLISH_CATASETS = tuple(x for x in DATASETS if x != 'AATK')
+ENGLISH_DATASETS = tuple(x for x in DATASETS if x != 'AATK')
 CATEGORIES = ('completions', 'results')
 
 NAME_TO_SAMPLES_BY_ID = {
@@ -221,8 +221,8 @@ def model_wise_results(dataset: str = 'AATK') -> pd.DataFrame:
 
 NAME_MAPPING = {
     'star-chat-alpha': 'StarChat (alpha)',
-    'code-llama-34B-instruct': 'CodeLlama 34B - Instruct',
     'llama2-70B-chat': 'Llama2 70B - Chat',
+    'code-llama-34B-instruct': 'CodeLlama 34B - Instruct',
     'code-llama-70B-instruct': 'CodeLlama 70B - Instruct',
     'zephyr-7B-beta': 'Zephyr 7B (beta)',
     'mistral-7B-instruct-v2': 'Mistral 7B - Instruct (v2)',
@@ -245,7 +245,7 @@ def probability_distributions(dataset: str = 'AATK_english_chatGPT', filename: s
         Optional filename to save the figure, by default None
     """
 
-    assert dataset in ENGLISH_CATASETS, 'Probability distributions only defined for reformulated AATK datasets'
+    assert dataset in ENGLISH_DATASETS, 'Probability distributions only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
 
     model_names = list(NAME_MAPPING.keys())
@@ -280,9 +280,12 @@ def probability_distributions(dataset: str = 'AATK_english_chatGPT', filename: s
         ax.grid(axis='x')
         sns.boxplot(df, orient='h', ax=ax)
         ax.set(xlabel=f'Distribution of $P_y$')
-        if tot == 1:
+        if tot == 1 or tot == 6:
             ax.set(ylabel='Prompt')
-        ax.set(title=NAME_MAPPING[model])
+        if 'CodeLlama' in NAME_MAPPING[model]:
+            ax.set(title='\n'.join(NAME_MAPPING[model].split(' - ')))
+        else:
+            ax.set(title=NAME_MAPPING[model])
 
     plt.show()
     if filename is not None:
@@ -352,7 +355,7 @@ def prompt_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str 
         The scores.
     """
 
-    assert dataset in ENGLISH_CATASETS, 'Prompt exposure only defined for reformulated AATK datasets'
+    assert dataset in ENGLISH_DATASETS, 'Prompt exposure only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
     cvss = get_cvss_scores()
 
@@ -384,8 +387,9 @@ def prompt_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str 
 
     if to_df:
         df = pd.DataFrame(PEs_by_model)
-        df.drop(columns=['codegen25-7B-instruct'], inplace=True)
-        df = df[['star-chat-alpha', 'code-llama-34B-instruct', 'llama2-70B-chat']]
+        # Reorder
+        df = df[list(NAME_MAPPING.keys())]
+        # Rename
         df.rename(columns=NAME_MAPPING, inplace=True)
         df.rename(index=lambda cwe: ' - '.join(cwe.rsplit('-', 1)), inplace=True)
 
@@ -393,3 +397,39 @@ def prompt_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str 
     
     else:
         return PEs_by_model
+    
+
+def model_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str = 'zephyr-7B-beta',
+                   exponential_average: bool = True, to_df: bool = True) -> dict | pd.DataFrame:
+    """Compute the model exposure scores.
+
+    Parameters
+    ----------
+    dataset : str, optional
+        The name of the dataset, by default 'AATK_english_chatGPT'
+    reference_model : str, optional
+        The model used to compute the perplexities, by default 'zephyr-7B-beta'.
+    exponential_average : bool, optional
+        Whether to use an exponential or traditional average, by default True
+    to_df : bool, optional
+        Whether to convert output to dataframe, by default True
+
+    Returns
+    -------
+    dict | pd.DataFrame
+        The scores.
+    """
+
+    prompt_exposure_scores = prompt_exposure(dataset, reference_model, to_df=True)
+    if exponential_average:
+        model_exposure_scores = 10**prompt_exposure_scores
+        model_exposure_scores = np.log10(model_exposure_scores.mean(axis=0))
+    else:
+        model_exposure_scores = prompt_exposure_scores.mean(axis=0)
+
+    if to_df:
+        return model_exposure_scores
+    else:
+        return model_exposure_scores.to_dict()
+
+

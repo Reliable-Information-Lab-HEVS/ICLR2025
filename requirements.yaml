@@ -26,6 +26,7 @@ dependencies:
     - sentencepiece
     - protobuf
     - tiktoken
+    - tensorboard
     # For flash attention 2
     - packaging
     - ninja
