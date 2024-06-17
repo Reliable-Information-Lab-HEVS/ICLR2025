@@ -233,6 +233,33 @@ NAME_MAPPING = {
 }
 
 
+def valid_completions(dataset: str = 'AATK_english_chatGPT'):
+    """Show the proportion of valid code snippets in the AATK english completions.
+
+    Parameters
+    ----------
+    dataset : str, optional
+        The name of the dataset, by default 'AATK_english_chatGPT'
+    """
+
+    assert dataset in ENGLISH_DATASETS, 'Probability distributions only defined for reformulated AATK datasets'
+    files = extract_filenames(dataset, category='results')
+
+    tot_valid_per_model = {}
+
+    for file in files:
+        result = utils.load_jsonl(file)
+        model = parse_filename(file)['model']
+        
+        tot_valid = 0
+        for res in result:
+            tot_valid += res['valid']
+
+        # Value in percentage
+        tot_valid_per_model[model] = tot_valid / (len(result) * 25) * 100
+
+    return tot_valid_per_model
+
 
 def probability_distributions(dataset: str = 'AATK_english_chatGPT', filename: str | None = None):
     """Show the probability distribution per scenarios.
