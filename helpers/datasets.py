@@ -46,7 +46,7 @@ class HumanEval(SampleDataset):
     """Class representing the HumanEval dataset.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval', 'HumanEval.jsonl')
     id_key: str = 'task_id'
 
 
@@ -54,7 +54,7 @@ class HumanEvalInstruct(SampleDataset):
     """Class representing the HumanEval_Instruct dataset.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval_Instruct.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval', 'HumanEval_Instruct.jsonl')
     id_key: str = 'task_id'
 
 
@@ -62,7 +62,7 @@ class HumanEvalPHP(SampleDataset):
     """Class representing the MutiPL-E variation of the HumanEval dataset for the PHP language.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval_php.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval', 'HumanEval_php.jsonl')
     id_key: str = 'task_id'
 
 
@@ -70,7 +70,7 @@ class HumanEvalCPP(SampleDataset):
     """Class representing the MutiPL-E variation of the HumanEval dataset for the C++ language.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval_cpp.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval', 'HumanEval_cpp.jsonl')
     id_key: str = 'task_id'
 
 
@@ -78,7 +78,7 @@ class HumanEvalRust(SampleDataset):
     """Class representing the MutiPL-E variation of the HumanEval dataset for the Rust language.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval_rs.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'HumanEval', 'HumanEval_rs.jsonl')
     id_key: str = 'task_id'
 
 
@@ -103,34 +103,34 @@ class AATK(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'AATK.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK.jsonl')
     id_key: str = 'id'
 
 
 class AATKInstructChatGPT(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
-    Also contains the prompts in natural language (english).
+    Also contains the prompts in natural language (instruct).
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english_chatGPT.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_chatGPT.jsonl')
     id_key: str = 'id'
 
 
 class AATKInstructZephyr(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
-    Also contains the prompts in natural language (english).
+    Also contains the prompts in natural language (instruct).
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english_zephyr.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_zephyr.jsonl')
     id_key: str = 'id'
 
 
 class AATKInstructLlama3(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
-    Also contains the prompts in natural language (english).
+    Also contains the prompts in natural language (instruct).
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'AATK_english_llama3.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_llama3.jsonl')
     id_key: str = 'id'
 
 

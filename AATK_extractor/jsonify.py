@@ -53,7 +53,7 @@ if __name__ == '__main__':
             origin = 'authors'
 
         # Create new folder where we save the custom ql queries for easier access
-        folder = os.path.join(utils.DATA_FOLDER, 'custom_ql_queries')
+        folder = os.path.join(utils.DATA_FOLDER, 'AATK', 'custom_ql_queries')
         os.makedirs(folder, exist_ok=True)
 
         # Check if the query is custom or not
