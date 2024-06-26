@@ -33,20 +33,20 @@ AATK_GREEDY_GENERATION_KWARGS = {
 
 
 REFORMULATION_MODEL_TO_DATASET = {
-    'chatGPT': datasets.AATKEnglishChatGPT(),
-    'zephyr': datasets.AATKEnglishZephyr(),
-    'llama3': datasets.AATKEnglishLlama3(),
+    'chatGPT': datasets.AATKInstructChatGPT(),
+    'zephyr': datasets.AATKInstructZephyr(),
+    'llama3': datasets.AATKInstructLlama3(),
 }
 
 
 REFORMULATION_MODEL_TO_DATASET_NAME = {
-    'chatGPT': 'AATK_english_chatGPT',
-    'zephyr': 'AATK_english_zephyr',
-    'llama3': 'AATK_english_llama3',
+    'chatGPT': 'AATK_instruct_chatGPT',
+    'zephyr': 'AATK_instruct_zephyr',
+    'llama3': 'AATK_instruct_llama3',
 }
 
 
-def aatk_english_benchmark(model_name: str, reformulation_model: str, quantization_8bits: bool = False,
+def aatk_instruct_benchmark(model_name: str, reformulation_model: str, quantization_8bits: bool = False,
                            quantization_4bits: bool = False, temperatures: tuple[int] = TEMPERATURES,
                            generation_kwargs: dict = AATK_GENERATION_KWARGS,
                            greedy_generation_kwargs: dict = AATK_GREEDY_GENERATION_KWARGS):
@@ -70,7 +70,7 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
     prompt_template_mode = 'chat'
 
     if not textwiz.is_chat_model(model_name):
-        raise ValueError('Cannot run AATKEnglish benchmark on non-chat model.')
+        raise ValueError('Cannot run AATKInstruct benchmark on non-chat model.')
     
     dtype_name = textwiz.dtype_category(model_name, quantization_4bits, quantization_8bits)
     folder = aatk.get_folder(REFORMULATION_MODEL_TO_DATASET_NAME[reformulation_model], model_name, dtype_name)
@@ -117,11 +117,11 @@ def aatk_english_benchmark(model_name: str, reformulation_model: str, quantizati
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='AATK english benchmark')
+    parser = argparse.ArgumentParser(description='AATK instruct benchmark')
     parser.add_argument('model', type=str,
                         help='The model to run.')
     parser.add_argument('--reformulation_model', type=str, choices=['chatGPT', 'zephyr', 'llama3'], default='chatGPT',
-                        help='Version of the AATK english benchmark (i.e. model used for reformulations)')
+                        help='Version of the AATK instruct benchmark (i.e. model used for reformulations)')
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
     parser.add_argument('--int4', action='store_true',
@@ -136,6 +136,6 @@ if __name__ == '__main__':
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
 
-    aatk_english_benchmark(model, reformulation_model, int8, int4)
+    aatk_instruct_benchmark(model, reformulation_model, int8, int4)
     
 

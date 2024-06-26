@@ -16,7 +16,7 @@ dependencies:
   - pandas=2.0.2
   - pip:
     # - transformers==4.33.1
-    - git+https://github.com/Cyrilvallez/transformers.git@cache-efficiency
+    - git+https://github.com/Cyrilvallez/transformers.git@logits-dtype
     - tokenizers
     - huggingface-hub
     - accelerate

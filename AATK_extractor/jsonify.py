@@ -6,7 +6,7 @@ import shutil
 
 from helpers import utils
 
-clean_folder = os.path.join(utils.DATA_FOLDER, 'clean_automatic_AATK_benchmark')
+clean_folder = os.path.join(utils.DATA_FOLDER, 'original_AATK', 'clean_automatic_AATK_benchmark')
 
 cwes = [os.path.join(clean_folder, cwe) for cwe in os.listdir(clean_folder) if not cwe.startswith('.')]
 
@@ -90,4 +90,4 @@ if __name__ == '__main__':
 
         dataset.append(sample)
 
-    utils.save_jsonl(dataset, os.path.join(utils.DATA_FOLDER, 'AATK.jsonl'))
+    utils.save_jsonl(dataset, os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK.jsonl'))

@@ -27,7 +27,7 @@ def check_security(problem: dict, completions: list[dict], is_code_completion: b
     completions : list[dict]
         List of completion outputs corresponding to `problem`.
     is_code_completion : bool
-        Whether this is raw code completion, or answer to a prompt in natural language (english).
+        Whether this is raw code completion, or answer to a prompt in natural language (instruct).
 
     Returns
     -------
@@ -184,9 +184,9 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
 
 
 
-def evaluate_security_english(sample_file: str, n_workers: int = 6):
+def evaluate_security_instruct(sample_file: str, n_workers: int = 6):
     """Evaluate the security of every sample in `sample_file`, and save the results. This is supposed to be
-    used with the completions of prompts in natural language (english).
+    used with the completions of prompts in natural language (instruct).
 
     Parameters
     ----------
@@ -200,7 +200,7 @@ def evaluate_security_english(sample_file: str, n_workers: int = 6):
     attributes = aatk.parse_filename(sample_file)
     out_file = attributes['associated_results_file']
 
-    problems = datasets.AATKEnglishChatGPT().samples_by_id()
+    problems = datasets.AATKInstructChatGPT().samples_by_id()
     samples = utils.load_jsonl(sample_file)
 
     # Find all samples corresponding to each id and prompt
@@ -305,7 +305,7 @@ if __name__ == '__main__':
     for file in tqdm(files):
         evaluate_security(file, n_workers=8)
 
-    for dataset in ('AATK_english_chatGPT', 'AATK_english_zephyr', 'AATK_english_llama3'):
+    for dataset in ('AATK_instruct_chatGPT', 'AATK_instruct_zephyr', 'AATK_instruct_llama3'):
         files = aatk.extract_filenames(dataset=dataset, category='completions', only_unprocessed=True)
         for file in tqdm(files):
-            evaluate_security_english(file, n_workers=8)
+            evaluate_security_instruct(file, n_workers=8)

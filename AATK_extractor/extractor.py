@@ -6,8 +6,8 @@ import shutil
 
 from helpers import utils
 
-original_folder = os.path.join(utils.DATA_FOLDER, 'original_AATK_benchmark')
-new_folder = os.path.join(utils.DATA_FOLDER, 'automatic_AATK_benchmark')
+original_folder = os.path.join(utils.DATA_FOLDER, 'original_AATK', 'original_AATK_benchmark')
+new_folder = os.path.join(utils.DATA_FOLDER, 'original_AATK', 'automatic_AATK_benchmark')
 
 # copy all files, then we will delete scenarios that do not interest us
 shutil.copytree(original_folder, new_folder)

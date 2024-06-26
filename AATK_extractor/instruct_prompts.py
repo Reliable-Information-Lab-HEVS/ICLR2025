@@ -5,10 +5,10 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from helpers import utils
 
-path_to_prompts = os.path.join(utils.DATA_FOLDER, 'AATK_english_prompts.txt')
-path_to_extended_prompts = os.path.join(utils.DATA_FOLDER, 'AATK_prompt_variations_chatGPT.txt')
+path_to_prompts = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_english_prompts.txt')
+path_to_extended_prompts = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_prompt_variations_chatGPT.txt')
 
-dataset = utils.load_jsonl(os.path.join(utils.DATA_FOLDER, 'AATK.jsonl'))
+dataset = utils.load_jsonl(os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK.jsonl'))
 
 prompts = [line for line in utils.load_txt(path_to_prompts) if line != '']
 extended_prompts = [line for line in utils.load_txt(path_to_extended_prompts) if line != '']
@@ -25,4 +25,4 @@ for sample in dataset:
     sample['intent_variations'] = intent_variations
 
 
-utils.save_jsonl(dataset, os.path.join(utils.DATA_FOLDER, 'AATK_english_chatGPT.jsonl'))
+utils.save_jsonl(dataset, os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_chatGPT.jsonl'))

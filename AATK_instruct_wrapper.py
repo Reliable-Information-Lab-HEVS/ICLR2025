@@ -9,9 +9,9 @@ from helpers import utils
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='AATKEnglish benchmark')
+    parser = argparse.ArgumentParser(description='AATKInstruct benchmark')
     parser.add_argument('--reformulation_model', type=str, choices=['chatGPT', 'zephyr', 'llama3'], default='chatGPT',
-                        help='Version of the AATK english benchmark (i.e. model used for reformulations)')
+                        help='Version of the AATK instruct benchmark (i.e. model used for reformulations)')
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
     parser.add_argument('--int4', action='store_true',
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
     # Create the commands to run
     gpu_footprints = textwiz.estimate_number_of_gpus(models, int8, int4)
-    commands = [f'python3 -u AATK_english.py {model} --reformulation_model {reformulation_model}' for model in models]
+    commands = [f'python3 -u AATK_instruct.py {model} --reformulation_model {reformulation_model}' for model in models]
     if int8:
         commands = [c + ' --int8' for c in commands]
     if int4:

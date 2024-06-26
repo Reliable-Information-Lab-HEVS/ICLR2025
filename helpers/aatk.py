@@ -9,14 +9,14 @@ import seaborn as sns
 from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
-DATASETS = ('AATK', 'AATK_english_chatGPT', 'AATK_english_zephyr', 'AATK_english_llama3')
+DATASETS = ('AATK', 'AATK_instruct_chatGPT', 'AATK_instruct_zephyr', 'AATK_instruct_llama3')
 ENGLISH_DATASETS = tuple(x for x in DATASETS if x != 'AATK')
 CATEGORIES = ('completions', 'results')
 
 NAME_TO_SAMPLES_BY_ID = {
-    'AATK_english_chatGPT': datasets.AATKEnglishChatGPT().samples_by_id(),
-    'AATK_english_zephyr': datasets.AATKEnglishZephyr().samples_by_id(),
-    'AATK_english_llama3': datasets.AATKEnglishLlama3().samples_by_id(),
+    'AATK_instruct_chatGPT': datasets.AATKInstructChatGPT().samples_by_id(),
+    'AATK_instruct_zephyr': datasets.AATKInstructZephyr().samples_by_id(),
+    'AATK_instruct_llama3': datasets.AATKInstructLlama3().samples_by_id(),
 }
 
 def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:
@@ -233,13 +233,13 @@ NAME_MAPPING = {
 }
 
 
-def valid_completions(dataset: str = 'AATK_english_chatGPT'):
-    """Show the proportion of valid code snippets in the AATK english completions.
+def valid_completions(dataset: str = 'AATK_instruct_chatGPT'):
+    """Show the proportion of valid code snippets in the AATK instruct completions.
 
     Parameters
     ----------
     dataset : str, optional
-        The name of the dataset, by default 'AATK_english_chatGPT'
+        The name of the dataset, by default 'AATK_instruct_chatGPT'
     """
 
     assert dataset in ENGLISH_DATASETS, 'Probability distributions only defined for reformulated AATK datasets'
@@ -261,13 +261,13 @@ def valid_completions(dataset: str = 'AATK_english_chatGPT'):
     return tot_valid_per_model
 
 
-def probability_distributions(dataset: str = 'AATK_english_chatGPT', filename: str | None = None):
+def probability_distributions(dataset: str = 'AATK_instruct_chatGPT', filename: str | None = None):
     """Show the probability distribution per scenarios.
 
     Parameters
     ----------
     dataset : str, optional
-        The name of the dataset, by default 'AATK_english_chatGPT'
+        The name of the dataset, by default 'AATK_instruct_chatGPT'
     filename : str | None, optional
         Optional filename to save the figure, by default None
     """
@@ -334,7 +334,7 @@ def get_cvss_scores() -> dict:
         The scores.
     """
 
-    with open(os.path.join(utils.DATA_FOLDER, 'cvss_scores.txt')) as file:
+    with open(os.path.join(utils.DATA_FOLDER, 'AATK', 'cvss_scores.txt')) as file:
         scores = [x.strip() for x in file.readlines()]
 
     cvss = {}
@@ -364,13 +364,13 @@ def get_perplexity(model: str, dataset: str, id: str, prompt_id: str) -> float:
         raise RuntimeError(f'It seems that perplexities were not computed with {model} on the dataset {dataset}')
 
 
-def prompt_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str = 'zephyr-7B-beta', to_df: bool = True) -> dict | pd.DataFrame:
+def prompt_exposure(dataset: str = 'AATK_instruct_chatGPT', reference_model: str = 'zephyr-7B-beta', to_df: bool = True) -> dict | pd.DataFrame:
     """Compute the prompt exposure for each scenario.
 
     Parameters
     ----------
     dataset : str, optional
-        The name of the dataset, by default 'AATK_english_chatGPT'
+        The name of the dataset, by default 'AATK_instruct_chatGPT'
     reference_model : str, optional
         The model used to compute the perplexities, by default 'zephyr-7B-beta'.
     to_df : bool, optional
@@ -426,14 +426,14 @@ def prompt_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str 
         return PEs_by_model
     
 
-def model_exposure(dataset: str = 'AATK_english_chatGPT', reference_model: str = 'zephyr-7B-beta',
+def model_exposure(dataset: str = 'AATK_instruct_chatGPT', reference_model: str = 'zephyr-7B-beta',
                    exponential_average: bool = True, to_df: bool = True) -> dict | pd.DataFrame:
     """Compute the model exposure scores.
 
     Parameters
     ----------
     dataset : str, optional
-        The name of the dataset, by default 'AATK_english_chatGPT'
+        The name of the dataset, by default 'AATK_instruct_chatGPT'
     reference_model : str, optional
         The model used to compute the perplexities, by default 'zephyr-7B-beta'.
     exponential_average : bool, optional

@@ -335,7 +335,7 @@ def save_human_eval_dataset(language: str):
     problems = sorted(problems, key=lambda x: int(x['name'].split('_')[1]))
     # Add task_id
     problems = [{**problem, 'task_id': '/'.join(problem['name'].split('_')[0:2])} for problem in problems]
-    save_jsonl(problems, os.path.join(DATA_FOLDER, f'HumanEval_{language}.jsonl'))
+    save_jsonl(problems, os.path.join(DATA_FOLDER, 'HumanEval', f'HumanEval_{language}.jsonl'))
 
 
 def find_rank_of_subprocess_inside_the_pool():

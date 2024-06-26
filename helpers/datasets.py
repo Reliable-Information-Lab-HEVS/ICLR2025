@@ -107,7 +107,7 @@ class AATK(SampleDataset):
     id_key: str = 'id'
 
 
-class AATKEnglishChatGPT(SampleDataset):
+class AATKInstructChatGPT(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
     Also contains the prompts in natural language (english).
     """
@@ -116,7 +116,7 @@ class AATKEnglishChatGPT(SampleDataset):
     id_key: str = 'id'
 
 
-class AATKEnglishZephyr(SampleDataset):
+class AATKInstructZephyr(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
     Also contains the prompts in natural language (english).
     """
@@ -125,7 +125,7 @@ class AATKEnglishZephyr(SampleDataset):
     id_key: str = 'id'
 
 
-class AATKEnglishLlama3(SampleDataset):
+class AATKInstructLlama3(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
     Also contains the prompts in natural language (english).
     """
