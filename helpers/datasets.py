@@ -178,3 +178,28 @@ class WalliserDeutschDataset(Dataset):
     def __getitem__(self, index: int | slice) -> dict | list[dict]:
         return self.tokenized_texts[index]
             
+
+class PurpleLlamaDataset(object):
+    """Class representing the original instruct version of Purple Llama dataset.
+    """
+
+    def __init__(self):
+
+        self.path = os.path.join(utils.DATA_FOLDER, 'purple_llama', 'instruct.json')
+        # Load all dataset in memory since it is small
+        self.samples = utils.load_json(self.path)
+
+    def __len__(self):
+
+        return len(self.samples)
+    
+    def __getitem__(self, key: int | slice) -> dict[str, str] | list[dict[str, str]]:
+
+        return self.samples[key]
+    
+    def __iter__(self):
+        """Create a simple generator over the samples.
+        """
+
+        for i in range(len(self)):
+            yield self[i]

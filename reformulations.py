@@ -115,35 +115,24 @@ def create_variations(model: HFCausalModel, original_prompt: str, N: int = 10, r
     raise BadFormatException(f'Could not correctly generate {N} variations after {recursion_depth} tries.')
 
 
-def map_output_to_AATK_format(output_bank: list[dict]) -> list[dict]:
-    """Map created variations to AATK format (mapping by id)"""
-
-    AATK_samples = datasets.AATK().samples_by_id()
-    out = []
-    for sample in output_bank:
-        aatk_sample = AATK_samples[sample['id']]
-        aatk_sample['intent'] = sample['original_prompt']
-        aatk_sample['intent_variations'] = sample['prompt_variations']
-        out.append(aatk_sample)
-
-    return out
-
-
-def main(model: str, input_file: str, output_file: str, N: int, map_to_AATK_format: bool):
-    """Create `N` different versions of the prompts in `input_file`, and then use `main_model` to generate
-    text based on those prompts and `generation_kwargs`. If `existing_variations` is True, ìnput_file` is assumed
-    to already contain the prompts variations and they are not re-generated. Save results to `output_file`.
+def main(model: str, input_file: str, output_file: str, N: int, original_key: str, new_key: str = 'prompt_variations'):
+    """Create `N` different versions of the prompts in `input_file`. Save results to `output_file`.
 
     Parameters
     ----------
     model : str
         The model to use to generate the prompt variations.
     input_file : str
-        Path to the file containing the prompts.
+        Path to the file containing the prompts. It should be a `jsonl` file containing one json serialized object
+        per new line.
     output_file : str
         Where to save the results.
     N : int
         How many prompts to generate.
+    original_key : str
+        Name of the key holding the prompts to reformulate in each dictionary in `input_file`.
+    new_key : str, optional
+        Name of the dictionary key used to save the prompt variations in the new dictionaries. By default 'prompt_variations'.
     """
 
     # Make sure output file will be writable
@@ -160,13 +149,13 @@ def main(model: str, input_file: str, output_file: str, N: int, map_to_AATK_form
 
     # Create variations
     samples = utils.load_jsonl(input_file)
-    assert all(['prompt' in sample.keys() for sample in samples]), 'Input file format is incorrect'
+    assert all([original_key in sample.keys() for sample in samples]), 'The `original_key` is not present in all samples'
 
     model = HFCausalModel(model)
 
     output_bank = []
     for sample in tqdm(samples):
-        prompt = sample['prompt']
+        prompt = sample[original_key]
         # Try to create the prompt variations
         try:
             variations = create_variations(model, prompt, N)
@@ -174,20 +163,13 @@ def main(model: str, input_file: str, output_file: str, N: int, map_to_AATK_form
             warnings.warn(f'Could not create {N} variations of the following prompt (ignoring it):\n{prompt}')
             continue
 
-        output_sample = {k:v for k,v in sample.items() if k != 'prompt'}
-        output_sample['original_prompt'] = prompt
-        output_sample['prompt_variations'] = variations
+        output_sample = sample.copy()
+        output_sample[new_key] = variations
         # Add to the output bank
         output_bank.append(output_sample)
 
         # Save the generated prompts
         utils.save_jsonl(output_bank, output_file)
-
-    if map_to_AATK_format:
-        # Save the generated prompts
-        output_bank = map_output_to_AATK_format(output_bank)
-        utils.save_jsonl(output_bank, output_file)
-
 
 
 if __name__ == '__main__':
@@ -201,16 +183,18 @@ if __name__ == '__main__':
                         help='A path to save the output file.')
     parser.add_argument('--N', type=int, default=10,
                         help='How many variations of each prompt to create.')
-    parser.add_argument('--map_to_AATK_format', action='store_true',
-                        help='If given, try to map to the AATK dataset format.')
+    parser.add_argument('--original_key', type=str, required=True,
+                        help='The dictionary key containing the prompts to reformulate in `input_file`.')
+    parser.add_argument('--new_key', type=str, default='prompt_variations',
+                        help='The dictionary key in which to save the prompt reformulations in `output_file`.')
     
     args = parser.parse_args()
     model = args.model
     input_file = args.input_file
     output_file = args.output_file
     N = args.N
-    map_to_AATK_format = args.map_to_AATK_format
+    original_key = args.original_key
+    new_key = args.new_key
 
-    main(model=model, input_file=input_file, output_file=output_file, N=N,
-         map_to_AATK_format=map_to_AATK_format)
+    main(model=model, input_file=input_file, output_file=output_file, N=N, original_key=original_key, new_key=new_key)
 
