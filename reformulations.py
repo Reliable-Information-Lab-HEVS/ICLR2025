@@ -98,14 +98,12 @@ def create_variations(model: HFCausalModel, original_prompt: str, N: int = 10, r
         pass
 
     # Greedy decoding failed to output a correct format -> try stochastic sample of the new tokens
-    recursion_count = 0
     # We try to generate 10 times the new prompts, and abandon afterwards
-    while recursion_count < recursion_depth:
-
-        recursion_count += 1
-        # We use a larger repetition_penalty because its effect gets smoothed by the low temperature
-        out = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30, batch_size=1,
-                    stopping_patterns=[f'\n{N+1}. '], repetition_penalty=1.15, seed=123)
+    # We use a larger repetition_penalty because its effect gets smoothed by the low temperature
+    outputs = model(prompt, max_new_tokens=4096, do_sample=True, temperature=0.4, top_p=0.9, top_k=30,
+                    num_return_sequences=10, stopping_patterns=[f'\n{N+1}. '], repetition_penalty=1.15, seed=123)
+    
+    for out in outputs:
         try:
             prompts = parse_output(out, N)
             return prompts
