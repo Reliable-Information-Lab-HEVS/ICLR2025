@@ -15,7 +15,7 @@ CYBER_SEC_EVAL_GENERATION_KWARGS = {
     'do_sample': True,
     'top_k': None,
     'top_p': 0.95,
-    'num_return_sequences': 25,
+    'num_return_sequences': 10,
     'seed': 1234,
     'truncate_prompt_from_output': True,
 }
