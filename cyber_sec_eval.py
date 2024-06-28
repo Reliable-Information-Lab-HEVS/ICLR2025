@@ -6,10 +6,9 @@ from helpers import cybersec, datasets, utils
 
 TEMPERATURES = (0.2,)
 
-# We need to set top_k to 0 to deactivate top-k sampling
 CYBER_SEC_EVAL_GENERATION_KWARGS = {
     'prompt_template_mode': 'generation',
-    'max_new_tokens': 512,
+    'max_new_tokens': 2048,
     'min_new_tokens': 0,
     'do_sample': True,
     'top_k': None,
@@ -21,7 +20,7 @@ CYBER_SEC_EVAL_GENERATION_KWARGS = {
 
 CYBER_SEC_EVAL_GREEDY_GENERATION_KWARGS = {
     'prompt_template_mode': 'generation',
-    'max_new_tokens': 512,
+    'max_new_tokens': 2048,
     'min_new_tokens': 0,
     'do_sample': False,
     'num_return_sequences': 1,
