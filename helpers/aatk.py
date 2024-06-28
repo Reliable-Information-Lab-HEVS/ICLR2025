@@ -10,7 +10,7 @@ from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
 DATASETS = ('AATK', 'AATK_instruct_chatGPT', 'AATK_instruct_zephyr', 'AATK_instruct_llama3')
-ENGLISH_DATASETS = tuple(x for x in DATASETS if x != 'AATK')
+INSTRUCT_DATASETS = tuple(x for x in DATASETS if x != 'AATK')
 CATEGORIES = ('completions', 'results')
 
 NAME_TO_SAMPLES_BY_ID = {
@@ -242,7 +242,7 @@ def valid_completions(dataset: str = 'AATK_instruct_chatGPT'):
         The name of the dataset, by default 'AATK_instruct_chatGPT'
     """
 
-    assert dataset in ENGLISH_DATASETS, 'Probability distributions only defined for reformulated AATK datasets'
+    assert dataset in INSTRUCT_DATASETS, 'Probability distributions only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
 
     tot_valid_per_model = {}
@@ -272,7 +272,7 @@ def probability_distributions(dataset: str = 'AATK_instruct_chatGPT', filename: 
         Optional filename to save the figure, by default None
     """
 
-    assert dataset in ENGLISH_DATASETS, 'Probability distributions only defined for reformulated AATK datasets'
+    assert dataset in INSTRUCT_DATASETS, 'Probability distributions only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
 
     model_names = list(NAME_MAPPING.keys())
@@ -382,7 +382,7 @@ def prompt_exposure(dataset: str = 'AATK_instruct_chatGPT', reference_model: str
         The scores.
     """
 
-    assert dataset in ENGLISH_DATASETS, 'Prompt exposure only defined for reformulated AATK datasets'
+    assert dataset in INSTRUCT_DATASETS, 'Prompt exposure only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
     cvss = get_cvss_scores()
 

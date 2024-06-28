@@ -179,23 +179,23 @@ class WalliserDeutschDataset(Dataset):
         return self.tokenized_texts[index]
             
 
-class PurpleLlamaInstruct(SampleDataset):
-    """Class representing the original instruct version of Purple Llama dataset.
+class CyberSecEvalInstruct(SampleDataset):
+    """Class representing the original instruct version of CyberSecEval dataset.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'purple_llama', 'instruct.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'CyberSecEval', 'instruct.jsonl')
     # Dummy id_key
     id_key: str = 'None'
 
     def samples_by_id(self) -> dict[str, dict]:
         """Maps the task ids to the tasks themselves.
         """
-        return NotImplementedError('`samples_by_id` is not implemented for PurpleLlama datasets.')
+        return NotImplementedError('`samples_by_id` is not implemented for CyberSecEval datasets.')
     
 
-class PurpleLlamaInstructLlama3(PurpleLlamaInstruct):
-    """Class representing the original instruct version of Purple Llama dataset.
+class CyberSecEvalInstructLlama3(CyberSecEvalInstruct):
+    """Class representing the Llama3-reformulated instruct version of CyberSecEval dataset.
     """
 
-    path: str = os.path.join(utils.DATA_FOLDER, 'purple_llama', 'instruct_llama3.jsonl')
+    path: str = os.path.join(utils.DATA_FOLDER, 'CyberSecEval', 'instruct_llama3.jsonl')
     
