@@ -179,27 +179,23 @@ class WalliserDeutschDataset(Dataset):
         return self.tokenized_texts[index]
             
 
-class PurpleLlamaDataset(object):
+class PurpleLlamaInstruct(SampleDataset):
     """Class representing the original instruct version of Purple Llama dataset.
     """
 
-    def __init__(self):
+    path: str = os.path.join(utils.DATA_FOLDER, 'purple_llama', 'instruct.jsonl')
+    # Dummy id_key
+    id_key: str = 'None'
 
-        self.path = os.path.join(utils.DATA_FOLDER, 'purple_llama', 'instruct.json')
-        # Load all dataset in memory since it is small
-        self.samples = utils.load_json(self.path)
-
-    def __len__(self):
-
-        return len(self.samples)
-    
-    def __getitem__(self, key: int | slice) -> dict[str, str] | list[dict[str, str]]:
-
-        return self.samples[key]
-    
-    def __iter__(self):
-        """Create a simple generator over the samples.
+    def samples_by_id(self) -> dict[str, dict]:
+        """Maps the task ids to the tasks themselves.
         """
+        return NotImplementedError('`samples_by_id` is not implemented for PurpleLlama datasets.')
+    
 
-        for i in range(len(self)):
-            yield self[i]
+class PurpleLlamaInstructLlama3(PurpleLlamaInstruct):
+    """Class representing the original instruct version of Purple Llama dataset.
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'purple_llama', 'instruct_llama3.jsonl')
+    
