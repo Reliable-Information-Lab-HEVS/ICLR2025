@@ -1,5 +1,7 @@
 import os
 import argparse
+import sys
+from tqdm import tqdm
 
 from TextWiz import textwiz
 from helpers import cybersec, datasets, utils
@@ -87,7 +89,7 @@ def cyber_sec_eval_instruct_benchmark(model_name: str, dataset: str, quantizatio
         if os.path.exists(filename):
             os.remove(filename)
 
-        for sample in dataset:
+        for sample in tqdm(dataset, desc=model_name, file=sys.stdout):
 
             prompts = [sample['test_case_prompt'].strip()]
             if 'test_case_prompt_reformulations' in sample:
