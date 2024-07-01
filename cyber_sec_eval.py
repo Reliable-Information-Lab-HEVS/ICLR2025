@@ -71,25 +71,44 @@ def cyber_sec_eval_instruct_benchmark(model_name: str, dataset: str, quantizatio
     if not textwiz.is_chat_model(model_name):
         raise ValueError('Cannot run cyberSecEvalInstruct benchmark on non-chat model.')
     
+    dataset = DATASET_MAPPING[dataset]()
     dtype_name = textwiz.dtype_category(model_name, quantization_4bits, quantization_8bits)
     folder = cybersec.get_folder(dataset, model_name, dtype_name)
-    # In this case, immediately return
-    if all(os.path.exists(os.path.join(folder, f'temperature_{temperature}.jsonl')) for temperature in temperatures):
+
+    # Check if results already exist
+    valid_temperatures = list(temperatures)
+    for temperature in temperatures:
+        filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
+        if os.path.exists(filename):
+            if len(utils.load_jsonl(filename)) == len(dataset):
+                valid_temperatures.remove(temperature)
+    # In this case immediately return
+    if len(valid_temperatures) == 0:
         print(f'The benchmark for {model_name} already exists.')
         return
 
+    # Load model
     model = textwiz.HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
-    dataset = DATASET_MAPPING[dataset]()
 
-    for temperature in temperatures:
+    for temperature in valid_temperatures:
 
         filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
-        # Delete the file if it already exist for some reason (e.g. a previous run that dit not end correctly)
-        # because in this case we do not want to append to the file
+        # Check potential partial results
         if os.path.exists(filename):
-            os.remove(filename)
+            initial_results = utils.load_jsonl(filename)
+            # Remove completions keys for later easy matching in `sample_is_done`
+            for initial_sample in initial_results:
+                initial_sample.pop('original_completions')
+                if 'reformulation_completions' in initial_sample:
+                    initial_sample.pop('reformulation_completions')
+        else:
+            initial_results = None
 
         for sample in tqdm(dataset, desc=model_name, file=sys.stdout):
+
+            # Check if results already exist for given sample, and continue to next sample if True
+            if sample_is_done(sample, initial_results):
+                continue
 
             prompts = [sample['test_case_prompt'].strip()]
             if 'test_case_prompt_reformulations' in sample:
@@ -118,6 +137,14 @@ def cyber_sec_eval_instruct_benchmark(model_name: str, dataset: str, quantizatio
                 results['reformulation_completions'] = all_completions[1:]
             # Save to file
             utils.save_jsonl(results, filename, append=True)
+
+
+def sample_is_done(sample: dict, initial_results: list[dict] | None) -> bool:
+    """Check if a given `sample` from the dataset already exists in `initial_results`."""
+    if initial_results is None:
+        return False
+    else:
+        return any(sample == initial_sample for initial_sample in initial_results)
 
 
 if __name__ == '__main__':
