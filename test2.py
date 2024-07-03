@@ -16,7 +16,7 @@ input_ids = tokenizer.encode(prompt, return_tensors='pt').cuda()
 # Default mode
 t0 = time.time()
 foo = model.generate(input_ids, max_new_tokens=4096, min_new_tokens=4096, do_sample=False,
-                     cache_implementation='static')
+                     cache_implementation='static', return_dict=True)
 dt0 = time.time() - t0
 print(f'Total time for base inference: {dt0:.2e} s --- {4096 / dt0:.2f} tokens/s')
 
@@ -28,7 +28,7 @@ print(f'Time for default compiling: {dt0:.2e} s')
 
 t0 = time.time()
 foo = model.generate(input_ids, max_new_tokens=4096, min_new_tokens=4096, do_sample=False,
-                     cache_implementation='static')
+                     cache_implementation='static', return_dict=True)
 dt0 = time.time() - t0
 print(f'Total time for inference: with default compiling {dt0:.2e} s --- {4096 / dt0:.2f} tokens/s')
 
@@ -43,6 +43,6 @@ print(f'Time for autotune compiling: {dt0:.2e} s')
 
 t0 = time.time()
 foo = model.generate(input_ids, max_new_tokens=4096, min_new_tokens=4096, do_sample=False,
-                     cache_implementation='static')
+                     cache_implementation='static', return_dict=True)
 dt0 = time.time() - t0
 print(f'Total time for inference: with autotune compiling {dt0:.2e} s --- {4096 / dt0:.2f} tokens/s')
