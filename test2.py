@@ -22,7 +22,7 @@ print(f'Total time for base inference: {dt0:.2e} s --- {4096 / dt0:.2f} tokens/s
 
 # Default compiling
 t0 = time.time()
-model = torch.compile(model, mode='default', fullgraph=True)
+model.forward = torch.compile(model.forward, mode='default', fullgraph=True)
 dt0 = time.time() - t0
 print(f'Time for default compiling: {dt0:.2e} s')
 
@@ -37,7 +37,7 @@ model = AutoModelForCausalLM.from_pretrained(textwiz.loader.ALL_MODELS_MAPPING['
                                              attn_implementation='sdpa', low_cpu_mem_usage=True).cuda()
 # Better compiling
 t0 = time.time()
-model = torch.compile(model, mode='max-autotune', fullgraph=True)
+model.forward = torch.compile(model.forward, mode='default', fullgraph=True)
 dt0 = time.time() - t0
 print(f'Time for autotune compiling: {dt0:.2e} s')
 

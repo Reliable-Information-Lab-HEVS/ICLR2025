@@ -11,7 +11,6 @@ model_ = AutoModelForCausalLM.from_pretrained(textwiz.loader.ALL_MODELS_MAPPING[
 model.model = model_
 
 prompt = 'Write an extremely long text about monkeys'
-prompt = 
 
 # Default mode
 t0 = time.time()
