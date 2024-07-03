@@ -5,8 +5,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import time
 import os
 
-TORCH_LOGS="+dynamo"
-TORCHDYNAMO_VERBOSE=1
+os.environ['TORCH_LOGS' ] = "+dynamo"
+os.environ['TORCHDYNAMO_VERBOSE'] = 1
 
 model = AutoModelForCausalLM.from_pretrained(textwiz.loader.ALL_MODELS_MAPPING['llama3-8B-instruct'],
                                              torch_dtype=textwiz.loader.ALL_MODELS_DTYPES['llama3-8B-instruct'],
