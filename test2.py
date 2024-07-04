@@ -1,12 +1,15 @@
 from TextWiz import textwiz
 
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, StaticCache
-import time
 import os
 
 os.environ['TORCH_LOGS' ] = "+dynamo"
 os.environ['TORCHDYNAMO_VERBOSE'] = "1"
+os.environ['TRITON_PTXAS_PATH'] = "/cluster/raid/home/vacy/miniforge3/envs/llm/bin/ptxas"
+
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer, StaticCache
+import time
 
 model = AutoModelForCausalLM.from_pretrained(textwiz.loader.ALL_MODELS_MAPPING['llama3-8B-instruct'],
                                              torch_dtype=textwiz.loader.ALL_MODELS_DTYPES['llama3-8B-instruct'],
