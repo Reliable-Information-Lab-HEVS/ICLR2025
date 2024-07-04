@@ -39,7 +39,7 @@ print(f'Total time for base inference: {dt0:.2e} s --- {4096 / dt0:.2f} tokens/s
 past_key_values.reset()
 t0 = time.time()
 model.forward = torch.compile(model.forward, mode='reduce-overhead', fullgraph=True)
-initial_pass = model.generate(input_ids, max_new_tokens=1, min_new_tokens=1, do_sample=False,
+initial_pass = model.generate(input_ids, max_new_tokens=5, min_new_tokens=5, do_sample=False,
                               cache_implementation='static', return_dict=True)
 dt0 = time.time() - t0
 print(f'Time for default compiling: {dt0:.2e} s')
@@ -59,7 +59,7 @@ past_key_values.reset()
 # Better compiling
 t0 = time.time()
 model.forward = torch.compile(model.forward, mode='max-autotune', fullgraph=True)
-initial_pass = model.generate(input_ids, max_new_tokens=1, min_new_tokens=1, do_sample=False,
+initial_pass = model.generate(input_ids, max_new_tokens=5, min_new_tokens=5, do_sample=False,
                               cache_implementation='static', return_dict=True)
 dt0 = time.time() - t0
 print(f'Time for autotune compiling: {dt0:.2e} s')
