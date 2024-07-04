@@ -1,7 +1,7 @@
 from TextWiz import textwiz
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, StaticCache
 import time
 import os
 
