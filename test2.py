@@ -16,6 +16,14 @@ model = AutoModelForCausalLM.from_pretrained(textwiz.loader.ALL_MODELS_MAPPING['
                                              attn_implementation='sdpa', low_cpu_mem_usage=True).cuda()
 tokenizer = textwiz.load_tokenizer('llama3-8B-instruct')
 
+past_key_values = StaticCache(
+    config=model.config,
+    max_batch_size=1,
+    max_cache_len=4500,
+    device=model.device,
+    dtype=model.dtype,
+)
+
 
 prompt = 'Write an extremely long text about monkeys'
 input_ids = tokenizer.encode(prompt, return_tensors='pt').cuda()
@@ -23,11 +31,12 @@ input_ids = tokenizer.encode(prompt, return_tensors='pt').cuda()
 # Default mode
 t0 = time.time()
 foo = model.generate(input_ids, max_new_tokens=4096, min_new_tokens=4096, do_sample=False,
-                     cache_implementation='static', return_dict=True)
+                     past_key_values=past_key_values, return_dict=True)
 dt0 = time.time() - t0
 print(f'Total time for base inference: {dt0:.2e} s --- {4096 / dt0:.2f} tokens/s')
 
 # Default compiling
+past_key_values.reset()
 t0 = time.time()
 model.forward = torch.compile(model.forward, mode='reduce-overhead', fullgraph=True)
 initial_pass = model.generate(input_ids, max_new_tokens=1, min_new_tokens=1, do_sample=False,
@@ -35,6 +44,7 @@ initial_pass = model.generate(input_ids, max_new_tokens=1, min_new_tokens=1, do_
 dt0 = time.time() - t0
 print(f'Time for default compiling: {dt0:.2e} s')
 
+past_key_values.reset()
 t0 = time.time()
 foo = model.generate(input_ids, max_new_tokens=4096, min_new_tokens=4096, do_sample=False,
                      cache_implementation='static', return_dict=True)
@@ -44,6 +54,8 @@ print(f'Total time for inference: with default compiling {dt0:.2e} s --- {4096 /
 model = AutoModelForCausalLM.from_pretrained(textwiz.loader.ALL_MODELS_MAPPING['llama3-8B-instruct'],
                                              torch_dtype=textwiz.loader.ALL_MODELS_DTYPES['llama3-8B-instruct'],
                                              attn_implementation='sdpa', low_cpu_mem_usage=True).cuda()
+
+past_key_values.reset()
 # Better compiling
 t0 = time.time()
 model.forward = torch.compile(model.forward, mode='max-autotune', fullgraph=True)
@@ -52,6 +64,7 @@ initial_pass = model.generate(input_ids, max_new_tokens=1, min_new_tokens=1, do_
 dt0 = time.time() - t0
 print(f'Time for autotune compiling: {dt0:.2e} s')
 
+past_key_values.reset()
 t0 = time.time()
 foo = model.generate(input_ids, max_new_tokens=4096, min_new_tokens=4096, do_sample=False,
                      cache_implementation='static', return_dict=True)
