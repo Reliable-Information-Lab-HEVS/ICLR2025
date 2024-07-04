@@ -6,6 +6,7 @@ from torch.utils import benchmark
 from transformers import AutoTokenizer, AutoModelForCausalLM, StaticCache
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ['TRITON_PTXAS_PATH'] = "/cluster/raid/home/vacy/miniforge3/envs/llm/bin/ptxas"
 
 # Benchmarking settings
 BSZ = [1, 4]
