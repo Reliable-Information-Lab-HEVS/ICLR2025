@@ -49,7 +49,7 @@ device = "cuda"
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16)
 model = model.to(device).eval()
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-prompt = "My favourite condiment is"
+prompt = ["My favourite condiment is"]*10
 input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
 
 batch_size, sequence_length = input_ids.shape
@@ -73,7 +73,7 @@ logits = model(input_ids, cache_position=torch.arange(sequence_length, device=de
 input_id = sample(logits, temperature=0.6, top_k=5)[0]
 generated_ids[:,sequence_length] = input_id[:,0]
 
-cache_position = torch.tensor([sequence_length], device=device)
+cache_position = torch.tensor([sequence_length]*10, device=device)
 torch._dynamo.mark_static_address(cache_position)
 
 
