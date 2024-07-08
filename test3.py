@@ -3,9 +3,7 @@ import os
 # os.environ['TORCH_LOGS' ] = "+dynamo"
 os.environ['TORCH_LOGS' ] = "recompiles"
 # os.environ['TORCHDYNAMO_VERBOSE'] = "1"
-# os.environ['TRITON_PTXAS_PATH'] = "/cluster/raid/home/vacy/miniforge3/envs/llm/bin/ptxas"
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
-os.environ['TRITON_PTXAS_PATH'] = "/cluster/raid/home/vacy/miniforge3/envs/llm/bin/ptxas"
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, StaticCache

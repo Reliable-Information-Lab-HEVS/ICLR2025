@@ -16,6 +16,8 @@ eval "$(conda shell.bash hook)"
 # Activate (local) env
 conda activate llm
 
+export TRITON_PTXAS_PATH=/cluster/raid/home/vacy/miniforge3/envs/llm/bin/ptxas
+
 python3 test.py
 
 conda deactivate
