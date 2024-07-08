@@ -120,3 +120,27 @@ with torch.no_grad():
         # dt0 = time.time() - t0
         print(f'Time: {dt0:.2e} s')
         cache_position += 1
+
+
+
+torch.compiler.reset()
+decode_one_tokens = torch.compile(decode_one_tokens, mode="max-autotune",fullgraph=True)
+
+print('COMPILE AUTOTUNE:')
+
+with torch.no_grad():
+    for i in range(10):
+        # torch.cuda.synchronize()
+        # t0 = time.time()
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
+        # with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_mem_efficient=False, enable_math=True):
+        input_id = decode_one_tokens(model, input_id.clone(), cache_position, past_key_values=past_key_values)
+            # generated_ids.index_copy_(1, cache_position, input_id)
+        end.record()
+        torch.cuda.synchronize()
+        dt0 = start.elapsed_time(end) / 1000
+        # dt0 = time.time() - t0
+        print(f'Time: {dt0:.2e} s')
+        cache_position += 1
