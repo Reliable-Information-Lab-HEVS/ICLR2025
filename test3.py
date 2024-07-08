@@ -70,11 +70,9 @@ generated_ids[:,:sequence_length] = input_ids
 index_tensor = torch.tensor([0], device=device)
 
 # Prefill
-inputs = torch.tensor([[0]]*batch_size, device=device, dtype=int)
-torch._dynamo.mark_static_address(inputs)
-
 logits = model(input_ids, cache_position=torch.arange(sequence_length, device=device), past_key_values=past_key_values)[0]
-inputs.index_copy_(1, index_tensor, sample(logits, temperature=0.6, top_k=5)[0])
+inputs = sample(logits, temperature=0.6, top_k=5)[0]
+torch._dynamo.mark_static_address(inputs)
 generated_ids[:,sequence_length] = inputs[:, 0]
 
 cache_position = torch.tensor([sequence_length], device=device)
