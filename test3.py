@@ -51,8 +51,8 @@ prompt = ["My favourite condiment is"]*10
 input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(device)
 
 batch_size, sequence_length = input_ids.shape
-max_cache_length = 2048
-max_new_tokens = 100
+max_new_tokens = 2048
+max_cache_length = sequence_length + max_new_tokens
 
 past_key_values = StaticCache(
     config=model.config,
@@ -68,81 +68,163 @@ generated_ids[:,:sequence_length] = input_ids
 index_tensor = torch.tensor([0], device=device)
 
 # Prefill
-logits = model(input_ids, cache_position=torch.arange(sequence_length, device=device), past_key_values=past_key_values)[0]
-inputs = sample(logits, temperature=0.6, top_k=5)[0]
-torch._dynamo.mark_static_address(inputs)
-generated_ids[:,sequence_length] = inputs[:, 0]
+# logits = model(input_ids, cache_position=torch.arange(sequence_length, device=device), past_key_values=past_key_values)[0]
+# inputs = sample(logits, temperature=0.6, top_k=5)[0]
+# torch._dynamo.mark_static_address(inputs)
+# generated_ids[:,sequence_length] = inputs[:, 0]
+
+# cache_position = torch.tensor([sequence_length], device=device)
+# torch._dynamo.mark_static_address(cache_position)
+
+
+# torch.compiler.reset()
+
+# print('USUAL:')
+
+# with torch.no_grad():
+#     for i in range(10):
+#         # torch.cuda.synchronize()
+#         # t0 = time.time()
+#         start = torch.cuda.Event(enable_timing=True)
+#         end = torch.cuda.Event(enable_timing=True)
+#         start.record()
+#         # with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_mem_efficient=False, enable_math=True):
+#         out = decode_one_tokens(model, inputs, cache_position, past_key_values=past_key_values)
+#         inputs.index_copy_(1, index_tensor, out)
+#             # generated_ids.index_copy_(1, cache_position, input_id)
+#         end.record()
+#         torch.cuda.synchronize()
+#         dt0 = start.elapsed_time(end) / 1000
+#         # dt0 = time.time() - t0
+#         print(f'Time: {dt0:.2e} s')
+#         cache_position += 1
+
+
+# torch.compiler.reset()
+# decode_one_tokens = torch.compile(decode_one_tokens, mode="reduce-overhead",fullgraph=True)
+
+# print('COMPILE:')
+
+# with torch.no_grad():
+#     for i in range(10):
+#         # torch.cuda.synchronize()
+#         # t0 = time.time()
+#         start = torch.cuda.Event(enable_timing=True)
+#         end = torch.cuda.Event(enable_timing=True)
+#         start.record()
+#         # with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_mem_efficient=False, enable_math=True):
+#         out = decode_one_tokens(model, inputs, cache_position, past_key_values=past_key_values)
+#         inputs.index_copy_(1, index_tensor, out)
+#             # generated_ids.index_copy_(1, cache_position, input_id)
+#         end.record()
+#         torch.cuda.synchronize()
+#         dt0 = start.elapsed_time(end) / 1000
+#         # dt0 = time.time() - t0
+#         print(f'Time: {dt0:.2e} s')
+#         cache_position += 1
+
+
+
+# torch.compiler.reset()
+# decode_one_tokens = torch.compile(decode_one_tokens, mode="max-autotune",fullgraph=True)
+
+# print('COMPILE AUTOTUNE:')
+
+# with torch.no_grad():
+#     for i in range(10):
+#         # torch.cuda.synchronize()
+#         # t0 = time.time()
+#         start = torch.cuda.Event(enable_timing=True)
+#         end = torch.cuda.Event(enable_timing=True)
+#         start.record()
+#         # with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_mem_efficient=False, enable_math=True):
+#         inputs[:, :] = decode_one_tokens(model, inputs, cache_position, past_key_values=past_key_values)[:, :]
+#             # generated_ids.index_copy_(1, cache_position, input_id)
+#         end.record()
+#         torch.cuda.synchronize()
+#         dt0 = start.elapsed_time(end) / 1000
+#         # dt0 = time.time() - t0
+#         print(f'Time: {dt0:.2e} s')
+#         cache_position += 1
+
+
+torch.compiler.reset()
+torch.manual_seed(123)
+
+start = torch.cuda.Event(enable_timing=True)
+end = torch.cuda.Event(enable_timing=True)
+start.record()
+
+
+out = model.generate(input_ids, do_sample=True, top_k=5, temperature=0.6, max_new_tokens=max_new_tokens,
+                     min_new_tokens=max_new_tokens)
+
+end.record()
+torch.cuda.synchronize()
+dt0 = start.elapsed_time(end) / 1000
+print(f'Time: {dt0:.2e} s')
+
+
+
+
+torch.compiler.reset()
+torch.manual_seed(123)
+
+generated_ids = torch.zeros((batch_size, max_new_tokens+sequence_length), dtype = torch.int, device=device)
+generated_ids[:,:sequence_length] = input_ids
+
+start = torch.cuda.Event(enable_timing=True)
+end = torch.cuda.Event(enable_timing=True)
+start.record()
+
+logits = model(input_ids, past_key_values=past_key_values)[0]
+input_id = sample(logits, temperature=0.6, top_k=5)[0]
+testest = input_id.clone()
+generated_ids[:,sequence_length] = input_id[:,0]
 
 cache_position = torch.tensor([sequence_length], device=device)
 torch._dynamo.mark_static_address(cache_position)
 
-
-torch.compiler.reset()
-
-print('USUAL:')
-
-with torch.no_grad():
-    for i in range(10):
-        # torch.cuda.synchronize()
-        # t0 = time.time()
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
-        # with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_mem_efficient=False, enable_math=True):
-        out = decode_one_tokens(model, inputs, cache_position, past_key_values=past_key_values)
-        inputs.index_copy_(1, index_tensor, out)
-            # generated_ids.index_copy_(1, cache_position, input_id)
-        end.record()
-        torch.cuda.synchronize()
-        dt0 = start.elapsed_time(end) / 1000
-        # dt0 = time.time() - t0
-        print(f'Time: {dt0:.2e} s')
-        cache_position += 1
-
-
-torch.compiler.reset()
-decode_one_tokens = torch.compile(decode_one_tokens, mode="reduce-overhead",fullgraph=True)
-
-print('COMPILE:')
-
-with torch.no_grad():
-    for i in range(10):
-        # torch.cuda.synchronize()
-        # t0 = time.time()
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
-        # with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_mem_efficient=False, enable_math=True):
-        out = decode_one_tokens(model, inputs, cache_position, past_key_values=past_key_values)
-        inputs.index_copy_(1, index_tensor, out)
-            # generated_ids.index_copy_(1, cache_position, input_id)
-        end.record()
-        torch.cuda.synchronize()
-        dt0 = start.elapsed_time(end) / 1000
-        # dt0 = time.time() - t0
-        print(f'Time: {dt0:.2e} s')
-        cache_position += 1
-
-
-
-torch.compiler.reset()
 decode_one_tokens = torch.compile(decode_one_tokens, mode="max-autotune",fullgraph=True)
 
-print('COMPILE AUTOTUNE:')
+with torch.no_grad():
+    for i in range(max_new_tokens):
+        foo = decode_one_tokens(model, input_id, cache_position, past_key_values=past_key_values)
+        input_id[:, 0] = foo[:, 0]
+        generated_ids.index_copy_(1, cache_position, input_id)
+        cache_position += 1
+
+end.record()
+torch.cuda.synchronize()
+dt0 = start.elapsed_time(end) / 1000
+print(f'Time: {dt0:.2e} s')
+
+
+
+torch.manual_seed(123)
+past_key_values.reset()
+
+generated_ids = torch.zeros((batch_size, max_new_tokens+sequence_length), dtype = torch.int, device=device)
+generated_ids[:,:sequence_length] = input_ids
+
+start = torch.cuda.Event(enable_timing=True)
+end = torch.cuda.Event(enable_timing=True)
+start.record()
+
+logits = model(input_ids, past_key_values=past_key_values)[0]
+input_id = sample(logits, temperature=0.6, top_k=5)[0]
+generated_ids[:,sequence_length] = input_id[:,0]
+
+cache_position[0] = sequence_length
 
 with torch.no_grad():
-    for i in range(10):
-        # torch.cuda.synchronize()
-        # t0 = time.time()
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
-        # with torch.backends.cuda.sdp_kernel(enable_flash=False, enable_mem_efficient=False, enable_math=True):
-        inputs[:, :] = decode_one_tokens(model, inputs, cache_position, past_key_values=past_key_values)[:, :]
-            # generated_ids.index_copy_(1, cache_position, input_id)
-        end.record()
-        torch.cuda.synchronize()
-        dt0 = start.elapsed_time(end) / 1000
-        # dt0 = time.time() - t0
-        print(f'Time: {dt0:.2e} s')
+    for i in range(max_new_tokens):
+        foo = decode_one_tokens(model, input_id, cache_position, past_key_values=past_key_values)
+        input_id[:, 0] = foo[:, 0]
+        generated_ids.index_copy_(1, cache_position, input_id)
         cache_position += 1
+
+end.record()
+torch.cuda.synchronize()
+dt0 = start.elapsed_time(end) / 1000
+print(f'Time: {dt0:.2e} s')
