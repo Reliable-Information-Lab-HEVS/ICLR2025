@@ -47,7 +47,7 @@ device = "cuda"
 model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16)
 model = model.to(device).eval()
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-prompt = ["My favourite condiment is"]*10
+prompt = ["My favourite condiment is"]*5
 input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(device)
 
 batch_size, sequence_length = input_ids.shape
