@@ -3,7 +3,7 @@
 #SBATCH --job-name=cyber_sec_eval
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
-#SBATCH --time=10-00:00:00
+#SBATCH --time=15-00:00:00
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=230G
 #SBATCH --partition=nodes
