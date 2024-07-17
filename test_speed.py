@@ -10,6 +10,8 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 # Random token sequence
 input = torch.randint(0, 1000, (1, 500), device='cuda')
 
+out = model.generate(input, max_new_tokens=200, min_new_tokens=200, do_sample=False)
+
 times = []
 for _ in range(10):
     start = torch.cuda.Event(enable_timing=True)
