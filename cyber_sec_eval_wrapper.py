@@ -47,8 +47,16 @@ if __name__ == '__main__':
 
     print(f'Launching computations with {num_gpus} gpus available.')
 
-    # Create the commands to run
     gpu_footprints = textwiz.estimate_number_of_gpus(models, int8, int4)
+    # Skip models needing more resources than we have
+    skipped_models = [model for model, gpu in zip(models, gpu_footprints) if gpu > num_gpus]
+    print(f'Skipping {*skipped_models,} due to lack of gpu resources.')
+
+    # Only pick those that needs at most the resources we have
+    models = [model for model, gpu in zip(models, gpu_footprints) if gpu <= num_gpus]
+    gpu_footprints = [gpu for gpu in gpu_footprints if gpu <= num_gpus]
+
+    # Create the commands to run
     commands = [f'python3 -u cyber_sec_eval.py {model} --dataset {dataset}' for model in models]
     if int8:
         commands = [c + ' --int8' for c in commands]
