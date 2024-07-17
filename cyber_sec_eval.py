@@ -71,9 +71,11 @@ def cyber_sec_eval_instruct_benchmark(model_name: str, dataset: str, quantizatio
     if not textwiz.is_chat_model(model_name):
         raise ValueError('Cannot run cyberSecEvalInstruct benchmark on non-chat model.')
     
-    dataset = DATASET_MAPPING[dataset]()
     dtype_name = textwiz.dtype_category(model_name, quantization_4bits, quantization_8bits)
-    folder = cybersec.get_folder(dataset, model_name, dtype_name)
+    folder = cybersec.get_folder(DATASET_NAME_MAPPING[dataset], model_name, dtype_name)
+
+    # Load a proper Dataset object
+    dataset = DATASET_MAPPING[dataset]()
 
     # Check if results already exist
     valid_temperatures = list(temperatures)
