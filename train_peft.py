@@ -72,13 +72,19 @@ def main():
 
 def merge_all_model_checkpoints():
 
-    checkpoints = [os.path.join(result_folder, folder) for folder in os.listdir(result_folder) if folder != 'logs']
+    # Load the tokenizer to save it in the same destination along the model
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token_id = tokenizer.eos_token_id
+
+    checkpoints = [os.path.join(result_folder, folder) for folder in os.listdir(result_folder) if folder != 'logs' and not folder.startswith('.')]
     destinations = [os.path.join(result_folder, 'merged_models', folder) for folder in os.listdir(result_folder) if folder != 'logs']
     # Fully merge the Lora weights and resave model
     for checkpoint, destination in zip(checkpoints, destinations):
-        lora_model = AutoPeftModelForCausalLM.from_pretrained(checkpoint)
+        lora_model = AutoPeftModelForCausalLM.from_pretrained(checkpoint, torch_dtype=loader.get_model_dtype(textwiz_model_name))
         lora_model = lora_model.merge_and_unload()
         lora_model.save_pretrained(destination)
+        tokenizer.save_pretrained(destination)
         del lora_model
 
 
