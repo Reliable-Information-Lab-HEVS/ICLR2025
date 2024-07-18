@@ -204,6 +204,10 @@ def save_jsonl(dictionaries: list[dict], filename: str, append: bool = False):
 
     mode = 'a' if append else 'w'
 
+    # In case it is a single dictionary item (can happen if we are going to append a lot of single dict to the same file)
+    if isinstance(dictionaries, dict):
+        dictionaries = [dictionaries]
+
     with open(filename, mode) as fp:
         for dic in dictionaries:
             fp.write(json.dumps(dic) + '\n')
