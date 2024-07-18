@@ -138,7 +138,7 @@ def cyber_sec_eval_instruct_benchmark(model_name: str, dataset: str, quantizatio
             if len(prompts) > 1:
                 results['reformulation_completions'] = all_completions[1:]
             # Save to file
-            utils.save_jsonl(results, filename, append=True)
+            utils.save_jsonl([results], filename, append=True)
 
 
 def sample_is_done(sample: dict, initial_results: list[dict] | None) -> bool:
