@@ -1,5 +1,7 @@
+import os
+
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
-from peft import LoraConfig, TaskType, get_peft_model
+from peft import LoraConfig, TaskType, get_peft_model, AutoPeftModelForCausalLM
 
 from helpers import datasets
 from TextWiz.textwiz import loader, get_empty_conversation_template
@@ -68,6 +70,19 @@ def main():
     # print(training_results)
 
 
+def merge_all_model_checkpoints():
+
+    checkpoints = [os.path.join(result_folder, folder) for folder in os.listdir(result_folder) if folder != 'logs']
+    destinations = [os.path.join(result_folder, 'merged_models', folder) for folder in os.listdir(result_folder) if folder != 'logs']
+    # Fully merge the Lora weights and resave model
+    for checkpoint, destination in zip(checkpoints, destinations):
+        lora_model = AutoPeftModelForCausalLM.from_pretrained(checkpoint)
+        lora_model = lora_model.merge_and_unload()
+        lora_model.save_pretrained(destination)
+        del lora_model
+
+
 if __name__ == '__main__':
 
-    main()
+    # main()
+    merge_all_model_checkpoints()
