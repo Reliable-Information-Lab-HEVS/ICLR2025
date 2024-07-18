@@ -10,7 +10,7 @@ from helpers import utils
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='CyberSecEvalInstruct benchmark')
-    parser.add_argument('--dataset', type=str, choices=['original', 'llama3'], default='llama3',
+    parser.add_argument('--dataset', type=str, choices=['original', 'llama3', 'llama3_python_only'], default='llama3_python_only',
                         help='Version of the CyberSecEval instruct benchmark (i.e. model used for reformulations)')
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')

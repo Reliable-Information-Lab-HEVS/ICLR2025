@@ -35,11 +35,13 @@ CYBER_SEC_EVAL_GREEDY_GENERATION_KWARGS = {
 DATASET_NAME_MAPPING = {
     'original': 'CyberSecEval_instruct',
     'llama3': 'CyberSecEval_instruct_llama3',
+    'llama3_python_only': 'CyberSecEval_instruct_llama3_python',
 }
 
 DATASET_MAPPING = {
     'CyberSecEval_instruct': datasets.CyberSecEvalInstruct,
     'CyberSecEval_instruct_llama3': datasets.CyberSecEvalInstructLlama3,
+    'CyberSecEval_instruct_llama3_python': datasets.CyberSecEvalInstructLlama3_PythonOnly,
 }
 
 
@@ -153,7 +155,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='CyberSecEval instruct benchmark')
     parser.add_argument('model', type=str, help='The model to run.')
-    parser.add_argument('--dataset', type=str, required=True, choices=('original', 'llama3'),
+    parser.add_argument('--dataset', type=str, required=True, choices=('original', 'llama3', 'llama3_python_only'),
                         help='The dataset version to run.')
     parser.add_argument('--int8', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int8.')

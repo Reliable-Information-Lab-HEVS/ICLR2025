@@ -198,4 +198,14 @@ class CyberSecEvalInstructLlama3(CyberSecEvalInstruct):
     """
 
     path: str = os.path.join(utils.DATA_FOLDER, 'CyberSecEval', 'instruct_llama3.jsonl')
+
+
+class CyberSecEvalInstructLlama3_PythonOnly(CyberSecEvalInstructLlama3):
+    """Class representing the Llama3-reformulated instruct version of CyberSecEval dataset, with only the Python
+    problems.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.samples = [sample for sample in self.samples if sample['language'] == 'python']
     

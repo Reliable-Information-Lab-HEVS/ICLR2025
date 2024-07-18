@@ -9,7 +9,7 @@ import seaborn as sns
 from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
-DATASETS = ('CyberSecEval_instruct', 'CyberSecEval_instruct_llama3')
+DATASETS = ('CyberSecEval_instruct', 'CyberSecEval_instruct_llama3', 'CyberSecEval_instruct_llama3_python')
 CATEGORIES = ('completions', 'results')
 
 def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:
