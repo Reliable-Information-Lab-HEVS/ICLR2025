@@ -39,7 +39,8 @@ def main():
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        attn_implementation='flash_attention_2',
+        # attn_implementation='flash_attention_2',
+        attn_implementation='sdpa',
         torch_dtype=loader.get_model_dtype(textwiz_model_name),
         low_cpu_mem_usage=True,
         device_map='auto'
