@@ -23,6 +23,7 @@ dependencies:
     - accelerate
     - optimum
     - gradio>=4.0.0
+    - peft
     - bitsandbytes
     - sentencepiece
     - protobuf
