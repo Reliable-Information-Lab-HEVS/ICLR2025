@@ -273,6 +273,8 @@ with demo:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='LLM Playground')
+    parser.add_argument('--model', type=str, default=DEFAULT, choices=ALLOWED_MODELS,
+                        help='The model to use.')
     parser.add_argument('--concurrency', type=int, default=1,
                         help='Number of threads that can run for generation (using the GPUs).')
     parser.add_argument('--no_auth', action='store_true',
@@ -283,13 +285,14 @@ if __name__ == '__main__':
                         help='On which port to deploy the webapp.')
     
     args = parser.parse_args()
+    model = args.model
     no_auth = args.no_auth
     concurrency = args.concurrency
     LOG = args.log
     port = args.port
 
     # Initialize global model (necessary not to reload the model for each new inference)
-    MODEL = HFCausalModel(DEFAULT)
+    MODEL = HFCausalModel(model)
     
     print(f'Analytics: {demo.analytics_enabled}')
     if no_auth:
