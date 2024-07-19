@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=experiment_app
+#SBATCH --job-name=webapp
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
