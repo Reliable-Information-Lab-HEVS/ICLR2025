@@ -20,6 +20,6 @@ conda activate llm
 # srun --exclusive --exact --ntasks=1 --cpus-per-task=1 --mem=1G ../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc_experiment.toml &
 ../frp_server/frp_0.54.0_linux_amd64/frpc -c ../frp_server/frpc/frpc_experiment.toml &
 # Launch app
-python3 -u experiment_webapp_finetuned.py "$@"
+python3 -u webapp_chat.py "$@"
 
 conda deactivate
