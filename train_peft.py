@@ -78,7 +78,7 @@ def merge_all_model_checkpoints():
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
     checkpoints = [os.path.join(result_folder, folder) for folder in os.listdir(result_folder) if folder != 'logs' and not folder.startswith('.')]
-    destinations = [os.path.join(result_folder, 'merged_models', folder) for folder in os.listdir(result_folder) if folder != 'logs']
+    destinations = [os.path.join(result_folder, 'merged_models', folder) for folder in os.listdir(result_folder) if folder != 'logs' and not folder.startswith('.')]
     # Fully merge the Lora weights and resave model
     for checkpoint, destination in zip(checkpoints, destinations):
         lora_model = AutoPeftModelForCausalLM.from_pretrained(checkpoint, torch_dtype=loader.get_model_dtype(textwiz_model_name)).cuda()
