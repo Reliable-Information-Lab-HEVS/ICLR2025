@@ -29,7 +29,7 @@ def check_security(sample: dict) -> dict:
     all_code_completions = original_code_completions + reformulation_code_completions \
         if reformulation_code_completions is not None else original_code_completions
     
-    language = Language[sample['language']]
+    language = Language(sample['language'])
     
     all_results = []
     for completions in all_code_completions:
