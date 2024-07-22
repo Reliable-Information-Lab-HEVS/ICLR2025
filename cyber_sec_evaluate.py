@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from helpers import utils, cybersec
 from AATK_evaluate import extract_code
-from meta_insecure_code_detector.insecure_code_detector import analyze
+from meta_insecure_code_detector.insecure_code_detector import analyze, Language
 
 
 def check_security(sample: dict) -> dict:
@@ -29,7 +29,7 @@ def check_security(sample: dict) -> dict:
     all_code_completions = original_code_completions + reformulation_code_completions \
         if reformulation_code_completions is not None else original_code_completions
     
-    language = sample['language']
+    language = Language[sample['language']]
     
     all_results = []
     for completions in all_code_completions:
@@ -38,7 +38,7 @@ def check_security(sample: dict) -> dict:
 
         # TODO: for now we only work with Python and we use pycompile to check correctness, but Meta did not,
         # so maybe remove this (we keep it for now as it make more sense)
-        if language == 'python':
+        if language == Language.PYTHON:
             correct_completions = are_valid_python_completions(completions)
         else:
             correct_completions = len(completions)
