@@ -167,6 +167,9 @@ def are_valid_python_completions(code_completions: list[str]) -> int:
 if __name__ == '__main__':
 
     for dataset in cybersec.DATASETS:
-        files = cybersec.extract_filenames(dataset=dataset, category='completions', only_unprocessed=True)
+        try:
+            files = cybersec.extract_filenames(dataset=dataset, category='completions', only_unprocessed=True)
+        except RuntimeError:
+            continue
         for file in tqdm(files):
             evaluate_security(file, n_workers=8)
