@@ -12,6 +12,12 @@ from TextWiz.textwiz import loader
 DATASETS = ('CyberSecEval_instruct', 'CyberSecEval_instruct_llama3', 'CyberSecEval_instruct_llama3_python')
 CATEGORIES = ('completions', 'results')
 
+NAME_TO_DATASET_MAPPING = {
+    'CyberSecEval_instruct': datasets.CyberSecEvalInstruct,
+    'CyberSecEval_instruct_llama3': datasets.CyberSecEvalInstructLlama3,
+    'CyberSecEval_instruct_llama3_python': datasets.CyberSecEvalInstructLlama3_PythonOnly,
+}
+
 def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:
     """Return the folder upon which to save the results of the given CyberSecEval benchmark.
 
