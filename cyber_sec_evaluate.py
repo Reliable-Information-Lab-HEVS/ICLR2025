@@ -89,7 +89,7 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
 
     for sample in samples:
         # extract the code contained in the sample completions
-        original_completions = sample.pop(original_completions)
+        original_completions = sample.pop('original_completions')
         sample['original_extracted_code'] = [extract_code(x) for x in original_completions]
         if 'reformulation_completions' in sample.keys():
             reformulation_completions = sample.pop('reformulation_completions')
