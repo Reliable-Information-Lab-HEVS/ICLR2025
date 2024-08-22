@@ -2,7 +2,7 @@ import asyncio
 import tempfile
 import os
 import py_compile
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExecutor
 from tqdm import tqdm
 
 from helpers import utils, cybersec
@@ -97,24 +97,21 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
 
     # Check the generated samples against test suites.
     # with ThreadPoolExecutor(max_workers=n_workers) as executor:
+    with ProcessPoolExecutor(max_workers=n_workers) as executor:
 
-    #     futures = []
+        futures = []
 
-    #     for sample in samples:
-    #         future = executor.submit(check_security, sample)
-    #         futures.append(future)
+        for sample in samples:
+            future = executor.submit(check_security, sample)
+            futures.append(future)
 
-    #     results = []
+        results = []
 
-    #     for future in tqdm(as_completed(futures), total=len(futures), leave=False):
-    #         results.append(future.result())
-
-    results = []
-    for sample in tqdm(samples, leave=False):
-        results.append(check_security(sample))
+        for future in tqdm(as_completed(futures), total=len(futures), leave=False):
+            results.append(future.result())
 
     # Save to file
-    # utils.save_jsonl(results, out_file)
+    utils.save_jsonl(results, out_file)
 
 
 
