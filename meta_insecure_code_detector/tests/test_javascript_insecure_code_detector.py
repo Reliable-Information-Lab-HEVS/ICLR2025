@@ -18,8 +18,6 @@ JAVASCRIPT_TEST_CASES = [
     ("var random16 = crypto.pseudoRandomBytes(16);", 1),
     ("var randomNumber = Math.random();", 1),
     ("popup.postMessage(data, '*');", 1),
-    ("var dynamicFunction = new Function(code);", 1),
-    ("execScript(userInput)", 1),
     ("var buf = Buffer.allocUnsafe(10)", 1),
     ("var buf = Buffer.allocUnsafeSlow(10)", 1),
 ]

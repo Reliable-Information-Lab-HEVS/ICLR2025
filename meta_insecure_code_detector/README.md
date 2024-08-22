@@ -1,8 +1,6 @@
 # Insecure Code Detector
 
-**Note that an improved version of insecure code detector library is released together with [CodeShield](https://github.com/meta-llama/PurpleLlama/tree/main/CodeShield), CybersecurityBenchmarks will migrate to the new version in near future**
-
-Insecure Code Detector(ICD) is a tool designed to identify Insecure coding practices in any given code snippet. ICD operates using a comprehensive set of analyzers, each equipped with specific rules. As of now, ICD supports 8 different programming languages. Theses include widely-used languages such as C, C++, Python, and Java.
+Insecure Code Detector(ICD) is a library developed to identify Insecure coding practices in any given code snippet. ICD operates using a set of analyzers, each equipped with specific ruleset. As of now, ICD supports 8 different programming languages. Theses include widely-used languages such as C, C++, Python, and Java.
 
 ## Building principles of ICD
 ICD is built on three fundamental principles-
@@ -19,7 +17,7 @@ ICD is built on three fundamental principles-
 
 ## How does it work?
 
-ICD comprises of a set of analyzers which independently assess the security of the input code snippet based on static analysis rules. Currently we support [regex](https://en.wikipedia.org/wiki/Regular_expression) and [weggli](https://github.com/weggli-rs/weggli) analyzers. We plan to add support for more analyzers soon.
+ICD comprises of a set of analyzers which independently assess the security of the input code snippet based on static analysis rules. Currently we support [regex](https://en.wikipedia.org/wiki/Regular_expression) and [semgrep](https://github.com/semgrep/semgrep) analyzers. We plan to add support for more analyzers.
 
 ## Languages Supported
 
