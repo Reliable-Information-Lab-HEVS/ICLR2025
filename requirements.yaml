@@ -29,6 +29,7 @@ dependencies:
     - protobuf
     - tiktoken
     - tensorboard
+    - semgrep # For Meta's insecure code detector
     # For flash attention 2
     - packaging
     - ninja
