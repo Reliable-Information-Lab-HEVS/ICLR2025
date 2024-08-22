@@ -39,7 +39,8 @@ def check_security(sample: dict) -> dict:
         # TODO: for now we only work with Python and we use pycompile to check correctness, but Meta did not,
         # so maybe remove this (we keep it for now as it make more sense)
         if language == Language.PYTHON:
-            correct_completions = are_valid_python_completions(completions)
+            # correct_completions = are_valid_python_completions(completions)
+            correct_completions = len(completions)
         else:
             correct_completions = len(completions)
 
