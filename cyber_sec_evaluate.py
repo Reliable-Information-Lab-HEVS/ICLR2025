@@ -97,8 +97,8 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
             sample['reformulation_extracted_code'] = [[extract_code(x) for x in completions] for completions in reformulation_completions]
 
     # Check the generated samples against test suites.
-    # with ThreadPoolExecutor(max_workers=n_workers) as executor:
-    with ProcessPoolExecutor(max_workers=n_workers) as executor:
+    with ThreadPoolExecutor(max_workers=n_workers) as executor:
+    # with ProcessPoolExecutor(max_workers=n_workers) as executor:
 
         futures = []
 
