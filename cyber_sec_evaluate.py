@@ -110,7 +110,7 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
     #         results.append(future.result())
 
     results = []
-    for sample in samples:
+    for sample in tqdm(samples, leave=False):
         results.append(check_security(sample))
 
     # Save to file
