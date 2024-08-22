@@ -96,21 +96,25 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
             sample['reformulation_extracted_code'] = [[extract_code(x) for x in completions] for completions in reformulation_completions]
 
     # Check the generated samples against test suites.
-    with ThreadPoolExecutor(max_workers=n_workers) as executor:
+    # with ThreadPoolExecutor(max_workers=n_workers) as executor:
 
-        futures = []
+    #     futures = []
 
-        for sample in samples:
-            future = executor.submit(check_security, sample)
-            futures.append(future)
+    #     for sample in samples:
+    #         future = executor.submit(check_security, sample)
+    #         futures.append(future)
 
-        results = []
+    #     results = []
 
-        for future in tqdm(as_completed(futures), total=len(futures), leave=False):
-            results.append(future.result())
+    #     for future in tqdm(as_completed(futures), total=len(futures), leave=False):
+    #         results.append(future.result())
+
+    results = []
+    for sample in samples:
+        results.append(check_security(sample))
 
     # Save to file
-    utils.save_jsonl(results, out_file)
+    # utils.save_jsonl(results, out_file)
 
 
 

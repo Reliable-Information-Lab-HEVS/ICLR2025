@@ -35,3 +35,4 @@ dependencies:
     - ninja
     # needs to be run afterwards with the flag
     # pip install flash-attn --no-build-isolation
+    - semgrep==1.51.0 # For meta insecure code detector
