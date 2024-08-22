@@ -111,7 +111,7 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
             results.append(future.result())
 
     # Save to file
-    utils.save_jsonl(results, out_file)
+    # utils.save_jsonl(results, out_file)
 
 
 
