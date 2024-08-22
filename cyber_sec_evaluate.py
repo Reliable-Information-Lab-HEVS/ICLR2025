@@ -172,4 +172,4 @@ if __name__ == '__main__':
         except RuntimeError:
             continue
         for file in tqdm(files):
-            evaluate_security(file, n_workers=8)
+            evaluate_security(file, n_workers=32)
