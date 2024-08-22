@@ -27,7 +27,6 @@ class Language(str, enum.Enum):
     RUST = "rust"
     SWIFT = "swift"
     XML = "xml"
-    LANGUAGE_AGNOSTIC = "language_agnostic"
 
     def __str__(self) -> str:
         return self.name.lower()

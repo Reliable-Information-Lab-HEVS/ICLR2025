@@ -5,13 +5,4 @@
 
 # pyre-strict
 
-import enum
-
-
-class Analyzer(str, enum.Enum):
-    REGEX = "regex"
-    WEGGLI = "weggli"
-    SEMGREP = "semgrep"
-
-    def __str__(self) -> str:
-        return self.name.lower()
+# Python root

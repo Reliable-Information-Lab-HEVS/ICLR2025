@@ -8,19 +8,16 @@
 from __future__ import annotations
 
 import functools
-import json
 
 import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import yaml
 
 from .analyzers import Analyzer
 from .languages import Language
-from .usecases import UseCase
 
 try:
     from .internal import oss
@@ -41,68 +38,58 @@ class InsecurePattern:
 
 
 @functools.lru_cache(maxsize=None)
-def load(
-    language: Language, analyzer: Analyzer, usecase: UseCase
-) -> list[InsecurePattern]:
+def load(language: Language, analyzer: Analyzer) -> list[InsecurePattern]:
     yaml_file = oss.RULES_ROOT / f"{analyzer}/{language}.yaml"
-    result = _load_patterns(yaml_file, language, analyzer, usecase)
+
+    result = _load_patterns(yaml_file)
 
     if language == Language.CPP:
-        result += load(Language.C, analyzer, usecase)
+        result += load(Language.C, analyzer)
     elif language == Language.OBJECTIVE_C:
-        result += load(Language.C, analyzer, usecase)
+        result += load(Language.C, analyzer)
     elif language == Language.OBJECTIVE_CPP:
-        result += load(Language.OBJECTIVE_C, analyzer, usecase)
-        result += load(Language.CPP, analyzer, usecase)
+        result += load(Language.OBJECTIVE_C, analyzer)
+        result += load(Language.CPP, analyzer)
     elif analyzer == Analyzer.REGEX:
-        result += _load_patterns(
-            oss.RULES_ROOT / "regex/language_agnostic.yaml",
-            Language.LANGUAGE_AGNOSTIC,
-            analyzer,
-            usecase,
-        )
+        result += _load_patterns(oss.RULES_ROOT / "regex/language_agnostic.yaml")
     return result
 
 
 @functools.lru_cache(maxsize=None)
-def load_prescan_regexes(language: Language, usecase: UseCase) -> list[InsecurePattern]:
-    rule_file_path = (
-        oss.RULES_ROOT / "semgrep" / "_generated_" / f"{language}_{usecase}.json"
-    )
+def load_prescan_regexes(language: Language) -> list[InsecurePattern]:
+    rule_directory = oss.RULES_ROOT / "semgrep" / language
     patterns = []
-    if not os.path.exists(rule_file_path):
-        return []
-    with open(rule_file_path, "r") as file:
-        data = json.load(file)
-        rules = data["rules"] if "rules" in data else []
-        for rule in rules:
-            if ("metadata" in rule) and ("prescan_regex" in rule["metadata"]):
-                patterns.append(
-                    InsecurePattern(
-                        description=rule["message"],
-                        cwe_id=rule["metadata"]["cwe_id"],
-                        rule=rule["metadata"]["prescan_regex"],
-                        severity=rule["severity"],
-                    )
-                )
+    for root, _dirs, files in os.walk(rule_directory):
+        for file in files:
+            if not file.endswith(".yaml"):
+                continue
+            with open(os.path.join(root, file), "r") as file:
+                data = yaml.safe_load(file)
+                if "rules" in data:
+                    rule = data["rules"][0]
+                    if ("metadata" in rule) and ("prescan_regex" in rule["metadata"]):
+                        patterns.append(
+                            InsecurePattern(
+                                description=rule["message"],
+                                cwe_id=rule["metadata"]["cwe_id"],
+                                rule=rule["metadata"]["prescan_regex"],
+                                severity=rule["severity"],
+                            )
+                        )
+                    # even if one rule doesn't have prescan_regex,
+                    # the list is ineffective
+                    else:
+                        return []
     return patterns
 
 
 @functools.lru_cache(maxsize=None)
-def _load_patterns(
-    filename: Path, language: Language, analyzer: Analyzer, usecase: UseCase
-) -> list[InsecurePattern]:
+def _load_patterns(filename: Path) -> list[InsecurePattern]:
     result = []
-    enabled_rules = get_enabled_rules(language, analyzer, usecase)
     try:
         with open(filename, "r") as file:
             patterns = yaml.safe_load(file)
             for pattern in patterns:
-                if (
-                    "pattern_id" in pattern
-                    and pattern["pattern_id"] not in enabled_rules
-                ):
-                    continue
                 result.append(
                     InsecurePattern(
                         description=pattern["description"],
@@ -122,28 +109,3 @@ def _load_patterns(
     except Exception as exc:
         LOG.fatal(f"Unexpected error while loading patterns: {exc}")
     return result
-
-
-@functools.lru_cache(maxsize=None)
-def get_enabled_rules(
-    language: Language, analyzer: Analyzer, usecase: UseCase
-) -> list[str]:
-    enabled_rules = []
-    config_data = _read_rule_config(usecase)
-    if (
-        (config_data)
-        and (language.value in config_data)
-        and (analyzer.value in config_data[language.value])
-    ):
-        enabled_rules.extend(config_data[language.value][analyzer.value]["rules"])
-    return enabled_rules
-
-
-@functools.lru_cache(maxsize=None)
-def _read_rule_config(usecase: UseCase) -> dict[str, Any]:
-    yaml_file = oss.RULES_ROOT / "config.yaml"
-    with open(yaml_file, "r") as file:
-        data = yaml.safe_load(file)
-        if "config" in data and usecase.value in data["config"]:
-            return data["config"][usecase.value]
-    return {}

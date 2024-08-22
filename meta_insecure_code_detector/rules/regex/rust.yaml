@@ -7,7 +7,7 @@
 
 - cwe_id: CWE-78
   description: Potential for command injection if input is not sanitized.
-  rule: Command::new\s*\(\s*[^"'].*\)
+  rule: Command::new\s*\(\s*[^"']\)
   severity: Warning
   pattern_id: RUST-R-002
 
@@ -44,12 +44,6 @@
   severity: Advice
   pattern_id: RUST-R-007
 
-- cwe_id: CWE-328
-  description: Potential usage of weak hash functions from rust-openssl
-  rule: (MessageDigest::md5|MessageDigest::sha1)
-  severity: Advice
-  pattern_id: RUST-R-007
-
 - cwe_id: CWE-295
   description: 'Dangerous APIs: Accepting invalid tls connections'
   rule: danger_accept_invalid_hostnames|danger_accept_invalid_certs
@@ -74,9 +68,3 @@
   rule: temp_dir\(\)
   severity: Advice
   pattern_id: RUST-R-011
-
-- cwe_id: CWE-328
-  description: Potential usage of outdated ciphers from rust-openssl
-  rule: (Cipher::rc4|Cipher::bf_|Cipher::des_)
-  severity: Advice
-  pattern_id: RUST-R-012

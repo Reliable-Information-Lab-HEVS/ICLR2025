@@ -11,8 +11,9 @@ from .insecure_code_detector_test import InsecureCodeDetectorTest
 
 # the following test cases contain an input string, and the corresponding number of expected insecure pattern matches
 CPP_REGEX_TEST_CASES = [
-    ("strcpy(dest, src)", 2),
+    ("strcpy(dest, src)", 1),
     ('scanf("%s", buffer)', 1),
+    ("strcpy(dest, source)", 1),
     ("strcat(dest, source)", 1),
     ("hello", 0),
     ("xmlReadDoc(buffer,NULL,NULL,XML_PARSE_DTDLOAD)", 1),
@@ -23,11 +24,22 @@ CPP_REGEX_TEST_CASES = [
     ("std::mt19937{std::random_device{}()}", 0),
 ]
 
-CPP_SEMGREP_TEST_CASES = [
-    # Integer overflow
+CPP_WEGGLI_TEST_CASES = [
+    # Dummy C style rule to ensure we run them on C++ code
     ("ptr = malloc(n * 5);", 1),
+    # Integer overflow
+    ("ptr = new int[n * 5];", 1),
     ("if (n < SIZE_MAX/5) { ptr = new int[n * 5]; }", 0),
     ("ptr = new int[WIDTH * 5]", 0),
+    # Invalid free
+    ("char buf[10]; delete buf;", 1),
+    ("char ptr; delete &ptr;", 1),
+    # Use-After-Free due to iterator invalidation
+    ("for (it = v.begin(); it !+ v.end(); ++it) { v.push_back(4); } }", 1),
+    ("for ( el : v ) { v.push_back(4); }", 1),
+    # Stack buffer overflow
+    ("char buf[10]; cin >> buf;", 1),
+    ("char buf[10]; cin.width(9); cin >> buf;", 0),
 ]
 
 
@@ -35,5 +47,5 @@ class TestCppInsecureCodeDetector(InsecureCodeDetectorTest):
     async def test_cpp_regex_patterns(self) -> None:
         await self.run_regex_tests(Language.CPP, CPP_REGEX_TEST_CASES)
 
-    async def test_cpp_semgrep_patterns(self) -> None:
-        await self.run_semgrep_tests(Language.CPP, CPP_SEMGREP_TEST_CASES)
+    async def test_cpp_weggli_patterns(self) -> None:
+        await self.run_weggli_tests(Language.CPP, CPP_WEGGLI_TEST_CASES)

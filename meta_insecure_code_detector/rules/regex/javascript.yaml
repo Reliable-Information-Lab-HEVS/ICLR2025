@@ -7,4 +7,4 @@
   description: Usage of unencrypted communication channel
   rule: fetch\(['"`]http:\/\/[^\s'"`]+['"`]\)
   severity: Warning
-  pattern_id: unencrypted-fetch-usage
+  pattern_id: JS-R-012

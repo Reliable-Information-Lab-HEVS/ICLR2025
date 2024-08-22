@@ -10,10 +10,10 @@
   description: Sensitive information stored in web forms controls may be leaked to the client side if encryption mode is not used.
   rule: <system\.web>\s*<pages[^>]*viewStateEncryptionMode="(?:Auto|Never)"[^>]*/>\s*</system\.web>
   severity: Warning
-  pattern_id: webform-encryption-mode-leakage
+  pattern_id: CSHARP-R-015
 
 - cwe_id: CWE-554
   description: The view state could be altered by attacker since enableViewStateMac is disabled
   rule: <system\.web>\s*<pages[^>]*enableViewStateMac="false"[^>]*/>\s*</system\.web>
   severity: Warning
-  pattern_id: viewstate-mac-disabled
+  pattern_id: CSHARP-R-016

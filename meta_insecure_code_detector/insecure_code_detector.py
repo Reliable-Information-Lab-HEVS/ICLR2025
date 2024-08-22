@@ -26,7 +26,6 @@ from .analyzers import Analyzer
 from .insecure_patterns import InsecurePattern
 from .issues import Issue, Severity
 from .languages import Language
-from .usecases import UseCase
 
 LOG: logging.Logger = logging.getLogger(__name__)
 
@@ -38,11 +37,11 @@ except ImportError:
 LANGUAGE_ANALYZER_MAP: dict[Language, list[Analyzer]] = {
     Language.C: [
         Analyzer.REGEX,
-        Analyzer.SEMGREP,
+        Analyzer.WEGGLI,
     ],
     Language.CPP: [
         Analyzer.REGEX,
-        Analyzer.SEMGREP,
+        Analyzer.WEGGLI,
     ],
     Language.CSHARP: [
         Analyzer.REGEX,
@@ -86,7 +85,7 @@ async def analyze(
     code_before: Optional[str] = None,
     code_after: Optional[str] = None,
     path: Optional[Path] = None,
-    usecase: UseCase = UseCase.CYBERSECEVAL,
+    fast_mode: bool = False,
 ) -> List[Issue]:
     """
     Checks if the string contains insecure code.
@@ -120,22 +119,28 @@ async def analyze(
     if oss.ENABLE_REGEX_ANALYZER and (
         Analyzer.REGEX in LANGUAGE_ANALYZER_MAP.get(language, [])
     ):
-        result += _regex_analyze(generated_code, code_context, usecase)
+        result += _regex_analyze(generated_code, code_context)
 
-    if usecase == UseCase.CODESHIELD:
+    if fast_mode:
         # fast mode is greedy. returns for any match and doesn't include all matches
         if len(result) > 0:
             return result
+
+    # weggli analyze
+    if oss.ENABLE_WEGGLI and (
+        Analyzer.WEGGLI in LANGUAGE_ANALYZER_MAP.get(language, [])
+    ):
+        tasks.append(asyncio.create_task(_weggli_analyze(generated_code, code_context)))
 
     # SEMGREP analyze
     if oss.ENABLE_SEMGREP and (
         Analyzer.SEMGREP in LANGUAGE_ANALYZER_MAP.get(language, [])
     ):
-        if usecase == UseCase.CODESHIELD:
-            if not _is_semgrep_scan_recommended(generated_code, code_context, usecase):
+        if fast_mode:
+            if not _is_semgrep_scan_recommended(generated_code, code_context):
                 return result
         tasks.append(
-            asyncio.create_task(_semgrep_analyze(generated_code, code_context, usecase))
+            asyncio.create_task(_semgrep_analyze(generated_code, code_context))
         )
 
     # Gather results from all tasks
@@ -205,10 +210,8 @@ def _run_regex(generated_code: str, patterns: list[InsecurePattern]) -> List[Iss
     ]
 
 
-def _regex_analyze(
-    generated_code: str, code_context: CodeContext, usecase: UseCase
-) -> List[Issue]:
-    patterns = insecure_patterns.load(code_context.language, Analyzer.REGEX, usecase)
+def _regex_analyze(generated_code: str, code_context: CodeContext) -> List[Issue]:
+    patterns = insecure_patterns.load(code_context.language, Analyzer.REGEX)
     return _run_regex(generated_code, patterns)
 
 
@@ -257,6 +260,85 @@ def _filter_issues_in_generated_code(
     return result
 
 
+def _get_weggli_issue_line_number(weggli_output: str) -> int | None:
+    lines = weggli_output.splitlines()
+    for line in lines:
+        if re.search(r"\x1b\[31m.*\x1b\[0m", line):
+            line_number_group = re.search(r"^\s*(\d+):", line)
+            if line_number_group:
+                return int(line_number_group.group(1))
+    return None
+
+
+async def _run_all_weggli_tasks(
+    patterns: List[InsecurePattern],
+    weggli_command: list[str],
+    path: Path,
+    batch_size: int = 20,
+) -> list[Issue]:
+    tasks = []
+    for i in range(0, len(patterns), batch_size):
+        batch = patterns[i : i + batch_size]
+        tasks.append(_execute_weggli_task(batch, weggli_command, path))
+    results = await asyncio.gather(*tasks)
+    # Flatten the list of lists into a single list
+    return [issue for batch in results for issue in batch]
+
+
+async def _execute_weggli_task(
+    patterns: List[InsecurePattern], weggli_command: list[str], path: Path
+) -> List[Issue]:
+    tasks = []
+    for pattern in patterns:
+        command = (
+            weggli_command
+            + [
+                item
+                for sublist in (["-R", regex] for regex in pattern.regexes or [])
+                for item in sublist
+            ]
+            + [pattern.rule, str(path)]
+        )
+        tasks.append(_run_command(command))
+
+    weggli_outputs = await asyncio.gather(*tasks)
+
+    issues = []
+    for pattern, weggli_output in zip(patterns, weggli_outputs):
+        if str(path) in weggli_output:
+            issues.append(
+                Issue(
+                    description=pattern.description,
+                    cwe_id=pattern.cwe_id,
+                    severity=Severity.from_string(pattern.severity),
+                    line=_get_weggli_issue_line_number(weggli_output),
+                    rule=pattern.rule,
+                    analyzer=Analyzer.WEGGLI,
+                    pattern_id=pattern.pattern_id,
+                )
+            )
+    return issues
+
+
+async def _weggli_analyze(
+    generated_code: str,
+    code_context: CodeContext,
+) -> list[Issue]:
+    # get all weggli patterns to be analyzed
+    patterns = insecure_patterns.load(code_context.language, Analyzer.WEGGLI)
+
+    command_base = oss.WEGGLI_COMMAND + (
+        ["-X"] if code_context.language == Language.CPP else []
+    )
+    result = await _run_all_weggli_tasks(patterns, command_base, code_context.path)
+    if code_context.is_existing_path:
+        return result
+    filered_results = _filter_issues_in_generated_code(
+        result, generated_code, code_context.before
+    )
+    return filered_results
+
+
 def _parse_semgrep_issues(output: str) -> list[Issue]:
     """
     Parse the output of the run into a list of issues
@@ -292,11 +374,9 @@ def _parse_semgrep_issues(output: str) -> list[Issue]:
 
 
 def _is_semgrep_scan_recommended(
-    generated_code: str, code_context: CodeContext, usecase: UseCase
+    generated_code: str, code_context: CodeContext
 ) -> bool:
-    prescan_patterns = insecure_patterns.load_prescan_regexes(
-        code_context.language, usecase
-    )
+    prescan_patterns = insecure_patterns.load_prescan_regexes(code_context.language)
     if len(prescan_patterns) == 0:
         return True
     issues = _run_regex(generated_code, prescan_patterns)
@@ -308,25 +388,11 @@ def _is_semgrep_scan_recommended(
 async def _semgrep_analyze(
     generated_code: str,
     code_context: CodeContext,
-    usecase: UseCase,
 ) -> list[Issue]:
-    config_file_path = (
-        oss.SEMGREP_RULE_REPO_PATH
-        / "_generated_"
-        / f"{code_context.language.value}_{usecase.value}.json"
-    )
-
     root_folder = "/" if os.path.isabs(code_context.path) else None
-
     command = (
         oss.SEMGREP_COMMAND
-        + [
-            (
-                str(config_file_path)
-                if config_file_path.exists()
-                else str(oss.SEMGREP_RULE_REPO_PATH / code_context.language)
-            )
-        ]
+        + [str(oss.SEMGREP_RULE_REPO_PATH / code_context.language)]
         + (["--project-root", root_folder] if root_folder else [])
         + [str(code_context.path)]
     )

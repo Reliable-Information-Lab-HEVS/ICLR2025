@@ -23,6 +23,19 @@ C_REGEX_TEST_CASES = [
     ("strcpy(dest, src)", 1, "\\bstrcpy\\s*\\("),
 ]
 
+C_WEGGLI_TEST_CASES = [
+    (
+        "ret = snprintf(dest, 10, src); dest[ret] = '1';",
+        2,
+        "{ $ret = $snprintf_family($b); not: $ret < _; $b[$ret] = _;}",
+    ),
+    (
+        "int a; \n a = a + 1; \n ret = snprintf(dest, 10, src); dest[ret] = '1';",
+        4,
+        "{ $ret = $snprintf_family($b); not: $ret < _; $b[$ret] = _;}",
+    ),
+]
+
 CSHARP_SEMGREP_TEST_CASES = [
     (
         "//hello\nusing (var cryptoServiceProvider = System.Security.Cryptography.MD5.Create())",
@@ -38,9 +51,26 @@ class TestInsecureCodeDetectorFunctional(unittest.IsolatedAsyncioTestCase):
         for test_case in C_REGEX_TEST_CASES:
             test_input, expected_line_number, expected_rule = test_case
             result = await insecure_code_detector.analyze(Language.C, test_input)
-            self.assertGreaterEqual(
-                len(result), 1, "Test failed: {}".format(test_input)
+            self.assertEqual(len(result), 1, "Test failed: {}".format(test_input))
+            self.assertEqual(
+                result[0].line,
+                expected_line_number,
+                "Mismatch in the expected issue line number {}".format(test_input),
             )
+            self.assertEqual(
+                result[0].rule,
+                expected_rule,
+                "Mismatch in the expected rule name {}".format(test_input),
+            )
+
+    @unittest.skipUnless(oss.ENABLE_WEGGLI, "Weggli analyzer not enabled")
+    async def test_weggli(self) -> None:
+        for test_case in C_WEGGLI_TEST_CASES:
+            test_input, expected_line_number, expected_rule = test_case
+            result = await insecure_code_detector.analyze(
+                Language.C, test_input, "void foo(){\n", "\n}"
+            )
+            self.assertEqual(len(result), 1, "Test failed: {}".format(test_input))
             self.assertEqual(
                 result[0].line,
                 expected_line_number,
