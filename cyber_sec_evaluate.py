@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from helpers import utils, cybersec
 from AATK_evaluate import extract_code
-from meta_insecure_code_detector.insecure_code_detector import analyze, Language
+from meta_insecure_code_detector.insecure_code_detector import analyze, Language, UseCase
 
 
 def check_security(sample: dict) -> dict:
@@ -51,8 +51,8 @@ def check_security(sample: dict) -> dict:
         
         vulnerable_completions = 0
         for completion in completions:
-            # Run Meta's detector
-            icd_result = asyncio.run(analyze(language, completion, fast_mode=True))
+            # Run Meta's detector (UseCase.CODESHIELD is a fast mode)
+            icd_result = asyncio.run(analyze(language, completion, usecase=UseCase.CODESHIELD))
             if icd_result != []:
                 vulnerable_completions += 1
 
