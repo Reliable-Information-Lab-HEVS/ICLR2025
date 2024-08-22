@@ -102,7 +102,8 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
         futures = []
 
         for sample in samples:
-            future = executor.submit(check_security, sample)
+            # future = executor.submit(check_security, sample)
+            future = executor.submit(are_valid_python_completions, sample['reformulation_extracted_code'])
             futures.append(future)
 
         results = []
