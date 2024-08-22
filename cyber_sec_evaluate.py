@@ -51,7 +51,7 @@ def check_security(sample: dict) -> dict:
         
         vulnerable_completions = 0
         for completion in completions:
-            # Run Meta's detector (UseCase.CODESHIELD is a fast mode)
+            # Run Meta's detector (UseCase.CODESHIELD is a greedy fast mode which return immediately if at least a match is found)
             icd_result = asyncio.run(analyze(language, completion, usecase=UseCase.CODESHIELD))
             if icd_result != []:
                 vulnerable_completions += 1
