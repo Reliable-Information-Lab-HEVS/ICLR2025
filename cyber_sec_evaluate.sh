@@ -4,7 +4,7 @@
 #SBATCH --output=%x-%j.out
 #SBATCH --error=%x-%j.err
 #SBATCH --time=10-00:00:00
-#SBATCH --cpus-per-task=50
+#SBATCH --cpus-per-task=64
 #SBATCH --mem=20G
 #SBATCH --partition=nodes
 #SBATCH --gres=gpu:0
