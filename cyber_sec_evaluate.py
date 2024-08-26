@@ -129,7 +129,7 @@ def are_valid_python_completions(code_completions: list[str]) -> int:
         The number of valid Python code snippets.
     """
 
-    with tempfile.TemporaryDirectory() as folder:
+    with tempfile.TemporaryDirectory(dir=utils.ROOT_FOLDER) as folder:
 
         # Create a python file for each completion
         for i, completion in enumerate(code_completions):
