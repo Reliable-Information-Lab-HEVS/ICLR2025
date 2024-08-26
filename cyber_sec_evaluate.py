@@ -1,6 +1,7 @@
 import asyncio
 import tempfile
 import os
+import argparse
 import py_compile
 from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExecutor
 from tqdm import tqdm
@@ -166,12 +167,21 @@ def are_valid_python_completions(code_completions: list[str]) -> int:
 
 if __name__ == '__main__':
 
-    for dataset in cybersec.DATASETS:
-        try:
-            files = cybersec.extract_filenames(dataset=dataset, category='completions', only_unprocessed=True)
-        except RuntimeError:
-            continue
-        # Run the evaluation in parallel
-        with ProcessPoolExecutor(max_workers=len(files)) as executor:
-            # tuple() is needed to gather all results from the iterator
-            _ = tuple(executor.map(evaluate_security, files, [8]*len(files)))
+    # for dataset in cybersec.DATASETS:
+    #     try:
+    #         files = cybersec.extract_filenames(dataset=dataset, category='completions', only_unprocessed=True)
+    #     except RuntimeError:
+    #         continue
+    #     # Run the evaluation in parallel
+    #     with ProcessPoolExecutor(max_workers=len(files)) as executor:
+    #         # tuple() is needed to gather all results from the iterator
+    #         _ = tuple(executor.map(evaluate_security, files, [8]*len(files)))
+
+    parser = argparse.ArgumentParser(description='CyberSec Eval')
+    parser.add_argument('file', type=str, help='File to evaluate.')
+    parser.add_argument('--workers', type=int, default=16, help='Number of workers to use.')
+    
+    args = parser.parse_args()
+    file = args.file
+    workers = args.workers
+    evaluate_security(file, n_workers=workers)
