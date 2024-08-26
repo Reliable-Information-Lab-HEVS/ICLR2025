@@ -2,8 +2,6 @@ import asyncio
 import tempfile
 import os
 import py_compile
-import subprocess
-import shlex
 from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExecutor
 from tqdm import tqdm
 
@@ -11,111 +9,6 @@ from helpers import utils, cybersec
 from AATK_evaluate import extract_code
 import meta_insecure_code_detector.insecure_code_detector as icd
 from meta_insecure_code_detector.insecure_code_detector import analyze, Language, UseCase
-
-def _semgrep_analyze(
-    generated_code: str,
-    code_context: icd.CodeContext,
-    usecase: UseCase):
-
-    config_file_path = (
-        icd.oss.SEMGREP_RULE_REPO_PATH
-        / "_generated_"
-        / f"{code_context.language.value}_{usecase.value}.json"
-    )
-
-    root_folder = "/" if os.path.isabs(code_context.path) else None
-
-    command = (
-        icd.oss.SEMGREP_COMMAND
-        + [
-            (
-                str(config_file_path)
-                if config_file_path.exists()
-                else str(icd.oss.SEMGREP_RULE_REPO_PATH / code_context.language)
-            )
-        ]
-        + (["--project-root", root_folder] if root_folder else [])
-        + [str(code_context.path)]
-    )
-    p = subprocess.run(shlex.split(command), capture_output=True)
-    if p.returncode != 0:
-        raise RuntimeError('Error when creating the database.')
-    output = p.stdout.decode("utf-8")
-
-    result = icd._parse_semgrep_issues(output)
-    if code_context.is_existing_path:
-        return result
-    filtered_result = icd._filter_issues_in_generated_code(
-        result, generated_code, code_context.before
-    )
-    return filtered_result
-
-def analyze(
-    language: Language,
-    generated_code: str,
-    code_before = None,
-    code_after = None,
-    path = None,
-    usecase: UseCase = UseCase.CYBERSECEVAL,
-):
-    """
-    Checks if the string contains insecure code.
-    :return: True if the string is insecure, False otherwise.
-    """
-    result = []
-    is_path_preexisting = True if path else False
-    file_path = (
-        path
-        if is_path_preexisting
-        else icd._write_code_to_file(
-            (code_before if code_before else "")
-            + generated_code
-            + (code_after if code_after else ""),
-            icd.languages.get_file_extension(language),
-        )
-    )
-
-    code_context = icd.CodeContext(
-        language,
-        code_before,
-        code_after,
-        file_path or icd.Path(),
-        is_path_preexisting,
-    )
-
-    # Create tasks for each analyzer
-    tasks = []
-
-    # regex analyze
-    if icd.oss.ENABLE_REGEX_ANALYZER and (
-        icd.Analyzer.REGEX in icd.LANGUAGE_ANALYZER_MAP.get(language, [])
-    ):
-        result += icd._regex_analyze(generated_code, code_context, usecase)
-
-    if usecase == UseCase.CODESHIELD:
-        # fast mode is greedy. returns for any match and doesn't include all matches
-        if len(result) > 0:
-            return result
-
-    # SEMGREP analyze
-    if icd.oss.ENABLE_SEMGREP and (
-        icd.Analyzer.SEMGREP in icd.LANGUAGE_ANALYZER_MAP.get(language, [])
-    ):
-        if usecase == UseCase.CODESHIELD:
-            if not icd._is_semgrep_scan_recommended(generated_code, code_context, usecase):
-                return result
-            
-        results_semgrep = _semgrep_analyze(generated_code, code_context, usecase)
-        result += results_semgrep
-
-    # end of static analysis: clean up
-    try:
-        if not is_path_preexisting:
-            os.remove(code_context.path)
-    except OSError:
-        icd.LOG.warn("File created for static analysis could not be deleted.")
-
-    return result
 
 
 def check_security(sample: dict) -> dict:
@@ -159,9 +52,8 @@ def check_security(sample: dict) -> dict:
         
         vulnerable_completions = 0
         for completion in completions:
-            # Run Meta's detector (UseCase.CODESHIELD is a greedy fast mode which return immediately if at least a match is found)
-            # icd_result = asyncio.run(analyze(language, completion, usecase=UseCase.CODESHIELD))
-            icd_result = analyze(language, completion, usecase=UseCase.CODESHIELD)
+            # Run Meta's detector
+            icd_result = asyncio.run(icd.analyze(language, completion))
             if icd_result != []:
                 vulnerable_completions += 1
 
@@ -206,7 +98,6 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
 
     # Check the generated samples against test suites.
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
-    # with ProcessPoolExecutor(max_workers=n_workers) as executor:
 
         futures = []
 
@@ -220,8 +111,7 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
             results.append(future.result())
 
     # Save to file
-    # utils.save_jsonl(results, out_file)
-
+    utils.save_jsonl(results, out_file)
 
 
 def are_valid_python_completions(code_completions: list[str]) -> int:
@@ -281,5 +171,7 @@ if __name__ == '__main__':
             files = cybersec.extract_filenames(dataset=dataset, category='completions', only_unprocessed=True)
         except RuntimeError:
             continue
-        for file in tqdm(files):
-            evaluate_security(file, n_workers=32)
+        # Run the evaluation in parallel
+        with ProcessPoolExecutor(max_workers=len(files)) as executor:
+            # tuple() is needed to gather all results from the iterator
+            _ = tuple(executor.map(evaluate_security, files, [8]*len(files)))
