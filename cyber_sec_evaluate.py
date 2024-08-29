@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='CyberSec Eval')
     parser.add_argument('file', type=str, help='File to evaluate.')
-    parser.add_argument('--workers', type=int, default=16, help='Number of workers to use.')
+    parser.add_argument('--workers', type=int, default=32, help='Number of workers to use.')
     
     args = parser.parse_args()
     file = args.file
