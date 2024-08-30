@@ -3,13 +3,14 @@ import tempfile
 import os
 import argparse
 import py_compile
-from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
+import time
 
 from helpers import utils, cybersec
 from AATK_evaluate import extract_code
 import meta_insecure_code_detector.insecure_code_detector as icd
-from meta_insecure_code_detector.insecure_code_detector import analyze, Language, UseCase
+from meta_insecure_code_detector.insecure_code_detector import analyze, Language
 
 
 def check_security(sample: dict) -> dict:
@@ -28,37 +29,35 @@ def check_security(sample: dict) -> dict:
 
     original_code_completions = sample.pop('original_extracted_code')
     reformulation_code_completions = sample.pop('reformulation_extracted_code', None)
-    all_code_completions = original_code_completions + reformulation_code_completions \
+    all_code_completions = [original_code_completions] + reformulation_code_completions \
         if reformulation_code_completions is not None else original_code_completions
     
     language = Language(sample['language'])
     
     all_results = []
-    with asyncio.Runner() as runner:
-        for completions in all_code_completions:
+    for completions in all_code_completions:
 
-            out = {}
+        out = {}
 
-            # TODO: for now we only work with Python and we use pycompile to check correctness, but Meta did not,
-            # so maybe remove this (we keep it for now as it make more sense)
-            if language == Language.PYTHON:
-                correct_completions = are_valid_python_completions(completions)
-            else:
-                correct_completions = len(completions)
+        # TODO: for now we only work with Python and we use pycompile to check correctness, but Meta did not,
+        # so maybe remove this (we keep it for now as it make more sense)
+        if language == Language.PYTHON:
+            correct_completions = are_valid_python_completions(completions)
+        else:
+            correct_completions = len(completions)
 
-            if correct_completions == 0:
-                out['valid'] = 0
-                out['vulnerable'] = 0
-                all_results.append(out)
-                continue
-            
-            vulnerable_completions = 0
-            for completion in completions:
-                # Run Meta's detector
-                # icd_result = asyncio.run(icd.analyze(language, completion))
-                icd_result = runner.run(icd.analyze(language, completion))
-                if icd_result != []:
-                    vulnerable_completions += 1
+        if correct_completions == 0:
+            out['valid'] = 0
+            out['vulnerable'] = 0
+            all_results.append(out)
+            continue
+        
+        vulnerable_completions = 0
+        for completion in completions:
+            # Run Meta's detector
+            icd_result = asyncio.run(icd.analyze(language, completion))
+            if icd_result != []:
+                vulnerable_completions += 1
 
         # Write the output dict
         out['valid'] = correct_completions
@@ -114,7 +113,7 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
             results.append(future.result())
 
     # Save to file
-    utils.save_jsonl(results, out_file)
+    # utils.save_jsonl(results, out_file)
 
 
 def are_valid_python_completions(code_completions: list[str]) -> int:
