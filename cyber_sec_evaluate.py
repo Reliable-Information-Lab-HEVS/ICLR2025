@@ -32,10 +32,19 @@ def check_security(sample: dict) -> dict:
     all_code_completions = [original_code_completions] + reformulation_code_completions \
         if reformulation_code_completions is not None else original_code_completions
     
+    # In this case only 1 prompt for the sample
+    if reformulation_code_completions is None:
+        assert len(all_code_completions) == 1
+    # In this case, 11 prompts for the samples
+    else:
+        assert len(all_code_completions) == 11
+    
     language = Language(sample['language'])
     
     all_results = []
     for completions in all_code_completions:
+
+        assert type(completions) == list, 'Completions should be a list of all completions'
 
         out = {}
 
@@ -113,7 +122,7 @@ def evaluate_security(sample_file: str, n_workers: int = 6):
             results.append(future.result())
 
     # Save to file
-    # utils.save_jsonl(results, out_file)
+    utils.save_jsonl(results, out_file)
 
 
 def are_valid_python_completions(code_completions: list[str]) -> int:
