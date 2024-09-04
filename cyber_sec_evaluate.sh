@@ -24,6 +24,6 @@ srun --exclusive --exact --ntasks=1 --gpus-per-task=0 --cpus-per-task=8 --mem=10
 srun --exclusive --exact --ntasks=1 --gpus-per-task=0 --cpus-per-task=8 --mem=10G python3 -u cyber_sec_evaluate.py /cluster/raid/home/vacy/LLMs/results/CyberSecEval_instruct_llama3_python/completions/command-r/bfloat16/temperature_0.2.jsonl --workers 16 &
 srun --exclusive --exact --ntasks=1 --gpus-per-task=0 --cpus-per-task=8 --mem=10G python3 -u cyber_sec_evaluate.py /cluster/raid/home/vacy/LLMs/results/CyberSecEval_instruct_llama3_python/completions/zephyr-7B-beta/bfloat16/temperature_0.2.jsonl --workers 16 &
 srun --exclusive --exact --ntasks=1 --gpus-per-task=0 --cpus-per-task=8 --mem=10G python3 -u cyber_sec_evaluate.py /cluster/raid/home/vacy/LLMs/results/CyberSecEval_instruct_llama3_python/completions/mistral-7B-instruct-v2/bfloat16/temperature_0.2.jsonl --workers 16 &
-srun --exclusive --exact --ntasks=1 --gpus-per-task=0 --cpus-per-task=8 --mem=10G python3 -u cyber_sec_evaluate.py /cluster/raid/home/vacy/LLMs/results/CyberSecEval_instruct_llama3_python/completions/starling-7B-beta/bfloat16/temperature_0.2.jsonl --workers 16 &
+srun --exclusive --exact --ntasks=1 --gpus-per-task=0 --cpus-per-task=8 --mem=10G python3 -u cyber_sec_evaluate.py /cluster/raid/home/vacy/LLMs/results/CyberSecEval_instruct_llama3_python/completions/starling-7B-beta/bfloat16/temperature_0.2.jsonl --workers 16
 
 conda deactivate
