@@ -61,4 +61,4 @@ class YourDataset(SampleDataset):
     id_key: str = 'task_id'
 ```
 
-You can then easily manipulate the dataset through the `YourDataset` instances.
+You can then easily manipulate the dataset through a `YourDataset` instance.
