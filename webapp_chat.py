@@ -283,6 +283,8 @@ if __name__ == '__main__':
                         help='If given, will automatically log all interactions.')
     parser.add_argument('--port', type=int, default=7860,
                         help='On which port to deploy the webapp.')
+    parser.add_argument('--rank', type=int, default=0,
+                        help='GPU rank on which to deploy the model if using a single GPU.')
     
     args = parser.parse_args()
     model = args.model
@@ -290,9 +292,10 @@ if __name__ == '__main__':
     concurrency = args.concurrency
     LOG = args.log
     port = args.port
+    rank = args.rank
 
     # Initialize global model (necessary not to reload the model for each new inference)
-    MODEL = HFCausalModel(model)
+    MODEL = HFCausalModel(model, gpu_rank=rank)
     
     print(f'Analytics: {demo.analytics_enabled}')
     if not auth:
