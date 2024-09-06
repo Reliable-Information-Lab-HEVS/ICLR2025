@@ -4,6 +4,8 @@ This is the main repo containing all the work on code generation by LLMs. It is 
 
 ## Install
 
+### Clone the repo
+
 As `TextWiz` is a submodule inside this repository, it is not possible to simply clone this repo the usual way. One also has to initialize the submodule with the `--recurse_submodules` flag: 
 
 ```sh
@@ -23,6 +25,17 @@ git config submodule.recurse true
 ```
 
 And it will automatically pass the flag whenever you simply `git pull` from the remote.
+
+### Download results
+
+Due to the file size, the results are not included in this repository. To download them, run the following:
+
+```sh
+cd LLMs
+python3 download_results.py
+```
+
+and everything will be added in the correct location.
 
 ## Python environment
 
