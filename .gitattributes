@@ -1,1 +1,1 @@
-results/CyberSecEval_instruct_llama3_python/** filter=lfs diff=lfs merge=lfs -text
+results/CyberSecEval_instruct_llama3_python/completions/** filter=lfs diff=lfs merge=lfs -text
