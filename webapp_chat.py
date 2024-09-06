@@ -277,8 +277,8 @@ if __name__ == '__main__':
                         help='The model to use.')
     parser.add_argument('--concurrency', type=int, default=1,
                         help='Number of threads that can run for generation (using the GPUs).')
-    parser.add_argument('--no_auth', action='store_true',
-                        help='If given, will NOT require authentication to access the webapp.')
+    parser.add_argument('--auth', action='store_true',
+                        help='If given, will require authentication to access the webapp.')
     parser.add_argument('--log', action='store_true',
                         help='If given, will automatically log all interactions.')
     parser.add_argument('--port', type=int, default=7860,
@@ -286,7 +286,7 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     model = args.model
-    no_auth = args.no_auth
+    auth = args.auth
     concurrency = args.concurrency
     LOG = args.log
     port = args.port
@@ -295,7 +295,7 @@ if __name__ == '__main__':
     MODEL = HFCausalModel(model)
     
     print(f'Analytics: {demo.analytics_enabled}')
-    if no_auth:
+    if not auth:
         demo.queue(default_concurrency_limit=concurrency).launch(server_name='127.0.0.1', server_port=port,
                                                                  favicon_path='https://ai-forge.ch/favicon.ico')
     else:
