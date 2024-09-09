@@ -9,9 +9,7 @@ URL = 'https://www.dropbox.com/scl/fi/9yz9g7924nxwb8lmuazqw/results.zip?rlkey=h5
 DESTINATION = utils.ROOT_FOLDER
 
 def download():
-
     response = requests.get(URL)
-    
     if response.status_code == 200:
         print('Files downloaded successfully')
         # BytesIO avoids using a temporary file to store the bytes response
