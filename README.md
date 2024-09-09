@@ -115,3 +115,23 @@ Each benchmark comes with a specific helper file in which you can find the funct
 - **CyberSecEval**: &ensp;`helpers/cybersec.py`
 
 They contain specific functions to process the output files created [above](#processing-raw-code-outputs) and compute the required quantities/scores.
+
+## Other scripts
+
+Here is a quick list and description of the remaining scripts.
+
+### Webapps
+
+The three `webapp.py`, `webapp_chat.py` and `experiment_webapp.py` are used to launch simple `gradio` webapps to interact with models in a browser. The first one will allow you to switch model interactively, while the second one is a simplified version, specifically for chat-models. The last one was used for the WalliserDeutsch (strong and weak attackers) experiment.
+
+### Training 
+
+`train.py` and `train_peft.py` are the scripts used to perform the very basic and simple fine-tuning of Llama3 on the WalliserDeutsch dataset (full weights, and peft adapter respectively).
+
+### Reformulations & perplexity
+
+The script `reformulations.py` was used to create the prompt variations of the AATK-Instruct dataset for different models. In turn, `perplexity.py` was used to save the perplexity of each of those prompts with a given reference model to compute PE scores and ME scores.
+
+### Python code extractor
+
+Finally, the file `python_extractor.py` is designed to parse Python code blocks from text files (model outputs).
