@@ -1,6 +1,6 @@
 import requests
 import zipfile
-import subprocess
+import os
 import io
 
 from helpers import utils
@@ -23,10 +23,12 @@ def download():
 
 def clean_up():
     # Those annoying files starting with "._" were created when copying the data -> remove them
-    clean_command = 'find . -name "._*" -type f -delete'
-    p = subprocess.run(clean_command, shell=True)
-    if p.returncode != 0:
-        raise RuntimeError('Error when cleaning-up.')
+    results = os.path.join(DESTINATION, 'results')
+    for root, _, files in os.walk(results):
+        for file in files:
+            if file.startswith('._'):
+                os.remove(os.path.join(root, file))
+
 
 
 if __name__ == '__main__':
