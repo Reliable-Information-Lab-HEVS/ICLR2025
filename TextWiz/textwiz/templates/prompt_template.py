@@ -538,6 +538,12 @@ PROMPT_MAPPING = {
     
     # Finetuned
     'llama3-8B-walliser': Llama3PromptTemplate,
+
+    # Qwen
+    'qwen2.5-coder-7B-Instruct': QwenPromptTemplate,
+    'qwen2.5-coder-32B-Instruct': QwenPromptTemplate,
+    'qwen2.5-coder-7B': QwenPromptTemplate,
+    'qwen2.5-coder-32B': QwenPromptTemplate,
 }
 
 
