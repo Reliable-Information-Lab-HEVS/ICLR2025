@@ -299,17 +299,23 @@ class HFCausalModel(HFBaseModel):
                            'so we explicitly set `num_return_sequences=1`'))
             num_return_sequences = 1
 
-        # Prompt formatting
-        formatted_prompt = self.format_prompt(prompt, model_context=model_context, infill_suffix=infill_suffix,
-                                              system_prompt=system_prompt, prompt_template_mode=prompt_template_mode)
+        # # Prompt formatting
+        # formatted_prompt = self.format_prompt(prompt, model_context=model_context, infill_suffix=infill_suffix,
+        #                                       system_prompt=system_prompt, prompt_template_mode=prompt_template_mode)
         
-        # Prompt to reattach to output if `truncate_prompt_from_output` is False. This way we reattach the
-        # prompt given directly by the user, and not the prompt formatted with potential keywords in all
-        # but the most complicated cases
-        if infill_suffix == '' and system_prompt == '':
-            original_prompt = prompt + model_context
-        else:
-            original_prompt = formatted_prompt
+        # # Prompt to reattach to output if `truncate_prompt_from_output` is False. This way we reattach the
+        # # prompt given directly by the user, and not the prompt formatted with potential keywords in all
+        # # but the most complicated cases
+        # if infill_suffix == '' and system_prompt == '':
+        #     original_prompt = prompt + model_context
+        # else:
+        #     original_prompt = formatted_prompt
+
+        formatted_prompt = self.tokenizer.apply_chat_template(
+            [{"role": "user", "content": prompt}],
+            add_generation_prompt=True,
+            tokenize=False
+        )
 
         # Tokenize the prompt
         input = self.tokenizer.encode(formatted_prompt, return_tensors='pt')

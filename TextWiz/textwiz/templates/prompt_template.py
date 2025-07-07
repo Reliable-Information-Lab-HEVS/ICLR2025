@@ -460,6 +460,15 @@ class Llama3PromptTemplate(GenericPromptTemplate):
             formatted_prompt += model_context
 
         return formatted_prompt
+    
+class QwenPromptTemplate(GenericPromptTemplate):
+    def __init__(self, mode: str = 'default'):
+
+        super().__init__(mode)
+        self.default_mode = 'chat'
+    
+    def format_chat(self, prompt, model_context = '', system_prompt = ''):
+        raise NotImplementedError("This should not be used, we should use tokenizer.apply_chat_template")
 
     
 
