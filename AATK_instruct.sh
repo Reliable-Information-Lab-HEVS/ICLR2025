@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=11
 #SBATCH --mem=150G
 #SBATCH --partition=nodes
-#SBATCH --gres=gpu:a100:6
-#SBATCH --chdir=/cluster/raid/home/vacy/LLMs
+#SBATCH --gres=gpu:h200:2
+#SBATCH --chdir=/cluster/raid/home/stea/ICLR2025
 
 # Initialize the shell to use local conda
 eval "$(conda shell.bash hook)"
