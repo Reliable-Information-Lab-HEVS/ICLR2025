@@ -32,17 +32,21 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
     # Select models
+    # models = [
+    #     'zephyr-7B-beta',
+    #     'mistral-7B-instruct-v2',
+    #     'starling-7B-beta',
+    #     'star-chat-alpha',
+    #     'llama3-8B-instruct',
+    #     'command-r',
+    #     'code-llama-34B-instruct',
+    #     'llama2-70B-chat',
+    #     'code-llama-70B-instruct',
+    #     'llama3-70B-instruct',
+    # ]
+
     models = [
-        'zephyr-7B-beta',
-        'mistral-7B-instruct-v2',
-        'starling-7B-beta',
-        'star-chat-alpha',
-        'llama3-8B-instruct',
-        'command-r',
-        'code-llama-34B-instruct',
-        'llama2-70B-chat',
-        'code-llama-70B-instruct',
-        'llama3-70B-instruct',
+        'qwen2.5-coder-7B-Instruct'
     ]
 
     print(f'Launching computations with {num_gpus} gpus available.')
