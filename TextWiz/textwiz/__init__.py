@@ -122,6 +122,18 @@ GOOD_CODERS = (
     'llama2-70B-chat',
 )
 
+NEW_CODERS_INSTRUCT = (
+    'qwen2.5-coder-32B-Instruct',
+    'codegemma-7B-instruct',
+    'deepseek-coder-33B-instruct',
+)
+
+NEW_CODERS = (
+    'qwen2.5-coder-32B',
+    'codegemma-7B',
+    'deepseek-coder-33B',
+)
+
 
 SMALL_GOOD_CODERS = tuple(model for model in GOOD_CODERS if model in SMALL_MODELS)
 LARGE_GOOD_CODERS = tuple(model for model in GOOD_CODERS if model in LARGE_MODELS)

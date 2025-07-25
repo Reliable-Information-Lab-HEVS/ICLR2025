@@ -149,6 +149,7 @@ def main(model: str, input_file: str, output_file: str, N: int, original_key: st
     samples = utils.load_jsonl(input_file)
     assert all([original_key in sample.keys() for sample in samples]), 'The `original_key` is not present in all samples'
 
+    print("Running model: ", model)
     model = HFCausalModel(model)
 
     output_bank = []

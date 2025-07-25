@@ -43,6 +43,7 @@ def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = P
                         stopping_patterns: tuple[str] = stopping.EXTENDED_CODE_STOP_PATTERNS) -> list[str]:
     
     code_outputs = [parser(sequence) for sequence in outputs]
+    
 
     completions = []
     for output in code_outputs:
@@ -52,7 +53,7 @@ def extract_completions(outputs: list[str], sample: dict, parser: CodeParser = P
         code_after_func_def = re.search(regex, output, re.DOTALL)
 
         if code_after_func_def:
-            output = code_after_func_def.group(1)
+            output = code_after_func_def.group(1) 
             output = stopping.post_process_stopping_patterns([output], stopping_patterns)[0]
             # Remove the function definition
             if re.search(r'"""(.*?)"""', output, re.DOTALL):

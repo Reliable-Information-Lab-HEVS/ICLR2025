@@ -311,11 +311,26 @@ class HFCausalModel(HFBaseModel):
         # else:
         #     original_prompt = formatted_prompt
 
-        formatted_prompt = self.tokenizer.apply_chat_template(
-            [{"role": "user", "content": prompt}],
-            add_generation_prompt=True,
-            tokenize=False
-        )
+        if prompt_template_mode == 'chat':
+            try:
+                formatted_prompt = self.tokenizer.apply_chat_template(
+                    [{"role": "user", "content": prompt}],
+                    add_generation_prompt=True,
+                    tokenize=False
+                )
+            except ValueError as e:
+                raise ValueError(
+                    f'The model {self.model_name} does not have a chat template, please use a different prompt_template_mode.'
+                ) from e
+            
+        else:
+            formatted_prompt = self.format_prompt(prompt, model_context=model_context, infill_suffix=infill_suffix,
+                                                  system_prompt=system_prompt, prompt_template_mode=prompt_template_mode)
+            if infill_suffix == '' and system_prompt == '':
+                original_prompt = prompt + model_context
+            else:
+                original_prompt = formatted_prompt
+        
 
         # Tokenize the prompt
         input = self.tokenizer.encode(formatted_prompt, return_tensors='pt')

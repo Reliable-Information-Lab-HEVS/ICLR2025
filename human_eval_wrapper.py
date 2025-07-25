@@ -8,6 +8,7 @@ from TextWiz.textwiz.templates.prompt_template import PROMPT_MODES
 from helpers import datasets
 from helpers import utils
 
+import os
 
 
 
@@ -26,6 +27,8 @@ if __name__ == '__main__':
                         help='If given, will only run the benchmark on models with a non-default prompt template.')
     parser.add_argument('--mode', type=str, default='generation', choices=PROMPT_MODES,
                         help='The mode for the prompt template.')
+    parser.add_argument('--new_only', action='store_true',
+                        help='If given, will only run the benchmark on new models (not in the original HumanEval paper).')
     parser.add_argument('--instruct', action='store_true',
                         help='If given, run the HumanEvalInstruct benchmark.')
     parser.add_argument('--no_context', action='store_false',
@@ -39,6 +42,7 @@ if __name__ == '__main__':
     big_models = args.big_models
     big_models_only = args.big_models_only
     special_only = args.special_only
+    new_only = args.new_only
     instruct = args.instruct
     mode = args.mode
     use_context = args.no_context
@@ -60,12 +64,19 @@ if __name__ == '__main__':
     num_gpus = torch.cuda.device_count()
 
     # Select models (only keep the good coders)
+    new_models_chat = textwiz.NEW_CODERS_INSTRUCT
+    new_models = textwiz.NEW_CODERS
     small_models = textwiz.SMALL_GOOD_CODERS_SPECIAL_PROMPT if special_only else textwiz.SMALL_GOOD_CODERS
     large_models = textwiz.LARGE_GOOD_CODERS_SPECIAL_PROMPT if special_only else textwiz.LARGE_GOOD_CODERS
     if big_models_only:
         models = large_models
     elif big_models:
         models = small_models + large_models
+    elif new_only:
+        if mode == 'chat':
+            models = new_models_chat
+        else:
+            models = new_models + new_models_chat
     else:
         models = small_models
 
@@ -86,6 +97,13 @@ if __name__ == '__main__':
     t0 = time.time()
 
     utils.dispatch_jobs_srun(gpu_footprints, num_gpus, commands)
+
+    # #run them sequentially for now
+    # for command in commands:
+    #     # run them
+    #     print(f'Running command: {command}')
+    #     #there is no help function, so we can use os.system
+    #     os.system(command)
 
     dt = time.time() - t0
     print(f'Overall it took {dt/3600:.2f}h !')

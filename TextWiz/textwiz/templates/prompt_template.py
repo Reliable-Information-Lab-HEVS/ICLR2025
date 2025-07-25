@@ -461,7 +461,7 @@ class Llama3PromptTemplate(GenericPromptTemplate):
 
         return formatted_prompt
     
-class QwenPromptTemplate(GenericPromptTemplate):
+class NotImplementedTemplate(GenericPromptTemplate):
     def __init__(self, mode: str = 'default'):
 
         super().__init__(mode)
@@ -540,10 +540,19 @@ PROMPT_MAPPING = {
     'llama3-8B-walliser': Llama3PromptTemplate,
 
     # Qwen
-    'qwen2.5-coder-7B-Instruct': QwenPromptTemplate,
-    'qwen2.5-coder-32B-Instruct': QwenPromptTemplate,
-    'qwen2.5-coder-7B': QwenPromptTemplate,
-    'qwen2.5-coder-32B': QwenPromptTemplate,
+    'qwen2.5-coder-7B-instruct': NotImplementedTemplate,
+    'qwen2.5-coder-32B-instruct': NotImplementedTemplate,
+    'qwen2.5-coder-32B': NotImplementedTemplate,
+    'qwen2.5-coder-7B': NotImplementedTemplate,
+
+    # CodeGemma
+    'codegemma-7B': NotImplementedTemplate,
+    'codegemma-7B-instruct': NotImplementedTemplate,
+
+    # DeepSeek
+    'deepseek-coder-33B': NotImplementedTemplate,
+    'deepseek-coder-33B-instruct': NotImplementedTemplate,
+
 }
 
 

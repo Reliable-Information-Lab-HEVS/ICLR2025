@@ -1,1 +1,1 @@
-from .stopping import StoppingType, create_stopping_criteria, post_process_sequences
+from .stopping import StoppingType, create_stopping_criteria, post_process_sequences, EXTENDED_CODE_STOP_PATTERNS, post_process_stopping_patterns
