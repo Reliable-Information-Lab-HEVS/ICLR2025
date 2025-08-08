@@ -16,11 +16,14 @@ if __name__ == '__main__':
                         help='If given, will estimate the memory footprint of the model quantized to int8.')
     parser.add_argument('--int4', action='store_true',
                         help='If given, will estimate the memory footprint of the model quantized to int4.')
+    parser.add_argument('--new_models', action='store_true',
+                        help='If given, run the benchmark on new models')
     
     args = parser.parse_args()
     reformulation_model = args.reformulation_model
     int8 = args.int8
     int4 = args.int4
+    run_new_models = args.new_models
 
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
@@ -45,9 +48,10 @@ if __name__ == '__main__':
     #     'llama3-70B-instruct',
     # ]
 
-    models = [
-        'qwen2.5-coder-7B-Instruct'
-    ]
+    new_models = textwiz.NEW_CODERS
+    if run_new_models:
+        models = new_models
+
 
     print(f'Launching computations with {num_gpus} gpus available.')
 

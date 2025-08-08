@@ -88,7 +88,7 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'{utils.get_time()}  Starting with model {model_name}')
+    print(f'{utils.get_time()}  Starting with model {model_name}, prompt template mode {prompt_template_mode}')
 
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
@@ -97,9 +97,16 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
         model = HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
     # Define stopping type
-    if model.is_chat_model() and (prompt_template_mode == 'default' or prompt_template_mode == 'chat'):
-        stopping_patterns = None
+    if model.is_chat_model():
+        if (prompt_template_mode == 'default' or prompt_template_mode == 'chat'):
+            print(f'The model {model_name} is a chat model and is acting as such, stopping patterns will not be used.')
+            stopping_patterns = None
+        else:
+            print(f'The model {model_name} is a chat model but we are using a generation prompt template mode, so stopping patterns will be used.')
+            # In this case we use the stopping patterns for the HumanEval benchmark
+            stopping_patterns = stopping.StoppingType.PYTHON_HUMAN_EVAL
     else:
+        print(f'The model {model_name} is not a chat model, stopping patterns will be used.')
         stopping_patterns = stopping.StoppingType.PYTHON_HUMAN_EVAL
 
     folder = humaneval.get_folder('HumanEval', prompt_template_mode, model_name, model.dtype_category())
@@ -111,10 +118,10 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
     for temperature in temperatures:
 
         filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
-        # Delete the file if it already exist for some reason (e.g. a previous run that dit not end correctly)
-        # because in this case we do not want to append to the file
+        # If the file already exists, we notify the user and continue with the next temperature
         if os.path.exists(filename):
-            os.remove(filename)
+            print(f'{utils.get_time()}  The file {filename} already exists, skipping temperature {temperature}.')
+            continue
 
         for sample in dataset:
 
@@ -177,22 +184,35 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
         The argument for greedy generation used in the HumanEval benchmark, by default HUMAN_EVAL_GREEDY_GENERATION_KWARGS
     """
 
-    print(f'{utils.get_time()}  Starting with model {model_name}')
-
+    print(f'{utils.get_time()}  Starting with model {model_name}, prompt template mode {prompt_template_mode}, use context {use_context}')
     # Override quantization for bloom because it's too big
     if model_name == 'bloom-176B' and not (quantization_8bits or quantization_4bits):
         model = HFCausalModel(model_name, quantization_8bits=True)
     else:
         model = HFCausalModel(model_name, quantization_8bits=quantization_8bits, quantization_4bits=quantization_4bits)
 
-    # Define stopping type
-    if model.is_chat_model():
-        stopping_patterns = None
-    else:
-        stopping_patterns = stopping.StoppingType.PYTHON_HUMAN_EVAL
-
     folder = humaneval.get_folder('HumanEvalInstruct', prompt_template_mode, model_name, model.dtype_category(),
                                   use_context=use_context)
+    # if all folders already exist, we notify the user and return
+    all_exist = True
+    for temperature in temperatures:
+        filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
+        if not os.path.exists(filename):
+            all_exist = False
+            break
+    if all_exist:
+        print(f'{utils.get_time()}  All files already exist in {folder}, skipping.')
+        return
+
+
+    # Define stopping type
+    if model.is_chat_model():
+        print(f'The model {model_name} is a chat model, stopping patterns will not be used.')
+        stopping_patterns = None
+    else:
+        print(f'The model {model_name} is not a chat model, stopping patterns will be used.')
+        stopping_patterns = stopping.StoppingType.PYTHON_HUMAN_EVAL
+
 
     dataset = datasets.HumanEvalInstruct()
 
@@ -201,10 +221,10 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
     for temperature in temperatures:
 
         filename = os.path.join(folder, f'temperature_{temperature}.jsonl')
-        # Delete the file if it already exist for some reason (e.g. a previous run that dit not end correctly)
-        # because in this case we do not want to append to the file
+
         if os.path.exists(filename):
-            os.remove(filename)
+            print(f'{utils.get_time()}  The file {filename} already exists, skipping temperature {temperature}.')
+            continue
 
         for sample in dataset:
 
@@ -240,9 +260,11 @@ def human_eval_instruct(model_name: str, prompt_template_mode: str, use_context:
 
             # Save the model completions
             if model.is_chat_model():
+                print(f'The model {model_name} is a chat model, extracting completions and also saving the model output.')
                 true_completions = extract_completions(completions, sample)
                 results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
             else:
+                print(f'The model {model_name} is not a chat model, saving the completions directly.')
                 results = [{'task_id': task_id, 'completion': completion} for completion in completions]
             utils.save_jsonl(results, filename, append=True)
 

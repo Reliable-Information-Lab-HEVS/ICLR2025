@@ -20,12 +20,15 @@ if __name__ == '__main__':
                         help='If given, run the benchmark on large models that do not fit on a single gpu.')
     parser.add_argument('--big_models_only', action='store_true',
                         help='If given, only run the benchmark on large models that do not fit on a single gpu.')
+    parser.add_argument('--new_models', action='store_true',
+                        help='If given, run the benchmark on new models')
     
     args = parser.parse_args()
     int8 = args.int8
     int4 = args.int4
     big_models = args.big_models
     big_models_only = args.big_models_only
+    run_new_models = args.new_models
 
     if int4 and int8:
         raise ValueError('int4 and int8 quantization are mutually exclusive.')
@@ -39,7 +42,10 @@ if __name__ == '__main__':
     # Select models (only keep the good coders)
     small_models = textwiz.SMALL_GOOD_CODERS
     large_models = textwiz.LARGE_GOOD_CODERS
-    if big_models_only:
+    new_models = textwiz.NEW_CODERS
+    if run_new_models:
+        models = new_models
+    elif big_models_only:
         models = large_models
     elif big_models:
         models = small_models + large_models
