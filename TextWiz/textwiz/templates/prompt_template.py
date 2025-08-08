@@ -5,6 +5,8 @@ memory of previous prompts.
 """
 
 from ..loader import ALLOWED_CAUSAL_MODELS
+import torch
+
 
 PROMPT_MODES = ('default', 'generation', 'infill', 'chat')
 
@@ -21,7 +23,8 @@ class GenericPromptTemplate(object):
         self.extra_eos_tokens = []
 
 
-    def get_prompt(self, prompt: str, model_context: str = '', suffix: str = '', system_prompt: str = '') -> str:
+    def get_prompt(self, prompt: str, model_context: str = '', suffix: str = '', system_prompt: str = '',
+                   tokenizer: torch.nn.Module | None = None) -> str:
         """Format the `prompt` according to `self.mode`.
 
         Parameters
@@ -43,16 +46,38 @@ class GenericPromptTemplate(object):
         """
 
         if self.mode == 'default':
-            return self.format_default(prompt, model_context=model_context, suffix=suffix, system_prompt=system_prompt)
+            return self.format_default(prompt, model_context=model_context, suffix=suffix, system_prompt=system_prompt, tokenizer=tokenizer)
         elif self.mode == 'generation':
             return self.format_generation(prompt, model_context=model_context)
         elif self.mode == 'infill':
             return self.format_infill(prompt, model_context=model_context, suffix=suffix)
         elif self.mode == 'chat':
-            return self.format_chat(prompt, model_context=model_context, system_prompt=system_prompt)
+            try:
+                # Change from Alex: chat mode should always use apply_chat_template
+                if system_prompt != '' and tokenizer is not None:
+                    formatted_prompt = tokenizer.apply_chat_template(
+                        [{"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}],
+                        add_generation_prompt=True,
+                        tokenize=False
+                    )
+                else:
+                    formatted_prompt = tokenizer.apply_chat_template(
+                            [{"role": "user", "content": prompt}],
+                            add_generation_prompt=True,
+                            tokenize=False
+                        )
+                if model_context != '':
+                    formatted_prompt += model_context
+            except ValueError:
+                raise ValueError(
+                    f'The model {self.model_name} does not have a chat template, please use a different prompt_template_mode.'
+                )
+            return formatted_prompt
         
 
-    def format_default(self, prompt: str, model_context: str = '', suffix: str = '', system_prompt: str = '') -> str:
+    def format_default(self, prompt: str, model_context: str = '', suffix: str = '', system_prompt: str = '', 
+                       tokenizer: torch.nn.Module | None = None) -> str:
         """Format the `prompt` when `self.mode = 'default'`.
 
         Parameters
@@ -78,7 +103,29 @@ class GenericPromptTemplate(object):
         elif self.default_mode == 'infill':
             return self.format_infill(prompt, model_context=model_context, suffix=suffix)
         elif self.default_mode == 'chat':
-            return self.format_chat(prompt, model_context=model_context, system_prompt=system_prompt)
+            try:
+                # Change from Alex: chat mode should always use apply_chat_template
+                if system_prompt != '' and tokenizer is not None:
+                    formatted_prompt = tokenizer.apply_chat_template(
+                        [{"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}],
+                        add_generation_prompt=True,
+                        tokenize=False
+                    )
+                else:
+                    formatted_prompt = tokenizer.apply_chat_template(
+                            [{"role": "user", "content": prompt}],
+                            add_generation_prompt=True,
+                            tokenize=False
+                        )
+                if model_context != '':
+                    formatted_prompt += model_context
+            except ValueError:
+                raise ValueError(
+                    f'The model {self.model_name} does not have a chat template, please use a different prompt_template_mode.'
+                )
+            return formatted_prompt
+            # return self.format_chat(prompt, model_context=model_context, system_prompt=system_prompt, tokenizer=tokenizer)
 
 
     def format_generation(self, prompt: str, model_context: str = '') -> str:
@@ -175,8 +222,7 @@ class StarCoderPromptTemplate(GenericPromptTemplate):
     def __init__(self, mode: str = 'default'):
 
         super().__init__(mode)
-        # self.default_mode = 'infill'
-        self.default_mode = 'generation'
+        self.default_mode = 'infill'
 
         self.prefix_token = '<fim_prefix>'
         self.suffix_token = '<fim_suffix>'
@@ -461,7 +507,22 @@ class Llama3PromptTemplate(GenericPromptTemplate):
 
         return formatted_prompt
     
-class NotImplementedTemplate(GenericPromptTemplate):
+
+class DeepSeekBaseTemplate(GenericPromptTemplate):
+    def __init__(self, mode: str = 'default'):
+
+        super().__init__(mode)
+        self.default_mode = 'infill'
+    
+        self.prefix_token = '<｜fim▁begin｜>'
+        self.suffix_token = '<｜fim▁end｜>'
+        self.middle_token = '<｜fim▁hole｜>'
+
+    def format_infill(self, prefix: str, model_context: str = '', suffix: str = '') -> str:
+
+        return self.prefix_token + prefix + self.middle_token  + self.suffix_token + suffix + model_context
+
+class NotImplementedChatTemplate(GenericPromptTemplate):
     def __init__(self, mode: str = 'default'):
 
         super().__init__(mode)
@@ -483,10 +544,12 @@ PROMPT_MAPPING = {
     'star-coder-base': StarCoderPromptTemplate,
     'star-coder': StarCoderPromptTemplate,
     'star-coder-plus': StarCoderPromptTemplate,
+    'star-coder-2-15B': StarCoderPromptTemplate,
 
     # StarChat
     'star-chat-alpha': StarChatPromptTemplate,
     'star-chat-beta': StarChatPromptTemplate,
+    'star-chat-2-instruct': StarChatPromptTemplate,
 
     # Codegen2
     'codegen2-1B': Codegen2PromptTemplate,
@@ -540,18 +603,18 @@ PROMPT_MAPPING = {
     'llama3-8B-walliser': Llama3PromptTemplate,
 
     # Qwen
-    'qwen2.5-coder-7B-instruct': NotImplementedTemplate,
-    'qwen2.5-coder-32B-instruct': NotImplementedTemplate,
-    'qwen2.5-coder-32B': NotImplementedTemplate,
-    'qwen2.5-coder-7B': NotImplementedTemplate,
+    'qwen2.5-coder-7B-instruct': NotImplementedChatTemplate,
+    'qwen2.5-coder-32B-instruct': NotImplementedChatTemplate,
+    'qwen2.5-coder-32B': GenericPromptTemplate,
+    'qwen2.5-coder-7B': GenericPromptTemplate,
 
     # CodeGemma
-    'codegemma-7B': NotImplementedTemplate,
-    'codegemma-7B-instruct': NotImplementedTemplate,
+    'codegemma-7B': GenericPromptTemplate,
+    'codegemma-7B-instruct': NotImplementedChatTemplate,
 
     # DeepSeek
-    'deepseek-coder-33B': NotImplementedTemplate,
-    'deepseek-coder-33B-instruct': NotImplementedTemplate,
+    'deepseek-coder-33B': DeepSeekBaseTemplate,
+    'deepseek-coder-33B-instruct': NotImplementedChatTemplate,
 
 }
 

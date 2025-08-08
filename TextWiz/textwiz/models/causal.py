@@ -57,7 +57,7 @@ class HFCausalModel(HFBaseModel):
     
 
     def format_prompt(self, prompt: str, model_context: str = '', infill_suffix: str = '', system_prompt: str = '',
-                      prompt_template_mode: str = 'default') -> str:
+                      prompt_template_mode: str = 'default', tokenizer: torch.nn.Module | None = None) -> str:
         """Format the prompt according to the prompt template.
 
         Parameters
@@ -90,7 +90,7 @@ class HFCausalModel(HFBaseModel):
         self.prompt_template.set_mode(prompt_template_mode)
 
         formatted_prompt = self.prompt_template.get_prompt(prompt, model_context=model_context, suffix=infill_suffix,
-                                                           system_prompt=system_prompt)
+                                                           system_prompt=system_prompt, tokenizer=self.tokenizer)
         
         # Reset template mode to previous mode
         self.prompt_template.set_mode(old_mode)
@@ -311,25 +311,12 @@ class HFCausalModel(HFBaseModel):
         # else:
         #     original_prompt = formatted_prompt
 
-        if prompt_template_mode == 'chat':
-            try:
-                formatted_prompt = self.tokenizer.apply_chat_template(
-                    [{"role": "user", "content": prompt}],
-                    add_generation_prompt=True,
-                    tokenize=False
-                )
-            except ValueError as e:
-                raise ValueError(
-                    f'The model {self.model_name} does not have a chat template, please use a different prompt_template_mode.'
-                ) from e
-            
+        formatted_prompt = self.format_prompt(prompt, model_context=model_context, infill_suffix=infill_suffix,
+                                                system_prompt=system_prompt, prompt_template_mode=prompt_template_mode, tokenizer=self.tokenizer)
+        if infill_suffix == '' and system_prompt == '':
+            original_prompt = prompt + model_context
         else:
-            formatted_prompt = self.format_prompt(prompt, model_context=model_context, infill_suffix=infill_suffix,
-                                                  system_prompt=system_prompt, prompt_template_mode=prompt_template_mode)
-            if infill_suffix == '' and system_prompt == '':
-                original_prompt = prompt + model_context
-            else:
-                original_prompt = formatted_prompt
+            original_prompt = formatted_prompt
         
 
         # Tokenize the prompt

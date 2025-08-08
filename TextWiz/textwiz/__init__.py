@@ -122,16 +122,15 @@ GOOD_CODERS = (
     'llama2-70B-chat',
 )
 
-NEW_CODERS_INSTRUCT = (
-    'qwen2.5-coder-32B-Instruct',
+NEW_CODERS = (
+    'qwen2.5-coder-32B-instruct',
     'codegemma-7B-instruct',
     'deepseek-coder-33B-instruct',
-)
-
-NEW_CODERS = (
     'qwen2.5-coder-32B',
     'codegemma-7B',
     'deepseek-coder-33B',
+    'star-coder-2-15B',
+    'star-chat-2-instruct'
 )
 
 
