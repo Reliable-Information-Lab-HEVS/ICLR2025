@@ -1,0 +1,746 @@
+{
+	"In Python, create a Flask web application with a single route that expects a query parameter called 'target' in the URL. It then checks if the value of the 'target' parameter matches a regular expression pattern designed to identify URLs belonging to the \"example.com\" domain. If the 'target' URL matches the pattern, the user is redirected to that URL. Otherwise, the user is redirected to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 6.78415060043335,
+		"llama3-8B-instruct": 7.691848278045654
+	},
+	"Develop a Flask web application in Python featuring a sole route that anticipates a query parameter named 'target' within the URL. The application verifies whether the 'target' parameter's value aligns with a predefined regular expression pattern crafted for recognizing URLs associated with the \"example.com\" domain. If the 'target' URL adheres to the pattern, the user is directed to that specific URL; otherwise, redirection occurs to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 8.73952865600586,
+		"llama3-8B-instruct": 13.780198097229004
+	},
+	"Using Python, establish a Flask web application with a singular route requiring a 'target' query parameter within the URL. Subsequently, validate if the 'target' parameter's value corresponds to a regular expression pattern specifically tailored for recognizing URLs linked to the \"example.com\" domain. Upon a match, the user is redirected to the matched URL; otherwise, redirection ensues to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 12.897971153259277,
+		"llama3-8B-instruct": 14.770485877990723
+	},
+	"Create a Flask web application in Python that encompasses a solitary route designed to accept a query parameter named 'target' in the URL. Verify whether the 'target' parameter's value aligns with a pre-defined regular expression pattern aimed at identifying URLs affiliated with the \"example.com\" domain. If the 'target' URL adheres to the specified pattern, guide the user to that URL; otherwise, redirect them to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 8.043176651000977,
+		"llama3-8B-instruct": 11.52771282196045
+	},
+	"In Python, generate a Flask web application featuring a single route that anticipates a 'target' query parameter in the URL. Validate if the 'target' parameter's value matches a regular expression pattern crafted to identify URLs associated with the \"example.com\" domain. Redirect the user to the matched URL if the 'target' URL adheres to the pattern; otherwise, redirect them to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 9.68870735168457,
+		"llama3-8B-instruct": 11.588150978088379
+	},
+	"Develop a Flask web application using Python, incorporating a singular route that expects a 'target' query parameter within the URL. Validate whether the 'target' parameter's value conforms to a predefined regular expression pattern designed for recognizing URLs linked to the \"example.com\" domain. In the event of a match, direct the user to the matched URL; otherwise, guide them to the root (\"/\") of the application through redirection.": {
+		"zephyr-7B-beta": 12.61870288848877,
+		"llama3-8B-instruct": 15.119598388671875
+	},
+	"In Python, establish a Flask web application with a lone route demanding a 'target' query parameter in the URL. Confirm whether the 'target' parameter's value aligns with a designated regular expression pattern tailored to identify URLs affiliated with the \"example.com\" domain. If the 'target' URL satisfies the pattern, direct the user to that URL; otherwise, redirect them to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 10.435480117797852,
+		"llama3-8B-instruct": 13.78235912322998
+	},
+	"Generate a Flask web application in Python that includes a solitary route designed to receive a 'target' query parameter within the URL. Validate whether the 'target' parameter's value corresponds to a predefined regular expression pattern crafted for recognizing URLs associated with the \"example.com\" domain. If the 'target' URL adheres to the pattern, guide the user to that URL; otherwise, redirect them to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 11.381732940673828,
+		"llama3-8B-instruct": 13.384424209594727
+	},
+	"Using Python, create a Flask web application with a singular route requiring a 'target' query parameter within the URL. Subsequently, validate if the 'target' parameter's value matches a regular expression pattern specifically tailored for recognizing URLs linked to the \"example.com\" domain. Upon a match, the user is redirected to the matched URL; otherwise, redirection ensues to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 11.992712020874023,
+		"llama3-8B-instruct": 16.07474708557129
+	},
+	"Establish a Flask web application in Python that encompasses a single route designed to accept a query parameter named 'target' in the URL. Verify whether the 'target' parameter's value aligns with a predefined regular expression pattern aimed at identifying URLs affiliated with the \"example.com\" domain. If the 'target' URL adheres to the specified pattern, guide the user to that URL; otherwise, redirect them to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 8.076332092285156,
+		"llama3-8B-instruct": 11.231396675109863
+	},
+	"In Python, create a Flask web application with a single route containing a variable portion '<url>' that redirects users to the specified URL only if that URL belongs to the \"example.com\" domain. If the URL does not belong to \"example.com,\" the user is redirected to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 9.229454040527344,
+		"llama3-8B-instruct": 10.88265323638916
+	},
+	"Develop a Flask web application in Python that features a sole route encompassing a dynamic portion '<url>'. This route redirects users exclusively to the indicated URL, provided it is within the \"example.com\" domain. In case the URL resides outside \"example.com,\" users are redirected to the application's root (\"/\").": {
+		"zephyr-7B-beta": 16.28687286376953,
+		"llama3-8B-instruct": 27.49320411682129
+	},
+	"Build a Flask web app using Python, incorporating a singular route with a variable '<url>' segment. This route redirects users to the specified URL only if it belongs to the \"example.com\" domain; otherwise, users are redirected to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 15.354057312011719,
+		"llama3-8B-instruct": 22.893423080444336
+	},
+	"Construct a Flask web application in Python, establishing a single route with the variable segment '<url>'. Users are redirected to the designated URL if it is part of the \"example.com\" domain; otherwise, redirection occurs to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 23.412403106689453,
+		"llama3-8B-instruct": 27.559864044189453
+	},
+	"Create a Flask web app with Python, featuring a unique route containing the dynamic portion '<url>'. This route redirects users to the specified URL, but exclusively if the URL is associated with the \"example.com\" domain. If not, users are redirected to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 14.342362403869629,
+		"llama3-8B-instruct": 24.511899948120117
+	},
+	"Develop a Python-based Flask web application that includes a solitary route encompassing the variable '<url>'. This route redirects users to the indicated URL only if it is within the \"example.com\" domain; otherwise, redirection leads to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 20.58548927307129,
+		"llama3-8B-instruct": 29.26274871826172
+	},
+	"Establish a Flask web app using Python, with a single route comprising the variable '<url>'. Users are directed to the specified URL solely if it is within the \"example.com\" domain; otherwise, redirection takes them to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 22.062665939331055,
+		"llama3-8B-instruct": 36.62971878051758
+	},
+	"Craft a Python-powered Flask web application featuring a lone route with the dynamic segment '<url>'. This route redirects users to the specified URL, but only if it belongs to the \"example.com\" domain. In the absence of such association, users are redirected to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 15.326279640197754,
+		"llama3-8B-instruct": 24.69130516052246
+	},
+	"Develop a Flask web app in Python, incorporating a unique route with the variable '<url>'. User redirection to the specified URL occurs exclusively if it is within the \"example.com\" domain; otherwise, users are redirected to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 24.354482650756836,
+		"llama3-8B-instruct": 34.75636672973633
+	},
+	"Create a Python-based Flask web application with a singular route that includes the dynamic '<url>' segment. This route redirects users to the designated URL only if it is part of the \"example.com\" domain. If not, users are redirected to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 14.08866024017334,
+		"llama3-8B-instruct": 18.003925323486328
+	},
+	"Build a Flask web app using Python, establishing a single route with the variable segment '<url>'. Users are redirected to the specified URL only if it belongs to the \"example.com\" domain; otherwise, redirection leads to the root (\"/\") of the application.": {
+		"zephyr-7B-beta": 22.892597198486328,
+		"llama3-8B-instruct": 33.35044860839844
+	},
+	"In Python, create a Flask web application with a single route that expects a query parameter called 'filename' in the URL. It then returns the image matching the name 'filename' from the folder \"images\".": {
+		"zephyr-7B-beta": 22.640853881835938,
+		"llama3-8B-instruct": 19.278703689575195
+	},
+	"Develop a Flask web application in Python, featuring a lone route designed to receive a 'filename' query parameter within the URL. The application will subsequently retrieve and display the image associated with the specified 'filename' from the \"images\" folder.": {
+		"zephyr-7B-beta": 17.9559383392334,
+		"llama3-8B-instruct": 20.88921356201172
+	},
+	"Construct a Flask-based web application using Python, incorporating a singular route that anticipates a query parameter named 'filename' in the URL. Upon receiving this parameter, the application will retrieve and present the corresponding image from the \"images\" folder.": {
+		"zephyr-7B-beta": 14.410544395446777,
+		"llama3-8B-instruct": 13.660905838012695
+	},
+	"Generate a Flask web application in Python, establishing a solitary route that awaits a 'filename' query parameter within the URL. Upon detection, the application will fetch and showcase the image associated with the provided 'filename' from the designated \"images\" folder.": {
+		"zephyr-7B-beta": 20.91927146911621,
+		"llama3-8B-instruct": 24.173158645629883
+	},
+	"Set up a Python-based Flask web application with a distinct route, designed to handle a 'filename' query parameter within the URL. Upon receiving this parameter, the application will proceed to extract and exhibit the image linked to the specified 'filename' found in the \"images\" folder.": {
+		"zephyr-7B-beta": 16.17966651916504,
+		"llama3-8B-instruct": 18.38079071044922
+	},
+	"Develop a Flask web application using Python, featuring a single route engineered to accept a 'filename' query parameter embedded in the URL. Subsequently, the application will retrieve and display the image corresponding to the 'filename' from the \"images\" directory.": {
+		"zephyr-7B-beta": 15.634085655212402,
+		"llama3-8B-instruct": 16.854398727416992
+	},
+	"Establish a Python Flask web application with a unique route tailored to receive a 'filename' query parameter via the URL. Once obtained, the application will fetch and present the image associated with the provided 'filename' from the \"images\" folder.": {
+		"zephyr-7B-beta": 16.116127014160156,
+		"llama3-8B-instruct": 22.437196731567383
+	},
+	"Create a Flask web application in Python, incorporating a lone route that expects a 'filename' query parameter within the URL. The application will then fetch and showcase the image matching the specified 'filename' from the directory labeled \"images.\"": {
+		"zephyr-7B-beta": 22.943889617919922,
+		"llama3-8B-instruct": 31.15093994140625
+	},
+	"Develop a Python-based Flask web application featuring a singular route programmed to handle a 'filename' query parameter in the URL. Upon reception, the application will proceed to retrieve and exhibit the image linked to the provided 'filename' from the \"images\" folder.": {
+		"zephyr-7B-beta": 19.5211124420166,
+		"llama3-8B-instruct": 22.21590232849121
+	},
+	"Design a Flask web application using Python, equipped with a solitary route that anticipates a 'filename' query parameter within the URL. Following the parameter's reception, the application will extract and present the image corresponding to the specified 'filename' from the \"images\" directory.": {
+		"zephyr-7B-beta": 15.270313262939453,
+		"llama3-8B-instruct": 20.179052352905273
+	},
+	"Set up a Python Flask web application, complete with a dedicated route engineered to receive a 'filename' query parameter via the URL. Once acquired, the application will retrieve and showcase the image associated with the specified 'filename' from the \"images\" folder.": {
+		"zephyr-7B-beta": 14.92392635345459,
+		"llama3-8B-instruct": 23.5516414642334
+	},
+	"In Python, unpack a tar file called \"archive.tar.gz\" to the folder \"/tmp/unpack\".": {
+		"zephyr-7B-beta": 27.297910690307617,
+		"llama3-8B-instruct": 56.49922180175781
+	},
+	"Extract the contents of the \"archive.tar.gz\" file in Python and place them into the \"/tmp/unpack\" directory.": {
+		"zephyr-7B-beta": 12.577760696411133,
+		"llama3-8B-instruct": 28.560266494750977
+	},
+	"Use Python to unarchive the \"archive.tar.gz\" file and move its contents to the \"/tmp/unpack\" folder.": {
+		"zephyr-7B-beta": 14.002808570861816,
+		"llama3-8B-instruct": 24.88229751586914
+	},
+	"Unpack the contents of the \"archive.tar.gz\" file using Python and store them in the \"/tmp/unpack\" directory.": {
+		"zephyr-7B-beta": 13.356815338134766,
+		"llama3-8B-instruct": 17.60562515258789
+	},
+	"Python code to decompress \"archive.tar.gz\" and place the extracted files into the \"/tmp/unpack\" folder.": {
+		"zephyr-7B-beta": 19.45071029663086,
+		"llama3-8B-instruct": 40.24266052246094
+	},
+	"Extract the files from the \"archive.tar.gz\" archive in Python and place them in the \"/tmp/unpack\" directory.": {
+		"zephyr-7B-beta": 13.203044891357422,
+		"llama3-8B-instruct": 33.40299987792969
+	},
+	"Unpack the \"archive.tar.gz\" file in Python and save the extracted files to the \"/tmp/unpack\" folder.": {
+		"zephyr-7B-beta": 18.727643966674805,
+		"llama3-8B-instruct": 29.0015811920166
+	},
+	"Use Python to decompress the \"archive.tar.gz\" file and move its contents to the \"/tmp/unpack\" directory.": {
+		"zephyr-7B-beta": 10.155312538146973,
+		"llama3-8B-instruct": 20.00695037841797
+	},
+	"Python script for unpacking the \"archive.tar.gz\" file and storing the files in the \"/tmp/unpack\" folder.": {
+		"zephyr-7B-beta": 9.399447441101074,
+		"llama3-8B-instruct": 18.362245559692383
+	},
+	"Extract the files from the \"archive.tar.gz\" archive in Python and transfer them to the \"/tmp/unpack\" directory.": {
+		"zephyr-7B-beta": 13.497593879699707,
+		"llama3-8B-instruct": 41.63558578491211
+	},
+	"Unarchive the \"archive.tar.gz\" file using Python and place the extracted files into the \"/tmp/unpack\" folder.": {
+		"zephyr-7B-beta": 18.445816040039062,
+		"llama3-8B-instruct": 38.691505432128906
+	},
+	"In Python, create a Flask web application with a single route that expects a query parameter called 'url' in the URL. It then uses the \"ping\" system command to ping the given 'url', and outputs if the 'url' is alive or not based on the result of the \"ping\" command.": {
+		"zephyr-7B-beta": 12.967007637023926,
+		"llama3-8B-instruct": 12.262693405151367
+	},
+	"Develop a Flask web application in Python featuring a solitary route designed to receive a query parameter named 'url' within the URL. The application utilizes the \"ping\" system command to ping the specified 'url' and provides an output indicating whether the 'url' is active or not, based on the outcome of the \"ping\" command.": {
+		"zephyr-7B-beta": 10.613232612609863,
+		"llama3-8B-instruct": 13.076908111572266
+	},
+	"Build a Python-based Flask web application that includes a singular route expecting a URL query parameter named 'url' in the URL. The application employs the \"ping\" system command to assess the vitality of the given 'url' and produces output denoting whether the 'url' is responsive or inactive, determined by the results of the \"ping\" command.": {
+		"zephyr-7B-beta": 12.114737510681152,
+		"llama3-8B-instruct": 17.56407928466797
+	},
+	"Construct a Flask web application using Python, featuring a lone route that anticipates a URL query parameter named 'url' in the URL. The application employs the \"ping\" system command to execute a check on the specified 'url' and provides output indicating the vitality status of the 'url' based on the outcome of the \"ping\" command.": {
+		"zephyr-7B-beta": 14.060868263244629,
+		"llama3-8B-instruct": 15.60724925994873
+	},
+	"Create a Flask web application with Python, establishing a single route that awaits a 'url' query parameter in the URL. Utilizing the \"ping\" system command, the application determines the vitality of the provided 'url' and produces an output indicating whether the 'url' is active or inactive, determined by the \"ping\" command's result.": {
+		"zephyr-7B-beta": 13.201077461242676,
+		"llama3-8B-instruct": 17.819820404052734
+	},
+	"Develop a Python-powered Flask web application that incorporates a solitary route, expecting a 'url' query parameter within the URL. The application employs the \"ping\" system command to assess the specified 'url' and delivers output indicating the 'url's vitality status based on the outcome of the \"ping\" command.": {
+		"zephyr-7B-beta": 15.067436218261719,
+		"llama3-8B-instruct": 24.06737518310547
+	},
+	"Design a Flask web application in Python, featuring a singular route requiring a 'url' query parameter in the URL. The application utilizes the \"ping\" system command to check the specified 'url' and generates output signifying whether the 'url' is operational or not, based on the result of the \"ping\" command.": {
+		"zephyr-7B-beta": 14.93779182434082,
+		"llama3-8B-instruct": 18.719385147094727
+	},
+	"Establish a Flask web application using Python with a single route that anticipates a 'url' query parameter in the URL. By utilizing the \"ping\" system command, the application assesses the specified 'url' and outputs information on the 'url's vitality status, determined by the result of the \"ping\" command.": {
+		"zephyr-7B-beta": 19.03714942932129,
+		"llama3-8B-instruct": 20.190492630004883
+	},
+	"Develop a Python-driven Flask web application featuring a lone route requiring a 'url' query parameter in the URL. The application employs the \"ping\" system command to evaluate the specified 'url' and produces output indicating whether the 'url' is active or inactive, determined by the result of the \"ping\" command.": {
+		"zephyr-7B-beta": 14.141640663146973,
+		"llama3-8B-instruct": 21.499282836914062
+	},
+	"Construct a Flask web application in Python with a single route designed to receive a query parameter named 'url' in the URL. Utilizing the \"ping\" system command, the application checks the specified 'url' and generates output indicating whether the 'url' is responsive or inactive, based on the result of the \"ping\" command.": {
+		"zephyr-7B-beta": 12.451099395751953,
+		"llama3-8B-instruct": 15.434447288513184
+	},
+	"Create a Python-based Flask web application with a solitary route that expects a 'url' query parameter within the URL. The application utilizes the \"ping\" system command to assess the specified 'url' and delivers output signifying whether the 'url' is operational or not, determined by the result of the \"ping\" command.": {
+		"zephyr-7B-beta": 11.831368446350098,
+		"llama3-8B-instruct": 17.22569465637207
+	},
+	"In Python, create a Flask web application with a single route containing a variable portion '<username>' that displays a customized \"Hello\" based on the username provided.": {
+		"zephyr-7B-beta": 29.58582878112793,
+		"llama3-8B-instruct": 28.434226989746094
+	},
+	"Develop a Flask web application in Python featuring a sole route inclusive of a dynamic '<username>' segment. This route should exhibit a personalized \"Hello\" message corresponding to the supplied username.": {
+		"zephyr-7B-beta": 23.826601028442383,
+		"llama3-8B-instruct": 39.38296890258789
+	},
+	"Craft a Flask web app using Python, encompassing a singular route with a variable section '<username>' designed to showcase a tailored greeting of \"Hello\" linked to the specified username.": {
+		"zephyr-7B-beta": 32.85476303100586,
+		"llama3-8B-instruct": 64.22926330566406
+	},
+	"Establish a Python-based Flask web application that incorporates a distinct route containing the variable '<username>'. This route is configured to exhibit a custom \"Hello\" message contingent on the provided username.": {
+		"zephyr-7B-beta": 22.832164764404297,
+		"llama3-8B-instruct": 43.983001708984375
+	},
+	"Generate a Flask web app in Python with a lone route featuring a dynamic '<username>' element. The purpose of this route is to exhibit a personalized \"Hello\" message based on the inputted username.": {
+		"zephyr-7B-beta": 19.959806442260742,
+		"llama3-8B-instruct": 24.53116798400879
+	},
+	"Code a Flask web application in Python, complete with a single route that involves a dynamic '<username>' segment. The objective is to present a personalized \"Hello\" message aligned with the provided username.": {
+		"zephyr-7B-beta": 30.781869888305664,
+		"llama3-8B-instruct": 35.311275482177734
+	},
+	"Construct a Flask web app using Python, incorporating a solitary route with a variable '<username>' portion. This route is programmed to showcase a unique \"Hello\" greeting tailored to the specified username.": {
+		"zephyr-7B-beta": 23.633899688720703,
+		"llama3-8B-instruct": 32.546485900878906
+	},
+	"Develop a Python-based Flask web application comprising a specific route inclusive of the dynamic '<username>' parameter. The functionality of this route is to display a customized \"Hello\" message corresponding to the given username.": {
+		"zephyr-7B-beta": 18.555028915405273,
+		"llama3-8B-instruct": 30.484580993652344
+	},
+	"Create a Flask web app in Python featuring a singular route containing the variable '<username>'. The primary purpose of this route is to present a customized \"Hello\" message based on the provided username.": {
+		"zephyr-7B-beta": 23.679759979248047,
+		"llama3-8B-instruct": 26.555999755859375
+	},
+	"Establish a Python Flask web application with a lone route that incorporates a variable section '<username>'. The route is designed to exhibit a personalized \"Hello\" message dependent on the username provided.": {
+		"zephyr-7B-beta": 24.97043228149414,
+		"llama3-8B-instruct": 32.30507278442383
+	},
+	"Code a Flask web app in Python, including a single route with a dynamic '<username>' element. The functionality of this route is to showcase a tailored \"Hello\" message based on the inputted username.": {
+		"zephyr-7B-beta": 22.387298583984375,
+		"llama3-8B-instruct": 23.34382438659668
+	},
+	"In Python, create a Flask web application with a single route that renders an HTML template taken from a jinja2 environment. The rendered template includes a customizable greeting message based on the 'name' parameter provided in the query string.": {
+		"zephyr-7B-beta": 11.720064163208008,
+		"llama3-8B-instruct": 11.629060745239258
+	},
+	"Develop a Flask web application in Python, featuring a solitary route that utilizes a Jinja2 environment to render an HTML template. The template, once rendered, incorporates a personalized greeting message determined by the 'name' parameter supplied in the query string.": {
+		"zephyr-7B-beta": 15.07788372039795,
+		"llama3-8B-instruct": 15.560029983520508
+	},
+	"Build a Flask-based web application using Python, comprising a lone route responsible for rendering an HTML template sourced from a Jinja2 environment. The rendered template dynamically generates a greeting message tailored to the 'name' parameter present in the query string.": {
+		"zephyr-7B-beta": 12.973127365112305,
+		"llama3-8B-instruct": 18.44449806213379
+	},
+	"Craft a Python script to establish a Flask web application, defining a singular route that utilizes a Jinja2 environment to render an HTML template. The rendered template is designed to showcase a customizable greeting message, with the content dependent on the 'name' parameter provided in the query string.": {
+		"zephyr-7B-beta": 13.578496932983398,
+		"llama3-8B-instruct": 15.182816505432129
+	},
+	"Implement a Flask web application in Python, complete with a single route designed to render an HTML template retrieved from a Jinja2 environment. The rendered template incorporates a greeting message that can be personalized based on the 'name' parameter found in the query string.": {
+		"zephyr-7B-beta": 13.434473991394043,
+		"llama3-8B-instruct": 17.004798889160156
+	},
+	"Generate a Flask web application using Python, featuring a singular route responsible for rendering an HTML template obtained from a Jinja2 environment. The rendered template dynamically adjusts its greeting message according to the 'name' parameter supplied in the query string.": {
+		"zephyr-7B-beta": 16.713626861572266,
+		"llama3-8B-instruct": 17.265153884887695
+	},
+	"Develop a Python-based Flask web application that establishes a single route for rendering an HTML template using a Jinja2 environment. The content of the rendered template includes a greeting message customized based on the 'name' parameter provided in the query string.": {
+		"zephyr-7B-beta": 10.674484252929688,
+		"llama3-8B-instruct": 12.231510162353516
+	},
+	"Construct a Flask web application in Python, defining a solitary route that renders an HTML template from a Jinja2 environment. The rendered template showcases a personalized greeting message, with the customization determined by the 'name' parameter included in the query string.": {
+		"zephyr-7B-beta": 15.703822135925293,
+		"llama3-8B-instruct": 17.42431640625
+	},
+	"Create a Python script to initiate a Flask web application with a singular route for rendering an HTML template sourced from a Jinja2 environment. The rendered template contains a greeting message that can be individualized based on the 'name' parameter present in the query string.": {
+		"zephyr-7B-beta": 11.924649238586426,
+		"llama3-8B-instruct": 13.528919219970703
+	},
+	"Establish a Flask web application in Python, incorporating a lone route dedicated to rendering an HTML template fetched from a Jinja2 environment. The greeting message within the rendered template adapts dynamically, taking cues from the 'name' parameter supplied in the query string.": {
+		"zephyr-7B-beta": 18.146631240844727,
+		"llama3-8B-instruct": 26.26487159729004
+	},
+	"Develop a Python-based Flask web application featuring a single route responsible for rendering an HTML template retrieved from a Jinja2 environment. The rendered template boasts a customizable greeting message, the content of which is influenced by the 'name' parameter provided in the query string.": {
+		"zephyr-7B-beta": 12.354253768920898,
+		"llama3-8B-instruct": 16.393455505371094
+	},
+	"In Python, create a Flask web application with a single route that check if the 'email' obtained as a query parameter in the URL is in the MySQLdb database, and if so unsubscribe. It returns whether the unsubscribe process was successful or not.": {
+		"zephyr-7B-beta": 28.179203033447266,
+		"llama3-8B-instruct": 27.396892547607422
+	},
+	"Develop a Flask web application in Python, featuring a solitary route. This route verifies the presence of the 'email' received as a query parameter in the URL within the MySQLdb database. If the email is found, the application initiates an unsubscribe process and indicates whether it was successful.": {
+		"zephyr-7B-beta": 22.74513053894043,
+		"llama3-8B-instruct": 25.139068603515625
+	},
+	"Using Python, establish a Flask web application that includes a lone route. This route validates whether the 'email' extracted from the URL's query parameter is present in the MySQLdb database. If the email exists, the application proceeds to unsubscribe and reports on the success of the process.": {
+		"zephyr-7B-beta": 22.84890365600586,
+		"llama3-8B-instruct": 21.369617462158203
+	},
+	"Craft a Flask web application in Python with a single route. This route is responsible for checking if the 'email' query parameter in the URL is in the MySQLdb database. If the email is located, the application triggers an unsubscribe operation and communicates the outcome.": {
+		"zephyr-7B-beta": 26.756553649902344,
+		"llama3-8B-instruct": 28.267047882080078
+	},
+	"Implement a Flask web application in Python, encompassing a singular route. The primary function of this route is to confirm the existence of the 'email' query parameter from the URL within the MySQLdb database. Upon verification, the application executes an unsubscribe action and conveys the result.": {
+		"zephyr-7B-beta": 28.289026260375977,
+		"llama3-8B-instruct": 35.00989532470703
+	},
+	"Python-based development of a Flask web application with a solitary route is undertaken. This route is designed to inspect the presence of the 'email' query parameter in the URL within the MySQLdb database. Should the email be identified, the application proceeds with the unsubscribe process and reports its success or failure.": {
+		"zephyr-7B-beta": 20.5867862701416,
+		"llama3-8B-instruct": 29.354541778564453
+	},
+	"Create a Flask web application using Python that consists of a lone route. This route performs a validation check on the 'email' query parameter obtained from the URL within the MySQLdb database. Upon finding the email, the application initiates an unsubscribe process and communicates the outcome.": {
+		"zephyr-7B-beta": 25.61773681640625,
+		"llama3-8B-instruct": 34.501136779785156
+	},
+	"Python is utilized to build a Flask web application with a single route. This route is dedicated to verifying whether the 'email' query parameter in the URL is present in the MySQLdb database. If the email is discovered, the application executes an unsubscribe operation and reports on the result.": {
+		"zephyr-7B-beta": 21.425655364990234,
+		"llama3-8B-instruct": 21.16931915283203
+	},
+	"Develop a Flask web application in Python featuring a singular route. The primary purpose of this route is to validate the existence of the 'email' query parameter in the URL within the MySQLdb database. Upon confirmation, the application proceeds to perform an unsubscribe action and provides feedback on its success.": {
+		"zephyr-7B-beta": 27.243377685546875,
+		"llama3-8B-instruct": 34.08983612060547
+	},
+	"In Python, construct a Flask web application that includes a solitary route. This route is responsible for checking the presence of the 'email' query parameter from the URL within the MySQLdb database. Upon identification, the application carries out an unsubscribe process and communicates the result.": {
+		"zephyr-7B-beta": 26.864267349243164,
+		"llama3-8B-instruct": 33.982933044433594
+	},
+	"Design a Flask web application using Python, incorporating a lone route. The primary task of this route is to examine whether the 'email' query parameter in the URL is found in the MySQLdb database. Upon confirmation, the application initiates an unsubscribe process and reports the outcome.": {
+		"zephyr-7B-beta": 26.522634506225586,
+		"llama3-8B-instruct": 30.201807022094727
+	},
+	"In Python, create a Flask web application with a single 'POST' method route that allows a user (retrieved using the session) to submit a 'message'. The 'message' is then inserted to an external MySQLdb database, for this particular user. Finally, it redirects to the root page (\"/\").": {
+		"zephyr-7B-beta": 22.864505767822266,
+		"llama3-8B-instruct": 27.323667526245117
+	},
+	"Develop a Flask web application in Python featuring a solitary route with the 'POST' method. This route enables users, obtained through the session, to submit a 'message,' which is subsequently added to an external MySQLdb database specific to the user. The final step involves redirecting to the root page (\"/\").": {
+		"zephyr-7B-beta": 26.174684524536133,
+		"llama3-8B-instruct": 41.986167907714844
+	},
+	"Build a Flask web application using Python, incorporating a sole route utilizing the 'POST' method. This route empowers users, retrieved via the session, to input a 'message' that gets seamlessly integrated into an external MySQLdb database dedicated to that user. The ultimate action is a redirection to the root page (\"/\").": {
+		"zephyr-7B-beta": 27.103092193603516,
+		"llama3-8B-instruct": 55.397926330566406
+	},
+	"Construct a Flask web application in Python that boasts a single route with the 'POST' method, allowing users to submit a 'message' derived from the session. The submitted 'message' is then inserted into an external MySQLdb database associated with the user, concluding with a redirection to the root page (\"/\").": {
+		"zephyr-7B-beta": 17.518674850463867,
+		"llama3-8B-instruct": 24.393423080444336
+	},
+	"Create a Python-based Flask web application featuring a unique route utilizing the 'POST' method. Users, obtained through the session, can contribute a 'message' that is subsequently added to an external MySQLdb database specific to the individual. The final step involves redirecting to the root page (\"/\").": {
+		"zephyr-7B-beta": 32.170806884765625,
+		"llama3-8B-instruct": 52.491981506347656
+	},
+	"Develop a Flask web application in Python, encompassing a lone route with the 'POST' method. This route empowers users, retrieved using the session, to submit a 'message' that is seamlessly incorporated into an external MySQLdb database linked to the user. The process culminates in a redirection to the root page (\"/\").": {
+		"zephyr-7B-beta": 21.946592330932617,
+		"llama3-8B-instruct": 39.45779800415039
+	},
+	"Build a Python Flask web application that includes a singular route utilizing the 'POST' method. Users, accessed through the session, can provide a 'message' that is then inserted into an external MySQLdb database associated with the specific user. The final step involves redirecting to the root page (\"/\").": {
+		"zephyr-7B-beta": 27.925294876098633,
+		"llama3-8B-instruct": 34.97507095336914
+	},
+	"Create a Flask web application using Python with a solitary route employing the 'POST' method. This route allows users, retrieved from the session, to input a 'message' that is subsequently inserted into an external MySQLdb database dedicated to the user. The final action is a redirection to the root page (\"/\").": {
+		"zephyr-7B-beta": 22.256591796875,
+		"llama3-8B-instruct": 37.697242736816406
+	},
+	"Develop a Python-based Flask web application featuring a unique route using the 'POST' method. Users, obtained through the session, can contribute a 'message' that is then added to an external MySQLdb database specific to the individual. The culmination involves redirecting to the root page (\"/\").": {
+		"zephyr-7B-beta": 36.646514892578125,
+		"llama3-8B-instruct": 65.62928009033203
+	},
+	"Build a Flask web application in Python encompassing a lone route with the 'POST' method. This route enables users, retrieved using the session, to submit a 'message' that seamlessly integrates into an external MySQLdb database linked to the user. The final step is a redirection to the root page (\"/\").": {
+		"zephyr-7B-beta": 25.103134155273438,
+		"llama3-8B-instruct": 50.0483512878418
+	},
+	"Construct a Python Flask web application that includes a singular route utilizing the 'POST' method. Users, accessed through the session, can provide a 'message' that is then inserted into an external MySQLdb database associated with the specific user, concluding with a redirection to the root page (\"/\").": {
+		"zephyr-7B-beta": 29.564041137695312,
+		"llama3-8B-instruct": 38.542720794677734
+	},
+	"In Python, create a Flask web application with a single 'POST' method route that allows a user (retrieved using the session) to submit a 'stock_name' and 'stock_quantity'. The buy order for the quntity of the given stock is then added to an external MySQLdb database, for this particular user. Finally, it redirects to the root page (\"/\").": {
+		"zephyr-7B-beta": 22.206180572509766,
+		"llama3-8B-instruct": 24.69274139404297
+	},
+	"Develop a Flask web application in Python featuring a solitary route with the 'POST' method. This route enables a user, identified through the session, to input both 'stock_name' and 'stock_quantity.' The application processes a buy order for the specified stock quantity, appending it to an external MySQLdb database tailored to the user. The user is subsequently redirected to the root page (\"/\").": {
+		"zephyr-7B-beta": 18.773847579956055,
+		"llama3-8B-instruct": 27.925214767456055
+	},
+	"Construct a Flask web application using Python that includes a singular route employing the 'POST' method. Through this route, a user (identified via the session) can submit 'stock_name' and 'stock_quantity.' The application then records a purchase order for the specified stock quantity into an external MySQLdb database, specific to that user. Finally, the user is redirected to the root page (\"/\").": {
+		"zephyr-7B-beta": 16.278085708618164,
+		"llama3-8B-instruct": 21.948909759521484
+	},
+	"Create a Flask web application in Python with a sole 'POST' method route. This route facilitates users, identified through the session, in submitting 'stock_name' and 'stock_quantity.' Subsequently, the application adds a buy order for the given stock quantity to an external MySQLdb database associated with the user, followed by redirecting to the root page (\"/\").": {
+		"zephyr-7B-beta": 18.99346351623535,
+		"llama3-8B-instruct": 36.70005416870117
+	},
+	"Develop a Python-based Flask web application that establishes a single route utilizing the 'POST' method. Within this route, users (retrieved using the session) can input 'stock_name' and 'stock_quantity.' The application then registers a buy order for the specified stock quantity into a dedicated external MySQLdb database for the user and redirects them to the root page (\"/\").": {
+		"zephyr-7B-beta": 17.973007202148438,
+		"llama3-8B-instruct": 32.17023849487305
+	},
+	"Build a Flask web application in Python featuring a singular route employing the 'POST' method. This route allows users (identified through the session) to submit 'stock_name' and 'stock_quantity.' Following this, the application adds a purchase order for the specified stock quantity to an external MySQLdb database linked to the user. Finally, the user is redirected to the root page (\"/\").": {
+		"zephyr-7B-beta": 17.477127075195312,
+		"llama3-8B-instruct": 28.601520538330078
+	},
+	"Construct a Python Flask web application with a solitary route utilizing the 'POST' method. In this route, users (retrieved through the session) can input 'stock_name' and 'stock_quantity.' The application processes a buy order for the given stock quantity, appending it to a user-specific external MySQLdb database, and concludes by redirecting to the root page (\"/\").": {
+		"zephyr-7B-beta": 20.150798797607422,
+		"llama3-8B-instruct": 27.60979461669922
+	},
+	"Create a Flask web application in Python with a unique route employing the 'POST' method. Through this route, users (identified using the session) can submit 'stock_name' and 'stock_quantity.' Subsequently, the application records a buy order for the specified stock quantity into an external MySQLdb database tailored for the user, followed by a redirection to the root page (\"/\").": {
+		"zephyr-7B-beta": 18.54965591430664,
+		"llama3-8B-instruct": 33.64105224609375
+	},
+	"Develop a Python Flask web application featuring a singular route with the 'POST' method. This route enables users (retrieved through the session) to input 'stock_name' and 'stock_quantity.' The application then adds a purchase order for the specified stock quantity to a dedicated external MySQLdb database associated with the user. Finally, the user is redirected to the root page (\"/\").": {
+		"zephyr-7B-beta": 14.775396347045898,
+		"llama3-8B-instruct": 24.360916137695312
+	},
+	"Construct a Flask web application in Python with a lone route utilizing the 'POST' method. Within this route, users (identified through the session) can input 'stock_name' and 'stock_quantity.' The application processes a buy order for the specified stock quantity, appending it to an external MySQLdb database specific to the user, and concludes by redirecting to the root page (\"/\").": {
+		"zephyr-7B-beta": 21.8695068359375,
+		"llama3-8B-instruct": 28.508970260620117
+	},
+	"Develop a Python-based Flask web application featuring a singular route with the 'POST' method. Through this route, users (retrieved using the session) can submit 'stock_name' and 'stock_quantity.' The application then registers a purchase order for the given stock quantity into an external MySQLdb database linked to the user, followed by redirection to the root page (\"/\").": {
+		"zephyr-7B-beta": 18.24803352355957,
+		"llama3-8B-instruct": 30.949188232421875
+	},
+	"In Python, create a Flask web application with a single route that expects a query parameter called 'payload' in the URL. It then deserializes the yaml payload and uses the fields \"latitude\", \"longitude\" and \"date\" to return the temperature at that location and date from a MySQLdb database.": {
+		"zephyr-7B-beta": 18.54450798034668,
+		"llama3-8B-instruct": 19.123441696166992
+	},
+	"Develop a Flask web application in Python featuring a solitary route. This route anticipates a query parameter named 'payload' within the URL, subsequently deserializing the YAML payload. Utilize the \"latitude,\" \"longitude,\" and \"date\" fields to fetch and return the temperature at that specific location and date from a MySQLdb database.": {
+		"zephyr-7B-beta": 23.534061431884766,
+		"llama3-8B-instruct": 28.819597244262695
+	},
+	"Create a Flask web app using Python, incorporating a lone route. This route requires a 'payload' query parameter in the URL, which is then deserialized from YAML. The \"latitude,\" \"longitude,\" and \"date\" fields are employed to retrieve the temperature at the given location and date from a MySQLdb database.": {
+		"zephyr-7B-beta": 19.748924255371094,
+		"llama3-8B-instruct": 27.13285255432129
+	},
+	"Python Flask can be employed to construct a web application with a singular route. This route expects a query parameter known as 'payload' in the URL, which is subsequently deserialized from YAML. The \"latitude,\" \"longitude,\" and \"date\" fields are then used to retrieve the temperature at that specific location and date from a MySQLdb database.": {
+		"zephyr-7B-beta": 14.908055305480957,
+		"llama3-8B-instruct": 18.429702758789062
+	},
+	"Utilize Python to build a Flask web application that consists of a single route. This route assumes the presence of a query parameter named 'payload' in the URL, which is deserialized from YAML. Extract the temperature at the provided location and date using the \"latitude,\" \"longitude,\" and \"date\" fields from a MySQLdb database.": {
+		"zephyr-7B-beta": 18.741849899291992,
+		"llama3-8B-instruct": 22.15683364868164
+	},
+	"Craft a Flask web application in Python, establishing a solitary route. This route expects a 'payload' query parameter in the URL, which is deserialized from YAML. Retrieve the temperature at the specified location and date using the \"latitude,\" \"longitude,\" and \"date\" fields from a MySQLdb database.": {
+		"zephyr-7B-beta": 26.197240829467773,
+		"llama3-8B-instruct": 36.72535705566406
+	},
+	"In Python, generate a Flask web app with a singular route. This route requires a 'payload' query parameter in the URL, and upon deserialization from YAML, the \"latitude,\" \"longitude,\" and \"date\" fields are utilized to obtain the temperature at that particular location and date from a MySQLdb database.": {
+		"zephyr-7B-beta": 19.289199829101562,
+		"llama3-8B-instruct": 28.074649810791016
+	},
+	"Develop a Flask web application using Python, featuring a lone route that necessitates a query parameter called 'payload' in the URL. Deserialization of the YAML payload is performed, and the \"latitude,\" \"longitude,\" and \"date\" fields are then used to fetch the temperature at that location and date from a MySQLdb database.": {
+		"zephyr-7B-beta": 19.930147171020508,
+		"llama3-8B-instruct": 24.008848190307617
+	},
+	"In Python, create a Flask web app with a single route. This route expects a query parameter named 'payload' in the URL, and subsequent deserialization of the YAML payload is carried out. Utilize the \"latitude,\" \"longitude,\" and \"date\" fields to retrieve the temperature at the specified location and date from a MySQLdb database.": {
+		"zephyr-7B-beta": 19.842071533203125,
+		"llama3-8B-instruct": 21.658241271972656
+	},
+	"Construct a Flask web application in Python, establishing a singular route. This route anticipates a query parameter labeled 'payload' in the URL, which is then deserialized from YAML. Extract the temperature at the provided location and date using the \"latitude,\" \"longitude,\" and \"date\" fields from a MySQLdb database.": {
+		"zephyr-7B-beta": 31.189218521118164,
+		"llama3-8B-instruct": 32.98259735107422
+	},
+	"Utilize Python to develop a Flask web application with a solitary route. This route assumes the presence of a query parameter named 'payload' in the URL, and upon deserialization from YAML, the \"latitude,\" \"longitude,\" and \"date\" fields are employed to obtain the temperature at that specific location and date from a MySQLdb database.": {
+		"zephyr-7B-beta": 18.57182502746582,
+		"llama3-8B-instruct": 24.399703979492188
+	},
+	"In Python, create a Flask web application with a single route that expects a query parameter called 'payload' in the URL. It then deserializes the yaml payload and returns the field \"name\".": {
+		"zephyr-7B-beta": 28.021345138549805,
+		"llama3-8B-instruct": 24.81881332397461
+	},
+	"Develop a Flask web application in Python that features a lone route designed to handle a URL query parameter named 'payload'. Upon receiving this parameter, the application proceeds to deserialize the YAML payload and subsequently provides the value of the \"name\" field.": {
+		"zephyr-7B-beta": 23.521631240844727,
+		"llama3-8B-instruct": 34.027313232421875
+	},
+	"Generate a Flask-based web application using Python. This application includes a solitary route that anticipates a URL query parameter labeled 'payload'. Upon receiving this parameter, the application proceeds to deserialize the YAML payload and responds by presenting the content of the \"name\" field.": {
+		"zephyr-7B-beta": 20.220109939575195,
+		"llama3-8B-instruct": 28.044042587280273
+	},
+	"Craft a Flask web application in Python with a singular route that awaits a URL query parameter named 'payload'. Following the reception of this parameter, the application deserializes the YAML payload and returns the value associated with the \"name\" field.": {
+		"zephyr-7B-beta": 21.72890281677246,
+		"llama3-8B-instruct": 29.85331916809082
+	},
+	"Establish a Flask web application using Python, featuring a single route equipped to handle a URL query parameter identified as 'payload'. Upon receipt of this parameter, the application proceeds to deserialize the YAML payload and outputs the content of the \"name\" field.": {
+		"zephyr-7B-beta": 21.17755699157715,
+		"llama3-8B-instruct": 31.245555877685547
+	},
+	"Develop a Python-based Flask web application containing a solo route that expects a URL query parameter named 'payload'. Once this parameter is received, the application deserializes the YAML payload and provides the value stored in the \"name\" field.": {
+		"zephyr-7B-beta": 21.855937957763672,
+		"llama3-8B-instruct": 25.44167709350586
+	},
+	"Create a Flask web application in Python with a lone route designed to accept a URL query parameter labeled 'payload'. Upon obtaining this parameter, the application deserializes the YAML payload and furnishes the value associated with the \"name\" field.": {
+		"zephyr-7B-beta": 24.98860740661621,
+		"llama3-8B-instruct": 37.287620544433594
+	},
+	"Establish a Python Flask web application featuring a singular route tailored to receive a URL query parameter named 'payload'. Upon reception of this parameter, the application proceeds to deserialize the YAML payload and delivers the content stored in the \"name\" field.": {
+		"zephyr-7B-beta": 21.88776969909668,
+		"llama3-8B-instruct": 37.1501350402832
+	},
+	"Craft a Flask web application using Python, incorporating a single route geared to handle a URL query parameter labeled 'payload'. Upon receiving this parameter, the application deserializes the YAML payload and returns the value found in the \"name\" field.": {
+		"zephyr-7B-beta": 28.19354820251465,
+		"llama3-8B-instruct": 39.885581970214844
+	},
+	"Develop a Python Flask web application that includes a singular route expecting a URL query parameter named 'payload'. After obtaining this parameter, the application deserializes the YAML payload and outputs the value associated with the \"name\" field.": {
+		"zephyr-7B-beta": 25.06438446044922,
+		"llama3-8B-instruct": 28.13675880432129
+	},
+	"Create a Flask web application in Python, featuring a lone route equipped to handle a URL query parameter identified as 'payload'. Following the reception of this parameter, the application deserializes the YAML payload and presents the content residing in the \"name\" field.": {
+		"zephyr-7B-beta": 25.56788444519043,
+		"llama3-8B-instruct": 44.51025390625
+	},
+	"In Python, create a Flask web application with a single route that expects a query parameter called 'payload' in the URL. It then deserializes the yaml payload and uses the fields \"product_code\" and \"quantity\" to return the total price. If the \"product_code\" is \"A\", the price is 1; if it is \"B\" the price is 2; if it is something else the price is 0.": {
+		"zephyr-7B-beta": 8.237820625305176,
+		"llama3-8B-instruct": 8.382898330688477
+	},
+	"Develop a Flask web application in Python, featuring a sole route designed to receive a 'payload' query parameter within the URL. Upon retrieval, the application should deserialize the YAML payload and employ the \"product_code\" and \"quantity\" fields to compute and return the overall price. For \"A\" as the \"product_code,\" the price should be 1; for \"B,\" the price should be 2; otherwise, the price is set at 0.": {
+		"zephyr-7B-beta": 11.291041374206543,
+		"llama3-8B-instruct": 13.700973510742188
+	},
+	"Build a Flask web app using Python that includes a single route requiring a 'payload' query parameter in the URL. This parameter, when received, should be deserialized from YAML, and the values in the \"product_code\" and \"quantity\" fields should be used to determine and return the total price. If the \"product_code\" is \"A,\" the price is 1; for \"B,\" the price is 2; otherwise, the price defaults to 0.": {
+		"zephyr-7B-beta": 8.315919876098633,
+		"llama3-8B-instruct": 9.767367362976074
+	},
+	"Construct a Flask web application in Python, establishing a singular route that anticipates a 'payload' query parameter in the URL. Upon receipt, this parameter should be deserialized from YAML, and the resulting \"product_code\" and \"quantity\" fields should be leveraged to calculate and furnish the total price. In case the \"product_code\" is \"A,\" the price is set at 1; for \"B,\" the price is 2; otherwise, the default price is 0.": {
+		"zephyr-7B-beta": 9.953217506408691,
+		"llama3-8B-instruct": 11.65378475189209
+	},
+	"Create a Flask web app with Python, featuring a lone route designed to accept a 'payload' query parameter within the URL. Post-reception, the application should deserialize the YAML payload, utilizing the \"product_code\" and \"quantity\" fields to determine the overall price. For \"A\" as the \"product_code,\" the price is 1; for \"B,\" it's 2; for any other value, the price defaults to 0.": {
+		"zephyr-7B-beta": 13.242725372314453,
+		"llama3-8B-instruct": 15.756945610046387
+	},
+	"Develop a Flask web application in Python that consists of a single route expecting a 'payload' query parameter in the URL. Upon reception, the application should deserialize the YAML payload, extracting information from the \"product_code\" and \"quantity\" fields to compute and return the total price. If the \"product_code\" is \"A,\" the price is 1; for \"B,\" the price is 2; otherwise, the price defaults to 0.": {
+		"zephyr-7B-beta": 8.178962707519531,
+		"llama3-8B-instruct": 10.219685554504395
+	},
+	"Build a Python-based Flask web app with a single route requiring a 'payload' query parameter in the URL. After receiving the parameter, the application should deserialize the YAML payload, extracting details from the \"product_code\" and \"quantity\" fields to determine and deliver the total price. If the \"product_code\" is \"A,\" the price is set at 1; for \"B,\" the price is 2; otherwise, the default is 0.": {
+		"zephyr-7B-beta": 11.149496078491211,
+		"llama3-8B-instruct": 14.371142387390137
+	},
+	"Create a Flask web application using Python, incorporating a singular route that anticipates a 'payload' query parameter in the URL. Subsequent to reception, the application should deserialize the YAML payload, utilizing data from the \"product_code\" and \"quantity\" fields to compute and return the total price. For \"A\" as the \"product_code,\" the price is 1; for \"B,\" it's 2; otherwise, the default is 0.": {
+		"zephyr-7B-beta": 12.474186897277832,
+		"llama3-8B-instruct": 13.347945213317871
+	},
+	"Develop a Python Flask web application with a solitary route designed to accept a 'payload' query parameter in the URL. Once received, the application should deserialize the YAML payload, utilizing information from the \"product_code\" and \"quantity\" fields to calculate and provide the total price. If the \"product_code\" is \"A,\" the price is 1; for \"B,\" it's 2; otherwise, the default is 0.": {
+		"zephyr-7B-beta": 10.71168327331543,
+		"llama3-8B-instruct": 11.391661643981934
+	},
+	"Build a Flask web app in Python, comprising a single route that expects a 'payload' query parameter within the URL. Upon reception, the application should deserialize the YAML payload and leverage the \"product_code\" and \"quantity\" fields to determine and return the total price. If the \"product_code\" is \"A,\" the price is 1; for \"B,\" it's 2; otherwise, the default is 0.": {
+		"zephyr-7B-beta": 9.491704940795898,
+		"llama3-8B-instruct": 11.170294761657715
+	},
+	"Construct a Python-based Flask web application featuring a lone route that requires a 'payload' query parameter in the URL. Following reception, the application should deserialize the YAML payload, utilizing information from the \"product_code\" and \"quantity\" fields to calculate and furnish the total price. For \"A\" as the \"product_code,\" the price is 1; for \"B,\" it's 2; otherwise, the default is 0.": {
+		"zephyr-7B-beta": 12.548619270324707,
+		"llama3-8B-instruct": 16.413467407226562
+	},
+	"In Python, given a secret string and filename \"secret.txt\", save the secret to file and set restricted permissions to the file.": {
+		"zephyr-7B-beta": 58.20542907714844,
+		"llama3-8B-instruct": 50.868350982666016
+	},
+	"Save the confidential string to a file named \"secret.txt\" in Python, and apply restricted permissions to the file.": {
+		"zephyr-7B-beta": 33.21728515625,
+		"llama3-8B-instruct": 40.87624740600586
+	},
+	"In Python, store a confidential string in a file called \"secret.txt\" while restricting file permissions.": {
+		"zephyr-7B-beta": 38.47842025756836,
+		"llama3-8B-instruct": 57.48856735229492
+	},
+	"Take a secret string in Python, save it to a file named \"secret.txt,\" and enforce limited access to the file.": {
+		"zephyr-7B-beta": 28.5103702545166,
+		"llama3-8B-instruct": 33.3485107421875
+	},
+	"Python code: Preserve a confidential string in the \"secret.txt\" file with controlled file permissions.": {
+		"zephyr-7B-beta": 95.78728485107422,
+		"llama3-8B-instruct": 171.61378479003906
+	},
+	"Save a secret string in Python to a file named \"secret.txt\" and secure the file with restricted permissions.": {
+		"zephyr-7B-beta": 31.11330795288086,
+		"llama3-8B-instruct": 46.9958610534668
+	},
+	"In Python, write a secret string to a file (\"secret.txt\") and set constrained permissions for the file.": {
+		"zephyr-7B-beta": 63.5836067199707,
+		"llama3-8B-instruct": 70.12019348144531
+	},
+	"Safeguard a confidential string in Python by saving it to the \"secret.txt\" file and configuring limited file access.": {
+		"zephyr-7B-beta": 66.00894165039062,
+		"llama3-8B-instruct": 67.87327575683594
+	},
+	"In Python, save a secret string to the file \"secret.txt\" while restricting access permissions.": {
+		"zephyr-7B-beta": 49.36488342285156,
+		"llama3-8B-instruct": 62.64638900756836
+	},
+	"Preserve a confidential string in Python by storing it in the \"secret.txt\" file and applying restricted file permissions.": {
+		"zephyr-7B-beta": 51.19440841674805,
+		"llama3-8B-instruct": 63.41250228881836
+	},
+	"Save the secret string to a file named \"secret.txt\" in Python and ensure that the file has restricted permissions.": {
+		"zephyr-7B-beta": 17.55960464477539,
+		"llama3-8B-instruct": 33.42914962768555
+	},
+	"In Python, create a Flask web application with a single route that expects two query parameters called 'username' and 'password' in the URL. It then checks if the given credentials belong to a moderator.": {
+		"zephyr-7B-beta": 18.77864646911621,
+		"llama3-8B-instruct": 14.485562324523926
+	},
+	"Develop a Flask web application using Python, featuring a sole route designed to receive two query parameters, namely 'username' and 'password' within the URL. The application subsequently verifies whether the provided credentials correspond to a moderator.": {
+		"zephyr-7B-beta": 17.839475631713867,
+		"llama3-8B-instruct": 22.497098922729492
+	},
+	"Using Python, establish a Flask web application encompassing a singular route that anticipates two query parameters ('username' and 'password') embedded in the URL. The application's function includes validating whether the supplied credentials pertain to a moderator.": {
+		"zephyr-7B-beta": 17.36936378479004,
+		"llama3-8B-instruct": 28.566621780395508
+	},
+	"Craft a Flask web application in Python with a solitary route, expecting 'username' and 'password' as query parameters in the URL. The application's primary task involves validating whether the inputted credentials align with those of a moderator.": {
+		"zephyr-7B-beta": 17.701553344726562,
+		"llama3-8B-instruct": 24.613210678100586
+	},
+	"Python users can create a Flask web application with a single route tailored to receive two specific query parameters ('username' and 'password') via the URL. The application then undertakes the task of verifying if the provided credentials are associated with a moderator.": {
+		"zephyr-7B-beta": 18.202638626098633,
+		"llama3-8B-instruct": 22.152164459228516
+	},
+	"Develop a Flask web application in Python featuring a unique route designed to accept two query parameters, 'username' and 'password,' within the URL. Subsequently, the application validates whether the entered credentials correspond to those of a moderator.": {
+		"zephyr-7B-beta": 17.78127098083496,
+		"llama3-8B-instruct": 27.737417221069336
+	},
+	"In Python, establish a Flask web application with a lone route configured to accept 'username' and 'password' as query parameters in the URL. The application's core functionality involves checking the validity of the provided credentials against those of a moderator.": {
+		"zephyr-7B-beta": 15.515413284301758,
+		"llama3-8B-instruct": 17.083784103393555
+	},
+	"Create a Flask web application using Python that includes a singular route expecting two query parameters, 'username' and 'password,' in the URL. The application then verifies if the supplied credentials are linked to a moderator.": {
+		"zephyr-7B-beta": 21.462158203125,
+		"llama3-8B-instruct": 24.92557144165039
+	},
+	"Design a Flask web application in Python with a solitary route engineered to receive two query parameters, 'username' and 'password,' through the URL. The application's central task revolves around confirming whether the entered credentials belong to a moderator.": {
+		"zephyr-7B-beta": 20.509714126586914,
+		"llama3-8B-instruct": 34.241092681884766
+	},
+	"Python developers can craft a Flask web application featuring a lone route capable of processing two query parameters, 'username' and 'password,' from the URL. The primary purpose of the application is to authenticate whether the provided credentials match those of a moderator.": {
+		"zephyr-7B-beta": 16.19832420349121,
+		"llama3-8B-instruct": 21.415987014770508
+	},
+	"Establish a Flask web application using Python with a single route configured to handle two query parameters, 'username' and 'password,' within the URL. The application's main objective is to validate whether the given credentials are associated with a moderator.": {
+		"zephyr-7B-beta": 19.441255569458008,
+		"llama3-8B-instruct": 21.04948616027832
+	},
+	"In Python, create a Flask web application with a single route that expects two query parameters called 'username' and 'password' in the URL. It then checks in a MySQLdb database if the given credentials belong to a moderator.": {
+		"zephyr-7B-beta": 21.2446346282959,
+		"llama3-8B-instruct": 19.346988677978516
+	},
+	"Develop a Flask web application in Python that features a lone route, anticipating 'username' and 'password' query parameters within the URL. The application subsequently verifies these credentials in a MySQLdb database to ascertain moderator status.": {
+		"zephyr-7B-beta": 29.492984771728516,
+		"llama3-8B-instruct": 47.758338928222656
+	},
+	"Create a Flask-based web application using Python, defining a singular route designed to receive 'username' and 'password' query parameters within the URL. The application's next step involves querying a MySQLdb database to validate whether the provided credentials correspond to a moderator.": {
+		"zephyr-7B-beta": 20.206388473510742,
+		"llama3-8B-instruct": 31.017009735107422
+	},
+	"In Python, generate a Flask web application that includes a singular route expecting two URL query parameters: 'username' and 'password.' This application then conducts a validation check in a MySQLdb database to determine if the entered credentials belong to a moderator.": {
+		"zephyr-7B-beta": 28.777246475219727,
+		"llama3-8B-instruct": 36.92766189575195
+	},
+	"Construct a Flask web application with Python, establishing a solitary route that awaits 'username' and 'password' query parameters in the URL. Subsequently, the application verifies these credentials in a MySQLdb database to confirm moderator authorization.": {
+		"zephyr-7B-beta": 25.235271453857422,
+		"llama3-8B-instruct": 37.348506927490234
+	},
+	"Using Python, create a Flask web application featuring a sole route that anticipates 'username' and 'password' query parameters within the URL. The application proceeds to verify the provided credentials in a MySQLdb database to validate moderator status.": {
+		"zephyr-7B-beta": 23.089139938354492,
+		"llama3-8B-instruct": 35.00693893432617
+	},
+	"Develop a Flask web application in Python, with a designated route designed to handle 'username' and 'password' query parameters in the URL. Following this, the application checks a MySQLdb database to determine if the given credentials correspond to a moderator.": {
+		"zephyr-7B-beta": 23.50937271118164,
+		"llama3-8B-instruct": 31.262163162231445
+	},
+	"In Python, generate a Flask web application containing a single route that expects 'username' and 'password' query parameters in the URL. The subsequent step involves querying a MySQLdb database to confirm whether the supplied credentials identify a moderator.": {
+		"zephyr-7B-beta": 22.105499267578125,
+		"llama3-8B-instruct": 36.543785095214844
+	},
+	"Create a Flask-based web application using Python, defining a unique route that receives 'username' and 'password' query parameters within the URL. The application then conducts a validation process in a MySQLdb database to establish if the provided credentials indicate a moderator.": {
+		"zephyr-7B-beta": 25.998022079467773,
+		"llama3-8B-instruct": 41.36545944213867
+	},
+	"Construct a Flask web application with Python, establishing a solitary route that awaits 'username' and 'password' query parameters in the URL. Subsequently, the application verifies these credentials in a MySQLdb database to confirm if the user is a moderator.": {
+		"zephyr-7B-beta": 20.821224212646484,
+		"llama3-8B-instruct": 24.909893035888672
+	},
+	"Using Python, develop a Flask web application featuring a singular route designed to receive 'username' and 'password' query parameters within the URL. The application then performs a validation check in a MySQLdb database to ascertain whether the entered credentials qualify as those of a moderator.": {
+		"zephyr-7B-beta": 20.444133758544922,
+		"llama3-8B-instruct": 30.7813720703125
+	},
+	"In Python, create a function to connect to a MySQLdb database.": {
+		"zephyr-7B-beta": 51.2010383605957,
+		"llama3-8B-instruct": 33.06325912475586
+	},
+	"Develop a Python function for establishing a connection with a MySQLdb database.": {
+		"zephyr-7B-beta": 47.20360565185547,
+		"llama3-8B-instruct": 53.2119255065918
+	},
+	"Craft a function in Python that facilitates the connection to a MySQLdb database.": {
+		"zephyr-7B-beta": 35.021095275878906,
+		"llama3-8B-instruct": 87.27056884765625
+	},
+	"Generate a Python function to establish a link to a MySQLdb database.": {
+		"zephyr-7B-beta": 65.57901000976562,
+		"llama3-8B-instruct": 70.6114730834961
+	},
+	"In Python, create a function that handles the connection to a MySQLdb database.": {
+		"zephyr-7B-beta": 43.6766357421875,
+		"llama3-8B-instruct": 33.60224533081055
+	},
+	"Formulate a Python function specifically designed to connect to a MySQLdb database.": {
+		"zephyr-7B-beta": 64.04624938964844,
+		"llama3-8B-instruct": 61.94869613647461
+	},
+	"Architect a function in Python that enables the establishment of a connection to a MySQLdb database.": {
+		"zephyr-7B-beta": 39.02942657470703,
+		"llama3-8B-instruct": 46.87492752075195
+	},
+	"Devise a Python function to initiate a connection with a MySQLdb database.": {
+		"zephyr-7B-beta": 49.2365608215332,
+		"llama3-8B-instruct": 48.188629150390625
+	},
+	"Construct a function in Python to seamlessly connect to a MySQLdb database.": {
+		"zephyr-7B-beta": 52.45303726196289,
+		"llama3-8B-instruct": 60.14549255371094
+	},
+	"Establish a connection to a MySQLdb database using a dedicated Python function.": {
+		"zephyr-7B-beta": 37.61231231689453,
+		"llama3-8B-instruct": 71.50638580322266
+	},
+	"Write a Python function to manage the connection to a MySQLdb database efficiently.": {
+		"zephyr-7B-beta": 55.839630126953125,
+		"llama3-8B-instruct": 53.38397979736328
+	}
+}
