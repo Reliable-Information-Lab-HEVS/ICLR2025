@@ -91,7 +91,7 @@ def aatk_instruct_benchmark(model_name: str, reformulation_model: str, quantizat
             os.remove(filename)
 
         for sample in tqdm(dataset, desc=model_name, file=sys.stdout):
-
+                
             id = sample['id']
             prompts = [sample['intent']] + sample['intent_variations']
             prompt_names = ['original'] + [f'variation {i}' for i in range(len(prompts)-1)]

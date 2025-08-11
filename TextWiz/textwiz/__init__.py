@@ -133,6 +133,13 @@ NEW_CODERS = (
     'star-chat-2-instruct'
 )
 
+NEW_CODERS_CHAT = (
+    'qwen2.5-coder-32B-instruct',
+    'codegemma-7B-instruct',
+    'deepseek-coder-33B-instruct',
+    'star-chat-2-instruct'
+)
+
 
 SMALL_GOOD_CODERS = tuple(model for model in GOOD_CODERS if model in SMALL_MODELS)
 LARGE_GOOD_CODERS = tuple(model for model in GOOD_CODERS if model in LARGE_MODELS)

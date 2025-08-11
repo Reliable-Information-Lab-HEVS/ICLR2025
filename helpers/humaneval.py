@@ -360,6 +360,7 @@ def find_best_temperature_file(folder: str, k: int = 1, greedy: bool = False) ->
 def _get_default_dtype(model_name: str) -> str:
     """Return the default dtype used by a given model.
     """
+    print('Model: ', model_name)
     from TextWiz.textwiz import loader
 
     if model_name == 'bloom-176B':
@@ -396,7 +397,7 @@ def find_folders_with_dtype(dataset: str, mode: str, dtype: str = 'default') -> 
         raise ValueError(f'Dtype must be in {*dtypes,}')
 
     benchmark_path = os.path.join(utils.RESULTS_FOLDER, dataset, mode, 'results')
-    
+    print(f'Looking for folders in {benchmark_path} with dtype={dtype}.')
     folders = []
     for model in os.listdir(benchmark_path):
         if not model.startswith('.'):
@@ -777,6 +778,11 @@ PRETTY_NAMES_MAPPING = {
     'star-chat-alpha': 'StarChat (alpha)',
     'star-coder': 'StarCoder',
     'star-coder-base': 'StarCoderBase',
+    'code-gemma-7B': 'CodeGemma 7B',
+    'code-gemma-7B-instruct': 'CodeGemma - Instruct 7B',
+    'deepseek-coder-33B-instruct': 'DeepSeek Coder - Instruct 33B',
+    'qwen2.5-coder-32B-instruct': 'Qwen2.5 Coder - Instruct 32B',
+    'qwen2.5-coder-32B': 'Qwen2.5 Coder 32B',
 }
 
 MODELS = [k for k in PRETTY_NAMES_MAPPING.keys()]

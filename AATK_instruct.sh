@@ -3,12 +3,13 @@
 #SBATCH --job-name=aatk_instruct
 #SBATCH --output=run_logs/%x-%j.out
 #SBATCH --error=run_logs/%x-%j.err
-#SBATCH --time=10-00:00:00
+#SBATCH --time=7-00:00:00
 #SBATCH --cpus-per-task=11
 #SBATCH --mem=150G
 #SBATCH --partition=nodes
 #SBATCH --gres=gpu:h200:2
 #SBATCH --chdir=/cluster/raid/home/stea/ICLR2025
+#SBATCH --qos=normal
 
 # Initialize the shell to use local conda
 eval "$(conda shell.bash hook)"

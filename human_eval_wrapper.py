@@ -92,9 +92,29 @@ if __name__ == '__main__':
         
     t0 = time.time()
 
+    commands = [
+        'python3 -u human_eval.py code-llama-34B --language py --mode generation',
+        'python3 -u human_eval.py code-llama-34B-python --language py --mode generation',
+        'python3 -u human_eval.py code-llama-34B-instruct --language py --mode generation',
+        'python3 -u human_eval.py code-llama-34B-instruct --language py --mode default',
+        'python3 -u human_eval.py code-llama-34B --language py --mode generation --instruct',
+        'python3 -u human_eval.py code-llama-34B-python --language py --mode generation --instruct',
+        'python3 -u human_eval.py code-llama-34B-instruct --language py --mode generation --instruct',
+        'python3 -u human_eval.py code-llama-34B-instruct --language py --mode default --instruct',
+        'python3 -u human_eval.py code-llama-34B --language php --mode generation',
+        'python3 -u human_eval.py code-llama-34B-python --language php --mode generation',
+        'python3 -u human_eval.py code-llama-34B-instruct --language php --mode generation',
+        'python3 -u human_eval.py code-llama-34B --language php --mode generation',
+        'python3 -u human_eval.py code-llama-34B-python --language php --mode generation',
+        'python3 -u human_eval.py code-llama-34B-instruct --language php --mode generation',
+        'python3 -u human_eval.py code-llama-34B --language rs --mode generation',
+        'python3 -u human_eval.py code-llama-34B-python --language rs --mode generation',
+        'python3 -u human_eval.py code-llama-34B-instruct --language rs --mode generation',
+    ]
+
     utils.dispatch_jobs_srun(gpu_footprints, num_gpus, commands)
 
-    # #run them sequentially for now
+    #run them sequentially for now
     # for command in commands:
     #     # run them
     #     print(f'Running command: {command}')

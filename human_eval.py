@@ -150,9 +150,13 @@ def human_eval(model_name: str, prompt_template_mode: str, quantization_8bits: b
                                     prompt_template_mode=prompt_template_mode, **generation_kwargs)
 
             # Save the model completions
-            if model.is_chat_model() and (prompt_template_mode == 'default' or prompt_template_mode == 'chat'):
+            #if model.is_chat_model() and (prompt_template_mode == 'default' or prompt_template_mode == 'chat'):
+            if model.is_chat_model():
+                print(f'The model {model_name} is a chat model, extracting completions and also saving the model output.')
                 true_completions = extract_completions(completions, sample)
                 results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
+                # true_completions = extract_completions(completions, sample)
+                # results = [{'task_id': task_id, 'model_output': x, 'completion': y} for x, y in zip(completions, true_completions)]
             else:
                 results = [{'task_id': task_id, 'completion': completion} for completion in completions]
             utils.save_jsonl(results, filename, append=True)

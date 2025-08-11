@@ -48,7 +48,7 @@ if __name__ == '__main__':
     #     'llama3-70B-instruct',
     # ]
 
-    new_models = textwiz.NEW_CODERS
+    new_models = textwiz.NEW_CODERS_CHAT
     if run_new_models:
         models = new_models
 

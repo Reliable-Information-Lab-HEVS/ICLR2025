@@ -549,7 +549,7 @@ PROMPT_MAPPING = {
     # StarChat
     'star-chat-alpha': StarChatPromptTemplate,
     'star-chat-beta': StarChatPromptTemplate,
-    'star-chat-2-instruct': StarChatPromptTemplate,
+    'star-chat-2-instruct': NotImplementedChatTemplate,
 
     # Codegen2
     'codegen2-1B': Codegen2PromptTemplate,
