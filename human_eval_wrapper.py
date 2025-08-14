@@ -93,6 +93,7 @@ if __name__ == '__main__':
     t0 = time.time()
 
     commands = [
+        'python3 -u human_eval.py star-chat-2-instruct --language py --mode generation',
         'python3 -u human_eval.py code-llama-34B --language py --mode generation',
         'python3 -u human_eval.py code-llama-34B-python --language py --mode generation',
         'python3 -u human_eval.py code-llama-34B-instruct --language py --mode generation',
@@ -110,16 +111,17 @@ if __name__ == '__main__':
         'python3 -u human_eval.py code-llama-34B --language rs --mode generation',
         'python3 -u human_eval.py code-llama-34B-python --language rs --mode generation',
         'python3 -u human_eval.py code-llama-34B-instruct --language rs --mode generation',
+
     ]
 
-    utils.dispatch_jobs_srun(gpu_footprints, num_gpus, commands)
+    #utils.dispatch_jobs_srun(gpu_footprints, num_gpus, commands)
 
     #run them sequentially for now
-    # for command in commands:
-    #     # run them
-    #     print(f'Running command: {command}')
-    #     #there is no help function, so we can use os.system
-    #     os.system(command)
+    for command in commands:
+        # run them
+        print(f'Running command: {command}')
+        #there is no help function, so we can use os.system
+        os.system(command)
 
     dt = time.time() - t0
     print(f'Overall it took {dt/3600:.2f}h !')

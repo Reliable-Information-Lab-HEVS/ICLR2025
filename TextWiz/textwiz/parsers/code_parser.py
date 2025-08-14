@@ -48,7 +48,7 @@ class CodeParser(ABC):
     def full_parse(self, s: str) -> str:
         """Parse all Python code contained in `s`, and concatenate it. Return an empty string if no code
         was detected.
-
+        
         Parameters
         ----------
         s : str

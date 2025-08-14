@@ -146,7 +146,7 @@ class HFCausalModel(HFBaseModel):
         else:
             raise RuntimeError('Impossible to find the `eos_token_id`.')
 
-        # Retrieve bos_token_id (note that the attribute exists in all cases)
+        # Retrieve bos_token_id - it is possible for it to not exist! e.g. qwen3
         if self.model.generation_config.bos_token_id is not None:
             bos_token_id = self.model.generation_config.bos_token_id
         elif self.model.config.bos_token_id is not None:
@@ -154,7 +154,7 @@ class HFCausalModel(HFBaseModel):
         elif self.tokenizer.bos_token_id is not None:
             bos_token_id = self.tokenizer.bos_token_id
         else:
-            raise RuntimeError('Impossible to find the `bos_token_id`.')
+            bos_token_id = None
         
         # Retrieve pad_token_id and set it to eos_token_id if it does not exist (note that the attribute
         # exists in all cases)
@@ -175,7 +175,12 @@ class HFCausalModel(HFBaseModel):
                 pad_token_id = eos_token_id[0]
 
         # create the config
-        generation_config = GenerationConfig(eos_token_id=eos_token_id, bos_token_id=bos_token_id,
+        if bos_token_id is None:
+            generation_config = GenerationConfig(eos_token_id=eos_token_id, pad_token_id=pad_token_id,
+                                                    max_new_tokens=max_new_tokens, min_new_tokens=min_new_tokens,
+                                                    do_sample=do_sample)
+        else:
+            generation_config = GenerationConfig(eos_token_id=eos_token_id, bos_token_id=bos_token_id,
                                              pad_token_id=pad_token_id, max_new_tokens=max_new_tokens,
                                              min_new_tokens=min_new_tokens, do_sample=do_sample)
         
@@ -336,6 +341,7 @@ class HFCausalModel(HFBaseModel):
         # Anything larger than `num_return_sequences` is useless
         batch_size = min(batch_size, num_return_sequences)
 
+        print(f'Running with batch size {batch_size} for {num_return_sequences} sequences...')
         # This will lower the batch size if needed, in case of possible OOM. This allows to continue without crashing,
         # by reducing the batch size automatically
         first_output, batch_size = self.oom_safe_batch_generation(input, generation_config=generation_config,
@@ -356,6 +362,7 @@ class HFCausalModel(HFBaseModel):
 
         generated_text = []
 
+        print(f'Running with batch sizes {batch_sizes}...')
         for i, size in enumerate(batch_sizes):
 
             # Do not recompute the first batch of outputs
@@ -483,9 +490,12 @@ class HFCausalModel(HFBaseModel):
 
         # Try generating result
         try:
+            # print kwargs
+            print(f'Generation config: {generation_config}')
+            print('Generating text...')
             out = self.model.generate(input, generation_config=generation_config, stopping_criteria=stopping_criteria,
                                       num_return_sequences=batch_size, **kwargs)
-        
+            print('Text generated successfully.')
         except RuntimeError as e:
             if isinstance(e, torch.cuda.OutOfMemoryError):
                 retry = True
