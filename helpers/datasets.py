@@ -1,10 +1,10 @@
 import os
 from abc import ABC
 
-from torch.utils.data import Dataset
+#from torch.utils.data import Dataset
 
 from helpers import utils
-from TextWiz.textwiz import GenericConversation
+#from TextWiz.textwiz import GenericConversation
 
 class SampleDataset(ABC):
     """Base class for dataset consisting of a serie of samples (dictionaries) with an id. We define it as
@@ -134,49 +134,49 @@ class AATKInstructLlama3(SampleDataset):
     id_key: str = 'id'
 
 
-class WalliserDeutschDataset(Dataset):
+# class WalliserDeutschDataset(Dataset):
 
-    def __init__(self, tokenizer, template: GenericConversation | None = None, sample_size: int = 8192):
+#     def __init__(self, tokenizer, template: GenericConversation | None = None, sample_size: int = 8192):
 
-        self.path = os.path.join(utils.DATA_FOLDER, 'walliser_deutsch', 'clean_data.txt')
-        self.texts = utils.load_txt(self.path, separator='\n\n\n\n')
+#         self.path = os.path.join(utils.DATA_FOLDER, 'walliser_deutsch', 'clean_data.txt')
+#         self.texts = utils.load_txt(self.path, separator='\n\n\n\n')
 
-        # Remove whitespaces
-        self.texts = [x.strip() for x in self.texts]
+#         # Remove whitespaces
+#         self.texts = [x.strip() for x in self.texts]
 
-        # Apply conv template if any
-        if template is not None:
-            for i in range(len(self.texts)):
-                template.erase_conversation()
-                template.append_user_message(
-                    ("Please generate a short (100-150 words) news story about an event that "
-                     "took place in the Swiss canton of Valais, in the local language - Walliser Deutsch.")
-                )
-                template.append_model_message(self.texts[i])
-                self.texts[i] = template.get_prompt()
+#         # Apply conv template if any
+#         if template is not None:
+#             for i in range(len(self.texts)):
+#                 template.erase_conversation()
+#                 template.append_user_message(
+#                     ("Please generate a short (100-150 words) news story about an event that "
+#                      "took place in the Swiss canton of Valais, in the local language - Walliser Deutsch.")
+#                 )
+#                 template.append_model_message(self.texts[i])
+#                 self.texts[i] = template.get_prompt()
 
-        # Remove whitespaces once again
-        self.texts = [x.strip() for x in self.texts]
+#         # Remove whitespaces once again
+#         self.texts = [x.strip() for x in self.texts]
 
-        # Tokenize
-        tokenized_texts = [tokenizer(text) for text in self.texts]
+#         # Tokenize
+#         tokenized_texts = [tokenizer(text) for text in self.texts]
 
-        # Split if any text is longer than sample_size
-        self.tokenized_texts = []
-        for sample in tokenized_texts:
-            current_size = len(sample['input_ids'])
-            truncated_samples = [{k: v[i:i+sample_size] for k,v in sample.items()} for i in range(0, current_size, sample_size)]
-            self.tokenized_texts.extend(truncated_samples)
+#         # Split if any text is longer than sample_size
+#         self.tokenized_texts = []
+#         for sample in tokenized_texts:
+#             current_size = len(sample['input_ids'])
+#             truncated_samples = [{k: v[i:i+sample_size] for k,v in sample.items()} for i in range(0, current_size, sample_size)]
+#             self.tokenized_texts.extend(truncated_samples)
         
-        # Add labels to samples -> This is not needed when using DataCollatorForLanguageModeling as it will
-        # be added automatically
-        # self.tokenized_texts = [{'labels': sample['input_ids'].copy(), **sample} for sample in self.tokenized_texts]
+#         # Add labels to samples -> This is not needed when using DataCollatorForLanguageModeling as it will
+#         # be added automatically
+#         # self.tokenized_texts = [{'labels': sample['input_ids'].copy(), **sample} for sample in self.tokenized_texts]
 
-    def __len__(self) -> int:
-        return len(self.tokenized_texts)
+    # def __len__(self) -> int:
+    #     return len(self.tokenized_texts)
     
-    def __getitem__(self, index: int | slice) -> dict | list[dict]:
-        return self.tokenized_texts[index]
+    # def __getitem__(self, index: int | slice) -> dict | list[dict]:
+    #     return self.tokenized_texts[index]
             
 
 class CyberSecEvalInstruct(SampleDataset):

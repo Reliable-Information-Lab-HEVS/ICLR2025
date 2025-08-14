@@ -133,6 +133,8 @@ def extract_filenames(dataset: str = 'AATK', category: str = 'completions', only
                         for file in existing_files:
                             if not os.path.exists(file.replace('completions', 'results')):
                                 files.append(file)
+                            else:
+                                print(f'File already processed: {file}')
                     else:
                         files.extend(existing_files)
                     
@@ -230,7 +232,27 @@ NAME_MAPPING = {
     'command-r': 'Command-R',
     'llama3-8B-instruct': 'Llama3 8B - Instruct',
     'llama3-70B-instruct': 'Llama3 70B - Instruct',
+    'qwen2.5-coder-32B-instruct': 'Qwen2.5 Coder 32B - Instruct',
+    'codegemma-7B-instruct': 'CodeGemma 7B - Instruct',
+    'deepseek-coder-33B-instruct': 'DeepSeek Coder 33B - Instruct',
+    'qwen2.5-coder-32B': 'Qwen2.5 Coder 32B',
+    'codegemma-7B': 'CodeGemma 7B',
+    'deepseek-coder-33B': 'DeepSeek Coder 33B',
+    'star-coder-2-15B': 'StarCoder 2 - 15B',
+    'star-chat-2-instruct': 'StarChat 2 - Instruct'
 }
+
+NEW_MODELS = [
+    'star-chat-2-instruct',
+    'star-coder-2-15B',
+    'deepseek-coder-33B',
+    'deepseek-coder-33B-instruct',
+    'codegemma-7B-instruct',
+    'codegemma-7B',
+    'qwen2.5-coder-32B',
+    'qwen2.5-coder-32B-instruct',
+
+]
 
 
 def valid_completions(dataset: str = 'AATK_instruct_chatGPT'):
@@ -291,7 +313,7 @@ def vulnerable_completions(dataset: str = 'AATK_instruct_chatGPT'):
     return tot_vulnerable_per_model
 
 
-def probability_distributions(dataset: str = 'AATK_instruct_chatGPT', filename: str | None = None):
+def probability_distributions(dataset: str = 'AATK_instruct_chatGPT', filename: str | None = None, filter_new_models=False):
     """Show the probability distribution per scenarios.
 
     Parameters
@@ -304,8 +326,11 @@ def probability_distributions(dataset: str = 'AATK_instruct_chatGPT', filename: 
 
     assert dataset in INSTRUCT_DATASETS, 'Probability distributions only defined for reformulated AATK datasets'
     files = extract_filenames(dataset, category='results')
-
+   
     model_names = list(NAME_MAPPING.keys())
+    if filter_new_models:
+        model_names = [model for model in model_names if model in NEW_MODELS]
+  
 
     Py_per_model = {}
 
@@ -320,7 +345,9 @@ def probability_distributions(dataset: str = 'AATK_instruct_chatGPT', filename: 
 
         Py_per_model[model] = Py
 
-    fig, axes = plt.subplots(2, 5, sharex=True, sharey=True, figsize=(4.8*2.5, 6.4*2))
+    # change model_names to those that are also in files
+    model_names = [model for model in model_names if model in Py_per_model]
+    fig, axes = plt.subplots(2, 2, sharex=True, sharey=True, figsize=(4.8*2.5, 6.4*2))
     axes = [ax for ax in axes[0,:]] + [ax for ax in axes[1,:]]
 
 
@@ -441,13 +468,15 @@ def prompt_exposure(dataset: str = 'AATK_instruct_chatGPT', reference_model: str
         normalized_PEs = {id: PEs[id] / id_frequency[id] for id in PEs.keys()}
 
         PEs_by_model[model] = normalized_PEs
-
+    
     if to_df:
         df = pd.DataFrame(PEs_by_model)
+        models_in_df = df.columns
+        NAME_MAPPING_FILTERED = {k: v for k, v in NAME_MAPPING.items() if k in models_in_df}
         # Reorder
-        df = df[list(NAME_MAPPING.keys())]
+        df = df[list(NAME_MAPPING_FILTERED.keys())]
         # Rename
-        df.rename(columns=NAME_MAPPING, inplace=True)
+        df.rename(columns=NAME_MAPPING_FILTERED, inplace=True)
         df.rename(index=lambda cwe: ' - '.join(cwe.rsplit('-', 1)), inplace=True)
 
         return df

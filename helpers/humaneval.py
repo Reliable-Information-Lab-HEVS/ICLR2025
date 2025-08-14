@@ -16,6 +16,7 @@ CATEGORIES = ['completions', 'results']
 DATASETS = list(datasets.HUMANEVAL_DATASETS_MAPPING.keys())
 
 
+
 def get_folder(dataset: str, prompt_template_mode: str, model_name: str, dtype_category: str,
                use_context: bool = False) -> str:
     """Return the folder upon which to save the results of the given HumanEval benchmark.
@@ -360,7 +361,6 @@ def find_best_temperature_file(folder: str, k: int = 1, greedy: bool = False) ->
 def _get_default_dtype(model_name: str) -> str:
     """Return the default dtype used by a given model.
     """
-    print('Model: ', model_name)
     from TextWiz.textwiz import loader
 
     if model_name == 'bloom-176B':
@@ -397,7 +397,6 @@ def find_folders_with_dtype(dataset: str, mode: str, dtype: str = 'default') -> 
         raise ValueError(f'Dtype must be in {*dtypes,}')
 
     benchmark_path = os.path.join(utils.RESULTS_FOLDER, dataset, mode, 'results')
-    print(f'Looking for folders in {benchmark_path} with dtype={dtype}.')
     folders = []
     for model in os.listdir(benchmark_path):
         if not model.startswith('.'):
@@ -640,9 +639,8 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
         Whether to save the plots or not, by default False
     """
 
-    import matplotlib.pyplot as plt
     import seaborn as sns
-
+    import matplotlib.pyplot as plt
     from helpers import plot_config
 
     benchs = all_passes_at_k_and_error_causes(dtype=dtype, k=k, greedy=greedy, to_df=False)
@@ -693,10 +691,11 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
             ylabels = models
 
         size = np.array(plt.rcParams['figure.figsize']) * 2
-
+        #plt.rcParams.update({"text.usetex": False, "mathtext.fontset": "dejavusans", "font.family": "DejaVu Sans"})
         plt.figure(figsize=size)
         if title:
             plt.title(f'{benchmark}, dtype={dtype}, k={k}')
+        print("usetex is", plt.rcParams["text.usetex"])
         sns.heatmap(error_matrix, mask=mask, annot=True, annot_kws={'fontsize': 'x-small'}, fmt='.2f',
                     xticklabels=possible_errors, yticklabels=ylabels, cbar=True, cmap='Blues')
         plt.xticks(rotation=45, ha='right')
@@ -704,13 +703,14 @@ def model_wise_error_causes(dtype: str = 'default', k: int = 1, greedy: bool = T
         ax = plt.gca()
         ax.set_facecolor('lightyellow')
         # ax.set_facecolor('lightgoldenrodyellow')
-
+        #plt.tight_layout()
         if save:
-            plt.savefig(os.path.join(utils.ROOT_FOLDER, 'plots', f'{benchmark}_{k}_{dtype}.pdf'), bbox_inches='tight')
+            plt.savefig(os.path.join(utils.ROOT_FOLDER, 'plots', f'{benchmark}_{k}_{dtype}.pdf'), bbox_inches='tight', dpi=300)
 
         figs.append(plt.gcf())
 
     return figs
+
 
 
 
