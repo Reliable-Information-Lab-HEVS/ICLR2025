@@ -233,6 +233,7 @@ NAME_MAPPING = {
     'llama3-8B-instruct': 'Llama3 8B - Instruct',
     'llama3-70B-instruct': 'Llama3 70B - Instruct',
     'qwen2.5-coder-32B-instruct': 'Qwen2.5 Coder 32B - Instruct',
+    'qwen3-coder-30B-instruct': 'Qwen3 Coder 30B - Instruct',
     'codegemma-7B-instruct': 'CodeGemma 7B - Instruct',
     'deepseek-coder-33B-instruct': 'DeepSeek Coder 33B - Instruct',
     'qwen2.5-coder-32B': 'Qwen2.5 Coder 32B',
@@ -251,6 +252,9 @@ NEW_MODELS = [
     'codegemma-7B',
     'qwen2.5-coder-32B',
     'qwen2.5-coder-32B-instruct',
+    'qwen3-coder-30B-instruct',
+    'code-llama-34B-instruct',
+    'code-llama-70B-instruct'
 
 ]
 
@@ -347,7 +351,7 @@ def probability_distributions(dataset: str = 'AATK_instruct_chatGPT', filename: 
 
     # change model_names to those that are also in files
     model_names = [model for model in model_names if model in Py_per_model]
-    fig, axes = plt.subplots(2, 2, sharex=True, sharey=True, figsize=(4.8*2.5, 6.4*2))
+    fig, axes = plt.subplots(2, 3, sharex=True, sharey=True, figsize=(4.8*2.5, 6.4*2))
     axes = [ax for ax in axes[0,:]] + [ax for ax in axes[1,:]]
 
 
