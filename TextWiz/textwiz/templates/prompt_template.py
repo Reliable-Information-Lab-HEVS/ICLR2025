@@ -609,6 +609,12 @@ PROMPT_MAPPING = {
     'qwen2.5-coder-7B': GenericPromptTemplate,
     'qwen3-coder-30B-instruct': NotImplementedChatTemplate,
 
+    # Apertus
+    'apertus-8B': GenericPromptTemplate,
+    'apertus-8B-instruct': NotImplementedChatTemplate,
+    'apertus-70B': GenericPromptTemplate,
+    'apertus-70B-instruct': NotImplementedChatTemplate,
+
     # CodeGemma
     'codegemma-7B': GenericPromptTemplate,
     'codegemma-7B-instruct': NotImplementedChatTemplate,
