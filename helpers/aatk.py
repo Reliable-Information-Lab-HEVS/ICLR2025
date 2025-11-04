@@ -9,7 +9,7 @@ import seaborn as sns
 from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
-DATASETS = ('AATK', 'AATK_instruct_chatGPT', 'AATK_instruct_zephyr', 'AATK_instruct_llama3')
+DATASETS = ('AATK', 'AATK_instruct_chatGPT', 'AATK_instruct_chatGPT_extended', 'AATK_instruct_zephyr', 'AATK_instruct_llama3')
 INSTRUCT_DATASETS = tuple(x for x in DATASETS if x != 'AATK')
 CATEGORIES = ('completions', 'results')
 
@@ -38,7 +38,7 @@ def get_folder(dataset: str, model_name: str, dtype_category: str) -> str:
     """
 
     if dataset not in DATASETS:
-        raise ValueError(f'The dataset is not correct. It should be one of {*DATASETS,}.')
+        raise ValueError(f'The dataset {dataset} is not correct. It should be one of {*DATASETS,}.')
     
     path = os.path.join(utils.RESULTS_FOLDER , dataset, 'completions', model_name, dtype_category)
         

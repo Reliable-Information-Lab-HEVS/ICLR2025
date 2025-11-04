@@ -730,6 +730,8 @@ def dispatch_jobs_srun(gpu_footprints: list[int], num_gpus: int, commands: list[
             # but we still set them explicitly for completeness
             full_command = (f'srun --exclusive --exact --ntasks=1 --gpus-per-task={footprint} --cpus-per-task={cpus} '
                             f'--mem={mem}G {executable}')
+            
+            print(f'Launching command: {full_command} on gpus {allocated_gpus}')
             p = subprocess.Popen(shlex.split(full_command), stdout=output_file, stderr=error_file, bufsize=0)
 
             # Add them to the list of running processes

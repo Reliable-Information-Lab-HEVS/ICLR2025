@@ -144,6 +144,7 @@ NEW_CODERS_CHAT = (
     'qwen3-coder-30B-instruct',
     'code-llama-70B-instruct',
     'code-llama-34B-instruct',
+    'apertus-70B-instruct'
 )
 
 
