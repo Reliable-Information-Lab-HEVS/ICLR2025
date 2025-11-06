@@ -123,6 +123,38 @@ class AATKInstructChatGPTExtended(SampleDataset):
     path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_chatGPT_extended.jsonl')
     id_key: str = 'id'
 
+class AATKInstructChatGPTExtended(SampleDataset):
+    """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
+    Also contains the prompts in natural language (instruct).
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_chatGPT_extended.jsonl')
+    id_key: str = 'id'
+
+class AATKInstructChatGPTMutatedCharacter(SampleDataset):
+    """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
+    Also contains the prompts in natural language (instruct).
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_chatGPT_mutated_characters.jsonl')
+    id_key: str = 'id'
+
+class AATKInstructChatGPTMutatedRandomToken(SampleDataset):
+    """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
+    Also contains the prompts in natural language (instruct).
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_chatGPT_mutated_random_token.jsonl')
+    id_key: str = 'id'
+
+class AATKInstructChatGPTMutatedClosestToken(SampleDataset):
+    """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
+    Also contains the prompts in natural language (instruct).
+    """
+
+    path: str = os.path.join(utils.DATA_FOLDER, 'AATK', 'AATK_instruct_chatGPT_mutated_closest_token.jsonl')
+    id_key: str = 'id'
+
 class AATKInstructZephyr(SampleDataset):
     """Class representing the automatic and Python-only version of the Asleep At The Keyboard (AATK) benchmark.
     Also contains the prompts in natural language (instruct).

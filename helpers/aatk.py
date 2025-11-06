@@ -9,7 +9,7 @@ import seaborn as sns
 from helpers import utils, datasets
 from TextWiz.textwiz import loader
 
-DATASETS = ('AATK', 'AATK_instruct_chatGPT', 'AATK_instruct_chatGPT_extended', 'AATK_instruct_zephyr', 'AATK_instruct_llama3')
+DATASETS = ('AATK', 'AATK_instruct_chatGPT', 'AATK_instruct_chatGPT_extended', 'AATK_instruct_chatGPT_mutated_characters', 'AATK_instruct_chatGPT_mutated_random_token', 'AATK_instruct_chatGPT_mutated_closest_token', 'AATK_instruct_zephyr', 'AATK_instruct_llama3')
 INSTRUCT_DATASETS = tuple(x for x in DATASETS if x != 'AATK')
 CATEGORIES = ('completions', 'results')
 
